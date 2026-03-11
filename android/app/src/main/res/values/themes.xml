@@ -6,4 +6,11 @@
     </style>
 
     <style name="Theme.Kantin" parent="Base.Theme.Kantin" />
+
+    <!-- Theme untuk Splash Screen (tanpa action bar, status bar orange) -->
+    <style name="Theme.Kantin.NoActionBar" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">#FF6B00</item>
+        <item name="android:windowBackground">#FF6B00</item>
+    </style>
+
 </resources>
