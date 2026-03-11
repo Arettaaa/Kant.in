@@ -1,0 +1,16 @@
+# Android generated
+.gradle/
+.idea/
+build/
+local.properties
+*.iml
+
+# Laravel
+api/vendor/
+api/.env
+web/vendor/
+web/.env
+
+# General
+.DS_Store
+Thumbs.db
