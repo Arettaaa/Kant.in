@@ -108,7 +108,6 @@
                     android:paddingLeft="14dp"
                     android:paddingRight="14dp">
 
-                    <!-- Gunakan shape rounded di background LinearLayout ini -->
                     <TextView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
@@ -125,7 +124,7 @@
                         android:layout_marginLeft="10dp"
                         android:background="@null"
                         android:hint="email@id"
-                        android:hintTextColor="#9CA3AF"
+                        android:textColorHint="#9CA3AF"
                         android:textColor="#1A1A1A"
                         android:textSize="14sp"
                         android:inputType="textEmailAddress"
@@ -169,7 +168,7 @@
                         android:layout_marginLeft="10dp"
                         android:background="@null"
                         android:hint="••••••••"
-                        android:hintTextColor="#9CA3AF"
+                        android:textColorHint="#9CA3AF"
                         android:textColor="#1A1A1A"
                         android:textSize="14sp"
                         android:inputType="textPassword"
