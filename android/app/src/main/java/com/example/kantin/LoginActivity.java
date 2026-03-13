@@ -1,5 +1,6 @@
 package com.example.kantin;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.Button;
@@ -37,48 +38,59 @@ public class LoginActivity extends AppCompatActivity {
         ivTogglePassword.setOnClickListener(v -> {
             if (isPasswordVisible) {
                 etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                ivTogglePassword.setImageResource(R.drawable.eye);
                 isPasswordVisible = false;
             } else {
                 etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                ivTogglePassword.setImageResource(R.drawable.eye);
                 isPasswordVisible = true;
             }
             etPassword.setSelection(etPassword.getText().length());
         });
 
-        // Tombol Masuk
+        // Tombol Login
         btnLogin.setOnClickListener(v -> {
-            String email    = etEmail.getText().toString().trim();
+
+            String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
 
             if (email.isEmpty()) {
                 etEmail.setError("Email tidak boleh kosong");
-                etEmail.requestFocus(); return;
-            }
-            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                etEmail.setError("Format email tidak valid");
-                etEmail.requestFocus(); return;
-            }
-            if (password.isEmpty()) {
-                etPassword.setError("Kata sandi tidak boleh kosong");
-                etPassword.requestFocus(); return;
-            }
-            if (password.length() < 6) {
-                etPassword.setError("Kata sandi minimal 6 karakter");
-                etPassword.requestFocus(); return;
+                etEmail.requestFocus();
+                return;
             }
 
-            Toast.makeText(this, "Masuk sebagai: " + email, Toast.LENGTH_SHORT).show();
-            // Intent intent = new Intent(this, MainActivity.class);
-            // startActivity(intent); finish();
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                etEmail.setError("Format email tidak valid");
+                etEmail.requestFocus();
+                return;
+            }
+
+            if (password.isEmpty()) {
+                etPassword.setError("Kata sandi tidak boleh kosong");
+                etPassword.requestFocus();
+                return;
+            }
+
+            if (password.length() < 6) {
+                etPassword.setError("Minimal 6 karakter");
+                etPassword.requestFocus();
+                return;
+            }
+
+            Toast.makeText(this, "Login berhasil", Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        });
+
+        // Klik Daftar
+        tvRegister.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
         });
 
         tvForgotPassword.setOnClickListener(v ->
                 Toast.makeText(this, "Fitur belum tersedia", Toast.LENGTH_SHORT).show());
-
-        tvRegister.setOnClickListener(v ->
-                Toast.makeText(this, "Halaman daftar", Toast.LENGTH_SHORT).show());
 
         tvKantinOwner.setOnClickListener(v ->
                 Toast.makeText(this, "Masuk sebagai Pemilik Kantin", Toast.LENGTH_SHORT).show());
