@@ -16,7 +16,7 @@ use App\Http\Controllers\Api\TransactionController;
 */
 
 // Public (tanpa login)
-Route::post('/auth/register', [AuthController::class, 'register']); // udah bisa register pembeli dan admin global
+Route::post('/auth/register', [AuthController::class, 'register']); 
 Route::post('/auth/sessions', [AuthController::class, 'login']);
 
 // Protected (harus login)
