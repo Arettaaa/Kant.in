@@ -14,8 +14,12 @@ class PersonalAccessToken extends MongoModel implements HasAbilities
     protected $keyType = 'string';
 
     protected $fillable = [
-        'name', 'token', 'abilities',
-        'expires_at', 'tokenable_id', 'tokenable_type',
+        'name',
+        'token',
+        'abilities',
+        'expires_at',
+        'tokenable_id',
+        'tokenable_type',
     ];
 
     protected $casts = [
@@ -30,12 +34,17 @@ class PersonalAccessToken extends MongoModel implements HasAbilities
 
     public static function findToken($token)
     {
+        \Log::info('findToken called', ['token' => $token]);
+
         if (!str_contains($token, '|')) {
             return static::where('token', hash('sha256', $token))->first();
         }
 
         [$id, $plaintext] = explode('|', $token, 2);
-        $instance = static::find($id);
+        \Log::info('looking for id', ['id' => $id]);
+
+        $instance = static::where('_id', $id)->first();
+        \Log::info('instance found', ['found' => $instance ? 'yes' : 'no']);
 
         if ($instance && hash_equals($instance->token, hash('sha256', $plaintext))) {
             return $instance;
@@ -50,7 +59,7 @@ class PersonalAccessToken extends MongoModel implements HasAbilities
     public function can($ability)
     {
         return in_array('*', $this->abilities ?? []) ||
-               in_array($ability, $this->abilities ?? []);
+            in_array($ability, $this->abilities ?? []);
     }
 
     public function cant($ability)

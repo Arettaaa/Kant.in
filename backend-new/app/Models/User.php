@@ -29,20 +29,30 @@ class User extends Authenticatable
     public function createToken(string $name, array $abilities = ['*'], ?\DateTimeInterface $expiresAt = null)
     {
         $plainTextToken = $this->generateTokenString();
+        $hashedToken = hash('sha256', $plainTextToken);
 
-        $token = new PersonalAccessToken([
-            'name' => $name,
-            'token' => hash('sha256', $plainTextToken),
-            'abilities' => $abilities,
-            'expires_at' => $expiresAt,
-            'tokenable_id' => (string) $this->_id,
-            'tokenable_type' => get_class($this),
-        ]);
-
+        $token = new PersonalAccessToken();
+        $token->name = $name;
+        $token->token = $hashedToken;
+        $token->abilities = $abilities;
+        $token->expires_at = $expiresAt;
+        $token->tokenable_id = (string) $this->_id;
+        $token->tokenable_type = get_class($this);
         $token->save();
 
-        $tokenId = (string) $token->_id;
+        // Ambil fresh dari DB pakai token hash
+        $fresh = PersonalAccessToken::where('token', $hashedToken)->latest()->first();
+        $tokenId = (string) $fresh->_id;
 
-        return new NewAccessToken($token, $tokenId . '|' . $plainTextToken);
+        return new NewAccessToken($fresh, $tokenId . '|' . $plainTextToken);
     }
+
+    public function generateTokenString()
+    {
+        return Str::random(40);
+    }
+
+    const ROLE_ADMIN_GLOBAL = 'admin_global';
+    const ROLE_ADMIN_KANTIN = 'admin_kantin';
+    const ROLE_PEMBELI = 'pembeli';
 }
