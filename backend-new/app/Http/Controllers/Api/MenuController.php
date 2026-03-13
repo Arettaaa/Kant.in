@@ -31,7 +31,7 @@ class MenuController extends Controller
 
         return response()->json([
             'success' => true,
-            'data'    => $menus,
+            'data' => $menus,
         ]);
     }
 
@@ -48,7 +48,7 @@ class MenuController extends Controller
 
         return response()->json([
             'success' => true,
-            'data'    => $menus,
+            'data' => $menus,
         ]);
     }
 
@@ -58,16 +58,16 @@ class MenuController extends Controller
         $this->authorizeAdminKantin($request, $canteenId);
 
         $validated = $request->validate([
-            'name'                   => 'required|string',
-            'description'            => 'nullable|string',
-            'price'                  => 'required|integer|min:0',
-            'category'               => 'required|string',
-            'stock'                  => 'required|integer|min:0',
-            'image'                  => 'nullable|string',
+            'name' => 'required|string',
+            'description' => 'nullable|string',
+            'price' => 'required|integer|min:0',
+            'category' => 'required|string',
+            'stock' => 'required|integer|min:0',
+            'image' => 'nullable|string',
             'estimated_cooking_time' => 'required|integer|min:1',
         ]);
 
-        $validated['canteen_id']   = $canteenId;
+        $validated['canteen_id'] = $canteenId;
         $validated['is_available'] = $validated['stock'] > 0;
 
         $menu = Menu::create($validated);
@@ -75,7 +75,7 @@ class MenuController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Menu berhasil ditambahkan.',
-            'data'    => $menu,
+            'data' => $menu,
         ], 201);
     }
 
@@ -90,12 +90,12 @@ class MenuController extends Controller
         }
 
         $validated = $request->validate([
-            'name'                   => 'sometimes|string',
-            'description'            => 'nullable|string',
-            'price'                  => 'sometimes|integer|min:0',
-            'category'               => 'sometimes|string',
-            'stock'                  => 'sometimes|integer|min:0',
-            'image'                  => 'nullable|string',
+            'name' => 'sometimes|string',
+            'description' => 'nullable|string',
+            'price' => 'sometimes|integer|min:0',
+            'category' => 'sometimes|string',
+            'stock' => 'sometimes|integer|min:0',
+            'image' => 'nullable|string',
             'estimated_cooking_time' => 'sometimes|integer|min:1',
         ]);
 
@@ -109,7 +109,7 @@ class MenuController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Menu berhasil diperbarui.',
-            'data'    => $menu,
+            'data' => $menu,
         ]);
     }
 
@@ -123,26 +123,35 @@ class MenuController extends Controller
             return response()->json(['success' => false, 'message' => 'Menu tidak ditemukan.'], 404);
         }
 
-        $validated = $request->validate([
-            'is_available' => 'required|boolean',
+        $request->validate([
+            'is_available' => 'required|in:0,1,true,false',
         ]);
 
-        // Tidak boleh set available jika stok 0
-        if ($validated['is_available'] && $menu->stock == 0) {
+        \Log::info('updateAvailability', [
+            'raw' => $request->is_available,
+            'type' => gettype($request->is_available),
+            'cast' => (bool) (int) $request->is_available,
+        ]);
+
+        $isAvailable = (bool) (int) $request->is_available;
+
+        if ($isAvailable && $menu->stock == 0) {
             return response()->json([
                 'success' => false,
                 'message' => 'Tidak bisa mengaktifkan menu dengan stok 0.',
             ], 422);
         }
 
-        $menu->update(['is_available' => $validated['is_available']]);
+        Menu::where('_id', $menuId)->update(['is_available' => $isAvailable]);
+        $menu = Menu::where('_id', $menuId)->where('canteen_id', $canteenId)->first();
 
         return response()->json([
             'success' => true,
             'message' => 'Ketersediaan menu berhasil diperbarui.',
-            'data'    => $menu,
+            'data' => $menu,
         ]);
     }
+
 
     // ADMIN KANTIN: DELETE /canteens/{id}/menus/{menuId}
     public function destroy(Request $request, $canteenId, $menuId)
