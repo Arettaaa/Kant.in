@@ -3,186 +3,178 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF8F2"
+    android:background="#FFFFFF"
     android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="24dp"
-        android:paddingRight="24dp">
+        android:orientation="vertical">
 
-        <!-- ===== HEADER: LOGO + TAGLINE ===== -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center"
-            android:paddingTop="60dp"
-            android:paddingBottom="40dp">
+            android:paddingTop="64dp"
+            android:paddingBottom="40dp"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:background="@drawable/bg_header_peach">
 
-            <!-- Kotak logo oranye -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="72dp"
-                android:layout_height="72dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="#F97316"
-                app:cardElevation="0dp">
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@drawable/logo_kantin_2" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="🍴"
-                    android:textSize="32sp"
-                    android:gravity="center" />
-            </androidx.cardview.widget.CardView>
-
-            <!-- Nama app: Kant.in -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="16dp">
+               >
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_extrabold"
                     android:text="Kant"
-                    android:textSize="28sp"
-                    android:textStyle="bold"
-                    android:textColor="#1A1A1A" />
+                    android:textColor="#1A1A1A"
+                    android:textSize="35sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_extrabold"
                     android:text=".in"
-                    android:textSize="28sp"
-                    android:textStyle="bold"
-                    android:textColor="#F97316" />
+                    android:textColor="#F97316"
+                    android:textSize="35sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Tagline -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Solusi untuk pesan\nantar makanan di area kampus."
-                android:textSize="14sp"
-                android:textColor="#6B7280"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/inter_medium"
                 android:gravity="center"
                 android:lineSpacingExtra="4dp"
-                android:layout_marginTop="8dp" />
+                android:text="Solusi untuk pesan\nantar makanan di area kampus."
+                android:textColor="#6B7280"
+                android:textSize="17sp" />
+
         </LinearLayout>
 
-        <!-- ===== FORM CARD ===== -->
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="#FFFFFF"
-            app:cardElevation="4dp">
+            android:orientation="vertical"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:paddingTop="32dp"
+            android:paddingBottom="32dp"
+            android:background="#FFFFFF">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="370dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="24dp">
 
-                <!-- Label Email -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="@font/inter_bold"
                     android:text="Alamat Email"
-                    android:textSize="14sp"
                     android:textColor="#1A1A1A"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
-                <!-- Input Email -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
-                    android:orientation="horizontal"
-                    android:background="#F3F4F6"
+                    android:background="@drawable/bg_input_rounded"
                     android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     android:paddingLeft="14dp"
                     android:paddingRight="14dp">
 
-                    <TextView
+                    <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:text="✉"
-                        android:textSize="16sp"
-                        android:textColor="#9CA3AF"
-                        android:gravity="center" />
+                        android:alpha="1.0"
+                        android:src="@drawable/mail" />
 
                     <EditText
                         android:id="@+id/etEmail"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
                         android:layout_marginLeft="10dp"
+                        android:layout_weight="1"
                         android:background="@null"
+                        android:fontFamily="@font/inter_regular"
                         android:hint="email@id"
-                        android:textColorHint="#9CA3AF"
-                        android:textColor="#1A1A1A"
-                        android:textSize="14sp"
                         android:inputType="textEmailAddress"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        android:textColor="#1A1A1A"
+                        android:textColorHint="#9CA3AF"
+                        android:textSize="16sp" />
                 </LinearLayout>
 
                 <!-- Label Password -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Kata Sandi"
-                    android:textSize="14sp"
-                    android:textColor="#1A1A1A"
-                    android:textStyle="bold"
                     android:layout_marginTop="20dp"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="@font/inter_bold"
+                    android:text="Kata Sandi"
+                    android:textColor="#1A1A1A"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <!-- Input Password -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
-                    android:orientation="horizontal"
-                    android:background="#F3F4F6"
+                    android:background="@drawable/bg_input_rounded"
                     android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     android:paddingLeft="14dp"
                     android:paddingRight="14dp">
 
-                    <TextView
+                    <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:text="🔒"
-                        android:textSize="14sp"
-                        android:textColor="#9CA3AF"
-                        android:gravity="center" />
+                        android:alpha="1.0"
+                        android:src="@drawable/lock" />
 
                     <EditText
                         android:id="@+id/etPassword"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
                         android:layout_marginLeft="10dp"
+                        android:layout_weight="1"
                         android:background="@null"
+                        android:fontFamily="@font/inter_regular"
                         android:hint="••••••••"
-                        android:textColorHint="#9CA3AF"
-                        android:textColor="#1A1A1A"
-                        android:textSize="14sp"
                         android:inputType="textPassword"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        android:textColor="#1A1A1A"
+                        android:textColorHint="#9CA3AF"
+                        android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/tvTogglePassword"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="👁"
-                        android:textSize="16sp"
-                        android:textColor="#9CA3AF"
+                    <ImageView
+                        android:id="@+id/ivTogglePassword"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:alpha="1.0"
                         android:clickable="true"
-                        android:focusable="true" />
+                        android:focusable="true"
+                        android:src="@drawable/eye" />
                 </LinearLayout>
 
                 <!-- Lupa Kata Sandi -->
@@ -191,69 +183,79 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:text="Lupa kata sandi?"
-                    android:textColor="#F97316"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
                     android:layout_marginTop="10dp"
                     android:clickable="true"
-                    android:focusable="true" />
+                    android:focusable="true"
+                    android:fontFamily="@font/inter_bold"
+                    android:text="Lupa kata sandi?"
+                    android:textColor="#F97316"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
 
-        <!-- ===== TOMBOL MASUK ===== -->
-        <Button
-            android:id="@+id/btnLogin"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="28dp"
-            android:background="#F97316"
-            android:text="Masuk ke Kant.in  ›"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold" />
 
-        <!-- ===== LINK DAFTAR ===== -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="28dp"
+                android:paddingLeft="24dp"
+                android:paddingRight="24dp"
+                android:fontFamily="@font/inter_bold"
+                android:gravity="center"
+                android:text="Masuk ke Kant.in  ›"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:backgroundTint="#F97316"
+                app:cornerRadius="50dp"
+                app:elevation="0dp"
+                app:rippleColor="#E06010" />
+
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="20dp">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="20dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_regular"
                 android:text="Belum punya akun? "
-                android:textSize="14sp"
-                android:textColor="#6B7280" />
+                android:textColor="#6B7280"
+                android:textSize="15sp" />
 
             <TextView
                 android:id="@+id/tvRegister"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Daftar di sini"
-                android:textSize="14sp"
-                android:textColor="#F97316"
-                android:textStyle="bold"
                 android:clickable="true"
-                android:focusable="true" />
-        </LinearLayout>
+                android:focusable="true"
+                android:fontFamily="@font/inter_bold"
+                android:text="Daftar di sini"
+                android:textColor="#F97316"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+            </LinearLayout>
 
-        <!-- ===== LINK PEMILIK KANTIN ===== -->
-        <TextView
-            android:id="@+id/tvKantinOwner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="40dp"
-            android:text="Masuk sebagai Pemilik Kantin"
-            android:textSize="13sp"
-            android:textColor="#9CA3AF"
-            android:clickable="true"
-            android:focusable="true" />
+            <TextView
+                android:id="@+id/tvKantinOwner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/inter_regular"
+                android:gravity="center"
+                android:text="Masuk sebagai Pemilik Kantin"
+                android:textColor="#9CA3AF"
+                android:textSize="13sp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>
