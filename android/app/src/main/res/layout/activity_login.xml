@@ -78,7 +78,7 @@
             android:background="#FFFFFF">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="370dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="24dp">
@@ -93,38 +93,38 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:orientation="horizontal"
-                        android:background="@drawable/bg_input_rounded"
-                        android:gravity="center_vertical"
-                        android:paddingLeft="14dp"
-                        android:paddingRight="14dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_input_rounded"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="14dp">
 
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/mail"
-                            android:alpha="1.0" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:alpha="1.0"
+                        android:src="@drawable/mail" />
 
-                        <EditText
-                            android:id="@+id/etEmail"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="10dp"
-                            android:layout_weight="1"
-                            android:background="@null"
-                            android:fontFamily="@font/inter_regular"
-                            android:hint="email@id"
-                            android:inputType="textEmailAddress"
-                            android:singleLine="true"
-                            android:textColor="#1A1A1A"
-                            android:textColorHint="#9CA3AF"
-                            android:textSize="16sp" />
-                    </LinearLayout>
+                    <EditText
+                        android:id="@+id/etEmail"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:fontFamily="@font/inter_regular"
+                        android:hint="email@id"
+                        android:inputType="textEmailAddress"
+                        android:singleLine="true"
+                        android:textColor="#1A1A1A"
+                        android:textColorHint="#9CA3AF"
+                        android:textSize="16sp" />
+                </LinearLayout>
 
-                    <!-- Label Password -->
+                <!-- Label Password -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -136,48 +136,48 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                    <!-- Input Password -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:orientation="horizontal"
-                        android:background="@drawable/bg_input_rounded"
-                        android:gravity="center_vertical"
-                        android:paddingLeft="14dp"
-                        android:paddingRight="14dp">
+                <!-- Input Password -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_input_rounded"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingLeft="14dp"
+                    android:paddingRight="14dp">
 
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/lock"
-                            android:alpha="1.0" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:alpha="1.0"
+                        android:src="@drawable/lock" />
 
-                        <EditText
-                            android:id="@+id/etPassword"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="10dp"
-                            android:layout_weight="1"
-                            android:background="@null"
-                            android:fontFamily="@font/inter_regular"
-                            android:hint="••••••••"
-                            android:inputType="textPassword"
-                            android:singleLine="true"
-                            android:textColor="#1A1A1A"
-                            android:textColorHint="#9CA3AF"
-                            android:textSize="16sp" />
+                    <EditText
+                        android:id="@+id/etPassword"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="10dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:fontFamily="@font/inter_regular"
+                        android:hint="••••••••"
+                        android:inputType="textPassword"
+                        android:singleLine="true"
+                        android:textColor="#1A1A1A"
+                        android:textColorHint="#9CA3AF"
+                        android:textSize="16sp" />
 
-                        <ImageView
-                            android:id="@+id/ivTogglePassword"
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:src="@drawable/eye"
-                            android:alpha="1.0"
-                            android:clickable="true"
-                            android:focusable="true" />
-                    </LinearLayout>
+                    <ImageView
+                        android:id="@+id/ivTogglePassword"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:alpha="1.0"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:src="@drawable/eye" />
+                </LinearLayout>
 
-                    <!-- Lupa Kata Sandi -->
+                <!-- Lupa Kata Sandi -->
                 <TextView
                     android:id="@+id/tvForgotPassword"
                     android:layout_width="wrap_content"
@@ -192,7 +192,7 @@
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
-                </LinearLayout>
+            </LinearLayout>
 
 
             <com.google.android.material.button.MaterialButton
