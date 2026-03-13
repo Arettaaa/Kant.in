@@ -31,7 +31,6 @@ public class LoginActivity extends AppCompatActivity {
         ivTogglePassword = findViewById(R.id.ivTogglePassword);
         tvForgotPassword = findViewById(R.id.tvForgotPassword);
         tvRegister       = findViewById(R.id.tvRegister);
-        tvKantinOwner    = findViewById(R.id.tvKantinOwner);
         btnLogin         = findViewById(R.id.btnLogin);
 
         // Toggle show/hide password
@@ -46,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
             etPassword.setSelection(etPassword.getText().length());
         });
 
+        // Tombol Login
         // Tombol Login
         btnLogin.setOnClickListener(v -> {
 
@@ -78,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
 
             Toast.makeText(this, "Login berhasil", Toast.LENGTH_SHORT).show();
 
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            Intent intent = new Intent(LoginActivity.this, BerandaPelangganActivity.class);
             startActivity(intent);
             finish();
         });
@@ -92,7 +92,5 @@ public class LoginActivity extends AppCompatActivity {
         tvForgotPassword.setOnClickListener(v ->
                 Toast.makeText(this, "Fitur belum tersedia", Toast.LENGTH_SHORT).show());
 
-        tvKantinOwner.setOnClickListener(v ->
-                Toast.makeText(this, "Masuk sebagai Pemilik Kantin", Toast.LENGTH_SHORT).show());
     }
 }

@@ -29,6 +29,12 @@
             android:exported="false" />
 
         <activity
+            android:name=".RegisterAdminActivity"/>
+
+        <activity
+            android:name=".BerandaPelangganActivity"/>
+
+        <activity
             android:name=".RegisterActivity"
             android:exported="false"/>
 

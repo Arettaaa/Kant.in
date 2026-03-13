@@ -1,5 +1,6 @@
 package com.example.kantin;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.Button;
@@ -14,7 +15,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     EditText etName, etEmail, etPassword;
     ImageView ivTogglePassword;
-    TextView tvLogin;
+    TextView tvLogin, tabPelanggan, tabPemilik;
     Button btnRegister;
 
     boolean isPasswordVisible = false;
@@ -34,25 +35,20 @@ public class RegisterActivity extends AppCompatActivity {
         tvLogin = findViewById(R.id.tvLogin);
         btnRegister = findViewById(R.id.btnRegister);
 
+        tabPelanggan = findViewById(R.id.tabPelanggan);
+        tabPemilik = findViewById(R.id.tabPemilik);
+
         // Toggle password
         ivTogglePassword.setOnClickListener(v -> {
 
             if (isPasswordVisible) {
-
                 etPassword.setInputType(InputType.TYPE_CLASS_TEXT |
                         InputType.TYPE_TEXT_VARIATION_PASSWORD);
-
-                ivTogglePassword.setImageResource(R.drawable.eye);
-
                 isPasswordVisible = false;
 
             } else {
-
                 etPassword.setInputType(InputType.TYPE_CLASS_TEXT |
                         InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-
-                ivTogglePassword.setImageResource(R.drawable.eye);
-
                 isPasswordVisible = true;
             }
 
@@ -99,10 +95,18 @@ public class RegisterActivity extends AppCompatActivity {
             Toast.makeText(this, "Akun berhasil dibuat!", Toast.LENGTH_SHORT).show();
         });
 
-        // Pindah ke login
-        tvLogin.setOnClickListener(v -> {
+        // pindah ke register admin
+        tabPemilik.setOnClickListener(v -> {
+            Intent intent = new Intent(RegisterActivity.this, RegisterAdminActivity.class);
+            startActivity(intent);
             finish();
         });
 
+        // ke login
+        tvLogin.setOnClickListener(v -> {
+            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
+        });
     }
 }

@@ -241,20 +241,6 @@
                 android:textStyle="bold" />
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/tvKantinOwner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:fontFamily="@font/inter_regular"
-                android:gravity="center"
-                android:text="Masuk sebagai Pemilik Kantin"
-                android:textColor="#9CA3AF"
-                android:textSize="13sp" />
-
         </LinearLayout>
 
     </LinearLayout>
