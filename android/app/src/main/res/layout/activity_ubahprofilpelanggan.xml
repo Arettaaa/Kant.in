@@ -88,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:text="Nama Lengkap"
                 android:textColor="#4B5563"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp"/>
 
@@ -124,7 +124,7 @@
                 android:layout_height="wrap_content"
                 android:text="Nomor Telepon"
                 android:textColor="#4B5563"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp"/>
 
@@ -160,7 +160,7 @@
                 android:layout_height="wrap_content"
                 android:text="Alamat Email"
                 android:textColor="#4B5563"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp"/>
 
