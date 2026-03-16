@@ -18,6 +18,7 @@ class Canteen extends Model
         'delivery_fee_flat',
         'operating_hours',
         'is_active',
+        'status',
     ];
 
     public function menus()

@@ -4,45 +4,76 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Canteen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    // Register
     public function register(Request $request)
     {
-        $request->validate([
-            'name'     => 'required|string',
-            'email'    => 'required|email|unique:users,email',
+        $role = $request->role ?? 'pembeli';
+
+        $rules = [
+            'name' => 'required|string',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'phone'    => 'nullable|string',
-            'role'     => 'nullable|in:admin_global,admin_kantin,pembeli',
-        ]);
+            'phone' => 'nullable|string',
+            'role' => 'nullable|in:admin_kantin,pembeli',
+        ];
+
+        // Tambah validasi canteen_name jika admin_kantin
+        if ($role === 'admin_kantin') {
+            $rules['canteen_name'] = 'required|string';
+        }
+
+        $request->validate($rules);
+
+        // Kalau admin_kantin, buat canteen dulu dengan status pending
+        $canteenId = null;
+        if ($role === 'admin_kantin') {
+            $canteen = Canteen::create([
+                'name' => $request->canteen_name,
+                'is_active' => false,
+                'status' => 'pending',
+                'delivery_fee_flat' => 0,
+                'operating_hours' => ['open' => '08:00', 'close' => '17:00'],
+            ]);
+            $canteenId = (string) $canteen->_id;
+        }
 
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
+            'name' => $request->name,
+            'email' => $request->email,
             'password' => Hash::make($request->password),
-            'phone'    => $request->phone,
-            'role'     => $request->role ?? 'pembeli',
+            'phone' => $request->phone,
+            'role' => $role,
+            'canteen_id' => $canteenId,
+            'status' => $role === 'admin_kantin' ? 'pending' : 'active',
         ]);
+
+        // Admin kantin belum dapat token, harus tunggu approve
+        if ($role === 'admin_kantin') {
+            return response()->json([
+                'message' => 'Registrasi berhasil! Menunggu persetujuan admin.',
+                'user' => $user,
+            ], 201);
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Registrasi berhasil',
-            'token'   => $token,
-            'user'    => $user,
+            'token' => $token,
+            'user' => $user,
         ], 201);
     }
 
-    // Login
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|email',
+            'email' => 'required|email',
             'password' => 'required',
         ]);
 
@@ -54,16 +85,27 @@ class AuthController extends Controller
             ]);
         }
 
+        if ($user->status === 'pending') {
+            return response()->json([
+                'message' => 'Akun kamu belum disetujui oleh admin. Mohon tunggu.',
+            ], 403);
+        }
+
+        if ($user->status === 'rejected') {
+            return response()->json([
+                'message' => 'Akun kamu telah ditolak oleh admin. Silakan hubungi admin untuk informasi lebih lanjut.',
+            ], 403);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'message' => 'Login berhasil',
-            'token'   => $token,
-            'user'    => $user,
+            'token' => $token,
+            'user' => $user,
         ]);
     }
 
-    // Logout
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

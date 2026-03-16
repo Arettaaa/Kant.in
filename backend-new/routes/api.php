@@ -16,7 +16,7 @@ use App\Http\Controllers\Api\TransactionController;
 */
 
 // Public (tanpa login)
-Route::post('/auth/register', [AuthController::class, 'register']); 
+Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/sessions', [AuthController::class, 'login']);
 
 // Protected (harus login)
@@ -98,5 +98,7 @@ Route::middleware(['auth:sanctum', 'role:admin_global'])->group(function () {
     Route::get('/canteens/{id}/dashboard', [TransactionController::class, 'dashboard']);
     Route::get('/canteens/{id}/transactions', [TransactionController::class, 'index']);
 
-    Route::post('/canteens/{id}/admins', [CanteenController::class, 'assignAdmin']);
+    Route::get('/registrations', [CanteenController::class, 'registrations']);
+    Route::post('/registrations/{id}/approve', [CanteenController::class, 'approveRegistration']);
+    Route::post('/registrations/{id}/reject', [CanteenController::class, 'rejectRegistration']);
 });
