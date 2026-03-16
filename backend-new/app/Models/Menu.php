@@ -15,7 +15,6 @@ class Menu extends Model
         'description',
         'price',
         'category',
-        'stock',
         'image',
         'is_available',
         'estimated_cooking_time',

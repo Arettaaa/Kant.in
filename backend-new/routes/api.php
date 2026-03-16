@@ -97,4 +97,6 @@ Route::middleware(['auth:sanctum', 'role:admin_global'])->group(function () {
     // Dashboard & transactions
     Route::get('/canteens/{id}/dashboard', [TransactionController::class, 'dashboard']);
     Route::get('/canteens/{id}/transactions', [TransactionController::class, 'index']);
+
+    Route::post('/canteens/{id}/admins', [CanteenController::class, 'assignAdmin']);
 });

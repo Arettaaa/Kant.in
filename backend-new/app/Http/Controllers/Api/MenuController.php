@@ -6,10 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\Canteen;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
-    // PUBLIC: GET /canteens/{id}/menus?search=...
     public function index(Request $request, $canteenId)
     {
         $canteen = Canteen::find($canteenId);
@@ -27,15 +27,11 @@ class MenuController extends Controller
             $query->where('category', $request->category);
         }
 
-        $menus = $query->get();
+        $menus = $query->get()->map(fn($menu) => $this->formatMenu($menu));
 
-        return response()->json([
-            'success' => true,
-            'data' => $menus,
-        ]);
+        return response()->json(['success' => true, 'data' => $menus]);
     }
 
-    // PUBLIC: GET /canteens/{id}/menus/availabilities
     public function availabilities($canteenId)
     {
         $canteen = Canteen::find($canteenId);
@@ -43,43 +39,40 @@ class MenuController extends Controller
             return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan.'], 404);
         }
 
-        $menus = Menu::where('canteen_id', $canteenId)
-            ->get(['_id', 'name', 'is_available', 'stock']);
+        $menus = Menu::where('canteen_id', $canteenId)->get(['_id', 'name', 'is_available']);
 
-        return response()->json([
-            'success' => true,
-            'data' => $menus,
-        ]);
+        return response()->json(['success' => true, 'data' => $menus]);
     }
 
-    // ADMIN KANTIN: POST /canteens/{id}/menus
     public function store(Request $request, $canteenId)
     {
         $this->authorizeAdminKantin($request, $canteenId);
 
         $validated = $request->validate([
-            'name' => 'required|string',
-            'description' => 'nullable|string',
-            'price' => 'required|integer|min:0',
-            'category' => 'required|string',
-            'stock' => 'required|integer|min:0',
-            'image' => 'nullable|string',
-            'estimated_cooking_time' => 'required|integer|min:1',
+            'name'                   => 'required|string',
+            'description'            => 'nullable|string',
+            'price'                  => 'required|integer|min:0',
+            'category'               => 'required|string',
+            'image'                  => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'estimated_cooking_time' => 'nullable|integer|min:1',
         ]);
 
-        $validated['canteen_id'] = $canteenId;
-        $validated['is_available'] = $validated['stock'] > 0;
+        if ($request->hasFile('image')) {
+            $validated['image'] = $request->file('image')->store('menus', 'public');
+        }
+
+        $validated['canteen_id']   = $canteenId;
+        $validated['is_available'] = true;
 
         $menu = Menu::create($validated);
 
         return response()->json([
             'success' => true,
             'message' => 'Menu berhasil ditambahkan.',
-            'data' => $menu,
+            'data'    => $this->formatMenu($menu),
         ], 201);
     }
 
-    // ADMIN KANTIN: PUT /canteens/{id}/menus/{menuId}
     public function update(Request $request, $canteenId, $menuId)
     {
         $this->authorizeAdminKantin($request, $canteenId);
@@ -90,18 +83,19 @@ class MenuController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'sometimes|string',
-            'description' => 'nullable|string',
-            'price' => 'sometimes|integer|min:0',
-            'category' => 'sometimes|string',
-            'stock' => 'sometimes|integer|min:0',
-            'image' => 'nullable|string',
-            'estimated_cooking_time' => 'sometimes|integer|min:1',
+            'name'                   => 'sometimes|string',
+            'description'            => 'nullable|string',
+            'price'                  => 'sometimes|integer|min:0',
+            'category'               => 'sometimes|string',
+            'image'                  => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'estimated_cooking_time' => 'nullable|integer|min:1',
         ]);
 
-        // Auto set is_available false jika stock 0
-        if (isset($validated['stock']) && $validated['stock'] == 0) {
-            $validated['is_available'] = false;
+        if ($request->hasFile('image')) {
+            if ($menu->image) {
+                Storage::disk('public')->delete($menu->image);
+            }
+            $validated['image'] = $request->file('image')->store('menus', 'public');
         }
 
         $menu->update($validated);
@@ -109,11 +103,10 @@ class MenuController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Menu berhasil diperbarui.',
-            'data' => $menu,
+            'data'    => $this->formatMenu($menu->fresh()),
         ]);
     }
 
-    // ADMIN KANTIN: PUT /canteens/{id}/menus/{menuId}/availabilities
     public function updateAvailability(Request $request, $canteenId, $menuId)
     {
         $this->authorizeAdminKantin($request, $canteenId);
@@ -127,19 +120,9 @@ class MenuController extends Controller
             'is_available' => 'required|in:0,1,true,false',
         ]);
 
-        \Log::info('updateAvailability', [
-            'raw' => $request->is_available,
-            'type' => gettype($request->is_available),
-            'cast' => (bool) (int) $request->is_available,
-        ]);
-
-        $isAvailable = (bool) (int) $request->is_available;
-
-        if ($isAvailable && $menu->stock == 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Tidak bisa mengaktifkan menu dengan stok 0.',
-            ], 422);
+        $isAvailable = filter_var($request->is_available, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        if (is_null($isAvailable)) {
+            $isAvailable = (bool)(int) $request->is_available;
         }
 
         Menu::where('_id', $menuId)->update(['is_available' => $isAvailable]);
@@ -148,12 +131,10 @@ class MenuController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Ketersediaan menu berhasil diperbarui.',
-            'data' => $menu,
+            'data'    => $this->formatMenu($menu),
         ]);
     }
 
-
-    // ADMIN KANTIN: DELETE /canteens/{id}/menus/{menuId}
     public function destroy(Request $request, $canteenId, $menuId)
     {
         $this->authorizeAdminKantin($request, $canteenId);
@@ -163,15 +144,24 @@ class MenuController extends Controller
             return response()->json(['success' => false, 'message' => 'Menu tidak ditemukan.'], 404);
         }
 
+        if ($menu->image) {
+            Storage::disk('public')->delete($menu->image);
+        }
+
         $menu->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Menu berhasil dihapus.',
-        ]);
+        return response()->json(['success' => true, 'message' => 'Menu berhasil dihapus.']);
     }
 
-    // Helper: pastikan admin kantin hanya bisa akses kantin miliknya
+    private function formatMenu($menu)
+    {
+        $data = $menu->toArray();
+        if (!empty($data['image'])) {
+            $data['image'] = asset('storage/' . $data['image']);
+        }
+        return $data;
+    }
+
     private function authorizeAdminKantin(Request $request, $canteenId)
     {
         $user = $request->user();
