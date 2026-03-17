@@ -26,6 +26,58 @@ Route::get('/admin/profil',        fn() => view('admin.pesanan'))->name('admin.p
 
 /*
 |--------------------------------------------------------------------------
+| Pelanggan Routes
+|--------------------------------------------------------------------------
+*/
+Route::get('/beranda',                  fn() => view('pelanggan.beranda'))->name('pelanggan.beranda');
+Route::get('/keranjang',                fn() => view('pelanggan.keranjang'))->name('pelanggan.keranjang');
+Route::get('/menu/{slug}',              fn() => view('pelanggan.detail-menu'))->name('pelanggan.detail-menu');
+Route::get('/jelajah',                  fn() => view('pelanggan.jelajah'))->name('pelanggan.jelajah');
+Route::get('/pesanan',                  fn() => view('pelanggan.pesanan'))->name('pelanggan.pesanan');
+Route::get('/profil',                   fn() => view('pelanggan.profil'))->name('pelanggan.profil');
+// Route::get('/login',                 fn() => view('pelanggan.login'))->name('pelanggan.login');
+
+/*
+|--------------------------------------------------------------------------
+| Pelanggan Routes detail kantin
+|--------------------------------------------------------------------------
+*/
+Route::get('/kantin/{slug}', function ($slug) {
+
+    $kantins = [
+        'warung-bu-ani' => [
+            'nama' => 'Warung Bu Ani',
+            'deskripsi' => 'Menyediakan nasi goreng khas dengan bumbu rempah pilihan.',
+            'rating' => 4.8
+        ],
+        'noodle-ninja' => [
+            'nama' => 'Noodle Ninja',
+            'deskripsi' => 'Mie Jepang autentik dengan kuah khas.',
+            'rating' => 4.6
+        ],
+        'fresh-sip' => [
+            'nama' => 'Fresh Sip',
+            'deskripsi' => 'Minuman segar dan dessert kekinian.',
+            'rating' => 4.9
+        ],
+        'asian-bowl-house' => [
+            'nama' => 'Asian Bowl House',
+            'deskripsi' => 'Menu rice bowl khas Asia.',
+            'rating' => 4.5
+        ],
+    ];
+
+    $kantin = $kantins[$slug] ?? null;
+
+    if (!$kantin) {
+        abort(404);
+    }
+
+    return view('pelanggan.detail-kantin', compact('kantin'));
+})->name('pelanggan.detail-kantin');
+
+/*
+|--------------------------------------------------------------------------
 | Redirect Root → Login
 |--------------------------------------------------------------------------
 */
