@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F9FAFB"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:elevation="2dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="32dp"
+            android:paddingBottom="24dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_card_outline"
+                android:padding="10dp"
+                android:src="@drawable/chevronleft"
+                app:tint="#1A1A1A" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:fontFamily="@font/inter_bold"
+                android:text="Pesanan"
+                android:textColor="#1A1A1A"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_bold"
+                    android:paddingBottom="12dp"
+                    android:text="Sedang Diproses"
+                    android:textColor="#F97316"
+                    android:textSize="14sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="#F97316" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_bold"
+                    android:paddingBottom="12dp"
+                    android:text="Riwayat"
+                    android:textColor="#9CA3AF"
+                    android:textSize="14sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#E5E7EB" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="32dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_card_outline"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <ImageView android:id="@+id/ic1" android:layout_width="16dp" android:layout_height="16dp" android:layout_centerVertical="true" android:src="@drawable/receipt" app:tint="#F97316" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_marginStart="8dp" android:layout_toEndOf="@id/ic1" android:fontFamily="@font/inter_bold" android:text="ORD-8492" android:textColor="#1A1A1A" android:textSize="15sp" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true" android:fontFamily="@font/inter_bold" android:text="Rp 30.000" android:textColor="#F97316" android:textSize="15sp" />
+                </RelativeLayout>
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:fontFamily="@font/inter_regular" android:text="Hari ini • 12:30 PM" android:textColor="#9CA3AF" android:textSize="12sp" />
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:background="@drawable/bg_badge_gray_light" android:orientation="vertical" android:padding="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="@font/inter_bold" android:text="Warung Bu Ani" android:textColor="#1A1A1A" android:textSize="14sp" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:fontFamily="@font/inter_regular" android:text="1x Nasi Goreng Spesial, 1x Es Teh Manis" android:textColor="#6B7280" android:textSize="13sp" />
+                </LinearLayout>
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_centerVertical="true" android:orientation="horizontal" android:paddingHorizontal="40dp">
+                        <View android:layout_width="0dp" android:layout_height="3dp" android:layout_weight="1" android:background="#F97316" /> <View android:layout_width="0dp" android:layout_height="3dp" android:layout_weight="1" android:background="#E5E7EB" /> </LinearLayout>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                            <ImageView android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle_orange_outline" android:padding="8dp" android:src="@drawable/clock" app:tint="#1A1A1A" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:fontFamily="@font/inter_bold" android:text="Menunggu" android:textColor="#1A1A1A" android:textSize="11sp" />
+                        </LinearLayout>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                            <ImageView android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle_orange_outline" android:padding="8dp" android:src="@android:drawable/ic_menu_agenda" app:tint="#F97316" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:fontFamily="@font/inter_bold" android:text="Dimasak" android:textColor="#F97316" android:textSize="11sp" />
+                        </LinearLayout>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                            <ImageView android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle_gray_outline" android:padding="8dp" android:src="@drawable/uploadcloud" app:tint="#D1D5DB" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:fontFamily="@font/inter_bold" android:text="Siap" android:textColor="#9CA3AF" android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/card_outline"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <ImageView android:id="@+id/ic2" android:layout_width="16dp" android:layout_height="16dp" android:layout_centerVertical="true" android:src="@drawable/receipt" app:tint="#F97316" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_marginStart="8dp" android:layout_toEndOf="@id/ic2" android:fontFamily="@font/inter_bold" android:text="ORD-8493" android:textColor="#1A1A1A" android:textSize="15sp" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true" android:fontFamily="@font/inter_bold" android:text="Rp 44.000" android:textColor="#F97316" android:textSize="15sp" />
+                </RelativeLayout>
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:fontFamily="@font/inter_regular" android:text="Hari ini • 12:45 PM" android:textColor="#9CA3AF" android:textSize="12sp" />
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:background="@drawable/bg_badge_gray_light" android:orientation="vertical" android:padding="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="@font/inter_bold" android:text="Mie Nusantara" android:textColor="#1A1A1A" android:textSize="14sp" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:fontFamily="@font/inter_regular" android:text="2x Mie Goreng Ayam" android:textColor="#6B7280" android:textSize="13sp" />
+                </LinearLayout>
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_centerVertical="true" android:orientation="horizontal" android:paddingHorizontal="40dp">
+                        <View android:layout_width="0dp" android:layout_height="3dp" android:layout_weight="1" android:background="#E5E7EB" /> <View android:layout_width="0dp" android:layout_height="3dp" android:layout_weight="1" android:background="#E5E7EB" /> </LinearLayout>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                            <ImageView android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle_orange_outline" android:padding="8dp" android:src="@drawable/ic_clock" app:tint="#F97316" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:fontFamily="@font/inter_bold" android:text="Menunggu" android:textColor="#F97316" android:textSize="11sp" />
+                        </LinearLayout>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                            <ImageView android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle_gray_outline" android:padding="8dp" android:src="@android:drawable/ic_menu_agenda" app:tint="#D1D5DB" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:fontFamily="@font/inter_bold" android:text="Dimasak" android:textColor="#9CA3AF" android:textSize="11sp" />
+                        </LinearLayout>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                            <ImageView android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle_gray_outline" android:padding="8dp" android:src="@drawable/uploadcloud" app:tint="#D1D5DB" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:fontFamily="@font/inter_bold" android:text="Siap" android:textColor="#9CA3AF" android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/card_outline"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <ImageView android:id="@+id/ic3" android:layout_width="16dp" android:layout_height="16dp" android:layout_centerVertical="true" android:src="@drawable/receipt" app:tint="#F97316" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerVertical="true" android:layout_marginStart="8dp" android:layout_toEndOf="@id/ic3" android:fontFamily="@font/inter_bold" android:text="ORD-8488" android:textColor="#1A1A1A" android:textSize="15sp" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:layout_centerVertical="true" android:fontFamily="@font/inter_bold" android:text="Rp 15.000" android:textColor="#F97316" android:textSize="15sp" />
+                </RelativeLayout>
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:fontFamily="@font/inter_regular" android:text="Hari ini • 12:15 PM" android:textColor="#9CA3AF" android:textSize="12sp" />
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:background="@drawable/bg_badge_gray_light" android:orientation="vertical" android:padding="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="@font/inter_bold" android:text="Fresh Sip" android:textColor="#1A1A1A" android:textSize="14sp" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:fontFamily="@font/inter_regular" android:text="1x Es Kopi Susu" android:textColor="#6B7280" android:textSize="13sp" />
+                </LinearLayout>
+
+                <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_centerVertical="true" android:orientation="horizontal" android:paddingHorizontal="40dp">
+                        <View android:layout_width="0dp" android:layout_height="3dp" android:layout_weight="1" android:background="#F97316" /> <View android:layout_width="0dp" android:layout_height="3dp" android:layout_weight="1" android:background="#F97316" /> </LinearLayout>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                            <ImageView android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle_orange_outline" android:padding="8dp" android:src="@drawable/ic_clock" app:tint="#1A1A1A" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:fontFamily="@font/inter_bold" android:text="Menunggu" android:textColor="#1A1A1A" android:textSize="11sp" />
+                        </LinearLayout>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                            <ImageView android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle_orange_outline" android:padding="8dp" android:src="@android:drawable/ic_menu_agenda" app:tint="#1A1A1A" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:fontFamily="@font/inter_bold" android:text="Dimasak" android:textColor="#1A1A1A" android:textSize="11sp" />
+                        </LinearLayout>
+                        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:orientation="vertical">
+                            <ImageView android:layout_width="36dp" android:layout_height="36dp" android:background="@drawable/bg_circle_orange_outline" android:padding="8dp" android:src="@drawable/uploadcloud" app:tint="#F97316" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:fontFamily="@font/inter_bold" android:text="Siap" android:textColor="#F97316" android:textSize="11sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </RelativeLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
