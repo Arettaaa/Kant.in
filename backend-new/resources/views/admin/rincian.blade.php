@@ -9,7 +9,7 @@
 @section('content')
 <div class="flex w-full h-screen bg-[#F9FAFB] overflow-hidden">
 
-    {{-- SIDEBAR (Tetap sama) --}}
+    {{-- ======================== SIDEBAR (STAY) ======================== --}}
     <aside class="w-[240px] h-screen bg-white flex flex-col py-8 px-6 shadow-sm flex-shrink-0 z-20 border-r border-gray-100">
         <div class="flex items-center gap-3 mb-10 px-2">
             <div class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg" style="background-color:#FF6900;">
@@ -17,31 +17,55 @@
             </div>
             <span class="text-xl font-extrabold text-gray-900 tracking-tight">Kantin</span>
         </div>
+
         <nav class="flex flex-col gap-2 flex-1">
+            {{-- Nav Pesanan (Active) --}}
             <a href="/admin/pesanan" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold transition-all" style="background-color:#FFF3E8;color:#FF6900;">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
                 Pesanan
             </a>
+            
+            {{-- Nav Kelola Menu --}}
+            <a href="/admin/menu" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                </svg>
+                Kelola Menu
+            </a>
+            
+            {{-- Nav Profil Kantin --}}
+            <a href="/admin/profil" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                Profil Kantin
+            </a>
         </nav>
-        <a href="/admin/login" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 mt-auto hover:text-red-500"><i class="fa-solid fa-right-from-bracket"></i> Keluar</a>
+
+        {{-- Logout --}}
+        <a href="/admin/login" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all mt-auto">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            Keluar
+        </a>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+    {{-- ======================== MAIN CONTENT (SCROLL) ======================== --}}
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#F9FAFB]">
         
-        {{-- Header Status --}}
-        <div class="w-full flex items-center justify-between px-10 py-6 bg-white border-b border-gray-100 sticky top-0 z-10">
+        {{-- Header --}}
+        <div class="sticky top-0 z-10 w-full flex items-center justify-between px-10 py-6 bg-white/90 backdrop-blur-md border-b border-gray-100">
             <div class="flex items-center gap-4">
-                <a href="/admin/pesanan" class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50">
+                <a href="/admin/pesanan" class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 transition-all">
                     <i class="fa-solid fa-arrow-left text-gray-400"></i>
                 </a>
                 <div>
                     <h2 class="text-lg font-extrabold text-gray-900 leading-none mb-1">Rincian Pesanan</h2>
                     <p id="detOrderId" class="text-sm text-orange-500 font-bold tracking-wide">#ORD-000</p>
                 </div>
-            </div>
-            <div class="flex gap-3">
-                <button class="px-6 py-2.5 rounded-xl border-2 border-red-50 text-red-500 font-black text-sm hover:bg-red-50 transition-all">✕ Tolak</button>
-                <button onclick="window.location.href='/admin/pesanan'" class="px-6 py-2.5 rounded-xl bg-[#22C55E] text-white font-black text-sm shadow-lg shadow-green-200 hover:brightness-110">✓ Verifikasi & Terima</button>
             </div>
         </div>
 
@@ -51,7 +75,7 @@
             <div class="col-span-12 lg:col-span-7 space-y-6">
                 
                 {{-- Card User --}}
-                <div class="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 flex items-center justify-between">
+                <div class="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100">
                     <div class="flex items-center gap-4">
                         <div class="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center border border-gray-100 overflow-hidden text-gray-200 text-2xl">
                             <i class="fa-solid fa-user"></i>
@@ -87,15 +111,25 @@
             </div>
 
             {{-- KOLOM KANAN --}}
-            <div class="col-span-12 lg:col-span-5">
+            <div class="col-span-12 lg:col-span-5 space-y-6">
                 <div class="bg-white rounded-[32px] p-8 shadow-sm border border-gray-100">
                     <div class="flex items-center gap-3 mb-6">
-                        <i class="fa-solid fa-receipt text-[#FF6900]"></i>
+                        <i class="fa-solid fa-receipt text-[#151311]"></i>
                         <p class="text-sm font-black text-gray-900 uppercase tracking-widest">Bukti Pembayaran</p>
                     </div>
                     <img src="https://images.unsplash.com/photo-1554224155-1696413565d3?w=800" class="w-full h-80 object-cover rounded-2xl border border-gray-100 mb-4" alt="Struk">
-                    <div class="p-4 rounded-2xl bg-orange-50 border border-orange-100">
-                        <p class="text-[11px] text-gray-500 font-medium">Pastikan nominal sesuai sebelum melakukan verifikasi.</p>
+                    <div class="p-4 rounded-2xl bg-orange-50 border border-orange-100 mb-8">
+                        <p class="text-[11px] text-gray-500 font-medium text-center">Pastikan nominal sesuai sebelum melakukan verifikasi.</p>
+                    </div>
+
+                    {{-- REVISI: Tombol dipindah ke bawah bukti --}}
+                    <div class="flex flex-col gap-3">
+                        <button onclick="window.location.href='/admin/pesanan'" class="w-full py-4 rounded-2xl bg-[#22C55E] text-white font-black text-sm shadow-lg shadow-green-200 hover:brightness-110 transition-all">
+                            ✓ Verifikasi & Terima
+                        </button>
+                        <button class="w-full py-4 rounded-2xl border-2 border-red-50 text-red-500 font-black text-sm hover:bg-red-50 transition-all">
+                            ✕ Tolak Pesanan
+                        </button>
                     </div>
                 </div>
             </div>

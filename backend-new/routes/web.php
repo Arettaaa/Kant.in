@@ -17,11 +17,16 @@ Route::get('/admin/login',    fn() => view('admin.login'))->name('admin.login');
 */
 Route::get('/admin/pesanan',       fn() => view('admin.pesanan'))->name('admin.pesanan');
 Route::get('/admin/pesanan/tolak', fn() => view('admin.pesanan'))->name('admin.pesanan.tolak');
-
 Route::get('/admin/pesanan/status', fn() => view('admin.status'))->name('admin.pesanan.status');
 Route::get('/admin/pesanan/rincian', fn() => view('admin.rincian'))->name('admin.pesanan.rincian');
+Route::get('/admin/pesanan/cancel', fn() => view('admin.cancel'))->name('admin.pesanan.cancel');
 
-Route::get('/admin/menu',          fn() => view('admin.pesanan'))->name('admin.menu');
+Route::get('/admin/menu',          fn() => view('admin.kelola-menu'))->name('admin.menu');
+Route::get('/admin/menu/tambah', fn() => view('admin.tambah-menu'))->name('admin.menu.tambah');
+Route::get('/admin/menu/edit', fn() => view('admin.edit-menu'))->name('admin.menu.edit');
+Route::get('/admin/menu/delete', fn() => view('admin.delete-menu'))->name('admin.menu.delete');
+
+
 Route::get('/admin/profil',        fn() => view('admin.pesanan'))->name('admin.profil');
 
 /*
