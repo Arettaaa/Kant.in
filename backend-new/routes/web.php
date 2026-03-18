@@ -15,19 +15,27 @@ Route::get('/admin/login',    fn() => view('admin.login'))->name('admin.login');
 | Admin Kantin Routes
 |--------------------------------------------------------------------------
 */
-Route::get('/admin/pesanan',       fn() => view('admin.pesanan'))->name('admin.pesanan');
-Route::get('/admin/pesanan/tolak', fn() => view('admin.pesanan'))->name('admin.pesanan.tolak');
+//pesanan
+Route::get('/admin/pesanan',        fn() => view('admin.pesanan'))->name('admin.pesanan');
+Route::get('/admin/pesanan/tolak',  fn() => view('admin.pesanan'))->name('admin.pesanan.tolak');
 Route::get('/admin/pesanan/status', fn() => view('admin.status'))->name('admin.pesanan.status');
 Route::get('/admin/pesanan/rincian', fn() => view('admin.rincian'))->name('admin.pesanan.rincian');
 Route::get('/admin/pesanan/cancel', fn() => view('admin.cancel'))->name('admin.pesanan.cancel');
 
-Route::get('/admin/menu',          fn() => view('admin.kelola-menu'))->name('admin.menu');
-Route::get('/admin/menu/tambah', fn() => view('admin.tambah-menu'))->name('admin.menu.tambah');
-Route::get('/admin/menu/edit', fn() => view('admin.edit-menu'))->name('admin.menu.edit');
-Route::get('/admin/menu/delete', fn() => view('admin.delete-menu'))->name('admin.menu.delete');
+//menu
+Route::get('/admin/menu',           fn() => view('admin.kelola-menu'))->name('admin.menu');
+Route::get('/admin/menu/tambah',    fn() => view('admin.tambah-menu'))->name('admin.menu.tambah');
+Route::get('/admin/menu/edit',      fn() => view('admin.edit-menu'))->name('admin.menu.edit');
+Route::get('/admin/menu/delete',    fn() => view('admin.delete-menu'))->name('admin.menu.delete');
 
+//riwayat
+Route::get('/admin/riwayat', fn() => view('admin.riwayat'))->name('admin.riwayat');
 
-Route::get('/admin/profil',        fn() => view('admin.pesanan'))->name('admin.profil');
+//profil
+Route::get('/admin/profil', fn() => view('admin.profil'))->name('admin.profil');
+Route::get('/admin/profil/edit', fn() => view('admin.edit-profil'))->name('admin.profil.edit');
+Route::get('/admin/profil/jam-operasional', fn() => view('admin.jam-operasional'))->name('admin.profil.jam');
+Route::get('/admin/pusat-bantuan', fn() => view('admin.support'))->name('admin.support');
 
 /*
 |--------------------------------------------------------------------------
