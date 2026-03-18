@@ -81,4 +81,4 @@ Route::get('/kantin/{slug}', function ($slug) {
 | Redirect Root → Login
 |--------------------------------------------------------------------------
 */
-Route::get('/', fn() => redirect()->route('admin.login'));
+Route::get('/', fn() => redirect()->route('beranda'));
