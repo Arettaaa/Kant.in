@@ -30,7 +30,6 @@
 
         {{-- Logo Section --}}
         <div class="flex flex-col items-center pt-10 pb-8 px-10 rounded-b-3xl" style="background-color:#FFF7ED;">
-            {{-- Logo: Box Orange + Font Awesome Utensils FREE --}}
             <div class="w-16 h-16 rounded-[18px] flex items-center justify-center mb-3 shadow-sm" style="background-color:#FF6900;">
                 <i class="fa-solid fa-utensils text-3xl text-white"></i>
             </div>
@@ -42,6 +41,20 @@
 
         {{-- Form Section --}}
         <div class="flex-1 flex flex-col px-10 pt-7 pb-10" style="background-color:#FFFFFF;">
+
+            {{-- DITAMBAH: Role Toggle — Pelanggan / Pemilik Kantin --}}
+            <div class="flex rounded-xl p-1 mb-5" style="background-color:#F3F4F6;">
+                <button id="tabPelanggan" onclick="switchLoginTab('pelanggan')"
+                    class="flex-1 py-2 text-sm font-semibold rounded-lg text-white transition-all duration-200"
+                    style="background-color:#FF6900;">
+                    Pelanggan
+                </button>
+                <button id="tabKantin" onclick="switchLoginTab('kantin')"
+                    class="flex-1 py-2 text-sm font-semibold rounded-lg text-gray-500 hover:text-gray-700 transition-all duration-200">
+                    Pemilik Kantin
+                </button>
+            </div>
+
             <div class="space-y-4">
 
                 {{-- Alamat Email --}}
@@ -52,7 +65,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                         </span>
                         <input type="email" placeholder="mahasiswa@kampus.ac.id"
-                            class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent transition-all duration-200" 
+                            class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent transition-all duration-200"
                             style="background-color:#FAFAFA;">
                     </div>
                 </div>
@@ -65,7 +78,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                         </span>
                         <input id="passwordLogin" type="password" placeholder="••••••••"
-                            class="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent transition-all duration-200" 
+                            class="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-transparent transition-all duration-200"
                             style="background-color:#FAFAFA;">
                         <button type="button" onclick="togglePassword('passwordLogin','eyeLogin')"
                             class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
@@ -76,22 +89,28 @@
                         </button>
                     </div>
                     <div class="flex justify-end mt-1.5">
-                        <a href="/admin/forgot-password" class="text-xs font-semibold hover:underline" style="color:#FF6900;">Lupa kata sandi?</a>
+                        <a href="/lupa-sandi" class="text-xs font-semibold hover:underline" style="color:#FF6900;">Lupa kata sandi?</a>
                     </div>
                 </div>
 
             </div>
 
-            <button onclick="window.location.href='/admin/pesanan'"
+            {{-- redirect berdasarkan role yang dipilih --}}
+            <button onclick="handleLogin()"
                 class="mt-5 w-full py-3 text-white font-bold text-sm rounded-xl shadow-md flex items-center justify-center gap-2 transition-all duration-200 active:scale-95"
-                style="background-color:#FF6900;" onmouseover="this.style.backgroundColor='#e55f00'" onmouseout="this.style.backgroundColor='#FF6900'">
-                Masuk ke Kant.in
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                style="background-color:#FF6900;"
+                onmouseover="this.style.backgroundColor='#e55f00'"
+                onmouseout="this.style.backgroundColor='#FF6900'">
+                Masuk
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                </svg>
             </button>
 
+            {{-- /admin/register → /register --}}
             <p class="text-center text-sm text-gray-500 mt-4">
                 Belum punya akun?
-                <a href="/admin/register" class="font-semibold hover:underline" style="color:#FF6900;">Daftar di sini</a>
+                <a href="/register" class="font-semibold hover:underline" style="color:#FF6900;">Daftar di sini</a>
             </p>
 
         </div>
@@ -102,6 +121,36 @@
 
 @push('scripts')
 <script>
+    // Default: Pelanggan aktif
+    let loginRole = 'pelanggan';
+
+    function switchLoginTab(role) {
+        const tabP = document.getElementById('tabPelanggan');
+        const tabK = document.getElementById('tabKantin');
+        loginRole  = role;
+
+        if (role === 'pelanggan') {
+            tabP.style.cssText = 'background-color:#FF6900; color:#fff;';
+            tabP.className = 'flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200';
+            tabK.style.cssText = '';
+            tabK.className = 'flex-1 py-2 text-sm font-semibold rounded-lg text-gray-500 hover:text-gray-700 transition-all duration-200';
+        } else {
+            tabK.style.cssText = 'background-color:#FF6900; color:#fff;';
+            tabK.className = 'flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200';
+            tabP.style.cssText = '';
+            tabP.className = 'flex-1 py-2 text-sm font-semibold rounded-lg text-gray-500 hover:text-gray-700 transition-all duration-200';
+        }
+    }
+
+    function handleLogin() {
+        // Redirect berbeda berdasarkan role
+        if (loginRole === 'pelanggan') {
+            window.location.href = '/beranda';       // → beranda pelanggan
+        } else {
+            window.location.href = '/admin/pesanan'; // → dashboard pemilik kantin
+        }
+    }
+
     function togglePassword(inputId, eyeId) {
         const input = document.getElementById(inputId);
         const eye   = document.getElementById(eyeId);

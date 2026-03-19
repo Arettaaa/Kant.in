@@ -16,8 +16,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
             </svg>
         </div>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">Akun Berhasil Dibuat!</h3>
-        <p class="text-gray-500 text-sm mb-6">Selamat datang di Kant.in. Anda akan diarahkan ke dashboard.</p>
+        <h3 id="modalTitle" class="text-xl font-bold text-gray-800 mb-2">Akun Berhasil Dibuat!</h3>
+        <p id="modalDesc" class="text-gray-500 text-sm mb-6">Selamat datang di Kant.in. Anda akan diarahkan ke dashboard.</p>
         <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
             <div id="progressBar" class="h-full bg-gradient-to-r from-orange-400 to-orange-600 rounded-full transition-all duration-[2500ms] ease-linear" style="width:0%"></div>
         </div>
@@ -31,7 +31,6 @@
 
         {{-- Logo Section --}}
         <div class="flex flex-col items-center pt-10 pb-8 px-10 rounded-b-3xl" style="background-color:#FFF7ED;">
-            {{-- Logo: Box Orange + Font Awesome Utensils FREE --}}
             <div class="w-16 h-16 rounded-[18px] flex items-center justify-center mb-3 shadow-sm" style="background-color:#FF6900;">
                 <i class="fa-solid fa-utensils text-3xl text-white"></i>
             </div>
@@ -97,6 +96,7 @@
                     </div>
                 </div>
 
+                {{-- Nama Kantin: hanya muncul saat tab Pemilik Kantin aktif --}}
                 <div id="namaKantinField">
                     <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Kantin</label>
                     <div class="relative">
@@ -116,9 +116,10 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </button>
 
+            {{-- DIUBAH: /admin/login → /login --}}
             <p class="text-center text-sm text-gray-500 mt-4">
                 Sudah punya akun?
-                <a href="/admin/login" class="font-semibold hover:underline" style="color:#FF6900;">Masuk</a>
+                <a href="/login" class="font-semibold hover:underline" style="color:#FF6900;">Masuk</a>
             </p>
         </div>
     </div>
@@ -143,22 +144,33 @@
 
 @push('scripts')
 <script>
+    // Track role aktif — default: kantin (sesuai tampilan awal Figma)
+    let activeRole = 'kantin';
+
     function switchTab(tab) {
         const tabP = document.getElementById('tabPelanggan');
         const tabK = document.getElementById('tabKantin');
         const nkf  = document.getElementById('namaKantinField');
+
+        activeRole = tab;
+
         if (tab === 'pelanggan') {
-            tabP.style.cssText = 'background-color:#FF6900;color:#fff;';
+            // Aktifkan Pelanggan
+            tabP.style.cssText = 'background-color:#FF6900; color:#fff;';
             tabP.className = 'flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200';
+            // Non-aktif Kantin
             tabK.style.cssText = '';
             tabK.className = 'flex-1 py-2 text-sm font-semibold rounded-lg text-gray-500 hover:text-gray-700 transition-all duration-200';
+            // Sembunyikan Nama Kantin — pelanggan tidak perlu
             nkf.style.display = 'none';
-            setTimeout(() => { window.location.href = '/register-pelanggan'; }, 300);
         } else {
-            tabK.style.cssText = 'background-color:#FF6900;color:#fff;';
+            // Aktifkan Pemilik Kantin
+            tabK.style.cssText = 'background-color:#FF6900; color:#fff;';
             tabK.className = 'flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200';
+            // Non-aktif Pelanggan
             tabP.style.cssText = '';
             tabP.className = 'flex-1 py-2 text-sm font-semibold rounded-lg text-gray-500 hover:text-gray-700 transition-all duration-200';
+            // Tampilkan Nama Kantin
             nkf.style.display = 'block';
         }
     }
@@ -178,10 +190,25 @@
     function handleRegister() {
         const modal = document.getElementById('successModal');
         const bar   = document.getElementById('progressBar');
+        const title = document.getElementById('modalTitle');
+        const desc  = document.getElementById('modalDesc');
+
+        // Pesan & redirect berbeda berdasarkan role
+        if (activeRole === 'pelanggan') {
+            title.textContent = 'Akun Berhasil Dibuat!';
+            desc.textContent  = 'Selamat datang di Kant.in! Mengarahkan ke beranda...';
+        } else {
+            title.textContent = 'Akun Kantin Berhasil Dibuat!';
+            desc.textContent  = 'Selamat bergabung! Mengarahkan ke dashboard kantin...';
+        }
+
         modal.classList.remove('hidden');
         modal.classList.add('flex');
         setTimeout(() => { bar.style.width = '100%'; }, 50);
-        setTimeout(() => { window.location.href = '/admin/pesanan'; }, 2800);
+
+        setTimeout(() => {
+            window.location.href = activeRole === 'pelanggan' ? '/beranda' : '/admin/pesanan';
+        }, 2800);
     }
 </script>
 @endpush

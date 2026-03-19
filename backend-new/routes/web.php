@@ -4,6 +4,19 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
+| Auth Pelanggan (shared login & register dari admin.blade, re-route)
+|--------------------------------------------------------------------------
+*/
+Route::get('/login',    fn() => view('admin.login'))->name('pelanggan.login');
+Route::get('/register', fn() => view('admin.register'))->name('pelanggan.register');
+
+// Lupa kata sandi
+Route::get('/lupa-sandi',            fn() => view('auth.lupa-sandi'));
+Route::get('/lupa-sandi/verifikasi', fn() => view('auth.verifikasi-otp'));
+Route::get('/lupa-sandi/reset',      fn() => view('auth.reset-sandi'));
+
+/*
+|--------------------------------------------------------------------------
 | Admin Auth Routes
 |--------------------------------------------------------------------------
 */
@@ -45,9 +58,14 @@ Route::get('/admin/pusat-bantuan', fn() => view('admin.support'))->name('admin.s
 Route::get('/beranda',                  fn() => view('pelanggan.beranda'))->name('pelanggan.beranda');
 Route::get('/keranjang',                fn() => view('pelanggan.keranjang'))->name('pelanggan.keranjang');
 Route::get('/menu/{slug}',              fn() => view('pelanggan.detail-menu'))->name('pelanggan.detail-menu');
+Route::get('/pembayaran',               fn() => view('pelanggan.pembayaran'))->name('pelanggan.pembayaran');
 Route::get('/jelajah',                  fn() => view('pelanggan.jelajah'))->name('pelanggan.jelajah');
 Route::get('/pesanan',                  fn() => view('pelanggan.pesanan'))->name('pelanggan.pesanan');
 Route::get('/profil',                   fn() => view('pelanggan.profil'))->name('pelanggan.profil');
+Route::get('/profil/edit',              fn() => view('pelanggan.edit-profil'))->name('pelanggan.edit-profil');
+Route::get('/profil/data-diri',         fn() => view('pelanggan.data-diri'))->name('pelanggan.data-diri');
+Route::get('/profil/keamanan',          fn() => view('pelanggan.keamanan-akun'))->name('pelanggan.keamanan');
+
 // Route::get('/login',                 fn() => view('pelanggan.login'))->name('pelanggan.login');
 
 /*
