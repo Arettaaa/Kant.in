@@ -38,6 +38,27 @@
             android:name=".RegisterActivity"
             android:exported="false"/>
 
+        <activity
+            android:name=".HistoryActivity" />
+
+        <activity
+            android:name=".ProfilPelangganActivity" />
+
+        <activity
+            android:name=".KeranjangPelangganActivity" />
+
+        <activity
+            android:name=".ExploreMenuPelangganActivity" />
+
+        <activity
+            android:name=".ExploreKantinPelangganActivity" />
+
+        <activity
+            android:name=".DetailMenuActivity" />
+
+        <activity
+            android:name=".DetailKantinActivity" />
+
         <!-- Halaman Utama -->
         <activity
             android:name=".MainActivity"

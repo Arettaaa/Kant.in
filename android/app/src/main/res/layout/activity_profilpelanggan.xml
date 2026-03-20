@@ -69,7 +69,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:padding="16dp"
-                            android:src="" /> </androidx.cardview.widget.CardView>
+                            android:src="@android:color/transparent" /> </androidx.cardview.widget.CardView>
                 </androidx.cardview.widget.CardView>
 
                 <TextView

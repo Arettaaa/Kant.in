@@ -73,14 +73,16 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="40dp"
+                    android:id="@+id/btn_history_top" android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:layout_marginEnd="12dp" android:background="@drawable/bg_circle_outline" android:padding="10dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/bg_circle_outline"
+                    android:padding="10dp"
                     android:src="@drawable/hugeicons_transaction_history"
                     app:tint="#F97316" />
 
                 <FrameLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/btn_keranjang" android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="12dp">
 
@@ -107,7 +109,7 @@
                 </FrameLayout>
 
                 <androidx.cardview.widget.CardView
-                    android:layout_width="40dp"
+                    android:id="@+id/btn_profil_top" android:layout_width="40dp"
                     android:layout_height="40dp"
                     app:cardBackgroundColor="#FF8904"
                     app:cardCornerRadius="20dp"
@@ -282,7 +284,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_lihat_semua_menu" android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
@@ -306,7 +308,7 @@
                     android:orientation="horizontal">
 
                     <androidx.cardview.widget.CardView
-                        android:layout_width="160dp"
+                        android:id="@+id/cv_menu_item" android:layout_width="160dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
                         android:layout_marginBottom="8dp"
@@ -383,7 +385,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_lihat_semua_kantin" android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
@@ -401,7 +403,7 @@
                 android:paddingEnd="20dp">
 
                 <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
+                    android:id="@+id/cv_kantin_item" android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
                     app:cardBackgroundColor="#FFFFFF"
@@ -490,6 +492,7 @@
         android:orientation="horizontal">
 
         <LinearLayout
+            android:id="@+id/nav_beranda"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -500,6 +503,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/nav_pesanan"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -510,6 +514,7 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/nav_profil"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

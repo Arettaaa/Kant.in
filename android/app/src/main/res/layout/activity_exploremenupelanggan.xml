@@ -193,7 +193,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginStart="16dp"
                         android:orientation="vertical"
-                        android:justifyContent="center">
+                        >
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -279,7 +279,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginStart="16dp"
                         android:orientation="vertical"
-                        android:justifyContent="center">
+                       >
 
                         <TextView
                             android:layout_width="wrap_content"
