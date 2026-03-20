@@ -23,6 +23,9 @@
                 android:padding="24dp">
 
                 <ImageView
+                    android:id="@+id/btnBack"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:background="@drawable/bg_circle_outline"
@@ -91,18 +94,6 @@
                             app:cardCornerRadius="47dp"
                             app:cardElevation="0dp" />
                     </androidx.cardview.widget.CardView>
-
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:background="@drawable/bg_circle_orange"
-                        android:padding="6dp"
-                        android:src="@drawable/camera"
-                        app:tint="#FFFFFF"
-                        app:layout_constraintBottom_toBottomOf="@+id/cardProfile"
-                        app:layout_constraintEnd_toEndOf="@+id/cardProfile"
-                        app:layout_constraintHorizontal_bias="0.95"
-                        app:layout_constraintVertical_bias="0.95" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <LinearLayout
@@ -314,6 +305,9 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/btnEditProfil"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:background="@drawable/bg_btn_orange_solid"

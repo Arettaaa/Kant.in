@@ -33,6 +33,7 @@
                     android:layout_marginBottom="24dp">
 
                     <ImageView
+                        android:id="@+id/btnBack"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:layout_centerVertical="true"
@@ -123,6 +124,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/btnUbahProfil"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_marginTop="24dp"
@@ -167,10 +169,14 @@
                         android:padding="20dp">
 
                         <LinearLayout
+                            android:id="@+id/menuDataDiri"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center_vertical"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?android:attr/selectableItemBackground">
 
                             <ImageView
                                 android:layout_width="40dp"
@@ -178,7 +184,9 @@
                                 android:background="@drawable/bg_circle_light_orange"
                                 android:padding="10dp"
                                 android:src="@drawable/user"
-                                app:tint="#F97316" /> <LinearLayout
+                                app:tint="#F97316" />
+
+                            <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
@@ -207,8 +215,12 @@
                             android:background="#F3F4F6" />
 
                         <LinearLayout
+                            android:id="@+id/menuKeamanan"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?android:attr/selectableItemBackground"
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
@@ -242,6 +254,7 @@
                 </androidx.cardview.widget.CardView>
 
                 <LinearLayout
+                    android:id="@+id/btnKeluar"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:background="@drawable/bg_btn_keluar"

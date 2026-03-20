@@ -42,7 +42,8 @@
             android:fontFamily="@font/inter_bold"
             android:text="Kant.in"
             android:textColor="#FFFFFF"
-            android:textSize="48sp" />
+            android:textSize="48sp"
+            android:textStyle="bold"/>
 
         <TextView
             android:layout_width="wrap_content"

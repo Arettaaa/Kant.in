@@ -8,8 +8,8 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="none"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:scrollbars="none">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -38,6 +38,7 @@
                     android:orientation="horizontal">
 
                     <TextView
+                        android:id="@+id/tvNamaWarung"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -68,6 +69,7 @@
                                 app:tint="#F97316" />
 
                             <TextView
+                                android:id="@+id/tvRatingWarung"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="4dp"
@@ -80,6 +82,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/tvDeskripsiWarung"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -98,10 +101,11 @@
                     <ImageView
                         android:layout_width="14dp"
                         android:layout_height="14dp"
-                        android:src="@android:drawable/ic_dialog_map"
+                        android:src="@drawable/mappin"
                         app:tint="#9CA3AF" />
 
                     <TextView
+                        android:id="@+id/tvLokasiKantin"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
@@ -125,13 +129,14 @@
                         app:tint="#9CA3AF" />
 
                     <TextView
+                        android:id="@+id/tvEstimasiWaktu"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:text="10-15 min"
                         android:textColor="#4B5563"
                         android:textSize="12sp"
-                        android:textStyle="bold"/>
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <View
@@ -143,11 +148,11 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
+                    android:layout_marginBottom="24dp"
                     android:background="@drawable/bg_search_bar"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="16dp"
-                    android:layout_marginBottom="24dp">
+                    android:paddingHorizontal="16dp">
 
                     <ImageView
                         android:layout_width="20dp"
@@ -156,6 +161,7 @@
                         app:tint="#9CA3AF" />
 
                     <EditText
+                        android:id="@+id/etSearchMenu"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginStart="8dp"
@@ -179,7 +185,7 @@
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginBottom="12dp"
                     app:cardBackgroundColor="#FFFFFF"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp">
@@ -190,30 +196,57 @@
                         android:padding="12dp">
 
                         <androidx.cardview.widget.CardView
-                            android:id="@+id/imgFood1"
-                            android:layout_width="72dp"
-                            android:layout_height="72dp"
+                            android:id="@+id/cardFood1"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
                             app:cardCornerRadius="12dp"
                             app:cardElevation="0dp">
                             <ImageView
+                                android:id="@+id/imgMenu1"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:background="#E5E7EB"
-                                android:scaleType="centerCrop"/>
+                                android:background="#F3F4F6"
+                                android:scaleType="centerCrop" />
                         </androidx.cardview.widget.CardView>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_toEndOf="@id/imgFood1"
-                            android:layout_toStartOf="@id/btnAdd1"
                             android:layout_marginStart="16dp"
                             android:layout_marginEnd="8dp"
+                            android:layout_toEndOf="@id/cardFood1"
+                            android:layout_toStartOf="@id/btnAdd1"
                             android:orientation="vertical">
 
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nasi Goreng Spesial" android:textColor="#1A1A1A" android:textSize="15sp" android:textStyle="bold"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nasi goreng dengan sambal bawang asli" android:textColor="#9CA3AF" android:textSize="12sp" android:layout_marginTop="4dp" android:maxLines="2" android:ellipsize="end"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp 25.000" android:textColor="#F97316" android:textSize="14sp" android:textStyle="bold" android:layout_marginTop="8dp"/>
+                            <TextView
+                                android:id="@+id/tvNamaMenu1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Nasi Goreng Spesial"
+                                android:textColor="#1A1A1A"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvDeskripsiMenu1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:ellipsize="end"
+                                android:maxLines="2"
+                                android:text="Nasi goreng dengan sambal bawang asli"
+                                android:textColor="#9CA3AF"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tvHargaMenu1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Rp 25.000"
+                                android:textColor="#F97316"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
                         </LinearLayout>
 
                         <androidx.cardview.widget.CardView
@@ -222,6 +255,9 @@
                             android:layout_height="32dp"
                             android:layout_alignParentEnd="true"
                             android:layout_alignParentBottom="true"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?android:attr/selectableItemBackground"
                             app:cardBackgroundColor="#FFF7ED"
                             app:cardCornerRadius="16dp"
                             app:cardElevation="0dp">
@@ -234,6 +270,105 @@
                         </androidx.cardview.widget.CardView>
                     </RelativeLayout>
                 </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="12dp">
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cardFood2"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            app:cardCornerRadius="12dp"
+                            app:cardElevation="0dp">
+                            <ImageView
+                                android:id="@+id/imgMenu2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="#F3F4F6"
+                                android:scaleType="centerCrop" />
+                        </androidx.cardview.widget.CardView>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_toEndOf="@id/cardFood2"
+                            android:layout_toStartOf="@id/btnAdd2"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvNamaMenu2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Ayam Geprek Keju"
+                                android:textColor="#1A1A1A"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvDeskripsiMenu2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:ellipsize="end"
+                                android:maxLines="2"
+                                android:text="Ayam geprek + lelehan keju mozzarella"
+                                android:textColor="#9CA3AF"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tvHargaMenu2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Rp 18.000"
+                                android:textColor="#F97316"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/btnAdd2"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentBottom="true"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?android:attr/selectableItemBackground"
+                            app:cardBackgroundColor="#FFF7ED"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="0dp">
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="8dp"
+                                android:src="@android:drawable/ic_input_add"
+                                app:tint="#F97316" />
+                        </androidx.cardview.widget.CardView>
+                    </RelativeLayout>
+                </androidx.cardview.widget.CardView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="16dp"
+                    android:text="Minuman Segar"
+                    android:textColor="#1A1A1A"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
@@ -249,99 +384,55 @@
                         android:padding="12dp">
 
                         <androidx.cardview.widget.CardView
-                            android:id="@+id/imgFood2"
-                            android:layout_width="72dp"
-                            android:layout_height="72dp"
+                            android:id="@+id/cardDrink1"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
                             app:cardCornerRadius="12dp"
                             app:cardElevation="0dp">
                             <ImageView
+                                android:id="@+id/imgMenu3"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:background="#E5E7EB"
-                                android:scaleType="centerCrop"/>
+                                android:background="#F3F4F6"
+                                android:scaleType="centerCrop" />
                         </androidx.cardview.widget.CardView>
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_toEndOf="@id/imgFood2"
-                            android:layout_toStartOf="@id/btnAdd2"
                             android:layout_marginStart="16dp"
                             android:layout_marginEnd="8dp"
-                            android:orientation="vertical">
-
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ayam Geprek Keju" android:textColor="#1A1A1A" android:textSize="15sp" android:textStyle="bold"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ayam geprek + lelehan keju mozzarella" android:textColor="#9CA3AF" android:textSize="12sp" android:layout_marginTop="4dp" android:maxLines="2" android:ellipsize="end"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp 18.000" android:textColor="#F97316" android:textSize="14sp" android:textStyle="bold" android:layout_marginTop="8dp"/>
-                        </LinearLayout>
-
-                        <androidx.cardview.widget.CardView
-                            android:id="@+id/btnAdd2"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:layout_alignParentEnd="true"
-                            android:layout_alignParentBottom="true"
-                            app:cardBackgroundColor="#FFF7ED"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="0dp">
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:padding="8dp"
-                                android:src="@android:drawable/ic_input_add"
-                                app:tint="#F97316" />
-                        </androidx.cardview.widget.CardView>
-                    </RelativeLayout>
-                </androidx.cardview.widget.CardView>
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:text="Minuman"
-                    android:textColor="#1A1A1A"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp">
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="12dp">
-
-                        <androidx.cardview.widget.CardView
-                            android:id="@+id/imgDrink1"
-                            android:layout_width="72dp"
-                            android:layout_height="72dp"
-                            app:cardCornerRadius="12dp"
-                            app:cardElevation="0dp">
-                            <ImageView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="#E5E7EB"
-                                android:scaleType="centerCrop"/>
-                        </androidx.cardview.widget.CardView>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_toEndOf="@id/imgDrink1"
+                            android:layout_toEndOf="@id/cardDrink1"
                             android:layout_toStartOf="@id/btnAdd3"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginEnd="8dp"
                             android:orientation="vertical">
 
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Es Teh Manis" android:textColor="#1A1A1A" android:textSize="15sp" android:textStyle="bold"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Es teh manis segar" android:textColor="#9CA3AF" android:textSize="12sp" android:layout_marginTop="4dp"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Rp 4.000" android:textColor="#F97316" android:textSize="14sp" android:textStyle="bold" android:layout_marginTop="8dp"/>
+                            <TextView
+                                android:id="@+id/tvNamaMenu3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Es Teh Manis"
+                                android:textColor="#1A1A1A"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvDeskripsiMenu3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Teh melati asli"
+                                android:textColor="#9CA3AF"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tvHargaMenu3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Rp 4.000"
+                                android:textColor="#F97316"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
                         </LinearLayout>
 
                         <androidx.cardview.widget.CardView
@@ -350,6 +441,9 @@
                             android:layout_height="32dp"
                             android:layout_alignParentEnd="true"
                             android:layout_alignParentBottom="true"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?android:attr/selectableItemBackground"
                             app:cardBackgroundColor="#FFF7ED"
                             app:cardCornerRadius="16dp"
                             app:cardElevation="0dp">
@@ -365,7 +459,7 @@
 
                 <Space
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"/>
+                    android:layout_height="60dp" />
 
             </LinearLayout>
         </RelativeLayout>
@@ -375,19 +469,17 @@
         android:id="@+id/btnBackWarung"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:layout_marginStart="24dp"
         android:layout_marginTop="32dp"
         android:background="@drawable/bg_circle_outline"
-
         android:backgroundTint="#80FFFFFF"
-
+        android:clickable="true"
+        android:elevation="6dp"
+        android:focusable="true"
         android:padding="10dp"
         android:src="@drawable/chevronleft"
-
-        app:tint="#1A1A1A"
-
-        android:elevation="4dp"/>
+        app:tint="#1A1A1A" />
 
 </RelativeLayout>

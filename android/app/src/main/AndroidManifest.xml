@@ -59,6 +59,33 @@
         <activity
             android:name=".DetailKantinActivity" />
 
+        <activity
+            android:name=".ActiveOrdersActivity" />
+
+        <activity
+            android:name=".CheckoutActivity" />
+
+        <activity
+            android:name=".DetailProfilPelangganActivity" />
+
+        <activity
+            android:name=".KeamananPelangganActivity" />
+
+        <activity
+            android:name=".LupaPasswordActivity" />
+
+        <activity
+            android:name=".PasswordBerhasilActivity" />
+
+        <activity
+            android:name=".ResetPasswordActivity" />
+
+        <activity
+            android:name=".SuccessPaymentActivity" />
+
+        <activity
+            android:name=".UbahProfilPelangganActivity" />
+
         <!-- Halaman Utama -->
         <activity
             android:name=".MainActivity"
