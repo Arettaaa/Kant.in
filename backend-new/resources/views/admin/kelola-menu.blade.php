@@ -54,7 +54,10 @@
                 </div>
                 <div class="text-start">
                     <h2 class="text-xl font-extrabold text-gray-900 leading-none mb-1 text-start">Warung Bu Ani</h2>
-                    <p class="text-sm text-gray-400 font-medium tracking-wide text-start">Manajemen Menu (4 terdaftar)</p>
+                    {{-- Dinamis ID untuk Count --}}
+                    <p class="text-sm text-gray-400 font-medium tracking-wide text-start">
+                        <span id="menuCount">0</span> Menu terdaftar
+                    </p>
                 </div>
             </div>
             <a href="{{ route('admin.menu.tambah') }}" class="flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#FF6900] text-white font-bold text-sm hover:brightness-110 transition-all">
@@ -63,8 +66,8 @@
             </a>
         </div>
 
-        {{-- Grid Menu --}}
-        <div class="px-10 pb-10 mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 text-start">
+        {{-- Grid Menu Container --}}
+        <div id="menuContainer" class="px-10 pb-10 mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 text-start">
             
             @php
                 $menus = [
@@ -86,7 +89,7 @@
                             <a href="{{ route('admin.menu.edit') }}" class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-blue-500 transition-all text-start">
                                 <i class="fa-solid fa-pencil text-[12px] text-start"></i>
                             </a>
-                            <button onclick="openDeleteModal('{{ $menu['id'] }}', '{{ $menu['name'] }}')" class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-red-500 transition-all text-start text-start">
+                            <button onclick="openDeleteModal('{{ $menu['id'] }}', '{{ $menu['name'] }}')" class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-red-500 transition-all text-start">
                                 <i class="fa-solid fa-trash-can text-[12px] text-start"></i>
                             </button>
                         </div>
@@ -109,29 +112,20 @@
     </main>
 </div>
 
-{{-- ======================== MODAL DELETE (Sesuai Gambar Terbaru) ======================== --}}
+{{-- ======================== MODAL DELETE ======================== --}}
 <div id="deleteModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px] transition-all">
     <div class="bg-white w-[400px] rounded-[32px] p-10 shadow-2xl scale-95 transition-transform duration-300">
         <div class="flex flex-col items-center text-center">
-            {{-- Icon Warning Bulat Pink --}}
             <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-500 mb-6">
                 <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
             </div>
-            
             <h3 class="text-2xl font-black text-gray-900 mb-3">Hapus Menu?</h3>
             <p class="text-[15px] text-gray-500 font-medium leading-relaxed mb-1">Apakah Anda yakin ingin menghapus menu</p>
             <p id="deleteMenuName" class="text-[16px] text-gray-900 font-black mb-6">"Nasi Goreng Spesial"?</p>
-
             <p class="text-[13px] text-gray-400 mb-10">Tindakan ini tidak dapat dibatalkan.</p>
-
-            {{-- Tombol Sejajar --}}
             <div class="grid grid-cols-2 w-full gap-4">
-                <button onclick="closeDeleteModal()" class="py-4 bg-gray-100 text-gray-600 rounded-2xl font-black text-[15px] hover:bg-gray-200 transition-all">
-                    Batal
-                </button>
-                <button onclick="confirmDelete()" class="py-4 bg-[#FF3B30] text-white rounded-2xl font-black text-[15px] shadow-lg shadow-red-100 hover:brightness-110 transition-all text-center">
-                    Hapus
-                </button>
+                <button onclick="closeDeleteModal()" class="py-4 bg-gray-100 text-gray-600 rounded-2xl font-black text-[15px] hover:bg-gray-200 transition-all">Batal</button>
+                <button onclick="confirmDelete()" class="py-4 bg-[#FF3B30] text-white rounded-2xl font-black text-[15px] shadow-lg shadow-red-100 hover:brightness-110 transition-all text-center">Hapus</button>
             </div>
         </div>
     </div>
@@ -139,7 +133,15 @@
 
 @push('scripts')
 <script>
-    // Logic Toggle Stok
+    // Fungsi untuk update jumlah menu di header
+    function updateMenuCount() {
+        const count = document.querySelectorAll('.menu-card').length;
+        document.getElementById('menuCount').innerText = count;
+    }
+
+    // Jalankan pertama kali saat halaman load
+    window.onload = updateMenuCount;
+
     function toggleMenuStatus(id) {
         const card = document.getElementById('menu-' + id);
         const btn = card.querySelector('.toggle-btn');
@@ -167,7 +169,6 @@
         }
     }
 
-    // Logic Modal Delete
     let menuIdToDelete = null;
     function openDeleteModal(id, name) {
         menuIdToDelete = id;
@@ -176,16 +177,19 @@
         modal.classList.remove('hidden');
         setTimeout(() => modal.querySelector('div').classList.replace('scale-95', 'scale-100'), 10);
     }
+
     function closeDeleteModal() {
         const modal = document.getElementById('deleteModal');
         modal.querySelector('div').classList.replace('scale-100', 'scale-95');
         setTimeout(() => modal.classList.add('hidden'), 200);
     }
+
     function confirmDelete() {
-        // Simulasi Hapus
-        document.getElementById('menu-' + menuIdToDelete).classList.add('scale-0', 'opacity-0');
+        const card = document.getElementById('menu-' + menuIdToDelete);
+        card.classList.add('scale-0', 'opacity-0');
         setTimeout(() => {
-            document.getElementById('menu-' + menuIdToDelete).remove();
+            card.remove();
+            updateMenuCount(); // Hitung ulang setelah dihapus
             closeDeleteModal();
         }, 300);
     }

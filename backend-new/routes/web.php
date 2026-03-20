@@ -43,6 +43,7 @@ Route::get('/admin/menu/delete',    fn() => view('admin.delete-menu'))->name('ad
 
 //riwayat
 Route::get('/admin/riwayat', fn() => view('admin.riwayat'))->name('admin.riwayat');
+Route::get('/admin/riwayat/detail',     fn() => view('admin.detail-pesanan'))->name('admin.riwayat.detail');
 
 //profil
 Route::get('/admin/profil', fn() => view('admin.profil'))->name('admin.profil');
