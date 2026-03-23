@@ -42,7 +42,7 @@ class CartController extends Controller
             return response()->json(['success' => false, 'message' => 'Menu tidak ditemukan.'], 404);
         }
 
-        if (!$menu->is_available || $menu->stock <= 0) {
+        if (!$menu->is_available)  {
             return response()->json(['success' => false, 'message' => 'Menu tidak tersedia.'], 422);
         }
 

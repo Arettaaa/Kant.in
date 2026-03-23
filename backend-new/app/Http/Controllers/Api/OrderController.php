@@ -37,7 +37,7 @@ class OrderController extends Controller
         // Validasi stok semua item sebelum checkout
         foreach ($cart->items as $item) {
             $menu = Menu::find($item['menu_id']);
-            if (!$menu || !$menu->is_available || $menu->stock < $item['quantity']) {
+            if (!$menu || !$menu->is_available) {
                 return response()->json([
                     'success' => false,
                     'message' => "Stok menu '{$item['name']}' tidak mencukupi.",
@@ -94,16 +94,6 @@ class OrderController extends Controller
             'status'            => Order::STATUS_PENDING,
         ]);
 
-        // Kurangi stok menu
-        foreach ($cart->items as $item) {
-            Menu::where('_id', $item['menu_id'])->decrement('stock', $item['quantity']);
-            // Auto set is_available false jika stok habis
-            $menu = Menu::find($item['menu_id']);
-            if ($menu && $menu->stock <= 0) {
-                $menu->update(['is_available' => false]);
-            }
-        }
-
         // Hapus cart setelah checkout
         $cart->delete();
 
@@ -158,17 +148,6 @@ class OrderController extends Controller
                 'success' => false,
                 'message' => 'Pesanan tidak dapat dibatalkan karena sudah diproses.',
             ], 422);
-        }
-
-        // Kembalikan stok
-        foreach ($order->items as $item) {
-            $menu = Menu::find($item['menu_id']);
-            if ($menu) {
-                $menu->increment('stock', $item['quantity']);
-                if ($menu->stock > 0 && !$menu->is_available) {
-                    $menu->update(['is_available' => true]);
-                }
-            }
         }
 
         $order->update(['status' => Order::STATUS_CANCELLED]);
