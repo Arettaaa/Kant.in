@@ -36,7 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:fontFamily="@font/inter_bold"
+                android:textStyle="bold"
                 android:text="Pesanan"
                 android:textColor="#1A1A1A"
                 android:textSize="20sp" />
@@ -59,7 +59,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/inter_bold"
+                    android:textStyle="bold"
                     android:paddingBottom="12dp"
                     android:text="Sedang Diproses"
                     android:textColor="#9CA3AF"
@@ -81,7 +81,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/inter_bold"
+                    android:textStyle="bold"
                     android:paddingBottom="12dp"
                     android:text="Riwayat"
                     android:textColor="#F97316"
@@ -125,7 +125,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:fontFamily="@font/inter_regular"
                         android:text="12 Okt 2025 • 01:20 PM"
                         android:textColor="#9CA3AF"
                         android:textSize="11sp" />
@@ -147,7 +146,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="4dp"
-                            android:fontFamily="@font/inter_bold"
+                            android:textStyle="bold"
                             android:text="Selesai"
                             android:textColor="#10B981"
                             android:textSize="10sp" />
@@ -174,7 +173,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_bold"
+                            android:textStyle="bold"
                             android:text="Warung Bu Ani"
                             android:textColor="#1A1A1A"
                             android:textSize="13sp" />
@@ -182,7 +181,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:fontFamily="@font/inter_regular"
                             android:text="2x Nasi Goreng Spesial"
                             android:textColor="#6B7280"
                             android:textSize="12sp" />
@@ -202,14 +200,13 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_regular"
                             android:text="Total Bayar"
                             android:textColor="#9CA3AF"
                             android:textSize="10sp" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_bold"
+                            android:textStyle="bold"
                             android:text="Rp 50.000"
                             android:textColor="#1A1A1A"
                             android:textSize="14sp" />
@@ -228,7 +225,7 @@
                             android:layout_height="wrap_content"
                             android:background="@drawable/btn_outline_yellow"
                             android:drawablePadding="4dp"
-                            android:fontFamily="@font/inter_bold"
+                            android:textStyle="bold"
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="6dp"
                             android:text="Nilai"
@@ -244,7 +241,7 @@
                             android:layout_marginStart="6dp"
                             android:background="@drawable/btn_outline_orange"
                             android:drawablePadding="4dp"
-                            android:fontFamily="@font/inter_bold"
+                            android:textStyle="bold"
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="6dp"
                             android:text="Pesan Lagi"
@@ -271,7 +268,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:fontFamily="@font/inter_regular"
                         android:text="11 Okt 2025 • 12:05 PM"
                         android:textColor="#9CA3AF"
                         android:textSize="11sp" />
@@ -294,7 +290,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="4dp"
-                            android:fontFamily="@font/inter_bold"
+                            android:textStyle="bold"
                             android:text="Dibatalkan"
                             android:textColor="#EF4444"
                             android:textSize="10sp" />
@@ -320,7 +316,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_bold"
+                            android:textStyle="bold"
                             android:text="Ayam Geprek Kampus"
                             android:textColor="#1A1A1A"
                             android:textSize="13sp" />
@@ -328,7 +324,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:fontFamily="@font/inter_regular"
                             android:text="1x Paket Geprek Leleh"
                             android:textColor="#6B7280"
                             android:textSize="12sp" />
@@ -347,14 +342,13 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_regular"
                             android:text="Total Bayar"
                             android:textColor="#9CA3AF"
                             android:textSize="10sp" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_bold"
+                            android:textStyle="bold"
                             android:text="Rp 22.000"
                             android:textColor="#1A1A1A"
                             android:textSize="14sp" />
@@ -367,7 +361,7 @@
                         android:layout_centerVertical="true"
                         android:background="@drawable/btn_outline_orange"
                         android:drawablePadding="4dp"
-                        android:fontFamily="@font/inter_bold"
+                        android:textStyle="bold"
                         android:paddingHorizontal="10dp"
                         android:paddingVertical="6dp"
                         android:text="Pesan Lagi"
@@ -393,7 +387,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:fontFamily="@font/inter_regular"
                         android:text="10 Okt 2025 • 11:45 AM"
                         android:textColor="#9CA3AF"
                         android:textSize="11sp" />
@@ -415,7 +408,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="4dp"
-                            android:fontFamily="@font/inter_bold"
+                            android:textStyle="bold"
                             android:text="Selesai"
                             android:textColor="#10B981"
                             android:textSize="10sp" />
@@ -441,7 +434,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_bold"
+                            android:textStyle="bold"
                             android:text="Geprek Bensu"
                             android:textColor="#1A1A1A"
                             android:textSize="13sp" />
@@ -449,7 +442,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:fontFamily="@font/inter_regular"
                             android:text="1x Ayam Geprek Jumbo, 1x Es Teh"
                             android:textColor="#6B7280"
                             android:textSize="12sp" />
@@ -468,14 +460,13 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_regular"
                             android:text="Total Bayar"
                             android:textColor="#9CA3AF"
                             android:textSize="10sp" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_bold"
+                            android:textStyle="bold"
                             android:text="Rp 25.000"
                             android:textColor="#1A1A1A"
                             android:textSize="14sp" />
@@ -501,7 +492,7 @@
                             android:layout_height="wrap_content"
                             android:background="@drawable/btn_outline_orange"
                             android:drawablePadding="4dp"
-                            android:fontFamily="@font/inter_bold"
+                            android:textStyle="bold"
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="6dp"
                             android:text="Pesan Lagi"

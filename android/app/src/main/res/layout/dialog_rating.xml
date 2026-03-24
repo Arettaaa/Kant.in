@@ -12,7 +12,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/inter_bold"
+        android:textStyle="bold"
         android:text="Nilai Pesananmu!"
         android:textColor="#1A1A1A"
         android:textSize="20sp" />
@@ -81,7 +81,7 @@
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:background="@drawable/bg_border_gray"
-            android:fontFamily="@font/inter_bold"
+            android:textStyle="bold"
             android:gravity="center"
             android:paddingVertical="12dp"
             android:text="Nanti Saja"
@@ -95,7 +95,7 @@
             android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:background="@drawable/bg_btn_orange_solid"
-            android:fontFamily="@font/inter_bold"
+            android:textStyle="bold"
             android:gravity="center"
             android:paddingVertical="12dp"
             android:text="Kirim Penilaian"

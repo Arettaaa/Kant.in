@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:fontFamily="@font/inter_bold"
+            android:textStyle="bold"
             android:text="Pembayaran"
             android:textColor="#1A1A1A"
             android:textSize="18sp" />
@@ -69,7 +69,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:fontFamily="@font/inter_bold"
+                        android:textStyle="bold"
                         android:text="Ringkasan Pesanan"
                         android:textColor="#1A1A1A"
                         android:textSize="15sp" />
@@ -80,7 +80,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:background="@drawable/bg_badge_orange_light"
-                        android:fontFamily="@font/inter_medium"
+                        android:textStyle="bold"
                         android:paddingHorizontal="10dp"
                         android:paddingVertical="4dp"
                         android:text="3 Item"
@@ -96,7 +96,6 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/inter_regular"
                         android:text="Subtotal"
                         android:textColor="#6B7280"
                         android:textSize="14sp" />
@@ -105,7 +104,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:fontFamily="@font/inter_bold"
+                        android:textStyle="bold"
                         android:text="Rp 43.000"
                         android:textColor="#1A1A1A"
                         android:textSize="14sp" />
@@ -118,7 +117,6 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/inter_regular"
                         android:text="Biaya Ongkir"
                         android:textColor="#6B7280"
                         android:textSize="14sp" />
@@ -127,7 +125,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:fontFamily="@font/inter_bold"
+                        android:textStyle="bold"
                         android:text="Rp 5.000"
                         android:textColor="#1A1A1A"
                         android:textSize="14sp" />
@@ -147,7 +145,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:fontFamily="@font/inter_bold"
+                        android:textStyle="bold"
                         android:text="Total Pembayaran"
                         android:textColor="#1A1A1A"
                         android:textSize="15sp" />
@@ -157,7 +155,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
-                        android:fontFamily="@font/inter_bold"
+                        android:textStyle="bold"
                         android:text="Rp 48.000"
                         android:textColor="#F97316"
                         android:textSize="18sp" />
@@ -183,7 +181,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_badge_blue_light"
-                        android:fontFamily="@font/inter_bold"
+                        android:textStyle="bold"
                         android:paddingHorizontal="10dp"
                         android:paddingVertical="4dp"
                         android:text="QRIS"
@@ -194,7 +192,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:fontFamily="@font/inter_bold"
+                        android:textStyle="bold"
                         android:text="Pindai untuk Bayar"
                         android:textColor="#1A1A1A"
                         android:textSize="15sp" />
@@ -204,7 +202,6 @@
                     android:layout_width="220dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:fontFamily="@font/inter_regular"
                     android:gravity="center"
                     android:text="Buka aplikasi bank atau e-wallet kamu dan pindai kode QR di bawah ini"
                     android:textColor="#6B7280"
@@ -235,7 +232,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_badge_gray_light"
-                    android:fontFamily="@font/inter_bold"
+                    android:textStyle="bold"
                     android:paddingHorizontal="16dp"
                     android:paddingVertical="8dp"
                     android:text="Kant.in Main Food Court"
@@ -247,7 +244,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:fontFamily="@font/inter_bold"
+                android:textStyle="bold"
                 android:text="Unggah Bukti Bayar"
                 android:textColor="#1A1A1A"
                 android:textSize="15sp" />
@@ -277,7 +274,7 @@
                     android:id="@+id/tvUploadStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/inter_bold"
+                    android:textStyle="bold"
                     android:text="Unggah bukti transfer"
                     android:textColor="#1A1A1A"
                     android:textSize="15sp" />
@@ -286,7 +283,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:fontFamily="@font/inter_regular"
                     android:text="JPG, PNG, atau PDF"
                     android:textColor="#9CA3AF"
                     android:textSize="13sp" />
@@ -310,7 +306,7 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:background="@drawable/bg_btn_orange_solid"
-            android:fontFamily="@font/inter_bold"
+            android:textStyle="bold"
             android:gravity="center"
             android:text="Konfirmasi Pembayaran"
             android:textColor="#FFFFFF"

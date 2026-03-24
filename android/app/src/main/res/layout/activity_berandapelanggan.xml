@@ -288,7 +288,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:fontFamily="@font/inter_bold"
+                    android:textStyle="bold"
                     android:text="Lihat Semua Menu >"
                     android:textColor="#F97316"
                     android:textSize="12sp" />
@@ -389,7 +389,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:fontFamily="@font/inter_bold"
+                    android:textStyle="bold"
                     android:text="Lihat Semua Kantin >"
                     android:textColor="#F97316"
                     android:textSize="12sp" />

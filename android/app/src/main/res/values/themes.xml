@@ -1,18 +1,14 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Base.Theme.Kantin" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:fontFamily">@font/inter</item>
+        <item name="fontFamily">@font/inter</item>
     </style>
 
     <style name="Theme.Kantin" parent="Base.Theme.Kantin" />
 
-    <!-- Theme untuk Splash Screen (tanpa action bar, status bar orange) -->
     <style name="Theme.Kantin.NoActionBar" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">#FF6B00</item>
         <item name="android:windowBackground">#FF6B00</item>
-        <item name="android:fontFamily">@font/inter_regular</item>
-        <item name="fontFamily">@font/inter_regular</item>
     </style>
 
 </resources>
