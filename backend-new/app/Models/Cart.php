@@ -11,8 +11,6 @@ class Cart extends Model
 
     protected $fillable = [
         'user_id',
-        'canteen_id',
-        'items',
-        'total_amount',
+        'canteens', // array of {canteen_id, items, subtotal}
     ];
 }

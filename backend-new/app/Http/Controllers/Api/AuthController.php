@@ -66,7 +66,7 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Registrasi berhasil',
             'token' => $token,
-            'user' => $user,
+            'user' => $this->formatUser($user),
         ], 201);
     }
 
@@ -102,7 +102,7 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Login berhasil',
             'token' => $token,
-            'user' => $user,
+            'user' => $this->formatUser($user),
         ]);
     }
 
@@ -113,5 +113,14 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Logout berhasil',
         ]);
+    }
+
+    private function formatUser($user)
+    {
+        $data = $user->toArray();
+        if ($data['role'] === 'pembeli') {
+            unset($data['canteen_id']);
+        }
+        return $data;
     }
 }
