@@ -76,9 +76,6 @@ Route::middleware(['auth:sanctum', 'role:admin_kantin'])->group(function () {
     Route::post('/canteens/{id}/orders/{orderId}/payments/verify', [OrderController::class, 'verifyPayment']);
     Route::post('/canteens/{id}/orders/{orderId}/payments/reject', [OrderController::class, 'rejectPayment']);
 
-    // Transactions
-    Route::get('/canteens/{id}/transactions', [TransactionController::class, 'index']);
-
     // Profile
     Route::get('/admin/profiles', [ProfileController::class, 'show']);
     Route::put('/admin/profiles', [ProfileController::class, 'update']);
@@ -95,11 +92,15 @@ Route::middleware(['auth:sanctum', 'role:admin_global'])->group(function () {
     Route::put('/canteens/{id}', [CanteenController::class, 'update']);
     Route::delete('/canteens/{id}', [CanteenController::class, 'destroy']);
 
-    // Dashboard & transactions
-    Route::get('/canteens/{id}/dashboard', [TransactionController::class, 'dashboard']);
-    Route::get('/canteens/{id}/transactions', [TransactionController::class, 'index']);
-
     Route::get('/registrations', [CanteenController::class, 'registrations']);
     Route::post('/registrations/{id}/approve', [CanteenController::class, 'approveRegistration']);
     Route::post('/registrations/{id}/reject', [CanteenController::class, 'rejectRegistration']);
+
+    Route::get('/transactions', [TransactionController::class, 'globalTransactions']);
+    Route::get('/dashboard', [TransactionController::class, 'globalDashboard']);
+});
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/canteens/{id}/transactions', [TransactionController::class, 'index']);
+    Route::get('/canteens/{id}/dashboard', [TransactionController::class, 'dashboard']);
 });

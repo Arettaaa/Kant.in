@@ -9,6 +9,11 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, string $role)
     {
+        \Log::info('RoleMiddleware', [
+            'user_role' => $request->user()?->role,
+            'required_role' => $role,
+        ]);
+
         if (!$request->user() || $request->user()->role !== $role) {
             return response()->json([
                 'message' => 'Unauthorized. Role tidak sesuai.'
@@ -17,4 +22,6 @@ class RoleMiddleware
 
         return $next($request);
     }
+
+
 }
