@@ -52,6 +52,7 @@ class CanteenController extends Controller
             'operating_hours' => 'required|array',
             'operating_hours.open' => 'required|string',
             'operating_hours.close' => 'required|string',
+            'qris_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             // Data admin kantin
             'admin_name' => 'required|string',
             'admin_email' => 'required|email|unique:users,email',
@@ -63,6 +64,10 @@ class CanteenController extends Controller
             $validated['image'] = $request->file('image')->store('canteens', 'public');
         }
 
+        if ($request->hasFile('qris_image')) {
+            $validated['qris_image'] = $request->file('qris_image')->store('qris', 'public');
+        }
+
         // Buat kantin
         $canteen = Canteen::create([
             'name' => $validated['name'],
@@ -70,6 +75,7 @@ class CanteenController extends Controller
             'location' => $validated['location'],
             'phone' => $validated['phone'] ?? null,
             'image' => $validated['image'] ?? null,
+            'qris_image' => $validated['qris_image'] ?? null,
             'delivery_fee_flat' => $validated['delivery_fee_flat'],
             'operating_hours' => $validated['operating_hours'],
             'is_active' => true,
@@ -121,6 +127,7 @@ class CanteenController extends Controller
             'operating_hours.open' => 'sometimes|string',
             'operating_hours.close' => 'sometimes|string',
             'is_active' => 'sometimes|boolean',
+            'qris_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         if ($request->hasFile('image')) {
@@ -129,6 +136,13 @@ class CanteenController extends Controller
                 Storage::disk('public')->delete($canteen->image);
             }
             $validated['image'] = $request->file('image')->store('canteens', 'public');
+        }
+
+        if ($request->hasFile('qris_image')) {
+            if ($canteen->qris_image) {
+                Storage::disk('public')->delete($canteen->qris_image);
+            }
+            $validated['qris_image'] = $request->file('qris_image')->store('qris', 'public');
         }
 
         $canteen->update($validated);
@@ -168,6 +182,9 @@ class CanteenController extends Controller
         $data = $canteen->toArray();
         if (!empty($data['image'])) {
             $data['image'] = asset('storage/' . $data['image']);
+        }
+        if (!empty($data['qris_image'])) {
+            $data['qris_image'] = asset('storage/' . $data['qris_image']);
         }
         return $data;
     }

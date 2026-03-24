@@ -17,13 +17,13 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'delivery_method' => 'required|in:pickup,delivery',
-            'location_note'   => 'required_if:delivery_method,delivery|nullable|string',
-            'payment_method'  => 'required|in:qris,cash',
-            'order_notes'     => 'nullable|string',
+            'location_note' => 'required_if:delivery_method,delivery|nullable|string',
+            'payment_method' => 'required|in:qris,cash',
+            'order_notes' => 'nullable|string',
         ]);
 
         $userId = (string) $request->user()->_id;
-        $cart   = Cart::where('user_id', $userId)->first();
+        $cart = Cart::where('user_id', $userId)->first();
 
         if (!$cart || empty($cart->items)) {
             return response()->json(['success' => false, 'message' => 'Keranjang kosong.'], 422);
@@ -54,44 +54,44 @@ class OrderController extends Controller
         $orderItems = array_map(function ($item) {
             $menu = Menu::find($item['menu_id']);
             return [
-                'menu_id'                => $item['menu_id'],
-                'name'                   => $item['name'],
-                'price'                  => $item['price'],
-                'quantity'               => $item['quantity'],
-                'notes'                  => $item['notes'] ?? null,
+                'menu_id' => $item['menu_id'],
+                'name' => $item['name'],
+                'price' => $item['price'],
+                'quantity' => $item['quantity'],
+                'notes' => $item['notes'] ?? null,
                 'estimated_cooking_time' => $menu->estimated_cooking_time ?? 0,
-                'subtotal'               => $item['subtotal'],
+                'subtotal' => $item['subtotal'],
             ];
         }, $cart->items);
 
-        $user       = $request->user();
-        $orderCode  = 'KANTIN-' . date('Y') . '-' . strtoupper(Str::random(6));
-        $subtotal   = $cart->total_amount;
-        $total      = $subtotal + $deliveryFee;
+        $user = $request->user();
+        $orderCode = 'KANTIN-' . date('Y') . '-' . strtoupper(Str::random(6));
+        $subtotal = $cart->total_amount;
+        $total = $subtotal + $deliveryFee;
 
         $order = Order::create([
-            'order_code'        => $orderCode,
+            'order_code' => $orderCode,
             'customer_snapshot' => [
                 'user_id' => (string) $user->_id,
-                'name'    => $user->name,
-                'phone'   => $user->phone,
+                'name' => $user->name,
+                'phone' => $user->phone,
             ],
-            'canteen_id'        => (string) $cart->canteen_id,
-            'items'             => $orderItems,
-            'order_notes'       => $validated['order_notes'] ?? null,
-            'subtotal_amount'   => $subtotal,
-            'delivery_details'  => [
-                'method'        => $validated['delivery_method'],
-                'fee'           => $deliveryFee,
+            'canteen_id' => (string) $cart->canteen_id,
+            'items' => $orderItems,
+            'order_notes' => $validated['order_notes'] ?? null,
+            'subtotal_amount' => $subtotal,
+            'delivery_details' => [
+                'method' => $validated['delivery_method'],
+                'fee' => $deliveryFee,
                 'location_note' => $validated['location_note'] ?? null,
             ],
-            'total_amount'      => $total,
-            'payment'           => [
-                'method'  => $validated['payment_method'],
-                'status'  => 'unpaid',
+            'total_amount' => $total,
+            'payment' => [
+                'method' => $validated['payment_method'],
+                'status' => 'unpaid',
                 'paid_at' => null,
             ],
-            'status'            => Order::STATUS_PENDING,
+            'status' => Order::STATUS_PENDING,
         ]);
 
         // Hapus cart setelah checkout
@@ -100,7 +100,7 @@ class OrderController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Pesanan berhasil dibuat.',
-            'data'    => $order,
+            'data' => $order,
         ], 201);
     }
 
@@ -150,14 +150,25 @@ class OrderController extends Controller
             ], 422);
         }
 
+        $timeout = env('ORDER_CANCEL_TIMEOUT', 10);
+        $minutesSinceOrder = $order->created_at->diffInMinutes(now());
+
+        if ($minutesSinceOrder > $timeout) {
+            return response()->json([
+                'success' => false,
+                'message' => "Pesanan tidak dapat dibatalkan. Batas waktu pembatalan adalah {$timeout} menit.",
+            ], 422);
+        }
+
         $order->update(['status' => Order::STATUS_CANCELLED]);
 
         return response()->json([
             'success' => true,
             'message' => 'Pesanan berhasil dibatalkan.',
-            'data'    => $order->fresh(),
+            'data' => $order->fresh(),
         ]);
     }
+
 
     // GET /buyers/orders/histories
     public function history(Request $request)
@@ -178,9 +189,14 @@ class OrderController extends Controller
     {
         $this->authorizeAdminKantin($request, $canteenId);
 
-        $orders = Order::where('canteen_id', $canteenId)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = Order::where('canteen_id', $canteenId)
+            ->orderBy('created_at', 'desc');
+
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $orders = $query->get();
 
         return response()->json(['success' => true, 'data' => $orders]);
     }
@@ -205,7 +221,7 @@ class OrderController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Pesanan sedang diproses.',
-            'data'    => $order->fresh(),
+            'data' => $order->fresh(),
         ]);
     }
 
@@ -229,7 +245,7 @@ class OrderController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Status pesanan berhasil diperbarui.',
-            'data'    => $order->fresh(),
+            'data' => $order->fresh(),
         ]);
     }
 
@@ -243,4 +259,6 @@ class OrderController extends Controller
             ], 403));
         }
     }
+
+
 }
