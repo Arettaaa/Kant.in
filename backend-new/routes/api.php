@@ -74,6 +74,8 @@ Route::middleware(['auth:sanctum', 'role:admin_kantin'])->group(function () {
     Route::get('/canteens/{id}/orders', [OrderController::class, 'canteenOrders']);
     Route::post('/canteens/{id}/orders/{orderId}/processes', [OrderController::class, 'process']);
     Route::put('/canteens/{id}/orders/{orderId}/statuses', [OrderController::class, 'updateStatus']);
+    Route::post('/canteens/{id}/orders/{orderId}/payments/verify', [OrderController::class, 'verifyPayment']);
+    Route::post('/canteens/{id}/orders/{orderId}/payments/reject', [OrderController::class, 'rejectPayment']);
 
     // Transactions
     Route::get('/canteens/{id}/transactions', [TransactionController::class, 'index']);
