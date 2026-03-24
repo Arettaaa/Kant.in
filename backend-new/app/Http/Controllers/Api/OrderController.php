@@ -18,8 +18,8 @@ class OrderController extends Controller
         $validated = $request->validate([
             'delivery_method' => 'required|in:pickup,delivery',
             'location_note' => 'required_if:delivery_method,delivery|nullable|string',
-            'payment_method' => 'required|in:qris,cash',
             'order_notes' => 'nullable|string',
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg,pdf|max:5120',
         ]);
 
         $userId = (string) $request->user()->_id;
@@ -34,23 +34,23 @@ class OrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Kantin tidak tersedia.'], 422);
         }
 
-        // Validasi stok semua item sebelum checkout
         foreach ($cart->items as $item) {
             $menu = Menu::find($item['menu_id']);
             if (!$menu || !$menu->is_available) {
                 return response()->json([
                     'success' => false,
-                    'message' => "Stok menu '{$item['name']}' tidak mencukupi.",
+                    'message' => "Menu '{$item['name']}' tidak tersedia.",
                 ], 422);
             }
         }
 
-        // Hitung delivery fee
+        // Upload bukti bayar
+        $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
+
         $deliveryFee = $validated['delivery_method'] === 'delivery'
             ? ($canteen->delivery_fee_flat ?? 0)
             : 0;
 
-        // Build items snapshot dengan estimated_cooking_time
         $orderItems = array_map(function ($item) {
             $menu = Menu::find($item['menu_id']);
             return [
@@ -87,19 +87,19 @@ class OrderController extends Controller
             ],
             'total_amount' => $total,
             'payment' => [
-                'method' => $validated['payment_method'],
-                'status' => 'unpaid',
+                'method' => 'qris',
+                'status' => 'pending_verification',
+                'proof' => asset('storage/' . $paymentProofPath),
                 'paid_at' => null,
             ],
             'status' => Order::STATUS_PENDING,
         ]);
 
-        // Hapus cart setelah checkout
         $cart->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Pesanan berhasil dibuat.',
+            'message' => 'Pesanan berhasil dibuat. Menunggu verifikasi pembayaran.',
             'data' => $order,
         ], 201);
     }
@@ -258,6 +258,64 @@ class OrderController extends Controller
                 'message' => 'Anda tidak memiliki akses ke kantin ini.',
             ], 403));
         }
+    }
+
+    // POST /canteens/{id}/orders/{orderId}/payments/verify
+    public function verifyPayment(Request $request, $canteenId, $orderId)
+    {
+        $this->authorizeAdminKantin($request, $canteenId);
+
+        $order = Order::where('_id', $orderId)->where('canteen_id', $canteenId)->first();
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Pesanan tidak ditemukan.'], 404);
+        }
+
+        if ($order->payment['status'] !== 'pending_verification') {
+            return response()->json(['success' => false, 'message' => 'Pembayaran sudah diverifikasi.'], 422);
+        }
+
+        $payment = $order->payment;
+        $payment['status'] = 'paid';
+        $payment['paid_at'] = now()->toDateTimeString();
+
+        $order->update(['payment' => $payment]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pembayaran berhasil diverifikasi.',
+            'data' => $order->fresh(),
+        ]);
+    }
+
+    // POST /canteens/{id}/orders/{orderId}/payments/reject
+    public function rejectPayment(Request $request, $canteenId, $orderId)
+    {
+        $this->authorizeAdminKantin($request, $canteenId);
+
+        $order = Order::where('_id', $orderId)->where('canteen_id', $canteenId)->first();
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Pesanan tidak ditemukan.'], 404);
+        }
+
+        if ($order->payment['status'] !== 'pending_verification') {
+            return response()->json(['success' => false, 'message' => 'Pembayaran sudah diverifikasi.'], 422);
+        }
+
+        $request->validate(['reason' => 'nullable|string']);
+
+        $payment = $order->payment;
+        $payment['status'] = 'rejected';
+
+        $order->update([
+            'payment' => $payment,
+            'status' => Order::STATUS_CANCELLED,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pembayaran ditolak. Pesanan dibatalkan.',
+            'data' => $order->fresh(),
+        ]);
     }
 
 
