@@ -42,10 +42,10 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:fontFamily="@font/inter_bold"
                         android:text="Warung Bu Ani"
                         android:textColor="#1A1A1A"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
+                        android:textSize="22sp" />
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="wrap_content"
@@ -73,10 +73,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="4dp"
+                                android:fontFamily="@font/inter_bold"
                                 android:text="4.8"
                                 android:textColor="#F97316"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
+                                android:textSize="14sp" />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
                 </LinearLayout>
@@ -86,6 +86,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:fontFamily="@font/inter_regular"
                     android:lineSpacingExtra="4dp"
                     android:text="Menyediakan ayam geprek dengan berbagai level pedas dan aneka minuman segar."
                     android:textColor="#6B7280"
@@ -109,15 +110,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
+                        android:fontFamily="@font/inter_medium"
                         android:text="Kantin Utara"
                         android:textColor="#4B5563"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
+                        android:textSize="12sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="12dp"
+                        android:fontFamily="@font/inter_regular"
                         android:text="•"
                         android:textColor="#D1D5DB"
                         android:textSize="12sp" />
@@ -133,10 +135,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
+                        android:fontFamily="@font/inter_medium"
                         android:text="10-15 min"
                         android:textColor="#4B5563"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <View
@@ -166,6 +168,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginStart="8dp"
                         android:background="@null"
+                        android:fontFamily="@font/inter_regular"
                         android:hint="Cari menu di warung ini..."
                         android:inputType="text"
                         android:textColor="#111827"
@@ -177,10 +180,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    android:fontFamily="@font/inter_bold"
                     android:text="Makanan Utama"
                     android:textColor="#1A1A1A"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textSize="18sp" />
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
@@ -222,10 +225,10 @@
                                 android:id="@+id/tvNamaMenu1"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter_bold"
                                 android:text="Nasi Goreng Spesial"
                                 android:textColor="#1A1A1A"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
+                                android:textSize="15sp" />
 
                             <TextView
                                 android:id="@+id/tvDeskripsiMenu1"
@@ -233,6 +236,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
                                 android:ellipsize="end"
+                                android:fontFamily="@font/inter_regular"
                                 android:maxLines="2"
                                 android:text="Nasi goreng dengan sambal bawang asli"
                                 android:textColor="#9CA3AF"
@@ -243,10 +247,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
+                                android:fontFamily="@font/inter_bold"
                                 android:text="Rp 25.000"
                                 android:textColor="#F97316"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
+                                android:textSize="14sp" />
                         </LinearLayout>
 
                         <androidx.cardview.widget.CardView
@@ -311,10 +315,10 @@
                                 android:id="@+id/tvNamaMenu2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter_bold"
                                 android:text="Ayam Geprek Keju"
                                 android:textColor="#1A1A1A"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
+                                android:textSize="15sp" />
 
                             <TextView
                                 android:id="@+id/tvDeskripsiMenu2"
@@ -322,6 +326,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
                                 android:ellipsize="end"
+                                android:fontFamily="@font/inter_regular"
                                 android:maxLines="2"
                                 android:text="Ayam geprek + lelehan keju mozzarella"
                                 android:textColor="#9CA3AF"
@@ -332,10 +337,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
+                                android:fontFamily="@font/inter_bold"
                                 android:text="Rp 18.000"
                                 android:textColor="#F97316"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
+                                android:textSize="14sp" />
                         </LinearLayout>
 
                         <androidx.cardview.widget.CardView
@@ -365,10 +370,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:layout_marginBottom="16dp"
+                    android:fontFamily="@font/inter_bold"
                     android:text="Minuman Segar"
                     android:textColor="#1A1A1A"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textSize="18sp" />
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
@@ -410,16 +415,17 @@
                                 android:id="@+id/tvNamaMenu3"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter_bold"
                                 android:text="Es Teh Manis"
                                 android:textColor="#1A1A1A"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
+                                android:textSize="15sp" />
 
                             <TextView
                                 android:id="@+id/tvDeskripsiMenu3"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
+                                android:fontFamily="@font/inter_regular"
                                 android:text="Teh melati asli"
                                 android:textColor="#9CA3AF"
                                 android:textSize="12sp" />
@@ -429,10 +435,10 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
+                                android:fontFamily="@font/inter_bold"
                                 android:text="Rp 4.000"
                                 android:textColor="#F97316"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
+                                android:textSize="14sp" />
                         </LinearLayout>
 
                         <androidx.cardview.widget.CardView

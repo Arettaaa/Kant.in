@@ -41,19 +41,19 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:fontFamily="@font/inter_bold"
+                        android:lineSpacingExtra="4dp"
                         android:text="Nasi Goreng\nSpesial"
                         android:textColor="#1A1A1A"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:lineSpacingExtra="4dp"/>
+                        android:textSize="24sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_bold"
                         android:text="Rp 25.000"
                         android:textColor="#F97316"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
+                        android:textSize="20sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -73,15 +73,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
+                        android:fontFamily="@font/inter_bold"
                         android:text="4.8"
                         android:textColor="#1A1A1A"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
+                        android:fontFamily="@font/inter_regular"
                         android:text="(124 ulasan)"
                         android:textColor="#6B7280"
                         android:textSize="14sp" />
@@ -90,6 +91,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="12dp"
+                        android:fontFamily="@font/inter_regular"
                         android:text="•"
                         android:textColor="#D1D5DB"
                         android:textSize="14sp" />
@@ -104,6 +106,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
+                        android:fontFamily="@font/inter_medium"
                         android:text="Siap dalam 15 mnt"
                         android:textColor="#6B7280"
                         android:textSize="14sp" />
@@ -113,15 +116,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
+                    android:fontFamily="@font/inter_bold"
                     android:text="Deskripsi"
                     android:textColor="#1A1A1A"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textSize="16sp" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:fontFamily="@font/inter_regular"
                     android:lineSpacingExtra="6dp"
                     android:text="Sepiring nasi goreng autentik Indonesia yang dimasak dengan kecap manis pilihan, disajikan dengan telur mata sapi, taburan bawang goreng renyah, serta pelengkap timun dan tomat segar. Menu favorit yang nikmat disantap kapan saja."
                     android:textColor="#6B7280"
@@ -132,10 +136,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="12dp"
+                    android:fontFamily="@font/inter_bold"
                     android:text="Tambah Toping (Opsional)"
                     android:textColor="#1A1A1A"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textSize="16sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -146,16 +150,17 @@
                     android:orientation="horizontal"
                     android:padding="16dp">
 
-                    <CheckBox
+                    <androidx.appcompat.widget.AppCompatCheckBox
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:buttonTint="#9CA3AF"/>
+                        app:buttonTint="#9CA3AF" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
+                        android:fontFamily="@font/inter_medium"
                         android:text="Ekstra Telur"
                         android:textColor="#1A1A1A"
                         android:textSize="14sp" />
@@ -163,10 +168,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_bold"
                         android:text="+Rp 5.000"
                         android:textColor="#6B7280"
-                        android:textSize="14sp"
-                        android:textStyle="bold"/>
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -178,16 +183,17 @@
                     android:orientation="horizontal"
                     android:padding="16dp">
 
-                    <CheckBox
+                    <androidx.appcompat.widget.AppCompatCheckBox
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:buttonTint="#9CA3AF"/>
+                        app:buttonTint="#9CA3AF" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
+                        android:fontFamily="@font/inter_medium"
                         android:text="Sosis Ayam"
                         android:textColor="#1A1A1A"
                         android:textSize="14sp" />
@@ -195,10 +201,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_bold"
                         android:text="+Rp 8.000"
                         android:textColor="#6B7280"
-                        android:textSize="14sp"
-                        android:textStyle="bold"/>
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -210,16 +216,17 @@
                     android:orientation="horizontal"
                     android:padding="16dp">
 
-                    <CheckBox
+                    <androidx.appcompat.widget.AppCompatCheckBox
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:buttonTint="#9CA3AF"/>
+                        app:buttonTint="#9CA3AF" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_weight="1"
+                        android:fontFamily="@font/inter_medium"
                         android:text="Sambal Pedas"
                         android:textColor="#1A1A1A"
                         android:textSize="14sp" />
@@ -227,10 +234,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:fontFamily="@font/inter_bold"
                         android:text="Gratis"
                         android:textColor="#9CA3AF"
-                        android:textSize="14sp"
-                        android:textStyle="bold"/>
+                        android:textSize="14sp" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -241,16 +248,16 @@
         android:id="@+id/btnBack"
         android:layout_width="44dp"
         android:layout_height="44dp"
-        android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:layout_marginStart="24dp"
         android:layout_marginTop="32dp"
         android:background="@drawable/bg_circle_outline"
         android:backgroundTint="#FFFFFF"
+        android:elevation="4dp"
         android:padding="12dp"
         android:src="@drawable/chevronleft"
-        app:tint="#1A1A1A"
-        android:elevation="4dp"/>
+        app:tint="#1A1A1A" />
 
     <LinearLayout
         android:id="@+id/bottomBarContainer"
@@ -283,13 +290,13 @@
 
             <TextView
                 android:id="@+id/tvQuantity"
-                android:text="1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
+                android:fontFamily="@font/inter_bold"
+                android:text="1"
                 android:textColor="#1A1A1A"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/btnPlus"
@@ -322,23 +329,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:orientation="vertical"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="111dp"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_bold"
                     android:text="Masukkan"
                     android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
+                    android:textSize="15sp" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_bold"
                     android:text="Keranjang"
                     android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
+                    android:textSize="15sp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

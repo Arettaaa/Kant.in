@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="24dp"
+    android:background="@drawable/bg_border_gray"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/inter_bold"
+        android:text="Nilai Pesananmu!"
+        android:textColor="#1A1A1A"
+        android:textSize="20sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/inter_regular"
+        android:gravity="center"
+        android:text="Bagaimana makanannya? Penilaianmu membantu teman-teman lain menemukan menu terbaik di kantin!"
+        android:textColor="#6B7280"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/star1"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/star"
+            app:tint="#FBBF24" />
+        <ImageView
+        android:id="@+id/star2"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/star"
+        app:tint="#FBBF24" />
+        <ImageView
+        android:id="@+id/star3"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/star"
+        app:tint="#FBBF24" />
+        <ImageView
+        android:id="@+id/star4"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/star"
+        app:tint="#FBBF24" />
+        <ImageView
+        android:id="@+id/star5"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:src="@drawable/star"
+        app:tint="#FBBF24" /> </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/btnNantiSaja"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_border_gray"
+            android:fontFamily="@font/inter_bold"
+            android:gravity="center"
+            android:paddingVertical="12dp"
+            android:text="Nanti Saja"
+            android:textColor="#4B5563"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/btnKirimPenilaian"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_btn_orange_solid"
+            android:fontFamily="@font/inter_bold"
+            android:gravity="center"
+            android:paddingVertical="12dp"
+            android:text="Kirim Penilaian"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+    </LinearLayout>
+</LinearLayout>
