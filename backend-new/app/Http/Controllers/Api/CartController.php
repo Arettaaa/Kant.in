@@ -51,6 +51,10 @@ class CartController extends Controller
             return response()->json(['success' => false, 'message' => 'Kantin tidak tersedia.'], 422);
         }
 
+        if (!$canteen->is_open) {
+            return response()->json(['success' => false, 'message' => 'Kantin sedang tutup.'], 422);
+        }
+
         $userId = (string) $request->user()->_id;
         $canteenId = (string) $menu->canteen_id;
         $cart = Cart::where('user_id', $userId)->first();

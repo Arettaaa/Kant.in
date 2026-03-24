@@ -50,6 +50,10 @@ class OrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Kantin tidak tersedia.'], 422);
         }
 
+        if (!$canteen->is_open) {
+            return response()->json(['success' => false, 'message' => 'Kantin sedang tutup. Tidak dapat melakukan pemesanan.'], 422);
+        }
+
         // Validasi jam operasional
         $now = now()->timezone('Asia/Jakarta')->format('H:i');
         $open = $canteen->operating_hours['open'] ?? '00:00';

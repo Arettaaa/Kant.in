@@ -79,6 +79,7 @@ class CanteenController extends Controller
             'delivery_fee_flat' => $validated['delivery_fee_flat'],
             'operating_hours' => $validated['operating_hours'],
             'is_active' => true,
+            'is_open' => true,
             'status' => 'active',
         ]);
 
@@ -278,6 +279,40 @@ class CanteenController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Registrasi kantin ditolak.',
+        ]);
+    }
+
+    // ADMIN KANTIN: PUT /canteens/{id}/availability
+    public function toggleOpen(Request $request, $id)
+    {
+        $user = $request->user();
+        $canteen = Canteen::find($id);
+
+        if (!$canteen) {
+            return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan.'], 404);
+        }
+
+        // Pastikan admin kantin hanya bisa toggle kantinnya sendiri
+        if ($user->role === 'admin_kantin' && (string) $user->canteen_id !== (string) $id) {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
+        }
+
+        $request->validate([
+            'is_open' => 'required|in:0,1,true,false',
+        ]);
+
+        $isOpen = filter_var($request->is_open, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        if (is_null($isOpen)) {
+            $isOpen = (bool) (int) $request->is_open;
+        }
+
+        Canteen::where('_id', $id)->update(['is_open' => $isOpen]);
+        $canteen = Canteen::find($id);
+
+        return response()->json([
+            'success' => true,
+            'message' => $isOpen ? 'Kantin sekarang buka.' : 'Kantin sekarang tutup.',
+            'data' => $this->formatCanteen($canteen),
         ]);
     }
 }
