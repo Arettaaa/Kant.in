@@ -2,8 +2,8 @@ package com.example.kantin.network;
 
 import com.example.kantin.model.request.LoginRequest;
 import com.example.kantin.model.request.RegisterAdminKantinRequest;
-import com.example.kantin.model.request.UpdateOrderStatusRequest;
-import com.example.kantin.model.request.UpdateProfileAdminRequest;
+import com.example.kantin.model.request.UpdateStatusOrderRequest;
+import com.example.kantin.model.request.UpdateProfilAdminRequest;
 import com.example.kantin.model.request.UpdatePasswordRequest;
 import com.example.kantin.model.response.BaseResponse;
 import com.example.kantin.model.response.LoginResponse;
@@ -130,7 +130,7 @@ public interface ApiService {
     Call<BaseResponse> updateOrderStatus(
             @Path("canteenId") String canteenId,
             @Path("orderId") String orderId,
-            @Body UpdateOrderStatusRequest request
+            @Body UpdateStatusOrderRequest request
     );
 
     /** Verifikasi bukti pembayaran → terima pesanan */
