@@ -480,14 +480,51 @@
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
-                        <TextView
+                        <LinearLayout
+                            android:id="@+id/layoutHistoryRating"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="⭐⭐⭐⭐⭐"
-                            android:textSize="10sp"
-                            android:layout_marginEnd="8dp"/>
+                            android:layout_gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:layout_marginEnd="8dp">
+
+                            <ImageView
+                                android:id="@+id/history_star1"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginEnd="2dp"
+                                android:src="@drawable/starfill"
+                                app:tint="#FBBF24" />
+                            <ImageView
+                                android:id="@+id/history_star2"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginEnd="2dp"
+                                android:src="@drawable/starfill"
+                                app:tint="#FBBF24" />
+                            <ImageView
+                                android:id="@+id/history_star3"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginEnd="2dp"
+                                android:src="@drawable/starfill"
+                                />
+                            <ImageView
+                                android:id="@+id/history_star4"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginEnd="2dp"
+                                android:src="@drawable/starfill" />
+                            <ImageView
+                                android:id="@+id/history_star5"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/star"
+                                app:tint="#D1D5DB" />
+                        </LinearLayout>
 
                         <TextView
+                            android:id="@+id/btnPesanLagi_kartu3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@drawable/btn_outline_orange"

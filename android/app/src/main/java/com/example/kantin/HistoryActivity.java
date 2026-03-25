@@ -67,7 +67,7 @@ public class HistoryActivity extends AppCompatActivity {
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        // Pastikan nama layout XML modal kamu adalah dialog_rating.xml
+        // Pastikan nama layout XML modal kamu adalah dialog_rating (sesuaikan jika namanya beda)
         dialog.setContentView(R.layout.dialog_rating);
 
         // Membuat background dialog jadi transparan agar sudut membulatnya terlihat
@@ -92,12 +92,14 @@ public class HistoryActivity extends AppCompatActivity {
             stars[i].setOnClickListener(v -> {
                 currentRating = ratingValue;
 
-                // Ubah warnanya: Kuning (#FBBF24) jika terpilih, Abu-abu (#D1D5DB) jika tidak
+                // UBAH BAGIAN INI: Ganti gambarnya jadi starfill
                 for (int j = 0; j < stars.length; j++) {
                     if (j < currentRating) {
-                        stars[j].setColorFilter(Color.parseColor("#FBBF24")); // Warna Kuning
+                        // Bintang berubah jadi penuh (pastikan ada icon starfill di drawable)
+                        stars[j].setImageResource(R.drawable.starfill);
                     } else {
-                        stars[j].setColorFilter(Color.parseColor("#D1D5DB")); // Warna Abu-abu kosong
+                        // Bintang kembali jadi kosong (garis tepi saja)
+                        stars[j].setImageResource(R.drawable.star);
                     }
                 }
             });
@@ -110,11 +112,16 @@ public class HistoryActivity extends AppCompatActivity {
         btnNantiSaja.setOnClickListener(v -> dialog.dismiss());
 
         btnKirimPenilaian.setOnClickListener(v -> {
-            // TODO: Nanti kalau mau simpan ke database, ambil dari variabel currentRating
-            dialog.dismiss();
+            if (currentRating == 0) {
+                // Beri peringatan kalau user belum pilih bintang
+                android.widget.Toast.makeText(this, "Pilih bintang dulu ya!", android.widget.Toast.LENGTH_SHORT).show();
+            } else {
+                android.widget.Toast.makeText(this, "Terima kasih atas penilaiannya!", android.widget.Toast.LENGTH_SHORT).show();
+                // TODO: Nanti kalau mau simpan ke database, ambil dari variabel currentRating
+                dialog.dismiss();
+            }
         });
 
-        // Tampilkan modal
         dialog.show();
     }
 }

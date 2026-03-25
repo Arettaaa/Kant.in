@@ -35,7 +35,7 @@ public class CancelPaymentActivity extends AppCompatActivity {
             onBackPressed(); // Berfungsi sama dengan tombol back bawaan HP
         });
 
-        startTimer(30000); // Set timer 30 detik
+        startTimer(31000); // Set timer 30 detik
 
         btnCancelOrder.setOnClickListener(v -> showCancelBottomSheetDialog());
     }
