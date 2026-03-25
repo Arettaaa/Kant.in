@@ -160,6 +160,7 @@
                     android:textSize="15sp" />
             </LinearLayout>
 
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -196,6 +197,48 @@
                     android:fontFamily="@font/inter_regular"
                     android:hint="mahasiswa@kampus.ac.id"
                     android:inputType="textEmailAddress"
+                    android:singleLine="true"
+                    android:textColor="#1A1A1A"
+                    android:textColorHint="#9CA3AF"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/inter_bold"
+                android:text="Nomor HP"
+                android:textColor="#1A1A1A"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_input_rounded"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="14dp"
+                android:paddingRight="14dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:alpha="0.5"
+                    android:src="@drawable/phone"
+                    app:tint="#D1D5DB" />
+                <EditText
+                    android:id="@+id/etPhone"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:fontFamily="@font/inter_regular"
+                    android:hint="081234567890"
+                    android:inputType="phone"
                     android:singleLine="true"
                     android:textColor="#1A1A1A"
                     android:textColorHint="#9CA3AF"
@@ -252,6 +295,7 @@
                     android:focusable="true"
                     android:src="@drawable/eye" />
             </LinearLayout>
+
 
             <TextView
                 android:layout_width="wrap_content"

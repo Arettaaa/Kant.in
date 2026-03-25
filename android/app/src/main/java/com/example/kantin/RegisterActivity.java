@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    EditText etName, etEmail, etPassword;
+    EditText etName, etEmail, etPhone, etPassword;
     ImageView ivTogglePassword;
     TextView tvLogin, tabPelanggan, tabPemilik;
     Button btnRegister;
@@ -30,6 +30,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         etName = findViewById(R.id.etName);
         etEmail = findViewById(R.id.etEmail);
+        etPhone = findViewById(R.id.etPhone);
         etPassword = findViewById(R.id.etPassword);
         ivTogglePassword = findViewById(R.id.ivTogglePassword);
         tvLogin = findViewById(R.id.tvLogin);
@@ -38,20 +39,31 @@ public class RegisterActivity extends AppCompatActivity {
         tabPelanggan = findViewById(R.id.tabPelanggan);
         tabPemilik = findViewById(R.id.tabPemilik);
 
-        // Toggle password
+        // Toggle password (buka/tutup mata)
         ivTogglePassword.setOnClickListener(v -> {
 
             if (isPasswordVisible) {
+                // Jika password sedang terlihat, maka SEMBUNYIKAN
                 etPassword.setInputType(InputType.TYPE_CLASS_TEXT |
                         InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+                // Ubah ikon ke mata tertutup
+                ivTogglePassword.setImageResource(R.drawable.eye_close);
+
                 isPasswordVisible = false;
 
             } else {
+                // Jika password sedang tersembunyi, maka TAMPILKAN
                 etPassword.setInputType(InputType.TYPE_CLASS_TEXT |
                         InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+
+                // Ubah ikon ke mata terbuka
+                ivTogglePassword.setImageResource(R.drawable.eye);
+
                 isPasswordVisible = true;
             }
 
+            // Pindahkan kursor ke akhir teks
             etPassword.setSelection(etPassword.getText().length());
         });
 
@@ -60,6 +72,7 @@ public class RegisterActivity extends AppCompatActivity {
 
             String nama = etName.getText().toString().trim();
             String email = etEmail.getText().toString().trim();
+            String phone = etPhone.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
 
             if (nama.isEmpty()) {
@@ -80,6 +93,18 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
+            if (phone.isEmpty()) {
+                etPhone.setError("Nomor HP tidak boleh kosong");
+                etPhone.requestFocus();
+                return;
+            }
+
+            if (phone.length() < 10) {
+                etPhone.setError("Nomor HP tidak valid");
+                etPhone.requestFocus();
+                return;
+            }
+
             if (password.isEmpty()) {
                 etPassword.setError("Password tidak boleh kosong");
                 etPassword.requestFocus();
@@ -93,6 +118,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
 
             Toast.makeText(this, "Akun berhasil dibuat!", Toast.LENGTH_SHORT).show();
+            // TODO: Tambahkan Intent ke halaman Home/Menu utama jika berhasil register
         });
 
         // pindah ke register admin
