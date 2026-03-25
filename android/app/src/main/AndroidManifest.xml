@@ -2,19 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:label="@string/app_name"
-
         android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-
         android:supportsRtl="true"
         android:theme="@style/Theme.Kantin">
-
+        <activity
+            android:name=".ProfilAdminKantin"
+            android:exported="false" />
         <!-- Entry point pertama -->
         <activity
             android:name=".SplashActivity"
@@ -22,87 +21,47 @@
             android:theme="@style/Theme.Kantin.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Halaman Login -->
+        </activity> <!-- Halaman Login -->
         <activity
             android:name=".LoginActivity"
             android:exported="false" />
-
-        <activity
-            android:name=".RegisterAdminActivity"/>
-
-        <activity
-            android:name=".BerandaPelangganActivity"/>
-
+        <activity android:name=".RegisterAdminActivity" />
+        <activity android:name=".BerandaPelangganActivity" />
         <activity
             android:name=".RegisterActivity"
-            android:exported="false"/>
-
+            android:exported="false" />
+        <activity android:name=".HistoryActivity" />
+        <activity android:name=".ProfilPelangganActivity" />
+        <activity android:name=".KeranjangPelangganActivity" />
+        <activity android:name=".ExploreMenuPelangganActivity" />
+        <activity android:name=".ExploreKantinPelangganActivity" />
+        <activity android:name=".DetailMenuActivity" />
+        <activity android:name=".DetailKantinActivity" />
+        <activity android:name=".ActiveOrdersActivity" />
+        <activity android:name=".CheckoutActivity" />
+        <activity android:name=".DetailProfilPelangganActivity" />
+        <activity android:name=".KeamananPelangganActivity" />
+        <activity android:name=".LupaPasswordActivity" />
+        <activity android:name=".PasswordBerhasilActivity" />
+        <activity android:name=".ResetPasswordActivity" />
+        <activity android:name=".CancelPaymentActivity" />
+        <activity android:name=".UbahProfilPelangganActivity" />
         <activity
-            android:name=".HistoryActivity" />
-
+            android:name=".ValidasiAdminActivity"
+            android:exported="false" />
         <activity
-            android:name=".ProfilPelangganActivity" />
-
-        <activity
-            android:name=".KeranjangPelangganActivity" />
-
-        <activity
-            android:name=".ExploreMenuPelangganActivity" />
-
-        <activity
-            android:name=".ExploreKantinPelangganActivity" />
-
-        <activity
-            android:name=".DetailMenuActivity" />
-
-        <activity
-            android:name=".DetailKantinActivity" />
-
-        <activity
-            android:name=".ActiveOrdersActivity" />
-
-        <activity
-            android:name=".CheckoutActivity" />
-
-        <activity
-            android:name=".DetailProfilPelangganActivity" />
-
-        <activity
-            android:name=".KeamananPelangganActivity" />
-
-        <activity
-            android:name=".LupaPasswordActivity" />
-
-        <activity
-            android:name=".PasswordBerhasilActivity" />
-
-        <activity
-            android:name=".ResetPasswordActivity" />
-
-        <activity
-            android:name=".CancelPaymentActivity" />
-
-        <activity
-            android:name=".UbahProfilPelangganActivity" />
-
-        <activity
-            android:name=".ValidasiAdminActivity" android:exported="false" />
-
-        <activity
-            android:name=".PesananDibatalkanActivity" android:exported="false" />
-
-        <!-- Halaman Utama -->
+            android:name=".PesananDibatalkanActivity"
+            android:exported="false" /> <!-- Halaman Utama -->
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
-
     </application>
 
 </manifest>

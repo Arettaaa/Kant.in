@@ -4,8 +4,19 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 /**
- * TransactionListResponse — untuk GET /canteens/{id}/transactions
- * Hanya menampilkan order dengan status "completed"
+ * TransactionListResponse — disesuaikan dengan TransactionController.php
+ *
+ * Response GET /canteens/{id}/transactions:
+ * {
+ *   "success": true,
+ *   "data": {
+ *     "total_revenue": 15000,
+ *     "total_orders": 1,
+ *     "orders": [ ...array of OrderItem... ]   ← key-nya "orders", BUKAN "transactions"
+ *   }
+ * }
+ *
+ * Hanya order dengan status "completed" yang masuk ke sini.
  */
 public class TransactionListResponse {
 
@@ -23,17 +34,22 @@ public class TransactionListResponse {
     public TransactionData getData()   { return data; }
 
     public static class TransactionData {
+
         @SerializedName("total_revenue")
         private double totalRevenue;
 
         @SerializedName("total_orders")
         private int totalOrders;
 
-        @SerializedName("transactions")
-        private List<OrderListResponse.OrderItem> transactions;
+        /**
+         * Key di response adalah "orders", BUKAN "transactions"
+         * Struktur sama dengan OrderListResponse.OrderItem
+         */
+        @SerializedName("orders")
+        private List<OrderListResponse.OrderItem> orders;
 
-        public double getTotalRevenue()                          { return totalRevenue; }
-        public int getTotalOrders()                              { return totalOrders; }
-        public List<OrderListResponse.OrderItem> getTransactions() { return transactions; }
+        public double getTotalRevenue()                        { return totalRevenue; }
+        public int getTotalOrders()                            { return totalOrders; }
+        public List<OrderListResponse.OrderItem> getOrders()   { return orders; }
     }
 }
