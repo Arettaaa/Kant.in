@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Data Diri - Kant.in'); ?>
 
-@section('title', 'Data Diri - Kant.in')
-
-@push('styles')
+<?php $__env->startPush('styles'); ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
     .input-field {
@@ -30,13 +28,13 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <div class="flex w-full h-screen bg-[#F9FAFB] overflow-hidden">
 
-    {{-- ======================== SIDEBAR MANUAL ======================== --}}
+    
     <aside class="w-[240px] h-screen bg-white flex flex-col py-8 px-6 shadow-sm flex-shrink-0 z-20 border-r border-gray-100">
         <div class="flex items-center gap-3 mb-8 px-2">
             <div class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg" style="background-color:#FF6900;">
@@ -60,18 +58,18 @@
             </a>
         </nav>
 
-        <form action="{{ route('logout') }}" method="POST" class="mt-auto">
-            @csrf
+        <form action="<?php echo e(route('logout')); ?>" method="POST" class="mt-auto">
+            <?php echo csrf_field(); ?>
             <button type="submit" class="flex items-center w-full gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">
                 <i class="fa-solid fa-right-from-bracket w-5 text-center"></i> Keluar
             </button>
         </form>
     </aside>
 
-    {{-- ======================== MAIN CONTENT ======================== --}}
+    
     <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#F9FAFB] hide-scrollbar">
 
-        {{-- Header Asli (Transparent/Blur) --}}
+        
         <div class="sticky top-0 z-30 w-full flex items-center gap-4 px-10 py-6 bg-white/90 backdrop-blur-md border-b border-gray-100">
             <a href="/profil" class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 transition-all">
                 <i class="fa-solid fa-arrow-left text-gray-400"></i>
@@ -85,23 +83,23 @@
         <div class="px-10 py-8">
             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 max-w-2xl mx-auto mt-4">
 
-                {{-- Avatar --}}
+                
                 <div class="flex justify-center mb-8">
                     <div class="w-24 h-24 rounded-full flex items-center justify-center border-4 border-white shadow-md overflow-hidden bg-[#FEF3E2]"
-                         style="{{ $user->photo_profile ? 'background-image:url('.asset('storage/'.$user->photo_profile).'); background-size:cover; background-position:center;' : '' }}">
-                        @if(!$user->photo_profile)
+                         style="<?php echo e($user->photo_profile ? 'background-image:url('.asset('storage/'.$user->photo_profile).'); background-size:cover; background-position:center;' : ''); ?>">
+                        <?php if(!$user->photo_profile): ?>
                             <i class="fa-solid fa-user text-orange-200 text-4xl"></i>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </div>
 
-                {{-- Field Detail (Readonly) --}}
+                
                 <div class="flex flex-col gap-5">
                     <div>
                         <label class="text-sm font-bold text-gray-700 mb-2 block ml-1">Nama Lengkap</label>
                         <div class="input-wrap">
                             <i class="fa-regular fa-user icon"></i>
-                            <input type="text" class="input-field" value="{{ $user->name }}" readonly>
+                            <input type="text" class="input-field" value="<?php echo e($user->name); ?>" readonly>
                         </div>
                     </div>
 
@@ -109,7 +107,7 @@
                         <label class="text-sm font-bold text-gray-700 mb-2 block ml-1">Nomor Telepon</label>
                         <div class="input-wrap">
                             <i class="fa-solid fa-phone icon"></i>
-                            <input type="text" class="input-field" value="{{ $user->phone ?? '-' }}" readonly>
+                            <input type="text" class="input-field" value="<?php echo e($user->phone ?? '-'); ?>" readonly>
                         </div>
                     </div>
 
@@ -117,7 +115,7 @@
                         <label class="text-sm font-bold text-gray-700 mb-2 block ml-1">Email</label>
                         <div class="input-wrap">
                             <i class="fa-regular fa-envelope icon"></i>
-                            <input type="text" class="input-field" value="{{ $user->email }}" readonly>
+                            <input type="text" class="input-field" value="<?php echo e($user->email); ?>" readonly>
                         </div>
                     </div>
 
@@ -125,12 +123,12 @@
                         <label class="text-sm font-bold text-gray-700 mb-2 block ml-1">Role Akun</label>
                         <div class="input-wrap">
                             <i class="fa-solid fa-user-tag icon"></i>
-                            <input type="text" class="input-field" value="{{ ucfirst($user->role) }}" readonly>
+                            <input type="text" class="input-field" value="<?php echo e(ucfirst($user->role)); ?>" readonly>
                         </div>
                     </div>
                 </div>
 
-                {{-- Tombol ke Edit Profil --}}
+                
                 <a href="/profil/edit"
                    class="edit-btn mt-10 w-full py-4 rounded-2xl text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-2"
                    style="background: linear-gradient(135deg, #FF6900, #ea580c);">
@@ -142,4 +140,5 @@
         </div>
     </main>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\arett\AndroidStudioProjects\Kantin\backend-new\resources\views/pelanggan/data-diri.blade.php ENDPATH**/ ?>

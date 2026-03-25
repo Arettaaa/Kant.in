@@ -1,8 +1,6 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Beranda - Kant.in'); ?>
 
-@section('title', 'Beranda - Kant.in')
-
-@push('styles')
+<?php $__env->startPush('styles'); ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
     .scrollbar-hide::-webkit-scrollbar {
@@ -53,17 +51,17 @@
         transition: all 0.2s ease;
     }
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 
 <div class="flex w-full h-screen bg-[#F9FAFB] overflow-hidden">
 
-    {{-- ======================== SIDEBAR ======================== --}}
+    
     <aside
         class="w-[240px] h-screen bg-white flex flex-col py-8 px-6 shadow-sm flex-shrink-0 z-20 border-r border-gray-100">
 
-        {{-- Logo --}}
+        
         <div class="flex items-center gap-3 mb-10 px-2">
             <div class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg"
                 style="background-color:#FF6900;">
@@ -72,7 +70,7 @@
             <span class="text-xl font-extrabold text-gray-900 tracking-tight">Kant.in</span>
         </div>
 
-        {{-- Nav --}}
+        
         <nav class="flex flex-col gap-2 flex-1">
             <a href="/beranda"
                 class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold transition-all"
@@ -112,11 +110,11 @@
             </a>
         </nav>
 
-        {{-- Logout / Login Dinamis --}}
-        @auth
-        {{-- Jika sudah login, tampilkan tombol Keluar --}}
-        <form action="{{ route('logout') }}" method="POST" class="mt-auto">
-            @csrf
+        
+        <?php if(auth()->guard()->check()): ?>
+        
+        <form action="<?php echo e(route('logout')); ?>" method="POST" class="mt-auto">
+            <?php echo csrf_field(); ?>
             <button type="submit"
                 class="flex items-center w-full gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,8 +124,8 @@
                 Keluar
             </button>
         </form>
-        @else
-        {{-- Jika belum login, tampilkan tombol Masuk --}}
+        <?php else: ?>
+        
         <a href="/login"
             class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-all mt-auto">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,17 +134,17 @@
             </svg>
             Masuk
         </a>
-        @endauth
+        <?php endif; ?>
     </aside>
 
-    {{-- ======================== MAIN CONTENT ======================== --}}
+    
     <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#F9FAFB]">
 
-        {{-- ---- TOPBAR ---- --}}
+        
         <div
             class="sticky top-0 z-10 flex items-center justify-between px-10 py-5 bg-white/90 backdrop-blur-md border-b border-gray-100">
 
-            {{-- Location + Greeting --}}
+            
             <div>
                 <div class="flex items-center gap-1.5 text-xs text-gray-400 font-semibold mb-0.5">
                     <svg class="w-3.5 h-3.5" style="color:#FF6900;" fill="currentColor" viewBox="0 0 24 24">
@@ -155,12 +153,12 @@
                     </svg>
                     <span style="color:#FF6900;">Sekolah Vokasi IPB</span>
                 </div>
-                <h1 class="text-xl font-extrabold text-gray-900 leading-tight">Halo, {{ $namaDepan }}! 👋</h1>
+                <h1 class="text-xl font-extrabold text-gray-900 leading-tight">Halo, <?php echo e($namaDepan); ?>! 👋</h1>
             </div>
 
-            {{-- Icons --}}
+            
             <div class="flex items-center gap-3">
-                {{-- Riwayat --}}
+                
                 <a href="/pesanan"
                     class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center hover:bg-gray-100 transition-all">
                     <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,7 +166,7 @@
                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                 </a>
-                {{-- Keranjang --}}
+                
                 <a href="/keranjang"
                     class="relative w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center hover:bg-gray-100 transition-all">
                     <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,7 +178,7 @@
                         style="background-color:#FF6900;">2</span>
                 </a>
 
-                {{-- Avatar --}}
+                
                 <a href="/profil"
                     class="w-10 h-10 rounded-full overflow-hidden border-2 border-orange-100 bg-orange-50 flex items-center justify-center cursor-pointer">
                     <svg class="w-5 h-5 text-orange-300" fill="currentColor" viewBox="0 0 24 24">
@@ -191,10 +189,10 @@
             </div>
         </div>
 
-        {{-- ---- SCROLL BODY ---- --}}
+        
         <div class="px-10 py-8 flex flex-col gap-8">
 
-            {{-- SEARCH --}}
+            
             <div class="relative">
                 <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none"
                     stroke="currentColor" viewBox="0 0 24 24">
@@ -208,12 +206,12 @@
                     onblur="this.style.boxShadow=''; this.style.borderColor='#e5e7eb';">
             </div>
 
-            {{-- KATEGORI --}}
+            
             <section>
                 <h2 class="text-lg font-extrabold text-gray-900 mb-4">Kategori</h2>
                 <div class="grid grid-cols-4 gap-3">
 
-                    {{-- Nasi (active) --}}
+                    
                     <button onclick="setCategory(this, 'nasi')"
                         class="category-card active flex flex-col items-center gap-2 py-5 px-3 rounded-2xl border border-transparent"
                         data-cat="nasi">
@@ -224,7 +222,7 @@
                         <span class="cat-label text-[13px] font-bold text-white">Nasi</span>
                     </button>
 
-                    {{-- Mie --}}
+                    
                     <button onclick="setCategory(this, 'mie')"
                         class="category-card flex flex-col items-center gap-2 py-5 px-3 rounded-2xl bg-white border border-gray-100"
                         data-cat="mie">
@@ -234,7 +232,7 @@
                         <span class="cat-label text-[13px] font-bold text-gray-500">Mie</span>
                     </button>
 
-                    {{-- Minuman --}}
+                    
                     <button onclick="setCategory(this, 'minuman')"
                         class="category-card flex flex-col items-center gap-2 py-5 px-3 rounded-2xl bg-white border border-gray-100"
                         data-cat="minuman">
@@ -244,7 +242,7 @@
                         <span class="cat-label text-[13px] font-bold text-gray-500">Minuman</span>
                     </button>
 
-                    {{-- Camilan --}}
+                    
                     <button onclick="setCategory(this, 'camilan')"
                         class="category-card flex flex-col items-center gap-2 py-5 px-3 rounded-2xl bg-white border border-gray-100"
                         data-cat="camilan">
@@ -257,12 +255,12 @@
                 </div>
             </section>
 
-            {{-- MAKANAN SEDANG TREN --}}
+            
             <section>
                 <h2 class="text-lg font-extrabold text-gray-900 mb-4">Makanan Sedang Tren</h2>
                 <div class="grid grid-cols-2 gap-4">
 
-                    {{-- Card 1 --}}
+                    
                     <a href="/menu/nasi-goreng-spesial"
                         class="food-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-all">
                         <div class="relative h-44 overflow-hidden bg-gray-100">
@@ -279,7 +277,7 @@
                         </div>
                     </a>
 
-                    {{-- Card 2 --}}
+                    
                     <a href="/menu/mie-goreng-ayam"
                         class="food-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-all">
                         <div class="relative h-44 overflow-hidden bg-gray-100">
@@ -299,7 +297,7 @@
                 </div>
             </section>
 
-            {{-- KANTIN POPULER --}}
+            
             <section class="pb-8">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-lg font-extrabold text-gray-900">Kantin Populer</h2>
@@ -310,7 +308,7 @@
 
                 <div class="grid grid-cols-2 gap-4">
 
-                    {{-- Warung Bu Ani --}}
+                    
                     <a href="/kantin/warung-bu-ani"
                         class="kantin-card bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
                         <div class="relative flex-shrink-0">
@@ -331,7 +329,7 @@
                         </div>
                     </a>
 
-                    {{-- Noodle Ninja --}}
+                    
                     <a href="/kantin/noodle-ninja"
                         class="kantin-card bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
                         <div class="relative flex-shrink-0">
@@ -352,7 +350,7 @@
                         </div>
                     </a>
 
-                    {{-- Fresh Sip --}}
+                    
                     <a href="/kantin/fresh-sip"
                         class="kantin-card bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
                         <div class="relative flex-shrink-0">
@@ -373,7 +371,7 @@
                         </div>
                     </a>
 
-                    {{-- Asian Bowl House --}}
+                    
                     <a href="/kantin/asian-bowl-house"
                         class="kantin-card bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
                         <div class="relative flex-shrink-0">
@@ -401,9 +399,9 @@
     </main>
 </div>
 
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script>
     function setCategory(el, cat) {
         // Reset all
@@ -427,4 +425,5 @@
         el.querySelector('.cat-label').style.color = 'white';
     }
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\Users\arett\AndroidStudioProjects\Kantin\backend-new\resources\views/pelanggan/beranda.blade.php ENDPATH**/ ?>

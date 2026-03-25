@@ -38,6 +38,7 @@
             </a>
         </nav>
 
+        {{-- Form Logout Manual --}}
         <form action="{{ route('logout') }}" method="POST" class="mt-auto border-t border-gray-50 pt-6">
             @csrf
             <button type="submit" class="flex items-center w-full gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">
@@ -58,7 +59,6 @@
             <div class="w-full max-w-4xl bg-white rounded-[40px] p-8 shadow-sm border border-gray-100 mb-10 text-center">
                 <div class="relative w-28 h-28 mx-auto mb-4">
                     <div class="w-full h-full rounded-full bg-orange-100 flex items-center justify-center border-4 border-white shadow-md">
-                        {{-- Ikon diganti jadi User Biasa --}}
                         <i class="fa-solid fa-user text-[#FF6900] text-4xl"></i>
                     </div>
                 </div>
@@ -67,8 +67,7 @@
                 <h2 class="text-2xl font-black text-gray-900 mb-1">{{ $user->name }}</h2>
                 <div class="flex items-center justify-center gap-2 mb-8">
                     <span class="px-4 py-1.5 bg-gray-50 rounded-full text-[11px] font-black text-gray-400 uppercase tracking-widest border border-gray-100">
-                        {{-- Ikon diganti jadi User Biasa juga di badge --}}
-                        <i class="fa-solid fa-user-check mr-1 text-[10px]"></i> {{ ucfirst($user->role) }}
+                        <i class="fa-solid fa-graduation-cap mr-1"></i> {{ ucfirst($user->role) }}
                     </span>
                 </div>
 
