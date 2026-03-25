@@ -1,0 +1,15 @@
+package com.example.kantin.model.request;
+
+import com.google.gson.annotations.SerializedName;
+
+public class UpdateStatusOrderRequest {
+    /** Nilai yang valid: "processing" | "ready" | "completed" */
+    @SerializedName("status")
+    private String status;
+
+    public void UpdateOrderStatusRequest(String status) {
+        this.status = status;
+    }
+
+    public String getStatus() { return status; }
+}
