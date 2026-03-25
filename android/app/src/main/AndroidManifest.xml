@@ -84,10 +84,13 @@
             android:name=".ResetPasswordActivity" />
 
         <activity
-            android:name=".SuccessPaymentActivity" />
+            android:name=".CancelPaymentActivity" />
 
         <activity
             android:name=".UbahProfilPelangganActivity" />
+
+        <activity
+            android:name=".ValidasiAdminActivity" android:exported="false" />
 
         <!-- Halaman Utama -->
         <activity

@@ -58,7 +58,7 @@ public class CheckoutActivity extends AppCompatActivity {
                 Toast.makeText(this, "Silakan unggah bukti bayar dulu ya!", Toast.LENGTH_SHORT).show();
             } else {
                 // Berpindah ke halaman SuccessPaymentActivity
-                Intent intent = new Intent(CheckoutActivity.this, SuccessPaymentActivity.class);
+                Intent intent = new Intent(CheckoutActivity.this, CancelPaymentActivity.class);
 
                 // Opsional: Jika ingin mengirim data harga ke halaman sukses
                 // intent.putExtra("TOTAL_PAYMENT", "Rp 48.000");
