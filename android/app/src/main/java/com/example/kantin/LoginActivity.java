@@ -47,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 // Tampilkan password
                 etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-                ivTogglePassword.setImageResource(R.drawable.eye); // Ganti ke ikon mata coret (jika ada)
+                ivTogglePassword.setImageResource(R.drawable.eye_close); // Ganti ke ikon mata coret (jika ada)
                 isPasswordVisible = true;
             }
             // Posisikan kursor tetap di akhir teks

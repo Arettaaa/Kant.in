@@ -92,6 +92,9 @@
         <activity
             android:name=".ValidasiAdminActivity" android:exported="false" />
 
+        <activity
+            android:name=".PesananDibatalkanActivity" android:exported="false" />
+
         <!-- Halaman Utama -->
         <activity
             android:name=".MainActivity"

@@ -35,11 +35,12 @@ public class CancelPaymentActivity extends AppCompatActivity {
             onBackPressed(); // Berfungsi sama dengan tombol back bawaan HP
         });
 
-        startTimer(30000);
+        startTimer(30000); // Set timer 30 detik
 
         btnCancelOrder.setOnClickListener(v -> showCancelBottomSheetDialog());
     }
 
+    // --- FUNGSI TIMER MUNDUR ---
     private void startTimer(long durationInMillis) {
         countDownTimer = new CountDownTimer(durationInMillis, 1000) {
             @Override
@@ -52,12 +53,15 @@ public class CancelPaymentActivity extends AppCompatActivity {
                 tvTimer.setText(timeFormatted);
             }
 
+            // DI SINI LETAK onFinish() YANG BENAR (Di dalam CountDownTimer)
             @Override
             public void onFinish() {
                 tvTimer.setText("00:00");
-                // Opsional: Anda bisa menonaktifkan tombol batal jika waktu habis
-                 btnCancelOrder.setEnabled(false);
-                 btnCancelOrder.setAlpha(0.5f);
+
+                // Langsung pindah ke halaman Validasi Admin otomatis
+                Intent intent = new Intent(CancelPaymentActivity.this, ValidasiAdminActivity.class);
+                startActivity(intent);
+                finish(); // Tutup halaman cancel agar user tidak bisa back ke halaman ini lagi
             }
         }.start();
     }
@@ -71,7 +75,6 @@ public class CancelPaymentActivity extends AppCompatActivity {
         bottomSheetDialog.setContentView(dialogView);
 
         // PENTING: Buat background bawaan dialog menjadi transparan
-        // Agar lengkungan (radius) dari bg_bottom_sheet.xml bisa terlihat
         if (bottomSheetDialog.getWindow() != null) {
             bottomSheetDialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
         }
@@ -87,8 +90,8 @@ public class CancelPaymentActivity extends AppCompatActivity {
 
             Toast.makeText(this, "Pesanan dibatalkan", Toast.LENGTH_SHORT).show();
 
-            Intent intent = new Intent(CancelPaymentActivity.this, HistoryActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            // UBAH BAGIAN INI
+            Intent intent = new Intent(CancelPaymentActivity.this, PesananDibatalkanActivity.class);
             startActivity(intent);
             finish();
         });
@@ -100,15 +103,15 @@ public class CancelPaymentActivity extends AppCompatActivity {
 
         // Tampilkan dialog ke layar
         bottomSheetDialog.show();
-    } // <-- Di kode Anda sebelumnya, ada kode duplikat di bawah kurung kurawal ini
+    }
 
+    // FUNGSI INI WAJIB ADA AGAR TIMER BERHENTI SAAT PINDAH HALAMAN
     @Override
-    public void onFinish() {
-        tvTimer.setText("00:00");
-
-        // Langsung pindah ke halaman Validasi Admin otomatis
-        Intent intent = new Intent(CancelPaymentActivity.this, ValidasiAdminActivity.class);
-        startActivity(intent);
-        finish(); // Tutup halaman cancel agar user tidak bisa back ke halaman ini lagi
+    protected void onDestroy() {
+        super.onDestroy();
+        // Pastikan timer dihentikan saat halaman ditutup agar tidak bocor di background
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
     }
 }

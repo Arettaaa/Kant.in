@@ -1,21 +1,26 @@
 package com.example.kantin;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class CheckoutActivity extends AppCompatActivity {
 
-    private ImageView btnBack, imgPreview;
-    private LinearLayout btnUpload;
-    private TextView btnKonfirmasi, tvUploadStatus;
+    private ImageView btnBack, btnRemoveFile;
+    private LinearLayout layoutUploadEmpty, layoutUploadSuccess;
+    private TextView btnKonfirmasi, tvFileName;
     private Uri imageUri;
 
     @Override
@@ -24,11 +29,12 @@ public class CheckoutActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_checkout);
 
-        // Inisialisasi
+        // Inisialisasi ID dari XML baru
         btnBack = findViewById(R.id.btnBack);
-        btnUpload = findViewById(R.id.btnUpload);
-        imgPreview = findViewById(R.id.imgPreview);
-        tvUploadStatus = findViewById(R.id.tvUploadStatus);
+        layoutUploadEmpty = findViewById(R.id.layoutUploadEmpty);
+        layoutUploadSuccess = findViewById(R.id.layoutUploadSuccess);
+        tvFileName = findViewById(R.id.tvFileName);
+        btnRemoveFile = findViewById(R.id.btnRemoveFile);
         btnKonfirmasi = findViewById(R.id.btnKonfirmasi);
 
         // 1. Aksi Pilih Gambar (Buka Galeri)
@@ -37,41 +43,68 @@ public class CheckoutActivity extends AppCompatActivity {
                 result -> {
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         imageUri = result.getData().getData();
-                        // Ganti icon upload jadi gambar yang dipilih
-                        imgPreview.setImageURI(imageUri);
-                        imgPreview.setPadding(0, 0, 0, 0); // Hapus padding agar gambar penuh
-                        imgPreview.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                        tvUploadStatus.setText("Gambar Berhasil Dipilih!");
+
+                        // Sembunyikan kotak putus-putus, tampilkan kotak hijau
+                        layoutUploadEmpty.setVisibility(View.GONE);
+                        layoutUploadSuccess.setVisibility(View.VISIBLE);
+
+                        // Ambil nama file dan tampilkan di TextView
+                        String fileName = getFileName(imageUri);
+                        tvFileName.setText(fileName);
                     }
                 }
         );
 
-        btnUpload.setOnClickListener(v -> {
+        // Klik area putus-putus untuk upload
+        layoutUploadEmpty.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_PICK);
             intent.setType("image/*");
             pickImageLauncher.launch(intent);
         });
 
-        // 2. Tombol Konfirmasi
+        // 2. Klik tombol silang (X) untuk menghapus file yang dipilih
+        btnRemoveFile.setOnClickListener(v -> {
+            imageUri = null; // Kosongkan data gambar
+            // Sembunyikan kotak hijau, tampilkan lagi kotak putus-putus
+            layoutUploadSuccess.setVisibility(View.GONE);
+            layoutUploadEmpty.setVisibility(View.VISIBLE);
+        });
+
+        // 3. Tombol Konfirmasi
         btnKonfirmasi.setOnClickListener(v -> {
             if (imageUri == null) {
                 Toast.makeText(this, "Silakan unggah bukti bayar dulu ya!", Toast.LENGTH_SHORT).show();
             } else {
-                // Berpindah ke halaman SuccessPaymentActivity
                 Intent intent = new Intent(CheckoutActivity.this, CancelPaymentActivity.class);
-
-                // Opsional: Jika ingin mengirim data harga ke halaman sukses
-                // intent.putExtra("TOTAL_PAYMENT", "Rp 48.000");
-
                 startActivity(intent);
 
                 // Kita finish() activity ini agar user tidak bisa balik
-                // ke halaman pembayaran lagi dengan tombol back HP
                 finish();
             }
         });
 
-        // 3. Tombol Back
+        // 4. Tombol Back
         btnBack.setOnClickListener(v -> finish());
+    }
+
+    // Method bantuan untuk mendapatkan nama file asli dari URI galeri
+    @SuppressLint("Range")
+    private String getFileName(Uri uri) {
+        String result = null;
+        if (uri.getScheme().equals("content")) {
+            try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            }
+        }
+        if (result == null) {
+            result = uri.getPath();
+            int cut = result.lastIndexOf('/');
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result != null ? result : "bukti_transfer.jpg";
     }
 }
