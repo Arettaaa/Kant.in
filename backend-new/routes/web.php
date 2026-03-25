@@ -113,4 +113,4 @@ Route::get('/kantin/{slug}', function ($slug) {
 | Redirect Root → Login
 |--------------------------------------------------------------------------
 */
-Route::get('/', fn() => redirect()->route('login'));
+Route::get('/', fn() => redirect()->route('pelanggan.beranda'));
