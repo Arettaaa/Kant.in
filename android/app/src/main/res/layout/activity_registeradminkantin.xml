@@ -145,7 +145,7 @@
                     android:src="@drawable/user" />
 
                 <EditText
-                    android:id="@+id/etName"
+                    android:id="@+id/etNamaLengkap"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginLeft="10dp"
