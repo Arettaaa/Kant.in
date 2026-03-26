@@ -55,8 +55,7 @@ Route::middleware(['auth:sanctum', 'role:pembeli'])->prefix('buyers')->group(fun
 
     // Profile
     Route::get('/profiles', [ProfileController::class, 'show']);
-    Route::put('/profiles', [ProfileController::class, 'update']);
-});
+    Route::post('/profiles', [ProfileController::class, 'update']);});
 
 /*
 |--------------------------------------------------------------------------
@@ -78,8 +77,8 @@ Route::middleware(['auth:sanctum', 'role:admin_kantin'])->group(function () {
 
     // Profile
     Route::get('/admin/profiles', [ProfileController::class, 'show']);
-    Route::put('/admin/profiles', [ProfileController::class, 'update']);
-
+    Route::post('/admin/profiles', [ProfileController::class, 'update']);
+    
     Route::put('/canteens/{id}/availability', [CanteenController::class, 'toggleOpen']);
 });
 
