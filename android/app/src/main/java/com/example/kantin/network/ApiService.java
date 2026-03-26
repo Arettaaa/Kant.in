@@ -31,6 +31,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -293,6 +294,9 @@ public interface ApiService {
 //    @POST("auth/register")
 //    Call<BaseResponse> register(@Body RegisterPelangganRequest request);
 
+    @GET("buyers/profiles")
+    Call<ProfileResponse> getBuyerProfile(@Header("Authorization") String token);
+
     /** 1. KERANJANG (Cart) **/
     @GET("buyers/carts")
     Call<CartResponse> getMyCart();
@@ -322,6 +326,16 @@ public interface ApiService {
     /** 3. PROFIL (Pelanggan) **/
     @GET("buyers/profiles")
     Call<ProfileResponse> getBuyerProfile();
+
+    // --- INI YANG BARU ---
+    @Multipart
+    @POST("buyers/profiles")
+    Call<ProfileResponse> updateProfileBuyers(
+            @Header("Authorization") String token,
+            @Part("name") RequestBody name,
+            @Part("phone") RequestBody phone,
+            @Part MultipartBody.Part photo_profile
+    );
 
     @PUT("buyers/profiles")
     Call<ProfileResponse> updateBuyerProfile(@Body UpdateProfileRequest request);

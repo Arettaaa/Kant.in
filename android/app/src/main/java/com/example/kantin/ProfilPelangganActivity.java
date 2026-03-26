@@ -6,17 +6,19 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 
-import com.example.kantin.utils.SessionManager; // Import SessionManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder; // Biar Alert-nya cantik
+// Jangan lupa import Glide buat nampilin foto
+import com.bumptech.glide.Glide;
+import com.example.kantin.utils.SessionManager;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class ProfilPelangganActivity extends AppCompatActivity {
 
-    private ImageView btnBack;
-    private TextView btnUbahProfil;
+    private ImageView btnBack, ivFotoProfil;
+    private TextView btnUbahProfil, tvNamaProfil, tvEmailProfil, tvPhoneProfil;
     private LinearLayout menuDataDiri, menuKeamanan, btnKeluar;
-
-    // Inisialisasi SessionManager
     private SessionManager sessionManager;
 
     @Override
@@ -25,16 +27,22 @@ public class ProfilPelangganActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_profilpelanggan);
 
-        // 1. Panggil SessionManager
+        // 1. Inisialisasi Session
         sessionManager = new SessionManager(this);
 
+        // 2. Hubungkan View dengan ID di XML
         btnBack = findViewById(R.id.btnBack);
+        ivFotoProfil = findViewById(R.id.ivFotoProfil);
+        tvNamaProfil = findViewById(R.id.tvNamaProfil);
+        tvEmailProfil = findViewById(R.id.tvEmailProfil);
+        tvPhoneProfil = findViewById(R.id.tvPhoneProfil);
+
         btnUbahProfil = findViewById(R.id.btnUbahProfil);
         menuDataDiri = findViewById(R.id.menuDataDiri);
         menuKeamanan = findViewById(R.id.menuKeamanan);
         btnKeluar = findViewById(R.id.btnKeluar);
 
-        // BACK KE BERANDA
+        // 3. Aksi Tombol / Navigasi
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> onBackPressed());
         }
@@ -51,10 +59,40 @@ public class ProfilPelangganActivity extends AppCompatActivity {
             startActivity(new Intent(this, KeamananPelangganActivity.class));
         });
 
-        // 2. Logika Keluar (Logout) yang Benar
-        btnKeluar.setOnClickListener(v -> {
-            showLogoutConfirmation();
-        });
+        btnKeluar.setOnClickListener(v -> showLogoutConfirmation());
+    }
+
+    // Gunakan onResume agar saat kembali dari halaman Edit Profil, data langsung ter-update!
+    @Override
+    protected void onResume() {
+        super.onResume();
+        tampilkanDataProfil();
+    }
+
+    private void tampilkanDataProfil() {
+        // 1. Ambil data segar dari SessionManager
+        String name = sessionManager.getUserName();
+        String email = sessionManager.getUserEmail();
+        String phone = sessionManager.getUserPhone(); // <-- Ambil nomor HP dari session
+        String photoUrl = sessionManager.getPhotoUrl();
+
+        // 2. Pasang ke TextView (Biar tulisan dummy +62 812... itu hilang)
+        tvNamaProfil.setText(name != null && !name.isEmpty() ? name : "Sobat Kantin");
+        tvEmailProfil.setText(email != null && !email.isEmpty() ? email : "Email belum diatur");
+
+        // INI DIA KUNCINYA!
+        tvPhoneProfil.setText(phone != null && !phone.isEmpty() ? phone : "Belum ada nomor HP");
+
+        // 3. Pasang Foto pakai Glide
+        if (photoUrl != null && !photoUrl.isEmpty()) {
+            Glide.with(this)
+                    .load(photoUrl)
+                    .circleCrop()
+                    .placeholder(R.drawable.user)
+                    .into(ivFotoProfil);
+        } else {
+            ivFotoProfil.setImageResource(R.drawable.user);
+        }
     }
 
     private void showLogoutConfirmation() {
@@ -62,10 +100,10 @@ public class ProfilPelangganActivity extends AppCompatActivity {
                 .setTitle("Konfirmasi Keluar")
                 .setMessage("Apakah Anda yakin ingin keluar dari akun ini?")
                 .setPositiveButton("Keluar", (dialog, which) -> {
-                    // HAPUS SEMUA DATA SESI (Token, Role, dll)
+                    // Bersihkan Session
                     sessionManager.clearSession();
 
-                    // Pindah ke Login dan bersihkan tumpukan Activity
+                    // Pindah ke Login
                     Intent intent = new Intent(this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);

@@ -15,12 +15,16 @@ import android.content.SharedPreferences;
 public class SessionManager {
 
     private static final String PREF_NAME = "KantinSession";
-    private static final String KEY_TOKEN       = "token";
-    private static final String KEY_USER_ID     = "user_id";
-    private static final String KEY_CANTEEN_ID  = "canteen_id";
-    private static final String KEY_USER_ROLE   = "user_role";
-    private static final String KEY_USER_NAME   = "user_name";
-    private static final String KEY_USER_EMAIL  = "user_email";
+
+    // Daftar Kunci (Key) untuk SharedPreferences
+    private static final String KEY_TOKEN        = "token";
+    private static final String KEY_USER_ID      = "user_id";
+    private static final String KEY_CANTEEN_ID   = "canteen_id";
+    private static final String KEY_USER_ROLE    = "user_role";
+    private static final String KEY_USER_NAME    = "user_name";
+    private static final String KEY_USER_EMAIL   = "user_email";
+    private static final String KEY_USER_PHONE   = "user_phone"; // Kunci HP
+    private static final String KEY_PHOTO_URL    = "photo_url";  // Kunci Foto
     private static final String KEY_IS_LOGGED_IN = "is_logged_in";
 
     /** Role constants — sesuai dengan role di backend */
@@ -36,18 +40,11 @@ public class SessionManager {
         editor = prefs.edit();
     }
 
-    // ----------------------------------------------------------------
-    // SAVE — panggil setelah login berhasil
-    // ----------------------------------------------------------------
+    // ================================================================
+    // 1. FUNGSI SIMPAN (SAVE)
+    // ================================================================
 
-    /**
-     * Simpan semua data sesi sekaligus.
-     *
-     * @param token     Bearer token dari response login
-     * @param userId    ID user dari response login
-     * @param canteenId ID kantin — kosong ("") jika bukan admin kantin
-     * @param role      Role user: "admin_kantin" / "buyer" / "admin_global"
-     */
+    /** Simpan sesi utama pas login */
     public void saveSession(String token, String userId, String canteenId, String role) {
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.putString(KEY_TOKEN, token);
@@ -57,22 +54,29 @@ public class SessionManager {
         editor.apply();
     }
 
-    /** Simpan nama dan email user (untuk tampilan profil) */
-    public void saveUserInfo(String name, String email) {
+    /** Simpan info detail user (Nama, Email, dan Telepon) */
+    public void saveUserInfo(String name, String email, String phone) {
         editor.putString(KEY_USER_NAME, name);
         editor.putString(KEY_USER_EMAIL, email);
+        editor.putString(KEY_USER_PHONE, phone); // Ini kuncinya!
         editor.apply();
     }
 
-    /** Update canteen ID saja (misal dapat dari response yang berbeda) */
+    /** Simpan URL foto profil */
+    public void savePhotoUrl(String photoUrl) {
+        editor.putString(KEY_PHOTO_URL, photoUrl);
+        editor.apply();
+    }
+
+    /** Update canteen ID (khusus admin kantin) */
     public void saveCanteenId(String canteenId) {
         editor.putString(KEY_CANTEEN_ID, canteenId);
         editor.apply();
     }
 
-    // ----------------------------------------------------------------
-    // GET — panggil kapan saja untuk ambil data
-    // ----------------------------------------------------------------
+    // ================================================================
+    // 2. FUNGSI AMBIL (GET)
+    // ================================================================
 
     public boolean isLoggedIn()   { return prefs.getBoolean(KEY_IS_LOGGED_IN, false); }
     public String getToken()      { return prefs.getString(KEY_TOKEN, ""); }
@@ -81,17 +85,18 @@ public class SessionManager {
     public String getUserRole()   { return prefs.getString(KEY_USER_ROLE, ""); }
     public String getUserName()   { return prefs.getString(KEY_USER_NAME, ""); }
     public String getUserEmail()  { return prefs.getString(KEY_USER_EMAIL, ""); }
+    public String getUserPhone()  { return prefs.getString(KEY_USER_PHONE, ""); }
+    public String getPhotoUrl()   { return prefs.getString(KEY_PHOTO_URL, ""); }
 
-    /** Cek apakah user yang login adalah Admin Kantin */
+    /** Cek role apakah Admin Kantin */
     public boolean isAdminKantin() {
         return ROLE_ADMIN_KANTIN.equals(getUserRole());
     }
 
-    // ----------------------------------------------------------------
-    // CLEAR — panggil saat logout
-    // ----------------------------------------------------------------
+    // ================================================================
+    // 3. FUNGSI HAPUS (LOGOUT)
+    // ================================================================
 
-    /** Hapus semua data sesi (logout) */
     public void clearSession() {
         editor.clear();
         editor.apply();

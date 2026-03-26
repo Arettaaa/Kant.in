@@ -16,6 +16,19 @@ public class BerandaPelangganActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_berandapelanggan);
 
+        com.example.kantin.utils.SessionManager sessionManager = new com.example.kantin.utils.SessionManager(this);
+
+        TextView tvHaloUser = findViewById(R.id.tv_halo_user);
+
+        String fullName = sessionManager.getUserName();
+
+        if (fullName != null && !fullName.isEmpty()) {
+            String firstName = fullName.split(" ")[0];
+            tvHaloUser.setText("Halo, " + firstName + "! 👋");
+        } else {
+            tvHaloUser.setText("Halo, Sobat Kant.in! 👋");
+        }
+
         // 1. Inisialisasi ID
         ImageView btnHistoryTop = findViewById(R.id.btn_history_top);
         FrameLayout btnKeranjang = findViewById(R.id.btn_keranjang);
@@ -26,7 +39,6 @@ public class BerandaPelangganActivity extends AppCompatActivity {
         CardView cvKantinItem = findViewById(R.id.cv_kantin_item);
         LinearLayout navPesanan = findViewById(R.id.nav_pesanan);
         LinearLayout navProfil = findViewById(R.id.nav_profil);
-
         // --- Aksi Bagian Header ---
         btnHistoryTop.setOnClickListener(v -> {
             startActivity(new Intent(this, HistoryActivity.class));

@@ -6,9 +6,11 @@
     android:background="@drawable/bg_bottom_sheet"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:fitsSystemWindows="true">
 
-    <View
+
+<View
         android:layout_width="40dp"
         android:layout_height="4dp"
         android:layout_marginBottom="24dp"

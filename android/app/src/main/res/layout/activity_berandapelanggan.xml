@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FAFAFA">
+    android:background="#FAFAFA"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:id="@+id/headerContainer"
@@ -52,6 +53,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/tv_halo_user"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -124,10 +126,13 @@
                         app:cardElevation="0dp">
 
                         <ImageView
+                            android:id="@+id/ivFotoProfil"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            android:src="@android:drawable/sym_def_app_icon" />
+                            android:scaleType="fitCenter"
+                            android:padding="7dp"
+                            android:src="@drawable/user"
+                            app:tint="#F97316"/>
                     </androidx.cardview.widget.CardView>
                 </androidx.cardview.widget.CardView>
 

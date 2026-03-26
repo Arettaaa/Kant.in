@@ -25,7 +25,8 @@ public class ApiClient {
     // ============================================================
 //    private static final String BASE_URL = "http://10.0.2.2:8000/api/";
 
-    private static final String BASE_URL = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/api/";    private static Retrofit retrofit = null;
+    public static final String BASE_URL = "https://kantin-production.up.railway.app/api/";
+    private static Retrofit retrofit = null;
     private static Retrofit authRetrofit = null;
 
     // ----------------------------------------------------------------

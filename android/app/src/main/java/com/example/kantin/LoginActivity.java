@@ -127,8 +127,9 @@ public class LoginActivity extends AppCompatActivity {
                             user.getCanteenId(),
                             user.getRole()
                     );
-                    sessionManager.saveUserInfo(user.getName(), email);
 
+                    sessionManager.saveUserInfo(user.getName(), user.getEmail(), user.getPhone());
+                    sessionManager.savePhotoUrl(user.getPhotoProfile());
                     // 2. LOGIKA VALIDASI STATUS ADMIN (Khusus Admin Kantin)
                     if (user.isAdminKantin() && !user.isActive()) {
                         // Jika Admin tapi belum active, arahkan ke halaman Validasi
