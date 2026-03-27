@@ -108,8 +108,10 @@ public class ProfilPelangganActivity extends AppCompatActivity {
             Glide.with(this)
                     .load(fullPhotoUrl) // <--- Panggil link gabungan
                     .circleCrop()       // Biar fotonya jadi bulat
-                    .placeholder(R.drawable.user) // Tampil sementara saat loading
-                    .error(R.drawable.user)       // Tampil kalau link gagal diload
+                    .placeholder(android.R.color.transparent)
+                    .error(android.R.color.transparent)
+//                    .placeholder(R.drawable.user)
+//                    .error(R.drawable.user)
                     .into(ivFotoProfil);
 
         } else {
@@ -119,11 +121,12 @@ public class ProfilPelangganActivity extends AppCompatActivity {
             Glide.with(this).clear(ivFotoProfil);
 
             // Set icon user default
-            ivFotoProfil.setImageResource(R.drawable.user);
-            // Kembalikan padding supaya iconnya gak kegedean (seperti 20dp di XML awal)
-            ivFotoProfil.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
-            // Kasih warna oranye secara manual via Java
-            ivFotoProfil.setColorFilter(Color.parseColor("#F97316"));
+            ivFotoProfil.setImageResource(android.R.color.transparent);
+//            ivFotoProfil.setImageResource(R.drawable.user);
+//            // Kembalikan padding supaya iconnya gak kegedean (seperti 20dp di XML awal)
+//            ivFotoProfil.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
+//            // Kasih warna oranye secara manual via Java
+//            ivFotoProfil.setColorFilter(Color.parseColor("#F97316"));
         }
     }
 
