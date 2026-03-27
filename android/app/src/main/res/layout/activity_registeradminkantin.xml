@@ -8,7 +8,7 @@
     android:fitsSystemWindows="true">
 
 
-<LinearLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_header_peach"
@@ -162,7 +162,6 @@
                     android:textSize="15sp" />
             </LinearLayout>
 
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -260,7 +259,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="8dp"
                 android:background="@drawable/bg_input_rounded"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -298,7 +297,55 @@
                     android:src="@drawable/eye" />
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:orientation="vertical">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:orientation="horizontal">
+
+                    <View
+                        android:id="@+id/bar1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:background="#E5E7EB" />
+                    <View
+                        android:id="@+id/bar2"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:background="#E5E7EB" />
+                    <View
+                        android:id="@+id/bar3"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:background="#E5E7EB" />
+                    <View
+                        android:id="@+id/bar4"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="#E5E7EB" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvStrengthLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_medium"
+                    android:textColor="#EF4444"
+                    android:textSize="12sp" />
+            </LinearLayout>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -346,7 +393,7 @@
                 android:layout_height="56dp"
                 android:layout_marginTop="32dp"
                 android:fontFamily="@font/inter_bold"
-                android:text="Buat Akun  ›"
+                android:text="Buat Akun"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF"
                 android:textSize="17sp"
