@@ -33,7 +33,7 @@ class ProfilController extends Controller
     public function update(Request $request)
     {
         $user = Auth::user();
-
+        dd($request->hasFile('photo_profile'));
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
