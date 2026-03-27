@@ -1,24 +1,38 @@
-package com.example.kantin.network;
-
+package com.example.kantin.network;// Import untuk Request (Data yang dikirim ke Laravel)
 import com.example.kantin.model.request.LoginRequest;
+import com.example.kantin.model.request.RegisterPelangganRequest;
 import com.example.kantin.model.request.RegisterAdminKantinRequest;
+import com.example.kantin.model.request.AddToCartRequest;
+import com.example.kantin.model.request.UpdateCartRequest;
+import com.example.kantin.model.request.CheckoutRequest;
 import com.example.kantin.model.request.UpdateStatusOrderRequest;
+import com.example.kantin.model.request.UpdateProfileRequest;
+
+// Import untuk Response (Data yang diterima dari Laravel)
 import com.example.kantin.model.response.BaseResponse;
 import com.example.kantin.model.response.LoginResponse;
-import com.example.kantin.model.response.MenuDetailResponse;
+import com.example.kantin.model.response.CanteenListResponse;
+import com.example.kantin.model.response.CanteenDetailResponse;
 import com.example.kantin.model.response.MenuListResponse;
-import com.example.kantin.model.response.OrderDetailResponse;
+import com.example.kantin.model.response.MenuDetailResponse;
+import com.example.kantin.model.response.CartResponse;
 import com.example.kantin.model.response.OrderListResponse;
+import com.example.kantin.model.response.OrderDetailResponse;
+import com.example.kantin.model.response.ProfileResponse;
 import com.example.kantin.model.response.ProfileAdminResponse;
 import com.example.kantin.model.response.TransactionListResponse;
 import com.example.kantin.model.response.DashboardResponse;
+import com.example.kantin.model.response.RegisterResponse;
 
+// Import library Retrofit & OkHttp
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -58,7 +72,13 @@ public interface ApiService {
      * Response: { message, user } — TANPA token (harus tunggu approve)
      */
     @POST("auth/register")
+    Call<RegisterResponse> registerPelanggan(@Body RegisterPelangganRequest request);
+
+    @POST("auth/register")
     Call<BaseResponse> registerAdminKantin(@Body RegisterAdminKantinRequest request);
+
+    //    @POST("auth/register")
+    //    Call<BaseResponse> registerAdminKantin(@Body RegisterAdminKantinRequest request);
 
     // ================================================================
     // 2. MENU — MenuController
@@ -267,4 +287,58 @@ public interface ApiService {
      */
     @GET("canteens/{canteenId}/dashboard")
     Call<DashboardResponse> getDashboard(@Path("canteenId") String canteenId);
+
+    // ================================================================
+    // FITUR PEMBELI (Prefix: buyers)
+    // ================================================================
+
+//    @POST("auth/register")
+//    Call<BaseResponse> register(@Body RegisterPelangganRequest request);
+
+    @GET("buyers/profiles")
+    Call<ProfileResponse> getBuyerProfile(@Header("Authorization") String token);
+
+    /** 1. KERANJANG (Cart) **/
+    @GET("buyers/carts")
+    Call<CartResponse> getMyCart();
+
+    @POST("buyers/carts/items")
+    Call<BaseResponse> addToCart(@Body AddToCartRequest request);
+
+    @PUT("buyers/carts/items/{itemId}")
+    Call<BaseResponse> updateCartItem(@Path("itemId") String itemId, @Body UpdateCartRequest request);
+
+    @DELETE("buyers/carts/items/{itemId}")
+    Call<BaseResponse> removeFromCart(@Path("itemId") String itemId);
+
+    /** 2. PESANAN (Order & Checkout) **/
+    @POST("buyers/checkouts")
+    Call<OrderDetailResponse> checkout(@Body CheckoutRequest request);
+
+    @GET("buyers/orders/histories")
+    Call<OrderListResponse> getOrderHistory();
+
+    @GET("buyers/orders/{orderId}")
+    Call<OrderDetailResponse> getOrderDetail(@Path("orderId") String orderId);
+
+    @POST("buyers/orders/{orderId}/cancellations")
+    Call<BaseResponse> cancelOrder(@Path("orderId") String orderId);
+
+    /** 3. PROFIL (Pelanggan) **/
+    @GET("buyers/profiles")
+    Call<ProfileResponse> getBuyerProfile();
+
+    // --- INI YANG BARU ---
+    @Headers("Accept: application/json")
+    @Multipart
+    @POST("buyers/profiles")
+    Call<ProfileResponse> updateProfileBuyers(
+            @Header("Authorization") String token,
+            @Part("name") RequestBody name,
+            @Part("phone") RequestBody phone,
+            @Part MultipartBody.Part photo_profile  // nullable
+    );
+
+    @PUT("buyers/profiles")
+    Call<ProfileResponse> updateBuyerProfile(@Body UpdateProfileRequest request);
 }

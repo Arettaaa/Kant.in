@@ -96,8 +96,10 @@
                             android:id="@+id/imgProfile"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            android:src="@android:color/transparent" />
+                            android:scaleType="fitCenter"
+                            android:padding="22dp"
+                            android:src="@drawable/user"
+                            />
                     </androidx.cardview.widget.CardView>
                 </androidx.cardview.widget.CardView>
 

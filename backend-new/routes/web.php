@@ -1,16 +1,27 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\BerandaController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\KeamananController;
 /*
 |--------------------------------------------------------------------------
 | Auth Pelanggan (shared login & register dari admin.blade, re-route)
 |--------------------------------------------------------------------------
 */
-Route::get('/login',    fn() => view('admin.login'))->name('pelanggan.login');
-Route::get('/register', fn() => view('admin.register'))->name('pelanggan.register');
+// Halaman Login & Register
+Route::get('/login', fn() => view('auth.login'))->name('pelanggan.login');
+Route::get('/register', fn() => view('auth.register'))->name('pelanggan.register');
 
-// Lupa kata sandi
+// Proses Login & Register ke Controller
+Route::post('/login', [AuthController::class, 'processLogin'])->name('login.post');
+Route::post('/register', [AuthController::class, 'processRegister'])->name('register.post');
+
+// Logout
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Lupa kata sandi (Tetap di folder auth)
 Route::get('/lupa-sandi',            fn() => view('auth.lupa-sandi'));
 Route::get('/lupa-sandi/verifikasi', fn() => view('auth.verifikasi-otp'));
 Route::get('/lupa-sandi/reset',      fn() => view('auth.reset-sandi'));
@@ -56,18 +67,24 @@ Route::get('/admin/pusat-bantuan', fn() => view('admin.support'))->name('admin.s
 | Pelanggan Routes
 |--------------------------------------------------------------------------
 */
-Route::get('/beranda',                  fn() => view('pelanggan.beranda'))->name('pelanggan.beranda');
-Route::get('/keranjang',                fn() => view('pelanggan.keranjang'))->name('pelanggan.keranjang');
+Route::get('/beranda', [BerandaController::class, 'index'])->name('pelanggan.beranda');Route::get('/keranjang',                fn() => view('pelanggan.keranjang'))->name('pelanggan.keranjang');
 Route::get('/menu/{slug}',              fn() => view('pelanggan.detail-menu'))->name('pelanggan.detail-menu');
 Route::get('/pembayaran',               fn() => view('pelanggan.pembayaran'))->name('pelanggan.pembayaran');
 Route::get('/jelajah',                  fn() => view('pelanggan.jelajah'))->name('pelanggan.jelajah');
 Route::get('/pesanan',                  fn() => view('pelanggan.pesanan'))->name('pelanggan.pesanan');
-Route::get('/profil',                   fn() => view('pelanggan.profil'))->name('pelanggan.profil');
-Route::get('/profil/edit',              fn() => view('pelanggan.edit-profil'))->name('pelanggan.edit-profil');
-Route::get('/profil/data-diri',         fn() => view('pelanggan.data-diri'))->name('pelanggan.data-diri');
-Route::get('/profil/keamanan',          fn() => view('pelanggan.keamanan-akun'))->name('pelanggan.keamanan');
+Route::get('/profil', [ProfilController::class, 'index'])->name('pelanggan.profil');
+Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('pelanggan.edit-profil');
+Route::get('/profil/data-diri', [ProfilController::class, 'dataDiri'])->name('pelanggan.data-diri');
 
-// Route::get('/login',                 fn() => view('pelanggan.login'))->name('pelanggan.login');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profil', [ProfilController::class, 'index'])->name('pelanggan.profil');
+    Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('pelanggan.edit-profil');
+    Route::get('/profil/data-diri', [ProfilController::class, 'dataDiri'])->name('pelanggan.data-diri');
+    Route::post('/profil/update', [ProfilController::class, 'update'])->name('pelanggan.profil.update');
+    Route::get('/profil/keamanan', [KeamananController::class, 'index'])->name('pelanggan.keamanan');
+    Route::post('/profil/keamanan', [KeamananController::class, 'updatePassword'])->name('pelanggan.password.update');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -113,4 +130,4 @@ Route::get('/kantin/{slug}', function ($slug) {
 | Redirect Root → Login
 |--------------------------------------------------------------------------
 */
-Route::get('/', fn() => redirect()->route('pelanggan.beranda'));
+Route::redirect('/', '/beranda');

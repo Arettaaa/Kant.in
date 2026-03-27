@@ -23,8 +23,10 @@ public class ApiClient {
     //  Contoh device HP : "http://192.168.1.100:8000/api/"
     //  Contoh production: "https://api.kantin.com/api/"
     // ============================================================
-    private static final String BASE_URL = "http://10.0.2.2:8000/api/";
+//    private static final String BASE_URL = "http://10.0.2.2:8000/api/";
 
+    public static final String BASE_URL = "https://kantin-production.up.railway.app/api/";
+//    public static final String BASE_URL = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/api/";
     private static Retrofit retrofit = null;
     private static Retrofit authRetrofit = null;
 
@@ -34,13 +36,19 @@ public class ApiClient {
     public static Retrofit getClient() {
         if (retrofit == null) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.setLevel(HttpLoggingInterceptor.Level.BODY); // log request/response
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
             OkHttpClient client = new OkHttpClient.Builder()
                     .addInterceptor(logging)
+                    .addInterceptor(chain -> {
+                        okhttp3.Request original = chain.request();
+                        okhttp3.Request request = original.newBuilder()
+                                .header("Accept", "application/json")
+                                .method(original.method(), original.body())
+                                .build();
+                        return chain.proceed(request);
+                    })
                     .connectTimeout(30, TimeUnit.SECONDS)
-                    .readTimeout(30, TimeUnit.SECONDS)
-                    .writeTimeout(30, TimeUnit.SECONDS)
                     .build();
 
             retrofit = new Retrofit.Builder()
@@ -51,7 +59,6 @@ public class ApiClient {
         }
         return retrofit;
     }
-
     // ----------------------------------------------------------------
     // Client dengan Bearer Token — untuk endpoint yang butuh login
     // token = string token dari SessionManager

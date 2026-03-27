@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FAFAFA">
+    android:background="#FAFAFA"
+    android:fitsSystemWindows="true">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -40,15 +41,17 @@
                         android:background="@drawable/bg_circle_outline"
                         android:padding="8dp"
                         android:src="@drawable/chevronleft"
-                        app:tint="#1A1A1A" /> <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:fontFamily="@font/inter_bold"
-                    android:text="Profil Saya"
-                    android:textColor="#1A1A1A"
-                    android:textSize="19sp"
-                    android:textStyle="bold" />
+                        app:tint="#1A1A1A" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:fontFamily="@font/inter_bold"
+                        android:text="Profil Saya"
+                        android:textColor="#1A1A1A"
+                        android:textSize="19sp"
+                        android:textStyle="bold" />
                 </RelativeLayout>
 
                 <androidx.cardview.widget.CardView
@@ -67,18 +70,22 @@
                         app:cardElevation="0dp">
 
                         <ImageView
+                            android:id="@+id/ivFotoProfil"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:padding="16dp"
-                            android:src="@android:color/transparent" /> </androidx.cardview.widget.CardView>
+                            android:padding="20dp"
+                            android:src="@android:color/transparent"                            android:scaleType="centerCrop"/>
+
+                    </androidx.cardview.widget.CardView>
                 </androidx.cardview.widget.CardView>
 
                 <TextView
+                    android:id="@+id/tvNamaProfil"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:fontFamily="@font/inter_bold"
-                    android:text="Yumna"
+                    android:text="Nama User"
                     android:textColor="#1A1A1A"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -89,12 +96,15 @@
                     android:layout_marginTop="8dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
+
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:src="@drawable/phone"
                         app:tint="#F97316" />
+
                     <TextView
+                        android:id="@+id/tvPhoneProfil"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
@@ -109,16 +119,19 @@
                     android:layout_marginTop="4dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
+
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:src="@drawable/mail"
                         app:tint="#F97316" />
+
                     <TextView
+                        android:id="@+id/tvEmailProfil"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="yumna@ac.id"
+                        android:text="email@user.com"
                         android:textColor="#6B7280"
                         android:textSize="16sp" />
                 </LinearLayout>
@@ -187,24 +200,24 @@
                                 app:tint="#F97316" />
 
                             <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Data Diri"
-                                android:textColor="#1A1A1A"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Nama, Tanggal Lahir"
-                                android:textColor="#9CA3AF"
-                                android:textSize="14sp" />
-                        </LinearLayout>
+                                android:layout_marginStart="16dp"
+                                android:orientation="vertical">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Data Diri"
+                                    android:textColor="#1A1A1A"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Nama, alamat, kontak"
+                                    android:textColor="#9CA3AF"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
                         </LinearLayout>
 
                         <View
@@ -230,25 +243,27 @@
                                 android:background="@drawable/bg_circle_light_orange"
                                 android:padding="10dp"
                                 android:src="@drawable/shield"
-                                app:tint="#F97316" /> <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
+                                app:tint="#F97316" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Keamanan Akun"
-                                android:textColor="#1A1A1A"
-                                android:textSize="16sp"
-                                android:textStyle="bold" />
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Kata Sandi"
-                                android:textColor="#9CA3AF"
-                                android:textSize="14sp" />
-                        </LinearLayout>
+                                android:layout_marginStart="16dp"
+                                android:orientation="vertical">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Keamanan Akun"
+                                    android:textColor="#1A1A1A"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Ubah Kata Sandi"
+                                    android:textColor="#9CA3AF"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
                         </LinearLayout>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
@@ -259,21 +274,25 @@
                     android:layout_height="50dp"
                     android:background="@drawable/bg_btn_keluar"
                     android:gravity="center"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:src="@drawable/logout"
-                        app:tint="#DC2626" /> <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:fontFamily="@font/inter_bold"
-                    android:text="Keluar"
-                    android:textColor="#DC2626"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                        app:tint="#DC2626" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:fontFamily="@font/inter_bold"
+                        android:text="Keluar"
+                        android:textColor="#DC2626"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
             </LinearLayout>
