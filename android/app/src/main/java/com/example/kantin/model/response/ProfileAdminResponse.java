@@ -3,14 +3,26 @@ package com.example.kantin.model.response;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * ProfileAdminResponse — disesuaikan dengan DB asli.
+ * ProfileAdminResponse — disesuaikan dengan ProfileController.php
  *
- * Field user DB: _id, name, email, phone, role, canteen_id,
- *                status (active/pending/rejected), photo_profile, created_at
+ * Response GET /admin/profiles:
+ * {
+ *   "success": true,
+ *   "data": {
+ *     "_id", "name", "email", "phone", "role",
+ *     "canteen_id", "status", "photo_profile",
+ *     "created_at", "updated_at"
+ *   }
+ * }
  *
- * Field canteen DB: _id, name, description, location, phone, image,
- *                   delivery_fee_flat, operating_hours{open,close},
- *                   is_active, is_open, status, created_at
+ * CATATAN: ProfileController hanya return data user saja (toArray()),
+ * tidak ada nested canteen. Canteen info diambil terpisah jika dibutuhkan.
+ *
+ * Field update yang diterima server (ProfileController@update):
+ * - name (sometimes)
+ * - phone (sometimes)
+ * - photo_profile (file image)
+ * - password (sometimes, min:8, confirmed → butuh password_confirmation)
  */
 public class ProfileAdminResponse {
 
@@ -28,11 +40,10 @@ public class ProfileAdminResponse {
     public AdminProfile getData()   { return data; }
 
     // ======================================================================
-    // Data admin kantin (gabungan user + canteen dari API)
+    // Data admin kantin — flat, sesuai User model Laravel
     // ======================================================================
     public static class AdminProfile {
 
-        // --- Data User ---
         @SerializedName("_id")
         private String id;
 
@@ -45,114 +56,42 @@ public class ProfileAdminResponse {
         @SerializedName("phone")
         private String phone;
 
-        /** "active" | "pending" | "rejected" */
-        @SerializedName("status")
-        private String status;
-
-        /** Nama field di DB: "photo_profile", BUKAN "photo_url" */
-        @SerializedName("photo_profile")
-        private String photoProfile;
-
         @SerializedName("role")
         private String role;
 
         @SerializedName("canteen_id")
         private String canteenId;
 
+        /** "active" | "pending" | "rejected" */
+        @SerializedName("status")
+        private String status;
+
+        /**
+         * URL foto profil — sudah di-format oleh server dengan asset('storage/...')
+         * Field DB: "photo_profile"
+         */
+        @SerializedName("photo_profile")
+        private String photoProfile;
+
         @SerializedName("created_at")
         private String createdAt;
 
-        // --- Data Kantin (dikirim bersama oleh API) ---
-        @SerializedName("canteen")
-        private CanteenInfo canteen;
+        @SerializedName("updated_at")
+        private String updatedAt;
 
         public String getId()           { return id; }
         public String getName()         { return name != null ? name : ""; }
         public String getEmail()        { return email != null ? email : ""; }
         public String getPhone()        { return phone != null ? phone : ""; }
-        public String getStatus()       { return status; }
-        public String getPhotoProfile() { return photoProfile; }
         public String getRole()         { return role; }
         public String getCanteenId()    { return canteenId; }
+        public String getStatus()       { return status; }
+        public String getPhotoProfile() { return photoProfile; }
         public String getCreatedAt()    { return createdAt; }
-        public CanteenInfo getCanteen() { return canteen; }
+        public String getUpdatedAt()    { return updatedAt; }
 
-        // Helper
-        public boolean isActive()  { return "active".equals(status); }
-        public boolean isPending() { return "pending".equals(status); }
-    }
-
-    // ======================================================================
-    // Data kantin yang melekat pada profil admin
-    // ======================================================================
-    public static class CanteenInfo {
-
-        @SerializedName("_id")
-        private String id;
-
-        @SerializedName("name")
-        private String name;
-
-        @SerializedName("description")
-        private String description;
-
-        @SerializedName("location")
-        private String location;
-
-        @SerializedName("phone")
-        private String phone;
-
-        /** URL gambar kantin — field DB bernama "image" */
-        @SerializedName("image")
-        private String image;
-
-        @SerializedName("delivery_fee_flat")
-        private String deliveryFeeFlat;
-
-        @SerializedName("operating_hours")
-        private OperatingHours operatingHours;
-
-        /** true = kantin aktif/terdaftar */
-        @SerializedName("is_active")
-        private boolean isActive;
-
-        /** true = kantin sedang buka (toggle oleh admin kantin) */
-        @SerializedName("is_open")
-        private boolean isOpen;
-
-        /** "active" | "pending" | "rejected" */
-        @SerializedName("status")
-        private String status;
-
-        public String getId()                   { return id; }
-        public String getName()                 { return name != null ? name : ""; }
-        public String getDescription()          { return description; }
-        public String getLocation()             { return location; }
-        public String getPhone()                { return phone; }
-        public String getImage()                { return image; }
-        public String getDeliveryFeeFlat()      { return deliveryFeeFlat; }
-        public OperatingHours getOperatingHours() { return operatingHours; }
-        public boolean isActive()               { return isActive; }
-        public boolean isOpen()                 { return isOpen; }
-        public String getStatus()               { return status; }
-
-        public double getDeliveryFeeAsDouble() {
-            try { return Double.parseDouble(deliveryFeeFlat); }
-            catch (Exception e) { return 0; }
-        }
-    }
-
-    // ======================================================================
-    // Nested: operating_hours
-    // ======================================================================
-    public static class OperatingHours {
-        @SerializedName("open")
-        private String open;
-
-        @SerializedName("close")
-        private String close;
-
-        public String getOpen()  { return open != null ? open : ""; }
-        public String getClose() { return close != null ? close : ""; }
+        public boolean isActive()       { return "active".equals(status); }
+        public boolean isPending()      { return "pending".equals(status); }
+        public boolean isRejected()     { return "rejected".equals(status); }
     }
 }
