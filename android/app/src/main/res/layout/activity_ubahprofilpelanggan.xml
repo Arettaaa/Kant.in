@@ -99,7 +99,7 @@
                             android:scaleType="fitCenter"
                             android:padding="22dp"
                             android:src="@drawable/user"
-                            app:tint="#F97316"/>
+                            />
                     </androidx.cardview.widget.CardView>
                 </androidx.cardview.widget.CardView>
 
