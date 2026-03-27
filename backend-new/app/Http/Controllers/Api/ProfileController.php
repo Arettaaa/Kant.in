@@ -10,13 +10,23 @@ class ProfileController extends Controller
 {
     public function show(Request $request)
     {
-        $user = $request->user()->toArray();
-        if ($user['role'] === 'pembeli') {
-            unset($user['canteen_id']);
-        }
+        $user = $request->user();
+
+        $data = [
+            'id'            => (string) $user->_id,
+            'name'          => $user->name,
+            'email'         => $user->email,
+            'phone'         => $user->phone,
+            'role'          => $user->role,
+            'status'        => $user->status,
+            'photo_profile' => !empty($user->photo_profile)
+                                ? asset('storage/' . $user->photo_profile)
+                                : null,
+        ];
+
         return response()->json([
             'success' => true,
-            'data'    => $user,
+            'data'    => $data,
         ]);
     }
 
@@ -43,14 +53,19 @@ class ProfileController extends Controller
         }
 
         $user->update($validated);
+        $user->refresh();
 
-        $data = $user->fresh()->toArray();
-        if ($data['role'] === 'pembeli') {
-            unset($data['canteen_id']);
-        }
-        if (!empty($data['photo_profile'])) {
-            $data['photo_profile'] = asset('storage/' . $data['photo_profile']);
-        }
+        $data = [
+            'id'            => (string) $user->_id,
+            'name'          => $user->name,
+            'email'         => $user->email,
+            'phone'         => $user->phone,
+            'role'          => $user->role,
+            'status'        => $user->status,
+            'photo_profile' => !empty($user->photo_profile)
+                                ? asset('storage/' . $user->photo_profile)
+                                : null,
+        ];
 
         return response()->json([
             'success' => true,

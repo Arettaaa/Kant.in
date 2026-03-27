@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfilController;
-
+use App\Http\Controllers\KeamananController;
 /*
 |--------------------------------------------------------------------------
 | Auth Pelanggan (shared login & register dari admin.blade, re-route)
@@ -75,16 +75,15 @@ Route::get('/pesanan',                  fn() => view('pelanggan.pesanan'))->name
 Route::get('/profil', [ProfilController::class, 'index'])->name('pelanggan.profil');
 Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('pelanggan.edit-profil');
 Route::get('/profil/data-diri', [ProfilController::class, 'dataDiri'])->name('pelanggan.data-diri');
-Route::get('/profil/keamanan',          fn() => view('pelanggan.keamanan-akun'))->name('pelanggan.keamanan');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profil', [ProfilController::class, 'index'])->name('pelanggan.profil');
     Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('pelanggan.edit-profil');
-    
-    // Rute untuk Data Diri yang tadi error
     Route::get('/profil/data-diri', [ProfilController::class, 'dataDiri'])->name('pelanggan.data-diri');
-    
     Route::post('/profil/update', [ProfilController::class, 'update'])->name('pelanggan.profil.update');
+    Route::get('/profil/keamanan', [KeamananController::class, 'index'])->name('pelanggan.keamanan');
+    Route::post('/profil/keamanan', [KeamananController::class, 'updatePassword'])->name('pelanggan.password.update');
 });
 
 /*

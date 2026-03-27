@@ -17,8 +17,9 @@ class AuthController extends Controller
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-            'phone' => 'required|string', // Pastikan phone divalidasi
+            // PENTING: Validasi kata sandi kuat (Min 8 char, ada huruf besar, huruf kecil, & angka)
+            'password' => ['required', 'min:8', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[0-9]/'],
+            'phone' => 'required|string',
         ];
 
         if ($role === 'admin_kantin') {
@@ -27,7 +28,8 @@ class AuthController extends Controller
 
         $request->validate($rules, [
             'email.unique' => 'Email ini sudah terdaftar, silakan gunakan email lain.',
-            'password.min' => 'Kata sandi minimal 6 karakter.'
+            'password.min' => 'Kata sandi minimal 8 karakter.',
+            'password.regex' => 'Kata sandi harus mengandung kombinasi huruf besar, huruf kecil, dan angka.'
         ]);
 
         $canteenId = null;
@@ -53,9 +55,18 @@ class AuthController extends Controller
             'status' => $role === 'admin_kantin' ? 'pending' : 'active',
         ]);
 
+        
         $message = ($role === 'admin_kantin') 
             ? 'Pendaftaran Berhasil! Akun sedang menunggu persetujuan admin.' 
             : 'Akun Berhasil Dibuat! Silakan masuk untuk melanjutkan.';
+
+        // PENTING: Cek kalau requestnya dari JS (AJAX), balikin JSON biar modal tau kalau sukses
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'redirect' => '/login',
+            ]);
+        }
 
         return redirect('/login')->with('success', $message);
     }

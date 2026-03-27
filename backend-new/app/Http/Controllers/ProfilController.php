@@ -33,7 +33,7 @@ class ProfilController extends Controller
     public function update(Request $request)
     {
         $user = Auth::user();
-        dd($request->hasFile('photo_profile'));
+
         $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
@@ -43,16 +43,23 @@ class ProfilController extends Controller
 
         try {
             if ($request->hasFile('photo_profile')) {
+                // hapus foto lama
                 if ($user->photo_profile) {
                     Storage::disk('public')->delete($user->photo_profile);
                 }
+
+                // simpan foto baru
                 $path = $request->file('photo_profile')->store('profiles', 'public');
-                dd($path);
+
+                // SIMPAN KE DATABASE
+                $user->photo_profile = $path;
             }
 
+            // update data lain
             $user->name = $request->name;
             $user->phone = $request->phone;
             $user->email = $request->email;
+
             $user->save();
 
             return back()->with('success_update', true);

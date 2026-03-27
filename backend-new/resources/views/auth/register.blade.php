@@ -42,15 +42,16 @@
         <div class="flex-1 flex flex-col px-10 pt-7 pb-10" style="background-color:#FFFFFF;">
 
             {{-- PENTING: Tampilan Error Validasi dari Controller --}}
-            @if ($errors->any())
-            <div class="mb-4 p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium">
-                <ul class="list-disc pl-5">
-                    @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
+            {{-- Bagian Error Container --}}
+            <div id="errorContainer" class="mb-4 p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium {{ $errors->any() ? '' : 'hidden' }}">
+                <ul id="errorList" class="list-disc pl-5">
+                    @if ($errors->any())
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    @endif
                 </ul>
             </div>
-            @endif
 
             <div class="flex rounded-xl p-1 mb-5" style="background-color:#F3F4F6;">
                 <button type="button" id="tabPelanggan" onclick="switchTab('pembeli')"
@@ -104,13 +105,15 @@
                         </div>
                     </div>
 
+                   {{-- Input Kata Sandi --}}
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1.5">Kata Sandi</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
                                 <i class="fa-solid fa-lock"></i>
                             </span>
-                            <input id="passwordRegister" type="password" name="password" placeholder="••••••••" required
+                            <input id="passwordRegister" type="password" name="password" placeholder="Min. 8 karakter (Huruf & Angka)" required
+                                oninput="checkStrength(this.value)"
                                 class="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-300 transition-all"
                                 style="background-color:#FAFAFA;">
                             <button type="button" onclick="togglePassword('passwordRegister','eyeIcon')"
@@ -118,6 +121,15 @@
                                 <i id="eyeIcon" class="fa-regular fa-eye"></i>
                             </button>
                         </div>
+                        
+                        {{-- Bar Indikator Kekuatan --}}
+                        <div class="mt-2 flex gap-1.5" id="strengthBar">
+                            <div id="s1" class="flex-1 h-1 bg-gray-200 rounded-full transition-all duration-300"></div>
+                            <div id="s2" class="flex-1 h-1 bg-gray-200 rounded-full transition-all duration-300"></div>
+                            <div id="s3" class="flex-1 h-1 bg-gray-200 rounded-full transition-all duration-300"></div>
+                            <div id="s4" class="flex-1 h-1 bg-gray-200 rounded-full transition-all duration-300"></div>
+                        </div>
+                        <p id="strengthLabel" class="text-xs text-gray-400 mt-1 font-medium"></p>
                     </div>
 
                     <div id="namaKantinField" style="display: none;">
@@ -169,20 +181,70 @@
 <script>
     let activeRole = 'pembeli';
 
+    // 1. DOMContentLoaded cukup membungkus proses inisialisasi dan form submit
     document.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const roleFromUrl = urlParams.get('role');
         if (roleFromUrl === 'kantin') switchTab('admin_kantin');
         else switchTab('pembeli');
 
-        // PENTING: Cegat form untuk jalankan animasi modal dulu
         const form = document.getElementById('registerForm');
-        form.onsubmit = function(e) {
-            e.preventDefault(); // Stop kirim data sebentar
-            showSuccessModal(this); 
-            return false;
-        };
-    });
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault(); 
+
+            const errorContainer = document.getElementById('errorContainer');
+            const errorList = document.getElementById('errorList');
+            
+            errorContainer?.classList.add('hidden');
+            if (errorList) errorList.innerHTML = '';
+
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Memproses...';
+
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.status === 422) {
+                    let errorHtml = '';
+                    for (let field in data.errors) {
+                        data.errors[field].forEach(errMsg => {
+                            errorHtml += `<li>${errMsg}</li>`;
+                        });
+                    }
+                    if (errorList) errorList.innerHTML = errorHtml;
+                    errorContainer?.classList.remove('hidden'); 
+                    window.scrollTo({ top: 0, behavior: 'smooth' }); 
+                } else if (response.ok && data.success) {
+                    showSuccessModal(data.redirect);
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan sistem, silakan coba lagi.');
+            } finally {
+                const modal = document.getElementById('successModal');
+                if (!modal?.classList.contains('flex')) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            }
+        });
+    }); // <--- PENTING: Tadi tanda kurung tutup ini hilang!
+
+    // 2. Fungsi-fungsi di bawah ini harus di LUAR DOMContentLoaded biar bisa dipanggil dari HTML
 
     function switchTab(role) {
         const tabP = document.getElementById('tabPelanggan');
@@ -207,7 +269,7 @@
         }
     }
 
-    function showSuccessModal(formElement) {
+    function showSuccessModal(redirectUrl) {
         const modal = document.getElementById('successModal');
         const bar   = document.getElementById('progressBar');
         const title = document.getElementById('modalTitle');
@@ -223,11 +285,11 @@
 
         modal.classList.remove('hidden');
         modal.classList.add('flex');
+        
         setTimeout(() => { bar.style.width = '100%'; }, 50);
 
-        // Setelah animasi (2.8 detik), baru submit form aslinya ke Controller
         setTimeout(() => {
-            formElement.submit(); 
+            window.location.href = redirectUrl || '/login';
         }, 2800);
     }
 
@@ -240,6 +302,34 @@
         } else {
             input.type = 'password';
             icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+
+    // Aku hapus fungsi duplikatnya ya, cukup pakai satu saja
+    function checkStrength(val) {
+        const bars   = ['s1','s2','s3','s4'];
+        const label  = document.getElementById('strengthLabel');
+        let score    = 0;
+        
+        if (val.length >= 8) score++; 
+        if (/[a-z]/.test(val) && /[A-Z]/.test(val)) score++; 
+        if (/[0-9]/.test(val)) score++; 
+        if (/[^A-Za-z0-9]/.test(val)) score++; 
+
+        const colors  = ['#ef4444','#f97316','#eab308','#22c55e'];
+        const labels  = ['Terlalu Lemah','Lumayan','Kuat','Sangat Kuat'];
+        const lblClrs = ['text-red-500','text-orange-500','text-yellow-500','text-green-500'];
+
+        bars.forEach((b, i) => {
+            const el = document.getElementById(b);
+            el.style.backgroundColor = i < score ? colors[score - 1] : '#e5e7eb';
+        });
+
+        if (val.length === 0) {
+            label.textContent = '';
+        } else {
+            label.textContent = labels[score - 1] || 'Terlalu Lemah';
+            label.className   = `text-xs mt-1 font-medium ${lblClrs[score - 1] || 'text-red-500'}`;
         }
     }
 </script>
