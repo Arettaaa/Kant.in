@@ -46,7 +46,8 @@ class ProfilController extends Controller
                 if ($user->photo_profile) {
                     Storage::disk('public')->delete($user->photo_profile);
                 }
-                $user->photo_profile = $request->file('photo_profile')->store('profiles', 'public');
+                $path = $request->file('photo_profile')->store('profiles', 'public');
+                dd($path);
             }
 
             $user->name = $request->name;
@@ -55,7 +56,6 @@ class ProfilController extends Controller
             $user->save();
 
             return back()->with('success_update', true);
-
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Gagal menyimpan: ' . $e->getMessage()]);
         }
