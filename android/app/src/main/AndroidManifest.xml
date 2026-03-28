@@ -17,6 +17,12 @@
         android:theme="@style/Theme.Kantin"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".EditMenu"
+            android:exported="false" />
+        <activity
+            android:name=".TambahMenu"
+            android:exported="false" />
+        <activity
             android:name=".FooterAdmin"
             android:exported="false" />
         <activity

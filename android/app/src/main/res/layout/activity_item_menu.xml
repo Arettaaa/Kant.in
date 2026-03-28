@@ -51,7 +51,7 @@
                     android:layout_alignParentEnd="true"
                     android:background="@drawable/bg_badge_gray_light"
                     android:padding="10dp"
-                    android:src="@drawable/again" />
+                    android:src="@drawable/button_pencil" />
             </RelativeLayout>
 
             <LinearLayout
