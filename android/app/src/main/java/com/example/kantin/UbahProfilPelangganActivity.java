@@ -2,7 +2,6 @@ package com.example.kantin;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,9 +13,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.example.kantin.model.response.ProfileResponse;
 import com.example.kantin.network.ApiClient;
 import com.example.kantin.network.ApiService;
-import com.example.kantin.model.response.ProfileResponse;
 import com.example.kantin.utils.SessionManager;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.button.MaterialButton;
@@ -49,11 +48,7 @@ public class UbahProfilPelangganActivity extends AppCompatActivity {
 
         sessionManager = new SessionManager(this);
         initViews();
-
-        // 1. Load data dari session
         loadDataAwal();
-
-        // 2. Sync data terbaru dari server
         syncDataFromServer();
 
         btnBack.setOnClickListener(v -> onBackPressed());
@@ -70,6 +65,7 @@ public class UbahProfilPelangganActivity extends AppCompatActivity {
         etPhone = findViewById(R.id.etPhone);
         etEmail = findViewById(R.id.etEmail);
         btnSimpan = findViewById(R.id.btnSimpan);
+        etEmail.setEnabled(false); // Biasanya email tidak bisa diubah
     }
 
     private void loadDataAwal() {
@@ -81,15 +77,13 @@ public class UbahProfilPelangganActivity extends AppCompatActivity {
 
     private void handleProfileImage(String path) {
         if (path != null && !path.isEmpty()) {
-            imgProfile.clearColorFilter();
             imgProfile.setPadding(0, 0, 0, 0);
             String fullUrl = path.startsWith("http") ? path : BASE_URL_STORAGE + path;
-            Glide.with(this).load(fullUrl).circleCrop().into(imgProfile);
+            Glide.with(this).load(fullUrl).circleCrop().placeholder(R.drawable.userorg).into(imgProfile);
         } else {
-            imgProfile.setImageResource(R.drawable.user);
-            int p = (int) (20 * getResources().getDisplayMetrics().density);
+            imgProfile.setImageResource(R.drawable.userorg);
+            int p = (int) (22 * getResources().getDisplayMetrics().density);
             imgProfile.setPadding(p, p, p, p);
-            imgProfile.setColorFilter(Color.parseColor("#F97316"));
         }
     }
 
@@ -100,17 +94,16 @@ public class UbahProfilPelangganActivity extends AppCompatActivity {
             public void onResponse(Call<ProfileResponse> call, Response<ProfileResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     ProfileResponse.UserData data = response.body().getData();
-                    etNama.setText(data.getName());
-                    etPhone.setText(data.getPhone());
                     sessionManager.saveUserInfo(data.getName(), data.getEmail(), data.getPhone());
                     sessionManager.savePhotoUrl(data.getPhotoProfile());
-                    handleProfileImage(data.getPhotoProfile());
+
+                    if (etNama.getText().toString().equals(sessionManager.getUserName())) etNama.setText(data.getName());
+                    if (etPhone.getText().toString().equals(sessionManager.getUserPhone())) etPhone.setText(data.getPhone());
+                    if (photoFile == null) handleProfileImage(data.getPhotoProfile());
                 }
             }
             @Override
-            public void onFailure(Call<ProfileResponse> call, Throwable t) {
-                Log.e("SYNC_ERROR", t.getMessage());
-            }
+            public void onFailure(Call<ProfileResponse> call, Throwable t) { Log.e("SYNC_ERROR", t.getMessage()); }
         });
     }
 
@@ -124,30 +117,30 @@ public class UbahProfilPelangganActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK && data != null) {
             Uri fileUri = data.getData();
             photoFile = new File(fileUri.getPath());
-            imgProfile.clearColorFilter();
-            imgProfile.setPadding(0, 0, 0, 0);
             Glide.with(this).load(photoFile).circleCrop().into(imgProfile);
-        } else if (resultCode == ImagePicker.RESULT_ERROR) {
-            Toast.makeText(this, ImagePicker.getError(data), Toast.LENGTH_SHORT).show();
+            imgProfile.setPadding(0, 0, 0, 0);
         }
     }
 
     private void validasiDanSimpan() {
         String name = etNama.getText().toString().trim();
+        String phone = etPhone.getText().toString().trim();
         if (name.isEmpty()) {
             etNama.setError("Nama tidak boleh kosong");
             return;
         }
-        simpanKeServer(name, etPhone.getText().toString().trim());
+        simpanKeServer(name, phone);
     }
 
     private void simpanKeServer(String name, String phone) {
         btnSimpan.setEnabled(false);
         btnSimpan.setText("Menyimpan...");
 
-        RequestBody rbName  = RequestBody.create(MediaType.parse("text/plain"), name);
+        // 1. Buat Body untuk teks
+        RequestBody rbName = RequestBody.create(MediaType.parse("text/plain"), name);
         RequestBody rbPhone = RequestBody.create(MediaType.parse("text/plain"), phone);
 
+        // 2. Buat Body untuk file (Hanya jika ada foto baru)
         MultipartBody.Part partPhoto = null;
         if (photoFile != null) {
             RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), photoFile);
@@ -155,6 +148,8 @@ public class UbahProfilPelangganActivity extends AppCompatActivity {
         }
 
         String token = "Bearer " + sessionManager.getToken();
+
+        // 3. Panggil API (Sekarang hanya 4 parameter karena _method dihapus)
         ApiClient.getClient().create(ApiService.class)
                 .updateProfileBuyers(token, rbName, rbPhone, partPhoto)
                 .enqueue(new Callback<ProfileResponse>() {
@@ -163,18 +158,18 @@ public class UbahProfilPelangganActivity extends AppCompatActivity {
                         btnSimpan.setEnabled(true);
                         btnSimpan.setText("Simpan Perubahan");
 
-                        if (response.isSuccessful() && response.body() != null) {
-                            Toast.makeText(UbahProfilPelangganActivity.this, "Update Berhasil!", Toast.LENGTH_SHORT).show();
-                            ProfileResponse.UserData data = response.body().getData();
-                            sessionManager.saveUserInfo(data.getName(), data.getEmail(), data.getPhone());
-                            sessionManager.savePhotoUrl(data.getPhotoProfile());
+                        if (response.isSuccessful()) {
+                            Toast.makeText(UbahProfilPelangganActivity.this, "Profil berhasil diperbarui!", Toast.LENGTH_SHORT).show();
+                            // Update session lokal agar saat balik ke halaman sebelumnya data sudah baru
+                            if (response.body() != null) {
+                                ProfileResponse.UserData d = response.body().getData();
+                                sessionManager.saveUserInfo(d.getName(), d.getEmail(), d.getPhone());
+                                sessionManager.savePhotoUrl(d.getPhotoProfile());
+                            }
                             finish();
                         } else {
-                            try {
-                                String errBody = response.errorBody().string();
-                                Log.e("API_ERROR", errBody);
-                                Toast.makeText(UbahProfilPelangganActivity.this, "Gagal: " + response.code(), Toast.LENGTH_LONG).show();
-                            } catch (Exception e) { e.printStackTrace(); }
+                            Log.e("API_ERROR", "Status: " + response.code());
+                            Toast.makeText(UbahProfilPelangganActivity.this, "Gagal: " + response.code(), Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -182,7 +177,8 @@ public class UbahProfilPelangganActivity extends AppCompatActivity {
                     public void onFailure(Call<ProfileResponse> call, Throwable t) {
                         btnSimpan.setEnabled(true);
                         btnSimpan.setText("Simpan Perubahan");
-                        Toast.makeText(UbahProfilPelangganActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e("API_FAILURE", t.getMessage());
+                        Toast.makeText(UbahProfilPelangganActivity.this, "Kesalahan Jaringan", Toast.LENGTH_SHORT).show();
                     }
                 });
     }

@@ -102,8 +102,7 @@
                                 android:layout_height="match_parent"
                                 android:scaleType="fitCenter"
                                 android:padding="18dp"
-                                app:tint="#F97316"
-                                android:src="@drawable/user" />
+                                android:src="@drawable/userorg" />
 
                         </androidx.cardview.widget.CardView>
                     </androidx.cardview.widget.CardView>
@@ -249,7 +248,7 @@
                         android:layout_height="44dp"
                         android:background="@drawable/bg_circle_outline"
                         android:padding="12dp"
-                        android:src="@drawable/calendar"
+                        android:src="@drawable/user"
                         app:tint="#6B7280" />
 
                     <LinearLayout
@@ -261,56 +260,17 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="TANGGAL BERGABUNG"
+                            android:text="ROLE"
                             android:textColor="#6B7280"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <TextView
+                            android:id="@+id/tvDetailRole"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="12 September 2023"
-                            android:textColor="#111827"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_info_card"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:layout_marginBottom="32dp"> <ImageView
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:background="@drawable/bg_circle_outline"
-                    android:padding="12dp"
-                    android:src="@drawable/mappin"
-                    app:tint="#6B7280" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="ALAMAT UTAMA"
-                            android:textColor="#6B7280"
-                            android:textSize="14sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Asrama Putri Blok B, Kamar 204"
+                            android:text="Pembeli"
                             android:textColor="#111827"
                             android:textSize="16sp"
                             android:textStyle="bold" />

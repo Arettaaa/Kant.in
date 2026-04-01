@@ -6,13 +6,10 @@ import com.example.kantin.model.request.AddToCartRequest;
 import com.example.kantin.model.request.UpdateCartRequest;
 import com.example.kantin.model.request.CheckoutRequest;
 import com.example.kantin.model.request.UpdateStatusOrderRequest;
-import com.example.kantin.model.request.UpdateProfileRequest;
 
 // Import untuk Response (Data yang diterima dari Laravel)
 import com.example.kantin.model.response.BaseResponse;
 import com.example.kantin.model.response.LoginResponse;
-import com.example.kantin.model.response.CanteenListResponse;
-import com.example.kantin.model.response.CanteenDetailResponse;
 import com.example.kantin.model.response.MenuListResponse;
 import com.example.kantin.model.response.MenuDetailResponse;
 import com.example.kantin.model.response.CartResponse;
@@ -264,7 +261,7 @@ public interface ApiService {
     @Multipart
     @POST("admin/profiles")
     Call<BaseResponse> updatePassword(
-            @Part("_method") RequestBody method,              // "PUT"
+            @Part("_method") String method,              // "PUT"
             @Part("password") RequestBody password,
             @Part("password_confirmation") RequestBody passwordConfirmation
     );
@@ -295,9 +292,6 @@ public interface ApiService {
 //    @POST("auth/register")
 //    Call<BaseResponse> register(@Body RegisterPelangganRequest request);
 
-    @GET("buyers/profiles")
-    Call<ProfileResponse> getBuyerProfile(@Header("Authorization") String token);
-
     /** 1. KERANJANG (Cart) **/
     @GET("buyers/carts")
     Call<CartResponse> getMyCart();
@@ -326,9 +320,11 @@ public interface ApiService {
 
     /** 3. PROFIL (Pelanggan) **/
     @GET("buyers/profiles")
-    Call<ProfileResponse> getBuyerProfile();
+    Call<ProfileResponse> getBuyerProfile(@Header("Authorization") String token);
 
-    // --- INI YANG BARU ---
+    /** * Update Profil (Nama, Phone, Foto)
+     * Gunakan POST + Multipart agar bisa handle file dan teks sekaligus
+     */
     @Headers("Accept: application/json")
     @Multipart
     @POST("buyers/profiles")
@@ -336,9 +332,16 @@ public interface ApiService {
             @Header("Authorization") String token,
             @Part("name") RequestBody name,
             @Part("phone") RequestBody phone,
-            @Part MultipartBody.Part photo_profile  // nullable
+            @Part MultipartBody.Part photo_profile
     );
 
-    @PUT("buyers/profiles")
-    Call<ProfileResponse> updateBuyerProfile(@Body UpdateProfileRequest request);
+    @Headers("Accept: application/json")
+    @Multipart
+    @POST("buyers/profiles")
+    Call<BaseResponse> updatePasswordBuyers(
+            @Header("Authorization") String token,
+            @Part("old_password") RequestBody oldPassword,
+            @Part("password") RequestBody password,
+            @Part("password_confirmation") RequestBody confirmation
+    );
 }
