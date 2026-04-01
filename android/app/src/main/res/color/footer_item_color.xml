@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Saat status SELECTED (Aktif) -->
+    <item android:color="#F97316" android:state_selected="true" />
+    <!-- Saat status DEFAULT (Tidak Aktif) -->
+    <item android:color="#9CA3AF" />
+</selector>

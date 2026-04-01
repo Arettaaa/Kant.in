@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Gambar saat Switch ON (Tersedia) -->
+    <item android:drawable="@drawable/button_avail" android:state_checked="true" />
+
+    <!-- Gambar saat Switch OFF (Habis) -->
+    <item android:drawable="@drawable/button_notavail" android:state_checked="false" />
+
+    <!-- Default (biasanya disamakan dengan OFF) -->
+    <item android:drawable="@drawable/button_notavail" />
+</selector>

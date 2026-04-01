@@ -6,20 +6,46 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:networkSecurityConfig="@xml/network_security_config"
-        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Kantin">
+        android:theme="@style/Theme.Kantin"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".DashboardAdmin"
+            android:exported="false" />
+        <activity
+            android:name=".EditMenu"
+            android:exported="false" />
+        <activity
+            android:name=".TambahMenu"
+            android:exported="false" />
+        <activity
+            android:name=".FooterAdmin"
+            android:exported="false" />
+        <activity
+            android:name=".ItemMenu"
+            android:exported="false" />
+        <activity
+            android:name=".KelolaMenu"
+            android:exported="false" />
+        <activity
+            android:name=".PusatBantuan"
+            android:exported="false" />
+        <activity
+            android:name=".ItemFAQ"
+            android:exported="false" />
+        <activity
+            android:name=".UbahProfilKantin"
+            android:exported="false" />
         <activity
             android:name=".ProfilAdminKantin"
-            android:exported="false" />
-        <!-- Entry point pertama -->
+            android:exported="false" /> <!-- Entry point pertama -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
