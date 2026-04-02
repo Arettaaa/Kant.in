@@ -7,9 +7,6 @@
 <style>
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    
-    /* Animasi pindah card */
-    .cursor-pointer { transition: all 0.3s ease; }
 </style>
 @endpush
 
@@ -85,8 +82,8 @@
         <div id="tabMasuk" class="flex-1 px-10 py-6 text-start">
             <div id="gridMasuk" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-start">
 
-                {{-- Card Alex (Set 12:08 WIB) --}}
-                <div id="order-alex" onclick="window.location.href='/admin/pesanan/rincian?name=Alex Johnson&order=%23ORD-089&items=2x Nasi Goreng Spesial,1x Brown Sugar Boba&ongkir=Rp 5.000'" class="cursor-pointer group bg-white rounded-[32px] p-7 shadow-sm border border-gray-100 flex flex-col min-h-[320px] transition-all hover:shadow-md text-start">
+                {{-- Card Alex --}}
+                <div id="order-alex" onclick="window.location.href='/admin/pesanan/rincian?name=Alex Johnson&order=%23ORD-089&items=2x Nasi Goreng Spesial,1x Brown Sugar Boba&ongkir=Rp 5.000'" class="cursor-pointer group bg-white rounded-[32px] p-7 shadow-sm border border-gray-100 flex flex-col min-h-[320px] hover:shadow-md text-start">
                     <div class="flex justify-between mb-6 text-start">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-300"><i class="fa-solid fa-user text-xl"></i></div>
@@ -106,13 +103,13 @@
                         <span class="text-xl font-black text-[#FF6900]">Rp 73.000</span>
                     </div>
                     <div class="flex gap-3 mt-auto text-start">
-                        <button onclick="event.stopPropagation(); this.closest('.cursor-pointer').remove(); updateBadges();" class="flex-1 py-4 rounded-2xl border-2 border-red-50 text-red-500 text-xs font-black hover:bg-red-50 transition-all">✕ Tolak</button>
+                        <button onclick="event.stopPropagation(); deleteCard(this);" class="flex-1 py-4 rounded-2xl border-2 border-red-50 text-red-500 text-xs font-black hover:bg-red-50 transition-all">✕ Tolak</button>
                         <button onclick="event.stopPropagation(); terimaOrder('alex', 'Alex Johnson', '#ORD-089', '2', 'DIMASAK', '12:08 WIB')" class="flex-1 py-4 rounded-2xl bg-[#22c55e] text-white text-xs font-black shadow-lg shadow-green-100 hover:brightness-105 transition-all">✓ Terima</button>
                     </div>
                 </div>
 
-                {{-- Card Sarah (Set 12:05 WIB) --}}
-                <div id="order-sarah" onclick="window.location.href='/admin/pesanan/rincian?name=Sarah Smith&order=%23ORD-090&items=1x Mie Goreng Ayam,1x Es Teh Manis&ongkir=Rp 5.000'" class="cursor-pointer group bg-white rounded-[32px] p-7 shadow-sm border border-gray-100 flex flex-col min-h-[320px] hover:shadow-md transition-all text-start">
+                {{-- Card Sarah --}}
+                <div id="order-sarah" onclick="window.location.href='/admin/pesanan/rincian?name=Sarah Smith&order=%23ORD-090&items=1x Mie Goreng Ayam,1x Es Teh Manis&ongkir=Rp 5.000'" class="cursor-pointer group bg-white rounded-[32px] p-7 shadow-sm border border-gray-100 flex flex-col min-h-[320px] hover:shadow-md text-start">
                     <div class="flex justify-between mb-6 text-start">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-300"><i class="fa-solid fa-user text-xl"></i></div>
@@ -132,22 +129,22 @@
                         <span class="text-xl font-black text-[#FF6900]">Rp 32.000</span>
                     </div>
                     <div class="flex gap-3 mt-auto text-start">
-                        <button onclick="event.stopPropagation(); this.closest('.cursor-pointer').remove(); updateBadges();" class="flex-1 py-4 rounded-2xl border-2 border-red-50 text-red-500 text-xs font-black hover:bg-red-50 transition-all">✕ Tolak</button>
+                        <button onclick="event.stopPropagation(); deleteCard(this);" class="flex-1 py-4 rounded-2xl border-2 border-red-50 text-red-500 text-xs font-black hover:bg-red-50 transition-all">✕ Tolak</button>
                         <button onclick="event.stopPropagation(); terimaOrder('sarah', 'Sarah Smith', '#ORD-090', '2', 'DIMASAK', '12:05 WIB')" class="flex-1 py-4 rounded-2xl bg-[#22c55e] text-white text-xs font-black shadow-lg shadow-green-100 hover:brightness-105 transition-all">✓ Terima</button>
                     </div>
                 </div>
 
-                {{-- Card Budi (Set 11:58 WIB) --}}
+                {{-- Card Budi --}}
                 <div id="order-budi" onclick="window.location.href='/admin/pesanan/rincian?name=Budi Santoso&order=%23ORD-091&items=2x Mie Goreng Ayam,2x Brown Sugar Boba&ongkir=Rp 0'" class="cursor-pointer group bg-white rounded-[32px] p-7 shadow-sm border border-gray-100 flex flex-col min-h-[320px] hover:shadow-md transition-all text-start">
                     <div class="flex justify-between mb-6 text-start">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-300"><i class="fa-solid fa-user text-xl"></i></div>
+                        <div class="flex items-center gap-3 text-start">
+                            <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-300"><i class="fa-solid fa-user text-xl text-start"></i></div>
                             <div class="text-start">
-                                <p class="text-base font-black text-gray-800">Budi Santoso</p>
-                                <p class="text-[10px] text-gray-400 font-black uppercase tracking-tight">🕒 11:58 WIB</p>
+                                <p class="text-base font-black text-gray-800 group-hover:text-[#FF6900]">Budi Santoso</p>
+                                <p class="text-[10px] text-gray-400 font-black uppercase mt-0.5 tracking-tight">🕒 11:58 WIB</p>
                             </div>
                         </div>
-                        <div class="text-right text-start"><p class="text-[10px] font-black text-gray-300 mb-1">#ORD-091</p><span class="text-[10px] font-black bg-purple-50 text-purple-500 px-2 py-1 rounded-lg uppercase tracking-tight">Ambil Sendiri</span></div>
+                        <div class="text-right text-start text-start"><p class="text-[10px] font-black text-gray-300 mb-1">#ORD-091</p><span class="text-[10px] font-black bg-purple-50 text-purple-500 px-2 py-1 rounded-lg uppercase tracking-tight">Ambil Sendiri</span></div>
                     </div>
                     <div class="flex-1 text-[13px] text-gray-700 py-5 border-y border-gray-50 space-y-3 text-start">
                         <p><b>2x</b> Mie Goreng Ayam</p>
@@ -158,7 +155,7 @@
                         <span class="text-xl font-black text-[#FF6900]">Rp 80.000</span>
                     </div>
                     <div class="flex gap-3 mt-auto text-start">
-                        <button onclick="event.stopPropagation(); this.closest('.cursor-pointer').remove(); updateBadges();" class="flex-1 py-4 rounded-2xl border-2 border-red-50 text-red-500 text-xs font-black hover:bg-red-50 transition-all">✕ Tolak</button>
+                        <button onclick="event.stopPropagation(); deleteCard(this);" class="flex-1 py-4 rounded-2xl border-2 border-red-50 text-red-500 text-xs font-black hover:bg-red-50 transition-all">✕ Tolak</button>
                         <button onclick="event.stopPropagation(); terimaOrder('budi', 'Budi Santoso', '#ORD-091', '4', 'DIMASAK', '11:58 WIB')" class="flex-1 py-4 rounded-2xl bg-[#22c55e] text-white text-xs font-black shadow-lg shadow-green-100 hover:brightness-105 transition-all">✓ Terima</button>
                     </div>
                 </div>
@@ -168,7 +165,8 @@
         {{-- ===== TAB: DIPROSES ===== --}}
         <div id="tabDiproses" class="hidden flex-1 px-10 py-6 text-start">
             <div id="gridDiproses" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-start">
-                {{-- David Lee (Set 11:42 WIB) --}}
+                
+                {{-- David Lee --}}
                 <div id="order-david" onclick="window.location.href='/admin/pesanan/status?name=David Lee&order=%23ORD-083&time=11:42 WIB'" class="cursor-pointer group bg-white rounded-[32px] p-7 shadow-sm border border-gray-100 flex flex-col min-h-[220px] transition-all hover:shadow-md text-start">
                     <div class="flex justify-between mb-6 text-start">
                         <div class="flex items-center gap-3">
@@ -182,54 +180,13 @@
                     </div>
                     <div class="mt-auto flex justify-between items-center pt-5 border-t border-gray-50 text-start">
                         <p class="text-[11px] text-gray-400 font-black uppercase tracking-widest text-start">1 ITEM</p>
-                        <div class="flex gap-2">
-                            <button onclick="event.stopPropagation(); selesaikanOrder(this)" class="px-4 py-2 rounded-xl bg-[#1A1A1A] text-white text-[10px] font-black shadow-lg hover:bg-black transition-all">SELESAIKAN</button>
+                        <div class="flex gap-2 text-start text-start">
+                            <button onclick="event.stopPropagation(); deleteCard(this)" class="px-4 py-2 rounded-xl bg-[#1A1A1A] text-white text-[10px] font-black shadow-lg hover:bg-black transition-all">SELESAIKAN</button>
                             <span class="px-4 py-2 rounded-xl text-[10px] font-black bg-green-50 text-[#00A63E] shadow-sm"><i class="fa-solid fa-check mr-1"></i> SIAP</span>
                         </div>
                     </div>
                 </div>
 
-                {{-- Rina Putri (Set 11:45 WIB) --}}
-                <div onclick="window.location.href='/admin/pesanan/status?name=Rina Putri&order=%23ORD-085&time=11:45 WIB'" class="cursor-pointer group bg-white rounded-[32px] p-7 shadow-sm border border-gray-100 flex flex-col min-h-[220px] transition-all hover:shadow-md text-start">
-                    <div class="flex justify-between mb-6 text-start">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-300"><i class="fa-solid fa-user text-xl text-start"></i></div>
-                            <div class="text-start">
-                                <p class="text-base font-black text-gray-800">Rina Putri</p>
-                                <p class="text-[10px] text-gray-400 font-black uppercase tracking-tight">🕒 11:45 WIB</p>
-                            </div>
-                        </div>
-                        <div class="text-right text-start"><p class="text-[10px] font-black text-gray-300 mb-1">#ORD-085</p><span class="text-[10px] font-black bg-purple-50 text-purple-500 px-2 py-1 rounded-lg uppercase tracking-tight">Ambil Sendiri</span></div>
-                    </div>
-                    <div class="mt-auto flex justify-between items-center pt-5 border-t border-gray-50 text-start">
-                        <p class="text-[11px] text-gray-400 font-black uppercase tracking-widest text-start">2 ITEM</p>
-                        <div class="flex gap-2">
-                            <button onclick="event.stopPropagation(); selesaikanOrder(this)" class="hidden px-4 py-2 rounded-xl bg-[#1A1A1A] text-white text-[10px] font-black">SELESAIKAN</button>
-                            <span class="px-4 py-2 rounded-xl text-[10px] font-black bg-orange-50 text-[#F54900] shadow-sm"><i class="fa-solid fa-fire-flame-curved mr-1 text-start"></i> DIMASAK</span>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Ahmad Dani (Set 11:50 WIB) --}}
-                <div onclick="window.location.href='/admin/pesanan/status?name=Ahmad Dani&order=%23ORD-084&time=11:50 WIB'" class="cursor-pointer group bg-white rounded-[32px] p-7 shadow-sm border border-gray-100 flex flex-col min-h-[220px] transition-all hover:shadow-md text-start">
-                    <div class="flex justify-between mb-6 text-start text-start">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-300 text-start"><i class="fa-solid fa-user text-xl text-start"></i></div>
-                            <div class="text-start text-start">
-                                <p class="text-base font-black text-gray-800">Ahmad Dani</p>
-                                <p class="text-[10px] text-gray-400 font-black uppercase tracking-tight text-start">🕒 11:50 WIB</p>
-                            </div>
-                        </div>
-                        <div class="text-right text-start"><p class="text-[10px] font-black text-gray-300 mb-1">#ORD-084</p><span class="text-[10px] font-black bg-blue-50 text-blue-500 px-2 py-1 rounded-lg uppercase tracking-tight">Antar Kurir</span></div>
-                    </div>
-                    <div class="mt-auto flex justify-between items-center pt-5 border-t border-gray-50 text-start text-start">
-                        <p class="text-[11px] text-gray-400 font-black uppercase tracking-widest text-start text-start">4 ITEM</p>
-                        <div class="flex gap-2">
-                             <button onclick="event.stopPropagation(); selesaikanOrder(this)" class="hidden px-4 py-2 rounded-xl bg-[#1A1A1A] text-white text-[10px] font-black text-start">SELESAIKAN</button>
-                             <span class="px-4 py-2 rounded-xl text-[10px] font-black bg-orange-50 text-[#F54900] shadow-sm text-start"><i class="fa-solid fa-fire-flame-curved mr-1 text-start"></i> DIMASAK</span>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </main>
@@ -238,6 +195,13 @@
 
 @push('scripts')
 <script>
+    // Fungsi simple untuk buang card tanpa pindah halaman
+    function deleteCard(btn) {
+        const card = btn.closest('.cursor-pointer');
+        card.remove();
+        updateBadges();
+    }
+
     function switchTab(tab) {
         const tMasuk = document.getElementById('tabMasuk');
         const tDiproses = document.getElementById('tabDiproses');
@@ -261,57 +225,29 @@
         const target = document.getElementById('order-' + id);
         if(target) target.remove();
         
-        // Buat HTML dengan format waktu WIB
         const html = `
-            <div onclick="window.location.href='/admin/pesanan/status?name=${nama}&order=${orderId.replace('#','%23')}&time=${waktu}'" class="cursor-pointer bg-white rounded-[32px] p-7 shadow-sm border border-gray-100 flex flex-col min-h-[220px] transition-all hover:shadow-md">
-                <div class="flex justify-between mb-6">
+            <div onclick="window.location.href='/admin/pesanan/status?name=${nama}&order=${orderId.replace('#','%23')}&time=${waktu}'" class="cursor-pointer group bg-white rounded-[32px] p-7 shadow-sm border border-gray-100 flex flex-col min-h-[220px] transition-all hover:shadow-md text-start">
+                <div class="flex justify-between mb-6 text-start">
                     <div class="flex items-center gap-3">
                         <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-300"><i class="fa-solid fa-user text-xl"></i></div>
-                        <div>
+                        <div class="text-start">
                             <p class="text-base font-black text-gray-800">${nama}</p>
                             <p class="text-[10px] text-gray-400 font-black uppercase tracking-tight">🕒 ${waktu}</p>
                         </div>
                     </div>
-                    <div class="text-right"><p class="text-[10px] font-black text-gray-300">${orderId}</p></div>
+                    <div class="text-right text-start"><p class="text-[10px] font-black text-gray-300 mb-1">${orderId}</p></div>
                 </div>
-                <div class="mt-auto flex justify-between items-center pt-5 border-t border-gray-50">
-                    <p class="text-[11px] text-gray-400 font-black uppercase tracking-widest">${items} ITEM</p>
+                <div class="mt-auto flex justify-between items-center pt-5 border-t border-gray-50 text-start">
+                    <p class="text-[11px] text-gray-400 font-black uppercase tracking-widest text-start">${items} ITEM</p>
                     <div class="flex gap-2">
-                        <button onclick="event.stopPropagation(); selesaikanOrder(this)" class="hidden px-4 py-2 rounded-xl bg-[#1A1A1A] text-white text-[10px] font-black">SELESAIKAN</button>
-                        <span class="px-4 py-2 rounded-xl text-[10px] font-black bg-orange-50 text-[#F54900] shadow-sm"><i class="fa-solid fa-fire-flame-curved mr-1"></i> ${status}</span>
+                        <button onclick="event.stopPropagation(); deleteCard(this)" class="px-4 py-2 rounded-xl bg-[#1A1A1A] text-white text-[10px] font-black">SELESAIKAN</button>
+                        <span class="px-4 py-2 rounded-xl text-[10px] font-black bg-orange-50 text-[#F54900] shadow-sm"><i class="fa-solid fa-fire-flame-curved mr-1 text-start"></i> DIMASAK</span>
                     </div>
                 </div>
             </div>`;
         document.getElementById('gridDiproses').insertAdjacentHTML('beforeend', html);
         updateBadges();
         switchTab('diproses');
-    }
-
-    function tolakOrder(btn) {
-        const card = btn.closest('.cursor-pointer');
-        card.style.transform = 'scale(0.9)';
-        card.style.opacity = '0';
-        
-        setTimeout(() => {
-            // Langsung arahkan ke riwayat tanpa simpan apa-apa
-            window.location.href = "{{ route('admin.riwayat') }}"; 
-        }, 300);
-    }
-
-    function selesaikanOrder(btn) {
-        const card = btn.closest('.cursor-pointer');
-        
-        // Animasi menghilang
-        card.style.transform = 'scale(0.9)'; 
-        card.style.opacity = '0';
-        
-        setTimeout(() => {
-            card.remove();
-            updateBadges();
-            
-            // INTEGRASI: Langsung pindah ke halaman riwayat
-            window.location.href = "{{ route('admin.riwayat') }}"; 
-        }, 300);
     }
 
     function updateBadges() {

@@ -34,6 +34,22 @@ Route::get('/lupa-sandi/reset',      fn() => view('auth.reset-sandi'));
 Route::get('/admin/register', fn() => view('admin.register'))->name('admin.register');
 Route::get('/admin/login',    fn() => view('admin.login'))->name('admin.login');
 
+
+/*
+|--------------------------------------------------------------------------
+| Admin Global Routes
+|--------------------------------------------------------------------------
+*/
+// Dasbor Utama
+Route::get('/admin/global/dasbor', fn() => view('admin_global.dasbor'))->name('admin.global.dasbor');
+
+// Menu Lainnya
+Route::get('/admin/global/kantin-mitra', fn() => view('admin_global.kantin'))->name('admin.global.kantin');
+Route::get('/admin/global/transaksi',    fn() => view('admin_global.transaksi'))->name('admin.global.transaksi');
+Route::get('/admin/global/notifikasi',   fn() => view('admin_global.notifikasi'))->name('admin.global.notifikasi');
+Route::get('/admin/global/pengaturan',   fn() => view('admin_global.pengaturan'))->name('admin.global.pengaturan');
+Route::get('/admin/global/profil',       fn() => view('admin_global.profil'))->name('admin.global.profil');
+
 /*
 |--------------------------------------------------------------------------
 | Admin Kantin Routes
