@@ -1,11 +1,21 @@
-# Android generated
+# Android generated 
 .gradle/
 .idea/
 build/
 local.properties
 *.iml
 
-# Laravel
+# Laravel (KHUSUS BACKEND-NEW)
+backend-new/vendor/
+backend-new/.env
+backend-new/storage/framework/
+backend-new/storage/logs/
+
+# Folder Backend Lama 
+backend/
+../backend/
+
+# Laravel 
 api/vendor/
 api/.env
 web/vendor/
