@@ -322,9 +322,6 @@ public interface ApiService {
     @GET("buyers/profiles")
     Call<ProfileResponse> getBuyerProfile(@Header("Authorization") String token);
 
-    /** * Update Profil (Nama, Phone, Foto)
-     * Gunakan POST + Multipart agar bisa handle file dan teks sekaligus
-     */
     @Headers("Accept: application/json")
     @Multipart
     @POST("buyers/profiles")
