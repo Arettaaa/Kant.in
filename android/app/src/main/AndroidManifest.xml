@@ -17,6 +17,9 @@
         android:theme="@style/Theme.Kantin"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".DetailPesanan"
+            android:exported="false" />
+        <activity
             android:name=".DashboardAdmin"
             android:exported="false" />
         <activity

@@ -192,7 +192,7 @@ public class LoginActivity extends AppCompatActivity {
         if (sessionManager.isAdminKantin()) {
             // Jika kamu punya MainActivity khusus Admin, arahkan ke sana
             // startActivity(new Intent(this, BerandaAdminKantinActivity.class));
-            startActivity(new Intent(LoginActivity.this, BerandaPelangganActivity.class));
+            startActivity(new Intent(LoginActivity.this, DashboardAdmin.class));
         } else {
             startActivity(new Intent(LoginActivity.this, BerandaPelangganActivity.class));
         }
