@@ -7,7 +7,6 @@ import android.widget.Toast;
 
 public class FooterAdmin {
 
-    // Fungsi "Pawang Footer" yang bisa dipanggil dari halaman mana aja
     public static void setupFooter(Activity activity) {
 
         // Cari ID tombol dari XML yang di-include
