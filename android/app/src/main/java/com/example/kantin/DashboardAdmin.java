@@ -1,5 +1,6 @@
 package com.example.kantin;
 
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,7 @@ import com.example.kantin.fragments.OrderProsesFragment;
 import com.example.kantin.network.ApiClient;
 import com.example.kantin.network.ApiService;
 import com.example.kantin.model.response.BaseResponse;
+import com.example.kantin.utils.SessionManager;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -30,6 +32,7 @@ public class DashboardAdmin extends AppCompatActivity {
     private TextView tvTabMasukLabel, tvTabProsesLabel, tvStatusBadge;
     private SwitchCompat switchStatusKantin;
     private View btnKeluar;
+    private SessionManager sessionManager;
 
     // Tambahkan variabel untuk navigasi bottom
     private View menuOrder, menuMenu, menuProfile;
@@ -42,6 +45,7 @@ public class DashboardAdmin extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard_admin);
+        sessionManager = new SessionManager(this);
 
         initViews();
         setupBottomNavigation();
@@ -67,8 +71,19 @@ public class DashboardAdmin extends AppCompatActivity {
             toggleCanteenAvailability(isChecked);
         });
 
-        btnKeluar.setOnClickListener(v -> finish());
-    }
+        btnKeluar.setOnClickListener(v -> {
+            // 1. Hapus data sesi dari aplikasi
+            sessionManager.clearSession();
+
+            // 2. Munculkan pesan
+            Toast.makeText(this, "Berhasil Keluar", Toast.LENGTH_SHORT).show();
+
+            // 3. Pindah ke halaman Login dan hapus riwayat tombol "Back"
+            Intent intent = new Intent(DashboardAdmin.this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        });    }
 
     private void initViews() {
         tabMasuk = findViewById(R.id.tabMasuk);
