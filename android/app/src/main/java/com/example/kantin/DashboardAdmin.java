@@ -1,39 +1,51 @@
 package com.example.kantin;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+
 import com.example.kantin.fragments.OrderMasukFragment;
 import com.example.kantin.fragments.OrderProsesFragment;
+import com.example.kantin.utils.SessionManager;
 
 public class DashboardAdmin extends AppCompatActivity {
 
+    // Variable Header & Tabs
     private LinearLayout tabMasuk, tabProses;
-    private TextView tvTabMasukLabel, tvTabProsesLabel, tvStatusBadge;
+    private TextView tvTabMasukLabel, tvTabProsesLabel, tvStatusBadge, btnKeluar;
     private SwitchCompat switchStatusKantin;
-    private View btnKeluar;
+
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_dashboard_admin);
 
-        // 1. Inisialisasi View dari activity_dashboard_admin.xml
+        sessionManager = new SessionManager(this);
+
+        // 1. Inisialisasi View (Khusus Header dan Tab saja)
         initViews();
 
-        // 2. Load Fragment default (Pesanan Masuk) saat pertama kali buka
+        // 2. PANGGIL PAWANG FOOTER DI SINI! (Sangat praktis)
+        FooterAdmin.setupFooter(this);
+
+        // 3. Load Fragment Awal (Pesanan Masuk)
         if (savedInstanceState == null) {
             loadFragment(new OrderMasukFragment());
             updateTabUI(true);
         }
 
-        // 3. Logika Navigasi Tab
+        // 4. Logika Tab Klik
         tabMasuk.setOnClickListener(v -> {
             loadFragment(new OrderMasukFragment());
             updateTabUI(true);
@@ -44,26 +56,31 @@ public class DashboardAdmin extends AppCompatActivity {
             updateTabUI(false);
         });
 
-        // 4. Logika Toggle Status Operasional (Buka/Tutup) [cite: 247]
+        // 5. Logika Switch Status
         switchStatusKantin.setOnCheckedChangeListener((buttonView, isChecked) -> {
             updateStatusKantinUI(isChecked);
         });
 
-        // 5. Tombol Keluar
+        // 6. Logika Logout
         btnKeluar.setOnClickListener(v -> {
-            // Logika Logout (Contoh: finish atau pindah ke LoginActivity)
+            sessionManager.clearSession();
+            Toast.makeText(this, "Berhasil Keluar", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(DashboardAdmin.this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
             finish();
         });
     }
 
     private void initViews() {
+        // Hanya perlu menghubungkan ID punya Dashboard saja
+        btnKeluar = findViewById(R.id.btnKeluar);
+        tvStatusBadge = findViewById(R.id.tvStatusBadge);
+        switchStatusKantin = findViewById(R.id.switchStatusKantin);
         tabMasuk = findViewById(R.id.tabMasuk);
         tabProses = findViewById(R.id.tabProses);
         tvTabMasukLabel = findViewById(R.id.tvTabMasukLabel);
         tvTabProsesLabel = findViewById(R.id.tvTabProsesLabel);
-        tvStatusBadge = findViewById(R.id.tvStatusBadge);
-        switchStatusKantin = findViewById(R.id.switchStatusKantin);
-        btnKeluar = findViewById(R.id.btnKeluar);
     }
 
     private void loadFragment(Fragment fragment) {
@@ -73,37 +90,33 @@ public class DashboardAdmin extends AppCompatActivity {
                 .commit();
     }
 
-    // Mengubah tampilan Tab saat diklik (Indikator Aktif/Teks Bold)
     private void updateTabUI(boolean isMasuk) {
         if (isMasuk) {
             tabMasuk.setBackgroundResource(R.drawable.admin_tab_indicator_active);
             tabProses.setBackground(null);
-            tvTabMasukLabel.setTextColor(ContextCompat.getColor(this, R.color.black));
+            tvTabMasukLabel.setTextColor(Color.parseColor("#111827"));
             tvTabMasukLabel.setTypeface(null, Typeface.BOLD);
-
-            tvTabProsesLabel.setTextColor(ContextCompat.getColor(this, R.color.gray_text));
+            tvTabProsesLabel.setTextColor(Color.parseColor("#6B7280"));
             tvTabProsesLabel.setTypeface(null, Typeface.NORMAL);
         } else {
             tabProses.setBackgroundResource(R.drawable.admin_tab_indicator_active);
             tabMasuk.setBackground(null);
-            tvTabProsesLabel.setTextColor(ContextCompat.getColor(this, R.color.black));
+            tvTabProsesLabel.setTextColor(Color.parseColor("#111827"));
             tvTabProsesLabel.setTypeface(null, Typeface.BOLD);
-
-            tvTabMasukLabel.setTextColor(ContextCompat.getColor(this, R.color.gray_text));
+            tvTabMasukLabel.setTextColor(Color.parseColor("#6B7280"));
             tvTabMasukLabel.setTypeface(null, Typeface.NORMAL);
         }
     }
 
-    // Mengubah Badge Status sesuai Switch (Buka/Tutup)
     private void updateStatusKantinUI(boolean isOpen) {
         if (isOpen) {
             tvStatusBadge.setText("MENERIMA PESANAN");
-            tvStatusBadge.setTextColor(ContextCompat.getColor(this, R.color.green_primary));
+            tvStatusBadge.setTextColor(Color.parseColor("#10B981"));
             tvStatusBadge.setBackgroundResource(R.drawable.admin_badge_status_open);
         } else {
             tvStatusBadge.setText("DIJEDA");
-            tvStatusBadge.setTextColor(ContextCompat.getColor(this, R.color.gray_badge_text));
-            tvStatusBadge.setBackgroundResource(R.drawable.admin_badge_status_closed); // Pastikan drawable ini ada
+            tvStatusBadge.setTextColor(Color.parseColor("#6B7280"));
+            tvStatusBadge.setBackgroundResource(R.drawable.admin_badge_status_closed);
         }
     }
 }
