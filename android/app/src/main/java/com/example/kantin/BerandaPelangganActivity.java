@@ -2,24 +2,44 @@ package com.example.kantin;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.kantin.model.response.CanteenListResponse;
+import com.example.kantin.network.ApiClient;
+import com.example.kantin.network.ApiService;
+import com.example.kantin.utils.SessionManager;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class BerandaPelangganActivity extends AppCompatActivity {
+
+    // Deklarasi RecyclerView untuk Kantin
+    private RecyclerView rvKantin;
+    private KantinAdapter kantinAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_berandapelanggan);
 
-        com.example.kantin.utils.SessionManager sessionManager = new com.example.kantin.utils.SessionManager(this);
+        SessionManager sessionManager = new SessionManager(this);
 
         TextView tvHaloUser = findViewById(R.id.tv_halo_user);
-
         String fullName = sessionManager.getUserName();
 
         if (fullName != null && !fullName.isEmpty()) {
@@ -29,16 +49,29 @@ public class BerandaPelangganActivity extends AppCompatActivity {
             tvHaloUser.setText("Halo, Sobat Kant.in! 👋");
         }
 
-        // 1. Inisialisasi ID
+        // 1. Inisialisasi ID Bagian Header & Navigasi
         ImageView btnHistoryTop = findViewById(R.id.btn_history_top);
         FrameLayout btnKeranjang = findViewById(R.id.btn_keranjang);
         CardView btnProfilTop = findViewById(R.id.btn_profil_top);
         TextView tvLihatSemuaMenu = findViewById(R.id.tv_lihat_semua_menu);
         TextView tvLihatSemuaKantin = findViewById(R.id.tv_lihat_semua_kantin);
+
+        // Inisialisasi CardView Menu (Menu masih pakai dummy/statis)
         CardView cvMenuItem = findViewById(R.id.cv_menu_item);
-        CardView cvKantinItem = findViewById(R.id.cv_kantin_item);
+
+        // Inisialisasi RecyclerView Kantin
+        rvKantin = findViewById(R.id.rv_kantin);
+
         LinearLayout navPesanan = findViewById(R.id.nav_pesanan);
         LinearLayout navProfil = findViewById(R.id.nav_profil);
+
+        // --- Setup RecyclerView Kantin ---
+        // Mengatur arah scroll menjadi VERTIKAL (ke bawah) sesuai desain baru
+        rvKantin.setLayoutManager(new LinearLayoutManager(this));
+
+        // --- Panggil Fungsi Ambil Data Kantin dari API ---
+        fetchKantinBeranda();
+
         // --- Aksi Bagian Header ---
         btnHistoryTop.setOnClickListener(v -> {
             startActivity(new Intent(this, HistoryActivity.class));
@@ -61,24 +94,59 @@ public class BerandaPelangganActivity extends AppCompatActivity {
             startActivity(new Intent(this, ExploreKantinPelangganActivity.class));
         });
 
-        // --- Aksi Item Dummy ---
+        // --- Aksi Item Menu Dummy ---
         cvMenuItem.setOnClickListener(v -> {
             startActivity(new Intent(this, DetailMenuActivity.class));
         });
 
-        cvKantinItem.setOnClickListener(v -> {
-            startActivity(new Intent(this, DetailKantinActivity.class));
-        });
-
-        // --- Aksi Bottom Navigation (DIPERBAIKI) ---
+        // --- Aksi Bottom Navigation ---
         navPesanan.setOnClickListener(v -> {
             startActivity(new Intent(this, HistoryActivity.class));
-            // Hapus finish() agar Beranda tidak tertutup
         });
 
         navProfil.setOnClickListener(v -> {
             startActivity(new Intent(this, ProfilPelangganActivity.class));
-            // Hapus finish() agar Beranda tidak tertutup
+        });
+    }
+
+    // --- Fungsi Fetch API Kantin ---
+    private void fetchKantinBeranda() {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+
+        Call<CanteenListResponse> call = apiService.getAllCanteens();
+
+        call.enqueue(new Callback<CanteenListResponse>() {
+            @Override
+            public void onResponse(Call<CanteenListResponse> call, Response<CanteenListResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+
+                    // Ambil seluruh data kantin dari API
+                    List<CanteenListResponse.CanteenData> allKantin = response.body().getData();
+                    List<CanteenListResponse.CanteenData> kantinBeranda = new ArrayList<>();
+
+                    if (allKantin != null && !allKantin.isEmpty()) {
+                        // Logika memotong data maksimal 5 item
+                        if (allKantin.size() > 5) {
+                            kantinBeranda = new ArrayList<>(allKantin.subList(0, 5));
+                        } else {
+                            kantinBeranda = allKantin;
+                        }
+
+                        // Pasang data yang sudah dipotong ke Adapter
+                        kantinAdapter = new KantinAdapter(BerandaPelangganActivity.this, kantinBeranda);
+                        rvKantin.setAdapter(kantinAdapter);
+                    }
+                } else {
+                    Toast.makeText(BerandaPelangganActivity.this, "Gagal memuat daftar kantin", Toast.LENGTH_SHORT).show();
+                    Log.e("API_ERROR", "Response Code: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CanteenListResponse> call, Throwable t) {
+                Toast.makeText(BerandaPelangganActivity.this, "Koneksi bermasalah: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("API_FAILURE", "Error: " + t.getMessage());
+            }
         });
     }
 }

@@ -14,6 +14,23 @@
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+    <string name="title_detail_order">Detail Pesanan</string>
+    <string name="label_customer_name">Alex Johnson</string>
+    <string name="label_menu_ordered">Menu Dipesan</string>
+    <string name="label_item_count">2 ITEM</string>
+    <string name="label_payment_summary">Ringkasan Pembayaran</string>
+    <string name="label_subtotal">Subtotal</string>
+    <string name="label_shipping">Biaya Ongkir</string>
+    <string name="label_total_payment">Total Pembayaran</string>
+    <string name="status_pending_verification">MENUNGGU VERIFIKASI</string>
+    <string name="label_qris">QRIS</string>
+    <string name="label_payment_proof">Bukti Pembayaran</string>
+    <string name="desc_payment_proof">Ketuk gambar untuk melihat detail. Pastikan nominal Rp 73.000 telah masuk ke rekening Anda.</string>
+    <string name="cb_verify_confirm">Saya telah memverifikasi pembayaran ini</string>
+    <string name="cb_verify_desc">Saya mengkonfirmasi bahwa jumlah dan detail pengirim sudah sesuai dengan riwayat mutasi.</string>
+    <string name="btn_reject">✕ Tolak</string>
+    <string name="btn_verify_accept">✓ Verifikasi &amp; Terima</string>
+
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris

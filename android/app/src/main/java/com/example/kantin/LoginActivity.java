@@ -120,27 +120,40 @@ public class LoginActivity extends AppCompatActivity {
                     LoginResponse data = response.body();
                     LoginResponse.UserData user = data.getUser();
 
-                    // 1. Simpan sesi menggunakan SessionManager buatan temen kamu
-                    sessionManager.saveSession(
-                            data.getToken(),
-                            user.getId(),
-                            user.getCanteenId(),
-                            user.getRole()
-                    );
+                    // 1. CEK STATUS AKTIF DULU (Khusus Admin Kantin)
+                    // Jika dia Admin tapi isActive-nya FALSE (atau 0)
+                    if (user.getRole().equalsIgnoreCase("admin_kantin") && !user.isActive()) {
 
-                    sessionManager.saveUserInfo(user.getName(), user.getEmail(), user.getPhone());
-                    sessionManager.savePhotoUrl(user.getPhotoProfile());
-                    // 2. LOGIKA VALIDASI STATUS ADMIN (Khusus Admin Kantin)
-                    if (user.isAdminKantin() && !user.isActive()) {
-                        // Jika Admin tapi belum active, arahkan ke halaman Validasi
-                        tampilkanDialogMenungguValidasi();
+                        // JANGAN simpan session, biarkan dia tetap logout
+                        // Tampilkan dialog pemberitahuan saja
+                        new MaterialAlertDialogBuilder(LoginActivity.this)
+                                .setTitle("Akun Belum Aktif")
+                                .setMessage("Maaf, akun Admin Kantin Anda belum divalidasi atau belum menyelesaikan pembayaran. Silakan hubungi Admin Global.")
+                                .setPositiveButton("Mengerti", null) // Cuma tutup dialog, tetap di Login
+                                .show();
+
+                        // Aktifkan kembali tombol login agar bisa coba akun lain
+                        btnLogin.setEnabled(true);
+                        btnLogin.setText("MASUK");
+
                     } else {
-                        // Jika Pelanggan atau Admin yang sudah di-approve
+                        // 2. JIKA PELANGGAN ATAU ADMIN YANG SUDAH AKTIF
+                        // Simpan semua data ke SessionManager
+                        sessionManager.saveSession(
+                                data.getToken(),
+                                user.getId(),
+                                user.getCanteenId(),
+                                user.getRole()
+                        );
+                        sessionManager.saveUserInfo(user.getName(), user.getEmail(), user.getPhone());
+                        sessionManager.savePhotoUrl(user.getPhotoProfile());
+
+                        // Langsung tampilkan sukses dan pindah ke Dashboard/Beranda
                         tampilkanDialogSukses(user.getName());
                     }
 
                 } else {
-                    tampilkanDialogError("Login Gagal", "Email atau password yang kamu masukkan salah. Cek lagi ya!");
+                    tampilkanDialogError("Login Gagal", "Email atau password salah.");
                 }
             }
 
@@ -188,11 +201,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void pindahKeBeranda() {
-        // Cek Role sebelum pindah halaman (Opsional jika ingin beda Beranda)
+        // Karena session hanya disimpan jika sudah Aktif/Pelanggan,
+        // kita cukup cek role-nya saja di sini.
         if (sessionManager.isAdminKantin()) {
-            // Jika kamu punya MainActivity khusus Admin, arahkan ke sana
-            // startActivity(new Intent(this, BerandaAdminKantinActivity.class));
-            startActivity(new Intent(LoginActivity.this, BerandaPelangganActivity.class));
+            startActivity(new Intent(LoginActivity.this, DashboardAdmin.class));
         } else {
             startActivity(new Intent(LoginActivity.this, BerandaPelangganActivity.class));
         }
