@@ -13,6 +13,7 @@ import com.example.kantin.model.response.LoginResponse;
 import com.example.kantin.model.response.MenuListResponse;
 import com.example.kantin.model.response.MenuDetailResponse;
 import com.example.kantin.model.response.CartResponse;
+import com.example.kantin.model.response.CanteenListResponse;
 import com.example.kantin.model.response.OrderListResponse;
 import com.example.kantin.model.response.OrderDetailResponse;
 import com.example.kantin.model.response.ProfileResponse;
@@ -76,6 +77,9 @@ public interface ApiService {
 
     //    @POST("auth/register")
     //    Call<BaseResponse> registerAdminKantin(@Body RegisterAdminKantinRequest request);
+
+    @GET("canteens")
+    Call<CanteenListResponse> getAllCanteens();
 
     // ================================================================
     // 2. MENU — MenuController
