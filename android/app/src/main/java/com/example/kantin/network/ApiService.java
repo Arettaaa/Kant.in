@@ -9,6 +9,7 @@ import com.example.kantin.model.request.UpdateStatusOrderRequest;
 
 // Import untuk Response (Data yang diterima dari Laravel)
 import com.example.kantin.model.response.BaseResponse;
+import com.example.kantin.model.response.CanteenDetailResponse;
 import com.example.kantin.model.response.LoginResponse;
 import com.example.kantin.model.response.MenuListResponse;
 import com.example.kantin.model.response.MenuDetailResponse;
@@ -78,8 +79,21 @@ public interface ApiService {
     //    @POST("auth/register")
     //    Call<BaseResponse> registerAdminKantin(@Body RegisterAdminKantinRequest request);
 
+    // 1. Daftar Kantin
     @GET("canteens")
     Call<CanteenListResponse> getAllCanteens();
+
+    // 2. Detail Kantin
+    @GET("canteens/{id}")
+    Call<CanteenDetailResponse> getCanteenDetail(@Path("id") String canteenId);
+
+    // 3. Menu per Kantin
+    @GET("canteens/{id}/menus")
+    Call<MenuListResponse> getCanteenMenus(@Path("id") String canteenId);
+
+    // 4. Semua Menu (Explore)
+    @GET("menus")
+    Call<MenuListResponse> getAllMenus();
 
     // ================================================================
     // 2. MENU — MenuController

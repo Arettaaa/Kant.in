@@ -4,55 +4,82 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.kantin.model.response.CanteenListResponse;
+import com.example.kantin.network.ApiClient;
+import com.example.kantin.network.ApiService;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ExploreKantinPelangganActivity extends AppCompatActivity {
+
+    private RecyclerView rvExploreKantin;
+    private KantinAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Menghilangkan ActionBar bawaan agar tampilan full seperti desain
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_explorekantinpelanggan);
 
         // --- INISIALISASI VIEW ---
         ImageView btnBack = findViewById(R.id.btnBackExplore);
-        CardView cvWarungBuAni = findViewById(R.id.cvWarungBuAni);
+        rvExploreKantin = findViewById(R.id.rvExploreKantin);
 
         LinearLayout navBeranda = findViewById(R.id.navBeranda);
         LinearLayout navPesanan = findViewById(R.id.navPesanan);
         LinearLayout navProfil = findViewById(R.id.navProfil);
 
-        // --- LOGIKA KLIK ---
+        // --- SETUP RECYCLERVIEW ---
+        rvExploreKantin.setLayoutManager(new LinearLayoutManager(this));
 
-        // 1. Tombol Kembali
+        // --- AMBIL DATA KANTIN DARI API ---
+        fetchSemuaKantin();
+
+        // --- LOGIKA KLIK ---
         btnBack.setOnClickListener(v -> onBackPressed());
 
-        // 2. Klik Kartu Kantin (Masuk ke Detail)
-        cvWarungBuAni.setOnClickListener(v -> {
-            // Pastikan kamu sudah buat DetailKantinActivity
-            Intent intent = new Intent(this, DetailKantinActivity.class);
-            startActivity(intent);
-        });
-
-        // 3. Navigasi Bawah: Ke Beranda
         navBeranda.setOnClickListener(v -> {
             Intent intent = new Intent(this, BerandaPelangganActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); // Agar tidak menumpuk halaman
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         });
 
-        // 4. Navigasi Bawah: Ke Pesanan/History
         navPesanan.setOnClickListener(v -> {
-            Intent intent = new Intent(this, HistoryActivity.class); // Sesuaikan nama Activity-mu
-            startActivity(intent);
+            startActivity(new Intent(this, HistoryActivity.class));
         });
 
-        // 5. Navigasi Bawah: Ke Profil
         navProfil.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ProfilPelangganActivity.class); // Sesuaikan nama Activity-mu
-            startActivity(intent);
+            startActivity(new Intent(this, ProfilPelangganActivity.class));
+        });
+    }
+
+    private void fetchSemuaKantin() {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        apiService.getAllCanteens().enqueue(new Callback<CanteenListResponse>() {
+            @Override
+            public void onResponse(Call<CanteenListResponse> call, Response<CanteenListResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<CanteenListResponse.CanteenData> list = response.body().getData();
+                    // Pakai KantinAdapter yang sudah kita buat tadi
+                    adapter = new KantinAdapter(ExploreKantinPelangganActivity.this, list);
+                    rvExploreKantin.setAdapter(adapter);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CanteenListResponse> call, Throwable t) {
+                Toast.makeText(ExploreKantinPelangganActivity.this, "Gagal memuat kantin", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

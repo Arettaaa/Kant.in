@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="160dp"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="8dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout android:layout_width="match_parent" android:layout_height="110dp">
+            <ImageView
+                android:id="@+id/img_menu_populer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E5E7EB"
+                android:scaleType="centerCrop" />
+
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="8dp" android:background="@drawable/bg_input_rounded" android:gravity="center_vertical" android:paddingHorizontal="6dp" android:paddingVertical="4dp">
+                <ImageView android:layout_width="12dp" android:layout_height="12dp" android:src="@android:drawable/star_on" app:tint="#F97316"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="4dp" android:text="4.8" android:textColor="#1A1A1A" android:textSize="10sp" android:textStyle="bold"/>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="12dp">
+            <TextView android:id="@+id/tv_nama_menu_populer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nama Menu" android:textColor="#1A1A1A" android:textStyle="bold" android:textSize="14sp" android:maxLines="1" android:ellipsize="end"/>
+            <TextView android:id="@+id/tv_harga_menu_populer" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Rp 0" android:textColor="#F97316" android:textStyle="bold" android:textSize="14sp"/>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
