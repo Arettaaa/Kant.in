@@ -172,4 +172,28 @@ class MenuController extends Controller
             ], 403));
         }
     }
+
+    public function allMenus(Request $request)
+    {
+        // Ambil semua menu tanpa filter canteen_id
+        $query = Menu::query();
+
+        // Tetap bisa cari makanan (misal: cari "Ayam")
+        if ($request->has('search')) {
+            $query->where('name', 'regex', '/' . $request->search . '/i');
+        }
+
+        // Tetap bisa filter kategori (misal: "makanan")
+        if ($request->has('category')) {
+            $query->where('category', $request->category);
+        }
+
+        // Ambil data dan format gambarnya (pakai fungsi formatMenu yang sudah kamu punya)
+        $menus = $query->get()->map(fn($menu) => $this->formatMenu($menu));
+
+        return response()->json([
+            'success' => true,
+            'data' => $menus
+        ]);
+    }
 }

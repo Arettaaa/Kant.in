@@ -30,6 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/canteens', [CanteenController::class, 'index']);
+Route::get('/menus', [MenuController::class, 'allMenus']);
 Route::get('/canteens/{id}', [CanteenController::class, 'show']);
 Route::get('/canteens/{id}/menus', [MenuController::class, 'index']);
 Route::get('/canteens/{id}/menus/availabilities', [MenuController::class, 'availabilities']);
