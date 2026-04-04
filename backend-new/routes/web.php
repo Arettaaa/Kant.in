@@ -43,8 +43,10 @@ Route::get('/admin/login',    fn() => view('admin.login'))->name('admin.login');
 // Dasbor Utama
 Route::get('/admin/global/dasbor', fn() => view('admin_global.dasbor'))->name('admin.global.dasbor');
 
-// Menu Lainnya
+// kantin mitra
 Route::get('/admin/global/kantin-mitra', fn() => view('admin_global.kantin'))->name('admin.global.kantin');
+Route::get('/admin/global/kantin-mitra/filter', fn() => view('admin_global.filter-kantin'))->name('admin.global.kantin.filter');
+
 Route::get('/admin/global/transaksi',    fn() => view('admin_global.transaksi'))->name('admin.global.transaksi');
 Route::get('/admin/global/notifikasi',   fn() => view('admin_global.notifikasi'))->name('admin.global.notifikasi');
 Route::get('/admin/global/pengaturan',   fn() => view('admin_global.pengaturan'))->name('admin.global.pengaturan');
