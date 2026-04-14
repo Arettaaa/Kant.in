@@ -26,4 +26,10 @@ class Canteen extends Model
     {
         return $this->hasMany(Menu::class, 'canteen_id');
     }
+
+    public function admin()
+    {
+        // Mengambil user yang memiliki role admin_kantin dan canteen_id yang cocok
+        return $this->hasOne(User::class, 'canteen_id', '_id');
+    }
 }

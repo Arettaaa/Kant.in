@@ -61,6 +61,10 @@ Route::middleware(['auth'])->prefix('admin/global')->name('admin.global.')->grou
     Route::get('/profil', [ProfilController::class, 'index'])->name('profil');
     Route::get('/keamanan', [KeamananController::class, 'index'])->name('keamanan');
 
+    Route::post('/kantin-mitra', [CanteenController::class, 'store'])->name('kantin.store');
+    Route::put('/kantin-mitra/{id}', [CanteenController::class, 'update'])->name('kantin.update');
+    Route::delete('/kantin-mitra/{id}', [CanteenController::class, 'destroy'])->name('kantin.destroy');
+
 });
 /*
 |--------------------------------------------------------------------------
