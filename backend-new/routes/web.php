@@ -5,6 +5,10 @@ use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\KeamananController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CanteenController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\NotificationController;
 /*
 |--------------------------------------------------------------------------
 | Auth Pelanggan (shared login & register dari admin.blade, re-route)
@@ -40,18 +44,24 @@ Route::get('/admin/login',    fn() => view('admin.login'))->name('admin.login');
 | Admin Global Routes
 |--------------------------------------------------------------------------
 */
-// Dasbor Utama
-Route::get('/admin/global/dasbor', fn() => view('admin_global.dasbor'))->name('admin.global.dasbor');
+Route::middleware(['auth'])->prefix('admin/global')->name('admin.global.')->group(function () {
 
-// kantin mitra
-Route::get('/admin/global/kantin-mitra', fn() => view('admin_global.kantin'))->name('admin.global.kantin');
-Route::get('/admin/global/kantin-mitra/filter', fn() => view('admin_global.filter-kantin'))->name('admin.global.kantin.filter');
+    // Dasbor
+    Route::get('/dasbor', [DashboardController::class, 'index'])->name('dasbor');
 
-Route::get('/admin/global/transaksi',    fn() => view('admin_global.transaksi'))->name('admin.global.transaksi');
-Route::get('/admin/global/notifikasi',   fn() => view('admin_global.notifikasi'))->name('admin.global.notifikasi');
-Route::get('/admin/global/pengaturan',   fn() => view('admin_global.pengaturan'))->name('admin.global.pengaturan');
-Route::get('/admin/global/profil',       fn() => view('admin_global.profil'))->name('admin.global.profil');
+    // Kantin
+    Route::get('/kantin-mitra', [CanteenController::class, 'index'])->name('kantin');
+    Route::get('/kantin-mitra/filter', [CanteenController::class, 'filter'])->name('kantin.filter');
 
+    // Transaksi & Notifikasi
+    Route::get('/transaksi', [TransactionController::class, 'index'])->name('transaksi');
+    Route::get('/notifikasi', [NotificationController::class, 'index'])->name('notifikasi');
+
+    // Profil & Keamanan
+    Route::get('/profil', [ProfilController::class, 'index'])->name('profil');
+    Route::get('/keamanan', [KeamananController::class, 'index'])->name('keamanan');
+
+});
 /*
 |--------------------------------------------------------------------------
 | Admin Kantin Routes

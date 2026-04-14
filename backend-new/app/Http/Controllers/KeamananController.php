@@ -8,9 +8,19 @@ use Illuminate\Validation\Rules\Password;
 
 class KeamananController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('pelanggan.keamanan-akun');
+        $user = $request->user();
+
+        $views = [
+            'admin_global' => 'admin_global.keamanan',
+            'admin_kantin' => 'admin_kantin.keamanan',
+            'pembeli' => 'pelanggan.keamanan-akun',
+        ];
+
+        $view = $views[$user->role] ?? 'pelanggan.keamanan-akun';
+
+        return view($view);
     }
 
     public function updatePassword(Request $request)
@@ -34,7 +44,6 @@ class KeamananController extends Controller
 
             // Kembalikan session sukses untuk mentrigger modal animasi
             return back()->with('success_password', 'Kata sandi Anda berhasil diperbarui.');
-
         } catch (\Exception $e) {
             // Kalau gagal nyimpen (misal database bermasalah)
             return back()->with('error_password', 'Sistem gagal menyimpan perubahan. Silakan coba lagi nanti.');

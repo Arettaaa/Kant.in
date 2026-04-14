@@ -11,19 +11,48 @@ class ProfilController extends Controller
     // Menampilkan Halaman Profil Utama
     public function index(Request $request)
     {
-        return view('pelanggan.profil', ['user' => $request->user()]);
+        $user = $request->user();
+
+        $views = [
+            'admin_global' => 'admin_global.profil',
+            'admin_kantin' => 'admin_kantin.profil',
+            'pembeli' => 'pelanggan.profil',
+        ];
+
+        $view = $views[$user->role] ?? 'pelanggan.profil';
+
+        return view($view, ['user' => $user]);
     }
 
     // Menampilkan Halaman Form Edit
     public function edit(Request $request)
     {
-        return view('pelanggan.edit-profil', ['user' => $request->user()]);
-    }
+        $user = $request->user();
 
+        $views = [
+            'admin_global' => 'admin_global.edit-profil',
+            'admin_kantin' => 'admin_kantin.edit-profil',
+            'pembeli' => 'pelanggan.edit-profil',
+        ];
+
+        $view = $views[$user->role] ?? 'pelanggan.edit-profil';
+
+        return view($view, ['user' => $user]);
+    }
     // Menampilkan Halaman Detail Data Diri
     public function dataDiri(Request $request)
     {
-        return view('pelanggan.data-diri', ['user' => $request->user()]);
+        $user = $request->user();
+
+        $views = [
+            'admin_global' => 'admin_global.data-diri',
+            'admin_kantin' => 'admin_kantin.data-diri',
+            'pembeli' => 'pelanggan.data-diri',
+        ];
+
+        $view = $views[$user->role] ?? 'pelanggan.data-diri';
+
+        return view($view, ['user' => $user]);
     }
 
     public function update(Request $request)
@@ -54,7 +83,6 @@ class ProfilController extends Controller
             $user->update($validated);
 
             return back()->with('success_update', true);
-            
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Gagal menyimpan: ' . $e->getMessage()]);
         }
