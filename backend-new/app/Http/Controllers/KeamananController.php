@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class KeamananController extends Controller
 {
@@ -15,34 +15,28 @@ class KeamananController extends Controller
 
     public function updatePassword(Request $request)
     {
-        $user = Auth::user();
-
-        // 1. Validasi Input
+        // 1. Validasi Input (Otomatis mengecek password lama)
         $request->validate([
-            'current_password' => 'required',
-            'new_password' => 'required|min:6|confirmed',
+            'current_password' => ['required', 'current_password'],
+            'new_password' => ['required', 'confirmed', Password::defaults()],
         ], [
             'current_password.required' => 'Kata sandi saat ini wajib diisi.',
+            'current_password.current_password' => 'Kata sandi saat ini tidak cocok dengan sistem kami.',
             'new_password.required' => 'Kata sandi baru wajib diisi.',
-            'new_password.min' => 'Kata sandi baru minimal 6 karakter.',
             'new_password.confirmed' => 'Konfirmasi kata sandi baru tidak cocok.',
         ]);
 
-        // 2. Cek Password Lama
-        if (!Hash::check($request->current_password, $user->password)) {
-            return back()->withErrors(['current_password' => 'Kata sandi saat ini tidak cocok dengan sistem kami.']);
-        }
-
-        // 3. Proses Simpan dengan Try-Catch
+        // 2. Proses Simpan dengan Try-Catch
         try {
-            $user->password = bcrypt($request->new_password);
-            $user->save();
+            $request->user()->update([
+                'password' => Hash::make($request->new_password)
+            ]);
 
             // Kembalikan session sukses untuk mentrigger modal animasi
             return back()->with('success_password', 'Kata sandi Anda berhasil diperbarui.');
 
         } catch (\Exception $e) {
-            // Kalau gagal nyimpen (misal server error)
+            // Kalau gagal nyimpen (misal database bermasalah)
             return back()->with('error_password', 'Sistem gagal menyimpan perubahan. Silakan coba lagi nanti.');
         }
     }
