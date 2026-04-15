@@ -49,8 +49,9 @@ public class BerandaPelangganActivity extends AppCompatActivity {
     private List<CanteenListResponse.CanteenData> cachedKantins = new ArrayList<>();
     private boolean menuLoaded = false, kantinLoaded = false;
 
-    @Override
+    private CardView chipSemua, chipMakanan, chipMinuman, chipCemilan;
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getSupportActionBar() != null) getSupportActionBar().hide();
@@ -64,10 +65,10 @@ public class BerandaPelangganActivity extends AppCompatActivity {
         rvKantin = findViewById(R.id.rv_kantin);
         rvMenuPopuler = findViewById(R.id.rv_menu_populer);
 
-        CardView chipSemua    = findViewById(R.id.chip_semua);
-        CardView chipMakanan  = findViewById(R.id.chip_makanan);
-        CardView chipMinuman  = findViewById(R.id.chip_minuman);
-        CardView chipCemilan  = findViewById(R.id.chip_cemilan);
+        chipSemua    = findViewById(R.id.chip_semua);
+        chipMakanan  = findViewById(R.id.chip_makanan);
+        chipMinuman  = findViewById(R.id.chip_minuman);
+        chipCemilan  = findViewById(R.id.chip_cemilan);
 
         ImageView btnHistoryTop = findViewById(R.id.btn_history_top);
         FrameLayout btnKeranjang = findViewById(R.id.btn_keranjang);
@@ -87,8 +88,6 @@ public class BerandaPelangganActivity extends AppCompatActivity {
         updateProfileUI();
         fetchKantinBeranda();
         fetchMenuPopuler();
-
-        // Preload data untuk search
         preloadSearchData();
 
         EditText etSearchBeranda = findViewById(R.id.etSearchBeranda);
@@ -104,13 +103,36 @@ public class BerandaPelangganActivity extends AppCompatActivity {
             return false;
         });
 
-        // --- 4. LOGIKA KLIK ---
+        ImageView btnIconSearch = findViewById(R.id.btnIconSearch);
+        btnIconSearch.setOnClickListener(v -> {
+            String query = etSearchBeranda.getText().toString().trim();
+            if (!query.isEmpty()) {
+                handleSearch(query);
+                etSearchBeranda.setText("");
+            } else {
+                Toast.makeText(this, "Ketik pencarian dulu ya!", Toast.LENGTH_SHORT).show();
+            }
+        });
 
-        chipSemua.setOnClickListener(v -> bukaExploreMenuDenganKategori("Semua"));
-        chipMakanan.setOnClickListener(v -> bukaExploreMenuDenganKategori("makanan"));
-        chipMinuman.setOnClickListener(v -> bukaExploreMenuDenganKategori("minuman"));
-        chipCemilan.setOnClickListener(v -> bukaExploreMenuDenganKategori("cemilan"));
+        // --- 4. LOGIKA KLIK CHIP KATEGORI ---
+        chipSemua.setOnClickListener(v -> {
+            updateKategoriUI(chipSemua);
+            bukaExploreMenuDenganKategori("Semua");
+        });
+        chipMakanan.setOnClickListener(v -> {
+            updateKategoriUI(chipMakanan);
+            bukaExploreMenuDenganKategori("makanan");
+        });
+        chipMinuman.setOnClickListener(v -> {
+            updateKategoriUI(chipMinuman);
+            bukaExploreMenuDenganKategori("minuman");
+        });
+        chipCemilan.setOnClickListener(v -> {
+            updateKategoriUI(chipCemilan);
+            bukaExploreMenuDenganKategori("cemilan");
+        });
 
+        // --- 5. LOGIKA NAVIGASI LAINNYA ---
         btnHistoryTop.setOnClickListener(v -> startActivity(new Intent(this, HistoryActivity.class)));
         btnKeranjang.setOnClickListener(v -> startActivity(new Intent(this, KeranjangPelangganActivity.class)));
         btnProfilTop.setOnClickListener(v -> startActivity(new Intent(this, ProfilPelangganActivity.class)));
@@ -119,6 +141,30 @@ public class BerandaPelangganActivity extends AppCompatActivity {
 
         navPesanan.setOnClickListener(v -> startActivity(new Intent(this, HistoryActivity.class)));
         navProfil.setOnClickListener(v -> startActivity(new Intent(this, ProfilPelangganActivity.class)));
+    }
+
+    // --- FUNGSI UNTUK MENGUBAH WARNA CHIP AKTIF & INAKTIF ---
+    private void updateKategoriUI(CardView activeChip) {
+        CardView[] allChips = {chipSemua, chipMakanan, chipMinuman, chipCemilan};
+
+        for (CardView chip : allChips) {
+            // Karena hierarki XML: CardView -> LinearLayout -> [ImageView, TextView]
+            LinearLayout layout = (LinearLayout) chip.getChildAt(0);
+            ImageView icon = (ImageView) layout.getChildAt(0);
+            TextView text = (TextView) layout.getChildAt(1);
+
+            if (chip == activeChip) {
+                // Style Aktif: Background Oranye, Teks & Ikon Putih
+                chip.setCardBackgroundColor(android.graphics.Color.parseColor("#F97316"));
+                icon.setColorFilter(android.graphics.Color.parseColor("#FFFFFF"));
+                text.setTextColor(android.graphics.Color.parseColor("#FFFFFF"));
+            } else {
+                // Style Tidak Aktif: Background Putih, Ikon Oranye, Teks Abu-abu
+                chip.setCardBackgroundColor(android.graphics.Color.parseColor("#FFFFFF"));
+                icon.setColorFilter(android.graphics.Color.parseColor("#F97316"));
+                text.setTextColor(android.graphics.Color.parseColor("#4B5563"));
+            }
+        }
     }
 
     private void updateProfileUI() {
@@ -181,7 +227,6 @@ public class BerandaPelangganActivity extends AppCompatActivity {
         });
     }
 
-
     private void preloadSearchData() {
         ApiService api = ApiClient.getClient().create(ApiService.class);
 
@@ -217,7 +262,6 @@ public class BerandaPelangganActivity extends AppCompatActivity {
     private void handleSearch(String query) {
         boolean adaMenu = false, adaKantin = false;
 
-        // Cek Menu
         if (cachedMenus != null) {
             for (MenuListResponse.MenuItem item : cachedMenus) {
                 if (item.getName() != null && item.getName().toLowerCase().contains(query.toLowerCase())) {
@@ -227,7 +271,6 @@ public class BerandaPelangganActivity extends AppCompatActivity {
             }
         }
 
-        // Cek Kantin
         if (cachedKantins != null) {
             for (CanteenListResponse.CanteenData kantin : cachedKantins) {
                 if (kantin.getName() != null && kantin.getName().toLowerCase().contains(query.toLowerCase())) {
@@ -237,30 +280,26 @@ public class BerandaPelangganActivity extends AppCompatActivity {
             }
         }
 
-        // Navigasi sesuai kondisi
         if (adaMenu && adaKantin) {
-            // Cocok di keduanya → ke SearchActivity (tab menu+kantin)
             Intent intent = new Intent(this, SearchActivity.class);
             intent.putExtra("QUERY", query);
             startActivity(intent);
         } else if (adaMenu) {
-            // Cuma cocok di menu → ke ExploreMenu
             Intent intent = new Intent(this, ExploreMenuPelangganActivity.class);
             intent.putExtra("QUERY", query);
             intent.putExtra("KATEGORI", "Semua");
             startActivity(intent);
         } else if (adaKantin) {
-            // Cuma cocok di kantin → ke ExploreKantin
             Intent intent = new Intent(this, ExploreKantinPelangganActivity.class);
             intent.putExtra("QUERY", query);
             startActivity(intent);
         } else {
-            // Tidak ketemu sama sekali → ke SearchActivity empty state
             Intent intent = new Intent(this, SearchActivity.class);
             intent.putExtra("QUERY", query);
             startActivity(intent);
         }
     }
+
     private void bukaExploreMenuDenganKategori(String kategori) {
         Intent intent = new Intent(this, ExploreMenuPelangganActivity.class);
         intent.putExtra("KATEGORI", kategori);
@@ -271,5 +310,9 @@ public class BerandaPelangganActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateProfileUI();
+        // Reset kategori ke "Semua" setiap kali user kembali ke Beranda
+        if (chipSemua != null) {
+            updateKategoriUI(chipSemua);
+        }
     }
 }
