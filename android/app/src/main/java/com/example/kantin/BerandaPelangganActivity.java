@@ -129,7 +129,7 @@ public class BerandaPelangganActivity extends AppCompatActivity {
         });
         chipCemilan.setOnClickListener(v -> {
             updateKategoriUI(chipCemilan);
-            bukaExploreMenuDenganKategori("cemilan");
+            bukaExploreMenuDenganKategori("camilan");
         });
 
         // --- 5. LOGIKA NAVIGASI LAINNYA ---

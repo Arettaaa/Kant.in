@@ -33,6 +33,8 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
     private LinearLayout chipCategoryContainer;
 
     private String activeCategory = "Semua";
+    // Tentukan kategori tetap di sini agar sama dengan Beranda
+    private final String[] fixedCategories = {"Semua", "makanan", "minuman", "camilan"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,33 +47,27 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
         chipCategoryContainer = findViewById(R.id.chipCategoryContainer);
         ImageView btnBack = findViewById(R.id.btnBackExploreMenu);
 
-        LinearLayout navHome = findViewById(R.id.navHome);
-        LinearLayout navHistory = findViewById(R.id.navHistory);
-        LinearLayout navProfile = findViewById(R.id.navProfile);
-
         rvExploreMenu.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ExploreMenuAdapter(this, new ArrayList<>());
         rvExploreMenu.setAdapter(adapter);
 
-        // --- 1. BACA KATEGORI DARI INTENT ---
-        String kategoriDariIntent = getIntent().getStringExtra("KATEGORI");
-        if (kategoriDariIntent != null && !kategoriDariIntent.isEmpty()) {
-            activeCategory = kategoriDariIntent;
+        // --- 1. AMBIL DATA DARI INTENT ---
+        String kategoriIntent = getIntent().getStringExtra("KATEGORI");
+        if (kategoriIntent != null) activeCategory = kategoriIntent;
+
+        String queryIntent = getIntent().getStringExtra("QUERY");
+        if (queryIntent != null) {
+            etSearchMenu.setText(queryIntent);
+            etSearchMenu.setSelection(queryIntent.length());
         }
 
-        // --- 2. BACA QUERY PENCARIAN DARI INTENT (TAMBAHAN BARU) ---
-        String queryDariIntent = getIntent().getStringExtra("QUERY");
-        if (queryDariIntent != null && !queryDariIntent.isEmpty()) {
-            etSearchMenu.setText(queryDariIntent);
-            // Pindahkan kursor ke ujung teks
-            etSearchMenu.setSelection(queryDariIntent.length());
-        }
+        // --- 2. BUAT CHIP SEKARANG (Tanpa nunggu API) ---
+        setupFixedCategoryChips();
 
-        // --- 3. AMBIL DATA DARI API ---
-        // (Filter otomatis akan jalan di dalam onResponse pakai data dari etSearchMenu)
+        // --- 3. JALANKAN API (Nanti datanya otomatis "cocok" ke filter) ---
         fetchAllMenus();
 
-        // --- 4. LISTENER KOLOM PENCARIAN ---
+        // --- 4. SEARCH LISTENER ---
         etSearchMenu.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
@@ -81,16 +77,57 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
             }
         });
 
-        // --- 5. LOGIKA KLIK TOMBOL ---
         btnBack.setOnClickListener(v -> onBackPressed());
-        navHome.setOnClickListener(v -> {
-            Intent intent = new Intent(this, BerandaPelangganActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-            finish();
-        });
-        navHistory.setOnClickListener(v -> startActivity(new Intent(this, HistoryActivity.class)));
-        navProfile.setOnClickListener(v -> startActivity(new Intent(this, ProfilPelangganActivity.class)));
+    }
+
+    private void setupFixedCategoryChips() {
+        chipCategoryContainer.removeAllViews();
+
+        for (String category : fixedCategories) {
+            TextView chip = new TextView(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, dpToPx(36));
+            params.setMarginEnd(dpToPx(8));
+            chip.setLayoutParams(params);
+
+            chip.setText(capitalize(category));
+            chip.setTextSize(13);
+            chip.setTypeface(null, android.graphics.Typeface.BOLD);
+            chip.setPadding(dpToPx(16), 0, dpToPx(16), 0);
+            chip.setGravity(android.view.Gravity.CENTER);
+
+            // Cek kondisi aktif
+            if (category.equalsIgnoreCase(activeCategory)) {
+                chip.setBackgroundResource(R.drawable.bg_chip_active);
+                chip.setTextColor(android.graphics.Color.WHITE);
+            } else {
+                chip.setBackgroundResource(R.drawable.bg_chip_inactive);
+                chip.setTextColor(android.graphics.Color.parseColor("#6B7280"));
+            }
+
+            chip.setOnClickListener(v -> {
+                activeCategory = category;
+                refreshChipStyles();
+                if (adapter != null) adapter.filter(etSearchMenu.getText().toString(), activeCategory);
+            });
+
+            chipCategoryContainer.addView(chip);
+        }
+    }
+
+    private void refreshChipStyles() {
+        for (int i = 0; i < chipCategoryContainer.getChildCount(); i++) {
+            TextView chip = (TextView) chipCategoryContainer.getChildAt(i);
+            String category = fixedCategories[i];
+
+            if (category.equalsIgnoreCase(activeCategory)) {
+                chip.setBackgroundResource(R.drawable.bg_chip_active);
+                chip.setTextColor(android.graphics.Color.WHITE);
+            } else {
+                chip.setBackgroundResource(R.drawable.bg_chip_inactive);
+                chip.setTextColor(android.graphics.Color.parseColor("#6B7280"));
+            }
+        }
     }
 
     private void fetchAllMenus() {
@@ -99,87 +136,17 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
             public void onResponse(Call<MenuListResponse> call, Response<MenuListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<MenuListResponse.MenuItem> data = response.body().getData();
-
                     adapter = new ExploreMenuAdapter(ExploreMenuPelangganActivity.this, data);
                     rvExploreMenu.setAdapter(adapter);
 
-                    buildCategoryChips(data);
-
-                    // Terapkan filter awal (kalau ada kategori atau query dari intent)
+                    // Langsung cocokkan (filter) dengan kategori yang sedang aktif
                     adapter.filter(etSearchMenu.getText().toString(), activeCategory);
                 }
             }
-
-            @Override
-            public void onFailure(Call<MenuListResponse> call, Throwable t) {
-                Toast.makeText(ExploreMenuPelangganActivity.this, "Gagal ambil semua menu", Toast.LENGTH_SHORT).show();
+            @Override public void onFailure(Call<MenuListResponse> call, Throwable t) {
+                Toast.makeText(ExploreMenuPelangganActivity.this, "Gagal ambil menu", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private void buildCategoryChips(List<MenuListResponse.MenuItem> data) {
-        chipCategoryContainer.removeAllViews();
-
-        // Kumpulkan kategori unik
-        List<String> categories = new ArrayList<>();
-        categories.add("Semua");
-        for (MenuListResponse.MenuItem item : data) {
-            String cat = item.getCategory();
-            if (cat != null && !cat.isEmpty() && !categories.contains(cat)) {
-                categories.add(cat);
-            }
-        }
-
-        // Buat TextView chip untuk setiap kategori
-        for (String category : categories) {
-            TextView chip = new TextView(this);
-
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    dpToPx(36)
-            );
-            params.setMarginEnd(dpToPx(8));
-            chip.setLayoutParams(params);
-
-            chip.setText(capitalize(category));
-            chip.setTextSize(13);
-            chip.setPadding(dpToPx(16), 0, dpToPx(16), 0);
-            chip.setGravity(android.view.Gravity.CENTER);
-
-            // Style aktif/inaktif
-            if (category.equals(activeCategory)) {
-                chip.setBackgroundResource(R.drawable.bg_chip_active);
-                chip.setTextColor(android.graphics.Color.WHITE);
-            } else {
-                chip.setBackgroundResource(R.drawable.bg_chip_inactive);
-                chip.setTextColor(android.graphics.Color.parseColor("#6B7280"));
-            }
-
-            chip.setOnClickListener(v -> setCategory(category));
-            chipCategoryContainer.addView(chip);
-        }
-    }
-
-    private void setCategory(String category) {
-        activeCategory = category;
-
-        // Update style semua chip
-        for (int i = 0; i < chipCategoryContainer.getChildCount(); i++) {
-            TextView chip = (TextView) chipCategoryContainer.getChildAt(i);
-            String chipText = chip.getText().toString();
-            String chipCategory = (i == 0) ? "Semua" : chipText.toLowerCase();
-
-            if (chipCategory.equalsIgnoreCase(category)) {
-                chip.setBackgroundResource(R.drawable.bg_chip_active);
-                chip.setTextColor(android.graphics.Color.WHITE);
-            } else {
-                chip.setBackgroundResource(R.drawable.bg_chip_inactive);
-                chip.setTextColor(android.graphics.Color.parseColor("#6B7280"));
-            }
-        }
-
-        // Jalankan ulang filter saat kategori diklik
-        if (adapter != null) adapter.filter(etSearchMenu.getText().toString(), activeCategory);
     }
 
     private String capitalize(String text) {

@@ -50,6 +50,11 @@ public class ExploreKantinPelangganActivity extends AppCompatActivity {
         chipBuka = findViewById(R.id.chipBuka);
         chipTutup = findViewById(R.id.chipTutup);
 
+        // --- TAMBAHAN UNTUK MENEBALKAN TEKS (BOLD) ---
+        chipSemua.setTypeface(null, android.graphics.Typeface.BOLD);
+        chipBuka.setTypeface(null, android.graphics.Typeface.BOLD);
+        chipTutup.setTypeface(null, android.graphics.Typeface.BOLD);
+
         LinearLayout navBeranda = findViewById(R.id.navBeranda);
         LinearLayout navPesanan = findViewById(R.id.navPesanan);
         LinearLayout navProfil = findViewById(R.id.navProfil);
@@ -142,6 +147,4 @@ public class ExploreKantinPelangganActivity extends AppCompatActivity {
             }
         });
     }
-
-
 }
