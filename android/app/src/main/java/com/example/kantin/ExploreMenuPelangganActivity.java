@@ -54,6 +54,12 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
 
         fetchAllMenus();
 
+        // Baca kategori dari intent (kalau ada)
+        String kategoriDariIntent = getIntent().getStringExtra("KATEGORI");
+        if (kategoriDariIntent != null && !kategoriDariIntent.isEmpty()) {
+            activeCategory = kategoriDariIntent;
+        }
+
         etSearchMenu.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
@@ -84,8 +90,10 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
                     adapter = new ExploreMenuAdapter(ExploreMenuPelangganActivity.this, data);
                     rvExploreMenu.setAdapter(adapter);
 
-                    // Build chip dinamis dari kategori unik di data
                     buildCategoryChips(data);
+
+                    // Terapkan filter awal kalau dari intent
+                    adapter.filter(etSearchMenu.getText().toString(), activeCategory);
                 }
             }
 

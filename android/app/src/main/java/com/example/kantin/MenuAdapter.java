@@ -66,7 +66,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
         // 4. Klik Item untuk ke Detail Menu
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, DetailMenuActivity.class);
-            intent.putExtra("MENU_ID", String.valueOf(menu.getId()));
+            intent.putExtra("MENU_ID", menu.getId()); // pastikan getId() ada
             context.startActivity(intent);
         });
 

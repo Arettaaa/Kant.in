@@ -53,6 +53,11 @@ public class BerandaPelangganActivity extends AppCompatActivity {
         rvKantin = findViewById(R.id.rv_kantin);
         rvMenuPopuler = findViewById(R.id.rv_menu_populer);
 
+        CardView chipSemua    = findViewById(R.id.chip_semua);
+        CardView chipMakanan  = findViewById(R.id.chip_makanan);
+        CardView chipMinuman  = findViewById(R.id.chip_minuman);
+        CardView chipCemilan  = findViewById(R.id.chip_cemilan);
+
         ImageView btnHistoryTop = findViewById(R.id.btn_history_top);
         FrameLayout btnKeranjang = findViewById(R.id.btn_keranjang);
         CardView btnProfilTop = findViewById(R.id.btn_profil_top);
@@ -73,6 +78,12 @@ public class BerandaPelangganActivity extends AppCompatActivity {
         fetchMenuPopuler();
 
         // --- 4. LOGIKA KLIK ---
+
+        chipSemua.setOnClickListener(v -> bukaExploreMenuDenganKategori("Semua"));
+        chipMakanan.setOnClickListener(v -> bukaExploreMenuDenganKategori("makanan"));
+        chipMinuman.setOnClickListener(v -> bukaExploreMenuDenganKategori("minuman"));
+        chipCemilan.setOnClickListener(v -> bukaExploreMenuDenganKategori("cemilan"));
+
         btnHistoryTop.setOnClickListener(v -> startActivity(new Intent(this, HistoryActivity.class)));
         btnKeranjang.setOnClickListener(v -> startActivity(new Intent(this, KeranjangPelangganActivity.class)));
         btnProfilTop.setOnClickListener(v -> startActivity(new Intent(this, ProfilPelangganActivity.class)));
@@ -141,6 +152,12 @@ public class BerandaPelangganActivity extends AppCompatActivity {
                 Log.e("API_ERROR", "Fetch Menu Populer: " + t.getMessage());
             }
         });
+    }
+
+    private void bukaExploreMenuDenganKategori(String kategori) {
+        Intent intent = new Intent(this, ExploreMenuPelangganActivity.class);
+        intent.putExtra("KATEGORI", kategori);
+        startActivity(intent);
     }
 
     @Override

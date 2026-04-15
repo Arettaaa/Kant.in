@@ -95,6 +95,10 @@ public interface ApiService {
     @GET("menus")
     Call<MenuListResponse> getAllMenus();
 
+    // Detail menu by ID
+    @GET("menus/{menuId}")
+    Call<MenuDetailResponse> getMenuDetail(@Path("menuId") String menuId);
+
     // ================================================================
     // 2. MENU — MenuController
     // ================================================================

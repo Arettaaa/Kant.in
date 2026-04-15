@@ -34,30 +34,34 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
+                <!-- Nama + Harga -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
+                        android:id="@+id/tvNamaMenu"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textStyle="bold"
                         android:lineSpacingExtra="4dp"
-                        android:text="Nasi Goreng\nSpesial"
+                        android:text="Nama Menu"
                         android:textColor="#1A1A1A"
                         android:textSize="24sp" />
 
                     <TextView
+                        android:id="@+id/tvHarga"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textStyle="bold"
-                        android:text="Rp 25.000"
+                        android:text="Rp 0"
                         android:textColor="#F97316"
                         android:textSize="20sp" />
                 </LinearLayout>
 
+                <!-- Rating (dummy) + Estimasi Waktu -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -76,16 +80,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:textStyle="bold"
-                        android:text="4.8"
+                        android:text="5.0"
                         android:textColor="#1A1A1A"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:text="(124 ulasan)"
-                        android:textColor="#6B7280"
                         android:textSize="14sp" />
 
                     <TextView
@@ -99,19 +95,20 @@
                     <ImageView
                         android:layout_width="14dp"
                         android:layout_height="14dp"
-                        android:src="@android:drawable/ic_menu_recent_history"
+                        android:src="@drawable/clock"
                         app:tint="#9CA3AF" />
 
                     <TextView
+                        android:id="@+id/tvEstimasiWaktu"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:fontFamily="@font/inter_medium"
-                        android:text="Siap dalam 15 mnt"
+                        android:text="Siap dalam - mnt"
                         android:textColor="#6B7280"
                         android:textSize="14sp" />
                 </LinearLayout>
 
+                <!-- Deskripsi -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -122,122 +119,15 @@
                     android:textSize="16sp" />
 
                 <TextView
+                    android:id="@+id/tvDeskripsi"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:layout_marginBottom="32dp"
                     android:lineSpacingExtra="6dp"
-                    android:text="Sepiring nasi goreng autentik Indonesia yang dimasak dengan kecap manis pilihan, disajikan dengan telur mata sapi, taburan bawang goreng renyah, serta pelengkap timun dan tomat segar. Menu favorit yang nikmat disantap kapan saja."
+                    android:text="-"
                     android:textColor="#6B7280"
                     android:textSize="14sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:layout_marginBottom="12dp"
-                    android:textStyle="bold"
-                    android:text="Tambah Toping (Opsional)"
-                    android:textColor="#1A1A1A"
-                    android:textSize="16sp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:background="@drawable/bg_search_bar"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <androidx.appcompat.widget.AppCompatCheckBox
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        app:buttonTint="#9CA3AF" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/inter_medium"
-                        android:text="Ekstra Telur"
-                        android:textColor="#1A1A1A"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textStyle="bold"
-                        android:text="+Rp 5.000"
-                        android:textColor="#6B7280"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:background="@drawable/bg_search_bar"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <androidx.appcompat.widget.AppCompatCheckBox
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        app:buttonTint="#9CA3AF" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/inter_medium"
-                        android:text="Sosis Ayam"
-                        android:textColor="#1A1A1A"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textStyle="bold"
-                        android:text="+Rp 8.000"
-                        android:textColor="#6B7280"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="32dp"
-                    android:background="@drawable/bg_search_bar"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <androidx.appcompat.widget.AppCompatCheckBox
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        app:buttonTint="#9CA3AF" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:layout_weight="1"
-                        android:fontFamily="@font/inter_medium"
-                        android:text="Sambal Pedas"
-                        android:textColor="#1A1A1A"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textStyle="bold"
-                        android:text="Gratis"
-                        android:textColor="#9CA3AF"
-                        android:textSize="14sp" />
-                </LinearLayout>
 
             </LinearLayout>
         </RelativeLayout>

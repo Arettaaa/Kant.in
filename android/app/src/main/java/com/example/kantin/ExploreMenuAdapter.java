@@ -63,8 +63,8 @@ public class ExploreMenuAdapter extends RecyclerView.Adapter<ExploreMenuAdapter.
                 .into(holder.ivMenu);
 
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, DetailKantinActivity.class);
-            intent.putExtra("CANTEEN_ID", menu.getCanteenId());
+            Intent intent = new Intent(context, DetailMenuActivity.class);
+            intent.putExtra("MENU_ID", menu.getId());
             context.startActivity(intent);
         });
     }
