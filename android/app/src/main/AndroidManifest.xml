@@ -16,6 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Kantin"
         android:usesCleartextTraffic="true">
+        <activity android:name=".SearchActivity" />
+
         <activity
             android:name=".DetailPesanan"
             android:exported="false" />

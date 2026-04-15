@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FAFAFA"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_header_rounded"
+        android:elevation="4dp"
+        android:orientation="vertical"
+        android:paddingLeft="24dp"
+        android:paddingTop="32dp"
+        android:paddingRight="24dp"
+        android:paddingBottom="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:id="@+id/btnBackSearch"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/hugeicons_transaction_history"
+                android:background="@drawable/bg_circle_outline"
+                android:padding="10dp"
+                app:tint="#F97316"
+                android:layout_marginEnd="12dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                app:cardBackgroundColor="#F3F4F6"
+                app:cardCornerRadius="15dp"
+                app:cardElevation="0dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/search"
+                        app:tint="#9CA3AF"/>
+                    <EditText
+                        android:id="@+id/etSearchGlobal"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:hint="Cari menu atau kantin..."
+                        android:textColorHint="#9CA3AF"
+                        android:textSize="14sp"
+                        android:imeOptions="actionSearch"
+                        android:inputType="text"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_chip_inactive"
+            android:orientation="horizontal"
+            android:padding="4dp">
+
+            <TextView
+                android:id="@+id/tabMenu"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Menu"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:background="@drawable/bg_chip_active"
+                android:textColor="#FFFFFF"/>
+
+            <TextView
+                android:id="@+id/tabKantin"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Kantin"
+                android:textSize="14sp"
+                android:textColor="#6B7280"
+                android:background="@android:color/transparent"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvJumlahHasil"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:text="Menampilkan semua hasil"
+        android:textColor="#6B7280"
+        android:textSize="13sp"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSearchMenu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="24dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSearchKantin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="24dp"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:id="@+id/layoutEmptyState"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/search"
+                app:tint="#D1D5DB"/>
+            <TextView
+                android:id="@+id/tvEmptyMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Tidak ada hasil ditemukan"
+                android:textColor="#9CA3AF"
+                android:textSize="15sp"/>
+        </LinearLayout>
+
+    </FrameLayout>
+
+</LinearLayout>

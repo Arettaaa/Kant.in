@@ -24,6 +24,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
 public class ExploreMenuPelangganActivity extends AppCompatActivity {
 
     private RecyclerView rvExploreMenu;
@@ -52,14 +53,25 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
         adapter = new ExploreMenuAdapter(this, new ArrayList<>());
         rvExploreMenu.setAdapter(adapter);
 
-        fetchAllMenus();
-
-        // Baca kategori dari intent (kalau ada)
+        // --- 1. BACA KATEGORI DARI INTENT ---
         String kategoriDariIntent = getIntent().getStringExtra("KATEGORI");
         if (kategoriDariIntent != null && !kategoriDariIntent.isEmpty()) {
             activeCategory = kategoriDariIntent;
         }
 
+        // --- 2. BACA QUERY PENCARIAN DARI INTENT (TAMBAHAN BARU) ---
+        String queryDariIntent = getIntent().getStringExtra("QUERY");
+        if (queryDariIntent != null && !queryDariIntent.isEmpty()) {
+            etSearchMenu.setText(queryDariIntent);
+            // Pindahkan kursor ke ujung teks
+            etSearchMenu.setSelection(queryDariIntent.length());
+        }
+
+        // --- 3. AMBIL DATA DARI API ---
+        // (Filter otomatis akan jalan di dalam onResponse pakai data dari etSearchMenu)
+        fetchAllMenus();
+
+        // --- 4. LISTENER KOLOM PENCARIAN ---
         etSearchMenu.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
@@ -69,6 +81,7 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
             }
         });
 
+        // --- 5. LOGIKA KLIK TOMBOL ---
         btnBack.setOnClickListener(v -> onBackPressed());
         navHome.setOnClickListener(v -> {
             Intent intent = new Intent(this, BerandaPelangganActivity.class);
@@ -92,7 +105,7 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
 
                     buildCategoryChips(data);
 
-                    // Terapkan filter awal kalau dari intent
+                    // Terapkan filter awal (kalau ada kategori atau query dari intent)
                     adapter.filter(etSearchMenu.getText().toString(), activeCategory);
                 }
             }
@@ -165,6 +178,7 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
             }
         }
 
+        // Jalankan ulang filter saat kategori diklik
         if (adapter != null) adapter.filter(etSearchMenu.getText().toString(), activeCategory);
     }
 

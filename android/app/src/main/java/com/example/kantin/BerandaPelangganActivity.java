@@ -21,11 +21,17 @@ import com.example.kantin.network.ApiClient;
 import com.example.kantin.network.ApiService;
 import com.example.kantin.utils.SessionManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
+import android.view.inputmethod.EditorInfo;
 
 public class BerandaPelangganActivity extends AppCompatActivity {
 
@@ -39,7 +45,12 @@ public class BerandaPelangganActivity extends AppCompatActivity {
     // Pastikan BASE_URL sesuai dengan link Ngrok aktif
     private final String BASE_URL_STORAGE = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/";
 
+    private List<MenuListResponse.MenuItem> cachedMenus = new ArrayList<>();
+    private List<CanteenListResponse.CanteenData> cachedKantins = new ArrayList<>();
+    private boolean menuLoaded = false, kantinLoaded = false;
+
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getSupportActionBar() != null) getSupportActionBar().hide();
@@ -76,6 +87,22 @@ public class BerandaPelangganActivity extends AppCompatActivity {
         updateProfileUI();
         fetchKantinBeranda();
         fetchMenuPopuler();
+
+        // Preload data untuk search
+        preloadSearchData();
+
+        EditText etSearchBeranda = findViewById(R.id.etSearchBeranda);
+        etSearchBeranda.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                String query = etSearchBeranda.getText().toString().trim();
+                if (!query.isEmpty()) {
+                    handleSearch(query);
+                    etSearchBeranda.setText("");
+                }
+                return true;
+            }
+            return false;
+        });
 
         // --- 4. LOGIKA KLIK ---
 
@@ -154,6 +181,86 @@ public class BerandaPelangganActivity extends AppCompatActivity {
         });
     }
 
+
+    private void preloadSearchData() {
+        ApiService api = ApiClient.getClient().create(ApiService.class);
+
+        api.getAllMenus().enqueue(new Callback<MenuListResponse>() {
+            @Override
+            public void onResponse(Call<MenuListResponse> call, Response<MenuListResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    cachedMenus = response.body().getData();
+                }
+                menuLoaded = true;
+            }
+            @Override
+            public void onFailure(Call<MenuListResponse> call, Throwable t) {
+                menuLoaded = true;
+            }
+        });
+
+        api.getAllCanteens().enqueue(new Callback<CanteenListResponse>() {
+            @Override
+            public void onResponse(Call<CanteenListResponse> call, Response<CanteenListResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    cachedKantins = response.body().getData();
+                }
+                kantinLoaded = true;
+            }
+            @Override
+            public void onFailure(Call<CanteenListResponse> call, Throwable t) {
+                kantinLoaded = true;
+            }
+        });
+    }
+
+    private void handleSearch(String query) {
+        boolean adaMenu = false, adaKantin = false;
+
+        // Cek Menu
+        if (cachedMenus != null) {
+            for (MenuListResponse.MenuItem item : cachedMenus) {
+                if (item.getName() != null && item.getName().toLowerCase().contains(query.toLowerCase())) {
+                    adaMenu = true;
+                    break;
+                }
+            }
+        }
+
+        // Cek Kantin
+        if (cachedKantins != null) {
+            for (CanteenListResponse.CanteenData kantin : cachedKantins) {
+                if (kantin.getName() != null && kantin.getName().toLowerCase().contains(query.toLowerCase())) {
+                    adaKantin = true;
+                    break;
+                }
+            }
+        }
+
+        // Navigasi sesuai kondisi
+        if (adaMenu && adaKantin) {
+            // Cocok di keduanya → ke SearchActivity (tab menu+kantin)
+            Intent intent = new Intent(this, SearchActivity.class);
+            intent.putExtra("QUERY", query);
+            startActivity(intent);
+        } else if (adaMenu) {
+            // Cuma cocok di menu → ke ExploreMenu
+            Intent intent = new Intent(this, ExploreMenuPelangganActivity.class);
+            intent.putExtra("QUERY", query);
+            intent.putExtra("KATEGORI", "Semua");
+            startActivity(intent);
+        } else if (adaKantin) {
+            // Cuma cocok di kantin → ke ExploreKantin
+            Intent intent = new Intent(this, ExploreKantinPelangganActivity.class);
+            intent.putExtra("QUERY", query);
+            startActivity(intent);
+        } else {
+            // Tidak ketemu sama sekali → ke SearchActivity empty state
+            Intent intent = new Intent(this, SearchActivity.class);
+            intent.putExtra("QUERY", query);
+            startActivity(intent);
+        }
+    }
     private void bukaExploreMenuDenganKategori(String kategori) {
         Intent intent = new Intent(this, ExploreMenuPelangganActivity.class);
         intent.putExtra("KATEGORI", kategori);

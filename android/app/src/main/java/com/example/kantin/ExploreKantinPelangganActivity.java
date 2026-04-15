@@ -125,8 +125,14 @@ public class ExploreKantinPelangganActivity extends AppCompatActivity {
                     List<CanteenListResponse.CanteenData> list = response.body().getData();
                     adapter = new KantinAdapter(ExploreKantinPelangganActivity.this, list);
                     rvExploreKantin.setAdapter(adapter);
-                    // Terapkan filter default setelah data masuk
                     setFilter("Semua");
+
+                    String queryDariIntent = getIntent().getStringExtra("QUERY");
+                    if (queryDariIntent != null && !queryDariIntent.isEmpty()) {
+                        etSearchKantin.setText(queryDariIntent);
+                        etSearchKantin.setSelection(queryDariIntent.length());
+                        adapter.filter(queryDariIntent, activeFilter);
+                    }
                 }
             }
 
@@ -136,4 +142,6 @@ public class ExploreKantinPelangganActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }
