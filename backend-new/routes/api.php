@@ -15,22 +15,12 @@ use App\Http\Controllers\Api\TransactionController;
 |--------------------------------------------------------------------------
 */
 
-// // Public (tanpa login)
-// Route::post('/auth/register', [AuthController::class, 'register']);
-// Route::post('/auth/sessions', [AuthController::class, 'login']);
-
-// // Protected (harus login)
-// Route::middleware('auth:sanctum')->group(function () {
-//     Route::delete('/auth/sessions', [AuthController::class, 'logout']);
-// });
-
-// Tambahkan middleware('web') di sini
-Route::post('/auth/register', [AuthController::class, 'register'])->middleware('web');
-Route::post('/auth/sessions', [AuthController::class, 'login'])->middleware('web');
+// Public (tanpa login)
+Route::post('/auth/register', [AuthController::class, 'register']);
+Route::post('/auth/sessions', [AuthController::class, 'login']);
 
 // Protected (harus login)
-// Tambahkan middleware 'web' juga di logout agar session di browser ikut terhapus
-Route::middleware(['auth:sanctum', 'web'])->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/auth/sessions', [AuthController::class, 'logout']);
 });
 

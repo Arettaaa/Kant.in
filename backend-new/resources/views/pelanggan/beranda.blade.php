@@ -115,7 +115,7 @@
         {{-- Logout / Login Dinamis --}}
         @auth
         {{-- Jika sudah login, tampilkan tombol Keluar --}}
-        {{-- <form action="{{ route('logout') }}" method="POST" class="mt-auto"> --}}
+        <form action="{{ route('logout') }}" method="POST" class="mt-auto">
             @csrf
             <button type="submit"
                 class="flex items-center w-full gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">

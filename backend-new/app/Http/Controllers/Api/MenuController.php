@@ -156,6 +156,7 @@ class MenuController extends Controller
     private function formatMenu($menu)
     {
         $data = $menu->toArray();
+        $data['_id'] = (string) $menu->_id; // ← paksa jadi string
         if (!empty($data['image'])) {
             $data['image'] = asset('storage/' . $data['image']);
         }
@@ -198,19 +199,19 @@ class MenuController extends Controller
     }
 
     public function show($id)
-{
-    $menu = Menu::find($id);
-    
-    if (!$menu) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Menu tidak ditemukan.'
-        ], 404);
-    }
+    {
+        $menu = Menu::find($id);
 
-    return response()->json([
-        'success' => true,
-        'data'    => $this->formatMenu($menu)
-    ]);
-}
+        if (!$menu) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Menu tidak ditemukan.'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data'    => $this->formatMenu($menu)
+        ]);
+    }
 }
