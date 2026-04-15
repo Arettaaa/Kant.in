@@ -96,14 +96,18 @@ class CanteenController extends Controller
     {
         $canteen = Canteen::findOrFail($id);
 
-        // Hapus foto agar tidak nyampah di storage
+        // 1. Hapus foto agar tidak nyampah di storage
         if ($canteen->image) {
             Storage::disk('public')->delete($canteen->image);
         }
 
-        // Hapus kantin (User adminnya juga bisa dihapus otomatis jika ada cascade/manual)
+        // 2. Hapus akun User (Admin/Pemilik Kantin) yang terikat dengan kantin ini
+        // Kita cari user yang 'canteen_id'-nya sama dengan ID kantin yang mau dihapus
+        User::where('canteen_id', $id)->delete();
+
+        // 3. Hapus data kantinnya
         $canteen->delete();
 
-        return redirect()->back()->with('success', 'Kantin telah dihapus.');
+        return redirect()->back()->with('success', 'Kantin beserta akun pemiliknya berhasil dihapus.');
     }
 }
