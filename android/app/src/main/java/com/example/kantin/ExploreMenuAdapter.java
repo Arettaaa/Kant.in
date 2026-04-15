@@ -12,16 +12,31 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.kantin.model.response.MenuListResponse;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class ExploreMenuAdapter extends RecyclerView.Adapter<ExploreMenuAdapter.ViewHolder> {
     private Context context;
     private List<MenuListResponse.MenuItem> listMenu;
+    private List<MenuListResponse.MenuItem> listOriginal;
 
     public ExploreMenuAdapter(Context context, List<MenuListResponse.MenuItem> listMenu) {
         this.context = context;
-        this.listMenu = listMenu;
+        this.listMenu = new ArrayList<>(listMenu);
+        this.listOriginal = new ArrayList<>(listMenu);
+    }
+
+    public void filter(String query, String category) {
+        listMenu.clear();
+        for (MenuListResponse.MenuItem menu : listOriginal) {
+            boolean matchSearch = menu.getName().toLowerCase().contains(query.toLowerCase());
+            boolean matchCategory = category.equals("Semua") || category.equalsIgnoreCase(menu.getCategory());
+            if (matchSearch && matchCategory) {
+                listMenu.add(menu);
+            }
+        }
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -36,7 +51,7 @@ public class ExploreMenuAdapter extends RecyclerView.Adapter<ExploreMenuAdapter.
         MenuListResponse.MenuItem menu = listMenu.get(position);
 
         holder.tvNamaMenu.setText(menu.getName());
-        holder.tvNamaKantin.setText("Kantin Terdekat"); // Nanti bisa ambil dari data kantin
+        holder.tvNamaKantin.setText("Kantin Terdekat");
 
         double harga = menu.getPriceAsDouble();
         NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
@@ -47,7 +62,6 @@ public class ExploreMenuAdapter extends RecyclerView.Adapter<ExploreMenuAdapter.
                 .placeholder(R.drawable.makanan)
                 .into(holder.ivMenu);
 
-        // Jika diklik, masuk ke Detail Kantin
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, DetailKantinActivity.class);
             intent.putExtra("CANTEEN_ID", menu.getCanteenId());

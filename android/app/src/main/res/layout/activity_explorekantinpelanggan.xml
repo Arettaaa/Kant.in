@@ -19,6 +19,7 @@
         android:paddingRight="24dp"
         android:paddingBottom="24dp">
 
+        <!-- Baris 1: Back + Title -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -47,51 +48,82 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <!-- Baris 2: Search Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_search_bar"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/search"
+                app:tint="#9CA3AF" />
+
+            <EditText
+                android:id="@+id/etSearchKantin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:background="@null"
+                android:hint="Cari kantin favoritmu..."
+                android:inputType="text"
+                android:textColor="#111827"
+                android:textColorHint="#9CA3AF"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <!-- Baris 3: Chip Filter (DI BAWAH search bar, BUKAN di sampingnya) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:background="@drawable/bg_search_bar"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="16dp">
+            <TextView
+                android:id="@+id/chipSemua"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:text="Semua"
+                android:textSize="13sp"
+                android:background="@drawable/bg_chip_active"
+                android:textColor="@android:color/white"
+                android:layout_marginEnd="8dp"/>
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/search"
-                    app:tint="#9CA3AF" />
+            <TextView
+                android:id="@+id/chipBuka"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:text="Buka"
+                android:textSize="13sp"
+                android:background="@drawable/bg_chip_inactive"
+                android:textColor="#6B7280"
+                android:layout_marginEnd="8dp"/>
 
-                <EditText
-                    android:id="@+id/etSearchKantin"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="8dp"
-                    android:background="@null"
-                    android:hint="Cari kantin favoritmu..."
-                    android:inputType="text"
-                    android:textColor="#111827"
-                    android:textColorHint="#9CA3AF"
-                    android:textSize="14sp" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/chipTutup"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:text="Tutup"
+                android:textSize="13sp"
+                android:background="@drawable/bg_chip_inactive"
+                android:textColor="#6B7280"/>
 
-            <ImageView
-                android:id="@+id/btnFilter"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="12dp"
-                android:background="@drawable/bg_search_bar"
-                android:padding="12dp"
-                android:src="@drawable/filter"
-                app:tint="#6B7280" />
         </LinearLayout>
+
     </LinearLayout>
 
+    <!-- isi bawah sama seperti sebelumnya -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -106,8 +138,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-
 
             <LinearLayout
                 android:layout_width="match_parent"

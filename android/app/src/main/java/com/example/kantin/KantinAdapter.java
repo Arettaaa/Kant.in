@@ -16,16 +16,39 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.kantin.model.response.CanteenListResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class KantinAdapter extends RecyclerView.Adapter<KantinAdapter.KantinViewHolder> {
 
     private Context context;
     private List<CanteenListResponse.CanteenData> listKantin;
+    private List<CanteenListResponse.CanteenData> listOriginal; // data asli
 
     public KantinAdapter(Context context, List<CanteenListResponse.CanteenData> listKantin) {
         this.context = context;
-        this.listKantin = listKantin;
+        this.listKantin = new ArrayList<>(listKantin);
+        this.listOriginal = new ArrayList<>(listKantin); // simpan data asli
+    }
+
+    // Filter berdasarkan query search DAN status filter
+    public void filter(String query, String statusFilter) {
+        listKantin.clear();
+        for (CanteenListResponse.CanteenData kantin : listOriginal) {
+            boolean matchSearch = kantin.getName().toLowerCase().contains(query.toLowerCase());
+            boolean matchStatus;
+            if (statusFilter.equals("Buka")) {
+                matchStatus = kantin.isOpen();
+            } else if (statusFilter.equals("Tutup")) {
+                matchStatus = !kantin.isOpen();
+            } else {
+                matchStatus = true; // "Semua"
+            }
+            if (matchSearch && matchStatus) {
+                listKantin.add(kantin);
+            }
+        }
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -39,10 +62,8 @@ public class KantinAdapter extends RecyclerView.Adapter<KantinAdapter.KantinView
     public void onBindViewHolder(@NonNull KantinViewHolder holder, int position) {
         CanteenListResponse.CanteenData kantin = listKantin.get(position);
 
-        // 1. Set Nama Kantin
         holder.tvNamaKantin.setText(kantin.getName());
 
-        // 2. Set Jam Operasional
         if (kantin.getOperatingHours() != null) {
             String open = kantin.getOperatingHours().getOpen();
             String close = kantin.getOperatingHours().getClose();
@@ -51,7 +72,6 @@ public class KantinAdapter extends RecyclerView.Adapter<KantinAdapter.KantinView
             holder.tvJamOperasional.setText("-");
         }
 
-        // 3. Set Status (Buka/Tutup)
         if (kantin.isOpen()) {
             holder.tvStatusKantin.setText("Buka");
             holder.tvStatusKantin.setTextColor(Color.parseColor("#10B981"));
@@ -64,9 +84,7 @@ public class KantinAdapter extends RecyclerView.Adapter<KantinAdapter.KantinView
             holder.ivStatusIcon.setColorFilter(Color.parseColor("#EF4444"));
         }
 
-        // 4. Set Gambar (Perbaikan link dobel)
         String imageUrl = kantin.getImage();
-        // Cek jika imageUrl tidak null dan tidak mengandung link lengkap, tambahkan baseUrl
         if (imageUrl != null && !imageUrl.startsWith("http")) {
             imageUrl = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/" + imageUrl;
         }
@@ -78,7 +96,6 @@ public class KantinAdapter extends RecyclerView.Adapter<KantinAdapter.KantinView
                 .centerCrop()
                 .into(holder.ivKantin);
 
-        // 5. Klik ke Detail Kantin
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, DetailKantinActivity.class);
             intent.putExtra("CANTEEN_ID", kantin.getId());
