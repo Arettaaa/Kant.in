@@ -195,53 +195,59 @@
                 </button>
             </div>
 
-         {{-- GRID KANTIN --}}
-<div id="kantinGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12 w-full text-start">
-    
-    {{-- 1. Mulai perulangan DI SINI --}}
-    @foreach($canteens as $kantin)
-    
-        {{-- 2. Card kantin dan data-status ada DI DALAM perulangan --}}
-        <div class="kantin-card bg-white p-6 rounded-[36px] border border-gray-100 shadow-sm flex items-center justify-between group transition-all duration-300 hover:shadow-md text-start"
-            data-status="{{ $kantin->status }}">
-            
-            <div class="flex items-center gap-5 text-start">
-                {{-- Tampilkan Foto Asli jika ada, jika tidak tampilkan Inisial --}}
-                @if($kantin->image)
-                    <img src="{{ asset('storage/' . $kantin->image) }}"
-                        class="w-20 h-20 rounded-[28px] object-cover shadow-inner flex-shrink-0">
-                @else
-                    <div class="w-20 h-20 rounded-[28px] bg-orange-50 border border-orange-100 flex items-center justify-center font-black text-[#FF6900] text-xl shadow-inner flex-shrink-0">
-                        {{ strtoupper(substr($kantin->name, 0, 2)) }}
-                    </div>
-                @endif
+            {{-- GRID KANTIN --}}
+            <div id="kantinGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12 w-full text-start">
 
-                <div class="text-start">
-                    <h4 class="name-target text-[17px] font-black text-gray-900 leading-none mb-1">{{ $kantin->name }}</h4>
-                    <p class="owner-target text-xs text-gray-400 font-bold italic mb-3">
-                        Pemilik: {{ $kantin->admin->name ?? 'Belum ada' }}
-                    </p>
-                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full {{ $kantin->status == 'active' ? 'bg-green-50 text-[#22C55E]' : 'bg-red-50 text-red-500' }} text-[10px] font-black uppercase tracking-widest">
-                        <span class="w-1.5 h-1.5 rounded-full {{ $kantin->status == 'active' ? 'bg-[#22C55E]' : 'bg-red-500' }}"></span>
-                        {{ $kantin->status == 'active' ? 'Aktif' : 'Nonaktif' }}
+                {{-- 1. Mulai perulangan DI SINI --}}
+                @foreach($canteens as $kantin)
+
+                {{-- 2. Card kantin dan data-status ada DI DALAM perulangan --}}
+                <div class="kantin-card bg-white p-6 rounded-[36px] border border-gray-100 shadow-sm flex items-center justify-between group transition-all duration-300 hover:shadow-md text-start"
+                    data-status="{{ $kantin->status }}">
+
+                    <div class="flex items-center gap-5 text-start">
+                        {{-- Tampilkan Foto Asli jika ada, jika tidak tampilkan Inisial --}}
+                        @if($kantin->image)
+                        <img src="{{ asset('storage/' . $kantin->image) }}"
+                            class="w-20 h-20 rounded-[28px] object-cover shadow-inner flex-shrink-0">
+                        @else
+                        <div
+                            class="w-20 h-20 rounded-[28px] bg-orange-50 border border-orange-100 flex items-center justify-center font-black text-[#FF6900] text-xl shadow-inner flex-shrink-0">
+                            {{ strtoupper(substr($kantin->name, 0, 2)) }}
+                        </div>
+                        @endif
+
+                        <div class="text-start">
+                            <h4 class="name-target text-[17px] font-black text-gray-900 leading-none mb-1">{{
+                                $kantin->name }}</h4>
+                            <p class="owner-target text-xs text-gray-400 font-bold italic mb-3">
+                                Pemilik: {{ $kantin->admin->name ?? 'Belum ada' }}
+                            </p>
+                            <div
+                                class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full {{ $kantin->status == 'active' ? 'bg-green-50 text-[#22C55E]' : 'bg-red-50 text-red-500' }} text-[10px] font-black uppercase tracking-widest">
+                                <span
+                                    class="w-1.5 h-1.5 rounded-full {{ $kantin->status == 'active' ? 'bg-[#22C55E]' : 'bg-red-500' }}"></span>
+                                {{ $kantin->status == 'active' ? 'Aktif' : 'Nonaktif' }}
+                            </div>
+                        </div>
                     </div>
+
+                    <div class="flex flex-col gap-2.5 text-start">
+                        <button onclick='openEditModal(@json($kantin))'
+                            class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-[#6B7280] border border-gray-100 transition-all hover:brightness-95">
+                            <i class="fa-solid fa-pencil text-[13px]"></i>
+                        </button>
+                        <button onclick="confirmDelete('{{ $kantin->_id }}', '{{ $kantin->name }}')"
+                            class="w-10 h-10 rounded-full bg-[#FEF2F2] flex items-center justify-center text-[#EF4444] border border-[#FEE2E2] transition-all hover:brightness-95">
+                            <i class="fa-solid fa-trash-can text-[13px]"></i>
+                        </button>
+                    </div>
+
                 </div>
-            </div>
+                {{-- 3. Tutup perulangan DI SINI --}}
+                @endforeach
 
-            <div class="flex flex-col gap-2.5 text-start">
-                <button onclick='openEditModal(@json($kantin))' class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-[#6B7280] border border-gray-100 transition-all hover:brightness-95">
-                    <i class="fa-solid fa-pencil text-[13px]"></i>
-                </button>
-                <button onclick="confirmDelete('{{ $kantin->_id }}', '{{ $kantin->name }}')" class="w-10 h-10 rounded-full bg-[#FEF2F2] flex items-center justify-center text-[#EF4444] border border-[#FEE2E2] transition-all hover:brightness-95">
-                    <i class="fa-solid fa-trash-can text-[13px]"></i>
-                </button>
             </div>
-            
-        </div>
-    {{-- 3. Tutup perulangan DI SINI --}}
-    @endforeach
-
-</div>
 
             {{-- ======================== SEMUA MODAL DISINI ======================== --}}
 
@@ -411,9 +417,9 @@
                 </div>
             </div>
 
-          @push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function () {
+            @push('scripts')
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
 
     // ======================
     // REALTIME DATE
@@ -468,7 +474,7 @@ function confirmDelete(id, name) {
 // EDIT MODAL
 // ======================
 function openEditModal(kantin) {
-    const form = document.getElementById('formEdit'); 
+    const form = document.getElementById('formEdit');
 
     let kantinId = kantin._id;
 
@@ -544,6 +550,6 @@ function resetFilter() {
     alert("{{ session('success') }}");
 @endif
 
-</script>
-@endpush
-@endsection
+            </script>
+            @endpush
+            @endsection
