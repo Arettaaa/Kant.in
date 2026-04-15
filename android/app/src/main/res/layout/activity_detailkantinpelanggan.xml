@@ -190,6 +190,20 @@
                     android:nestedScrollingEnabled="false"
                     tools:listitem="@layout/item_menu_detail" />
 
+                <TextView
+                    android:id="@+id/tvMenuKosong"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Yah, menu yang kamu cari tidak tersedia di kantin ini."
+                    android:textAlignment="center"
+                    android:textColor="#9CA3AF"
+                    android:textSize="14sp"
+                    android:textStyle="italic"
+                    android:visibility="gone" /> <Space
+                android:layout_width="match_parent"
+                android:layout_height="80dp" />
+
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="80dp" />

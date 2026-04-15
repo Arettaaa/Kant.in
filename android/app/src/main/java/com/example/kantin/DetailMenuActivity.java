@@ -26,6 +26,8 @@ public class DetailMenuActivity extends AppCompatActivity {
     private ImageView imgFood, btnBack, btnMinus, btnPlus;
     private TextView tvNamaMenu, tvHarga, tvDeskripsi, tvQuantity, tvEstimasiWaktu;
     private LinearLayout btnTambahKeranjang;
+    private boolean isErrorShown = false; // ← tambah ini
+
 
     private int quantity = 1;
     private double basePrice = 0;
@@ -82,6 +84,13 @@ public class DetailMenuActivity extends AppCompatActivity {
         }
     }
 
+    private void showErrorOnce(String message) {
+        if (!isErrorShown) {
+            isErrorShown = true;
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void fetchMenuDetail(String menuId) {
         ApiClient.getClient().create(ApiService.class)
                 .getMenuDetail(menuId)
@@ -91,13 +100,16 @@ public class DetailMenuActivity extends AppCompatActivity {
                         if (response.isSuccessful() && response.body() != null) {
                             bindData(response.body().getData());
                         } else {
-                            Toast.makeText(DetailMenuActivity.this, "Gagal memuat detail menu", Toast.LENGTH_SHORT).show();
+                            // ✅ Ganti Toast biasa → showErrorOnce
+                            showErrorOnce("Gagal memuat detail menu");
                         }
                     }
 
                     @Override
                     public void onFailure(Call<MenuDetailResponse> call, Throwable t) {
-                        Toast.makeText(DetailMenuActivity.this, "Gagal terhubung ke server", Toast.LENGTH_SHORT).show();
+                        android.util.Log.e("API_ERROR", "Detail Menu: " + t.getMessage());
+                        // ✅ Ganti Toast biasa → showErrorOnce
+                        showErrorOnce("Gagal terhubung ke server");
                     }
                 });
     }
@@ -110,14 +122,21 @@ public class DetailMenuActivity extends AppCompatActivity {
         tvDeskripsi.setText(menu.getDescription());
         tvHarga.setText(formatRupiah(basePrice));
 
-        // Estimasi waktu
-        tvEstimasiWaktu.setText("Siap dalam " + menu.getEstimatedCookingTime() + " mnt");
+        tvEstimasiWaktu.setText("Siap dalam " + menu.getEstimatedCookingTime() + " menit");
 
-        Glide.with(this)
-                .load(menu.getImage())
+        // ✅ Fix URL gambar — sama seperti adapter lain
+        String imageUrl = menu.getImage();
+        if (imageUrl != null && !imageUrl.startsWith("http")) {
+            imageUrl = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/" + imageUrl;
+        }
+
+        Glide.with(DetailMenuActivity.this) // ← pakai this eksplisit
+                .load(imageUrl)
                 .placeholder(R.drawable.makanan)
+                .error(R.drawable.makanan)
                 .into(imgFood);
     }
+
 
     private String formatRupiah(double harga) {
         NumberFormat fmt = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));

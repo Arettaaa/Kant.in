@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -35,6 +36,8 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
     private String activeCategory = "Semua";
     // Tentukan kategori tetap di sini agar sama dengan Beranda
     private final String[] fixedCategories = {"Semua", "makanan", "minuman", "camilan"};
+
+    private boolean isErrorShown = false; // ← tambahkan di atas onCreate
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,6 +133,14 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
         }
     }
 
+    // ✅ Taruh di sini — sejajar dengan fetchAllMenus(), setupFixedCategoryChips(), dll.
+    private void showErrorOnce(String message) {
+        if (!isErrorShown) {
+            isErrorShown = true;
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void fetchAllMenus() {
         ApiClient.getClient().create(ApiService.class).getAllMenus().enqueue(new Callback<MenuListResponse>() {
             @Override
@@ -138,13 +149,14 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
                     List<MenuListResponse.MenuItem> data = response.body().getData();
                     adapter = new ExploreMenuAdapter(ExploreMenuPelangganActivity.this, data);
                     rvExploreMenu.setAdapter(adapter);
-
-                    // Langsung cocokkan (filter) dengan kategori yang sedang aktif
                     adapter.filter(etSearchMenu.getText().toString(), activeCategory);
                 }
             }
-            @Override public void onFailure(Call<MenuListResponse> call, Throwable t) {
-                Toast.makeText(ExploreMenuPelangganActivity.this, "Gagal ambil menu", Toast.LENGTH_SHORT).show();
+
+            @Override
+            public void onFailure(Call<MenuListResponse> call, Throwable t) {
+                android.util.Log.e("API_ERROR", "Explore Menu: " + t.getMessage());
+                showErrorOnce("Gagal ambil menu"); // ← sekarang bisa diakses
             }
         });
     }
