@@ -147,19 +147,24 @@
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp">
                 <ImageView
+                    android:id="@+id/btnIconSearch"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/search"
                     app:tint="#9CA3AF" />
                 <EditText
+                    android:id="@+id/etSearchBeranda"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:hint="Mau makan apa hari ini?"
+                    android:hint="Cari makanan atau kantin favoritmu"
                     android:textColorHint="#9CA3AF"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    android:maxLines="1" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </LinearLayout>
@@ -185,7 +190,7 @@
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="12dp"
                 android:fontFamily="@font/inter_bold"
-                android:text="Kategori"
+                android:text="Kategori Menu"
                 android:textColor="#1A1A1A"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -203,7 +208,9 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
+                    <!-- Semua -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/chip_semua"
                         android:layout_width="76dp"
                         android:layout_height="96dp"
                         android:layout_marginEnd="12dp"
@@ -212,12 +219,14 @@
                         app:cardCornerRadius="16dp"
                         app:cardElevation="2dp">
                         <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                            <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/nasi" app:tint="#FFFFFF"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Nasi" android:textColor="#FFFFFF" android:textSize="12sp" android:textStyle="bold"/>
+                            <ImageView android:layout_width="30dp" android:layout_height="30dp" android:src="@drawable/utensils" app:tint="#FFFFFF"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Semua" android:textColor="#FFFFFF" android:textSize="12sp" android:textStyle="bold"/>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
+                    <!-- Makanan -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/chip_makanan"
                         android:layout_width="76dp"
                         android:layout_height="96dp"
                         android:layout_marginEnd="12dp"
@@ -231,7 +240,9 @@
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
+                    <!-- Minuman -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/chip_minuman"
                         android:layout_width="76dp"
                         android:layout_height="96dp"
                         android:layout_marginEnd="12dp"
@@ -245,7 +256,9 @@
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
 
+                    <!-- Cemilan -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/chip_cemilan"
                         android:layout_width="76dp"
                         android:layout_height="96dp"
                         android:layout_marginEnd="12dp"
@@ -254,10 +267,11 @@
                         app:cardCornerRadius="16dp"
                         app:cardElevation="2dp">
                         <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                            <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/cemilan" app:tint="#F97316"/>
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Cemilan" android:textColor="#4B5563" android:textSize="12sp" android:textStyle="bold"/>
+                            <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/camilan" app:tint="#F97316"/>
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Camilan" android:textColor="#4B5563" android:textSize="12sp" android:textStyle="bold"/>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
+
                 </LinearLayout>
             </HorizontalScrollView>
 

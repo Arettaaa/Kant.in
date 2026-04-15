@@ -34,7 +34,7 @@ Route::get('/menus', [MenuController::class, 'allMenus']);
 Route::get('/canteens/{id}', [CanteenController::class, 'show']);
 Route::get('/canteens/{id}/menus', [MenuController::class, 'index']);
 Route::get('/canteens/{id}/menus/availabilities', [MenuController::class, 'availabilities']);
-
+Route::get('/menus/{id}', [MenuController::class, 'show']);
 /*
 |--------------------------------------------------------------------------
 | Pembeli Routes

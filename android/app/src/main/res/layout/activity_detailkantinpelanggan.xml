@@ -127,15 +127,15 @@
                     <ImageView
                         android:layout_width="14dp"
                         android:layout_height="14dp"
-                        android:src="@android:drawable/ic_menu_recent_history"
+                        android:src="@drawable/clock"
                         app:tint="#9CA3AF" />
 
                     <TextView
-                        android:id="@+id/tvEstimasiWaktu"
+                        android:id="@+id/tvJamOperasional"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="10-15 min"
+                        android:text="08:00 - 17:00"
                         android:textColor="#4B5563"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -189,6 +189,20 @@
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"
                     tools:listitem="@layout/item_menu_detail" />
+
+                <TextView
+                    android:id="@+id/tvMenuKosong"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Yah, menu yang kamu cari tidak tersedia di kantin ini."
+                    android:textAlignment="center"
+                    android:textColor="#9CA3AF"
+                    android:textSize="14sp"
+                    android:textStyle="italic"
+                    android:visibility="gone" /> <Space
+                android:layout_width="match_parent"
+                android:layout_height="80dp" />
 
                 <Space
                     android:layout_width="match_parent"

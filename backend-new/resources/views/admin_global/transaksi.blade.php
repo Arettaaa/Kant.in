@@ -132,6 +132,58 @@
     .unduh-btn:active {
         transform: translateY(0);
     }
+
+    /* Style untuk Bell Dropdown */
+    .notif-dropdown {
+        position: absolute;
+        top: calc(100% + 12px);
+        right: 0;
+        width: 360px;
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.06);
+        border: 1px solid #f3f4f6;
+        z-index: 100;
+        overflow: hidden;
+        animation: dropIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes dropIn {
+        from {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.97);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .notif-dropdown-item {
+        padding: 14px 16px;
+        cursor: pointer;
+        transition: background 0.15s;
+        border-bottom: 1px solid #f9fafb;
+    }
+
+    .notif-dropdown-item:hover {
+        background-color: #FFFAF7;
+    }
+
+    .notif-dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .notif-icon-wrap {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
 </style>
 @endpush
 
@@ -207,10 +259,73 @@
                 <p id="realtimeDate" class="text-sm text-gray-400 font-bold">Memuat Tanggal...</p>
             </div>
             <div class="flex items-center gap-6">
-                <button class="relative w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-[#FF6900] border border-gray-100 transition-all">
-                    <i class="fa-solid fa-bell text-lg"></i>
-                    <span class="absolute top-2.5 right-3 w-3 h-3 border-2 border-white rounded-full" style="background-color:#FF6900;"></span>
-                </button>
+                {{-- Bell dengan dropdown --}}
+                <div class="relative" id="bellWrapper">
+                    <button onclick="toggleDropdown()"
+                        class="relative w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-[#FF6900] border border-gray-100 transition-all">
+                        <i class="fa-solid fa-bell text-lg"></i>
+                        <span id="bellBadge" class="absolute top-2.5 right-3 w-3 h-3 border-2 border-white rounded-full" style="background-color:#FF6900;"></span>
+                    </button>
+
+                    {{-- Dropdown --}}
+                    <div id="notifDropdown" class="notif-dropdown hidden" style="right:-20px;">
+                        {{-- Header dropdown --}}
+                        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+                            <span class="text-sm font-extrabold text-gray-900">Notifikasi Terbaru</span>
+                            <span class="text-xs font-black px-2.5 py-1 rounded-xl" style="background-color:#FFF3E8; color:#FF6900;">2 Baru</span>
+                        </div>
+
+                        {{-- Item 1 --}}
+                        <div class="notif-dropdown-item flex items-start gap-3">
+                            <div class="notif-icon-wrap flex-shrink-0" style="background-color:#FFF3E8; width:40px; height:40px; border-radius:12px;">
+                                <i class="fa-solid fa-store text-sm" style="color:#FF6900;"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start justify-between gap-2">
+                                    <p class="text-sm font-extrabold text-gray-900 leading-tight">Pendaftaran Kantin Baru: Warung</p>
+                                    <div class="w-2 h-2 rounded-full flex-shrink-0 mt-1" style="background-color:#FF6900;"></div>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Permohonan pendaftaran kantin baru telah diajukan dan menunggu verifikasi.</p>
+                                <p class="text-[11px] text-gray-300 font-semibold mt-1">10 mnt lalu</p>
+                            </div>
+                        </div>
+
+                        {{-- Item 2 --}}
+                        <div class="notif-dropdown-item flex items-start gap-3">
+                            <div class="notif-icon-wrap flex-shrink-0" style="background-color:#FFF3E8; width:40px; height:40px; border-radius:12px;">
+                                <i class="fa-solid fa-wave-square text-sm" style="color:#FF6900;"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start justify-between gap-2">
+                                    <p class="text-sm font-extrabold text-gray-900 leading-tight">Pembaruan Sistem Selesai</p>
+                                    <div class="w-2 h-2 rounded-full flex-shrink-0 mt-1" style="background-color:#FF6900;"></div>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Sinkronisasi gerbang pembayaran QRIS berhasil diselesaikan tanpa</p>
+                                <p class="text-[11px] text-gray-300 font-semibold mt-1">1 jam lalu</p>
+                            </div>
+                        </div>
+
+                        {{-- Item 3 --}}
+                        <div class="notif-dropdown-item flex items-start gap-3">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+                                <i class="fa-solid fa-shield-halved text-sm text-gray-400"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-extrabold text-gray-700 leading-tight">Akses Admin Baru Diberikan</p>
+                                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Akses admin diberikan kepada budi.admin@kant.in.</p>
+                                <p class="text-[11px] text-gray-300 font-semibold mt-1">3 jam lalu</p>
+                            </div>
+                        </div>
+
+                        {{-- Footer --}}
+                        <div class="px-5 py-3 border-t border-gray-50 text-center">
+                            <a href="/admin/global/notifikasi"
+                                class="text-sm font-extrabold transition-all hover:underline" style="color:#FF6900;">
+                                Lihat Selengkapnya
+                            </a>
+                        </div>
+                    </div>
+                </div>
                 <div class="h-10 w-[1px] bg-gray-100"></div>
                 <a href="/admin/global/profil" class="flex items-center gap-4 group">
                     <div class="text-right">
@@ -673,6 +788,20 @@
         if (container && !container.contains(e.target)) {
             if (dropdown) dropdown.classList.add('hidden');
             if (chevron) chevron.style.transform = 'rotate(0deg)';
+        }
+    });
+
+    //dropdown bell
+    function toggleDropdown() {
+        const dd = document.getElementById('notifDropdown');
+        dd.classList.toggle('hidden');
+    }
+
+    window.addEventListener('click', function(e) {
+        const wrapper = document.getElementById('bellWrapper');
+        const dropdown = document.getElementById('notifDropdown');
+        if (wrapper && !wrapper.contains(e.target)) {
+            if (dropdown) dropdown.classList.add('hidden');
         }
     });
 </script>

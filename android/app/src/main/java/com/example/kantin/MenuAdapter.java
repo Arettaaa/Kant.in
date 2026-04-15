@@ -2,11 +2,13 @@ package com.example.kantin;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -65,8 +67,19 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
 
         // 4. Klik Item untuk ke Detail Menu
         holder.itemView.setOnClickListener(v -> {
+            String menuId = menu.getId(); // atau String.valueOf(menu.getId()) kalau tipenya int
+
+            // Tambahkan log ini dulu untuk cek nilai ID
+            Log.d("MENU_DEBUG", "ID menu yang diklik: " + menuId);
+
+            // Guard: jangan buka activity kalau ID tidak valid
+            if (menuId == null || menuId.isEmpty() || menuId.equals("0")) {
+                Toast.makeText(context, "ID menu tidak valid", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             Intent intent = new Intent(context, DetailMenuActivity.class);
-            intent.putExtra("MENU_ID", String.valueOf(menu.getId()));
+            intent.putExtra("MENU_ID", menuId);
             context.startActivity(intent);
         });
 
@@ -79,6 +92,12 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
     @Override
     public int getItemCount() {
         return listMenu != null ? listMenu.size() : 0;
+    }
+
+    // --- TAMBAHAN BARU: Method untuk memfilter isi RecyclerView ---
+    public void filterList(List<MenuListResponse.MenuItem> filteredList) {
+        this.listMenu = filteredList;
+        notifyDataSetChanged(); // Refresh tampilan adapter dengan data baru
     }
 
     public static class MenuViewHolder extends RecyclerView.ViewHolder {

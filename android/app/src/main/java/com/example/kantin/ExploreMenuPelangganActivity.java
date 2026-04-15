@@ -2,10 +2,13 @@ package com.example.kantin;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,7 +31,13 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
     private RecyclerView rvExploreMenu;
     private ExploreMenuAdapter adapter;
     private EditText etSearchMenu;
-    private List<MenuListResponse.MenuItem> allMenuList = new ArrayList<>();
+    private LinearLayout chipCategoryContainer;
+
+    private String activeCategory = "Semua";
+    // Tentukan kategori tetap di sini agar sama dengan Beranda
+    private final String[] fixedCategories = {"Semua", "makanan", "minuman", "camilan"};
+
+    private boolean isErrorShown = false; // ← tambahkan di atas onCreate
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,64 +45,129 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_exploremenupelanggan);
 
-        // --- 1. INISIALISASI VIEW ---
-        rvExploreMenu = findViewById(R.id.rvExploreMenu); // ID sesuai XML yang kita ubah tadi
+        rvExploreMenu = findViewById(R.id.rvExploreMenu);
         etSearchMenu = findViewById(R.id.etSearchMenu);
+        chipCategoryContainer = findViewById(R.id.chipCategoryContainer);
         ImageView btnBack = findViewById(R.id.btnBackExploreMenu);
 
-        // Navbar
-        LinearLayout navHome = findViewById(R.id.navHome);
-        LinearLayout navHistory = findViewById(R.id.navHistory);
-        LinearLayout navProfile = findViewById(R.id.navProfile);
-
-        // --- 2. SETUP RECYCLERVIEW ---
         rvExploreMenu.setLayoutManager(new LinearLayoutManager(this));
-        // Kita set adapter kosong dulu sementara nunggu API
         adapter = new ExploreMenuAdapter(this, new ArrayList<>());
         rvExploreMenu.setAdapter(adapter);
 
-        // --- 3. AMBIL DATA DARI API ---
+        // --- 1. AMBIL DATA DARI INTENT ---
+        String kategoriIntent = getIntent().getStringExtra("KATEGORI");
+        if (kategoriIntent != null) activeCategory = kategoriIntent;
+
+        String queryIntent = getIntent().getStringExtra("QUERY");
+        if (queryIntent != null) {
+            etSearchMenu.setText(queryIntent);
+            etSearchMenu.setSelection(queryIntent.length());
+        }
+
+        // --- 2. BUAT CHIP SEKARANG (Tanpa nunggu API) ---
+        setupFixedCategoryChips();
+
+        // --- 3. JALANKAN API (Nanti datanya otomatis "cocok" ke filter) ---
         fetchAllMenus();
 
-        // --- 4. LOGIKA KLIK & NAVIGASI ---
+        // --- 4. SEARCH LISTENER ---
+        etSearchMenu.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void afterTextChanged(Editable s) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (adapter != null) adapter.filter(s.toString(), activeCategory);
+            }
+        });
 
         btnBack.setOnClickListener(v -> onBackPressed());
-
-        navHome.setOnClickListener(v -> {
-            // Balik ke BerandaPelangganActivity
-            Intent intent = new Intent(this, BerandaPelangganActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-            finish();
-        });
-
-        navHistory.setOnClickListener(v -> {
-            startActivity(new Intent(this, HistoryActivity.class));
-        });
-
-        navProfile.setOnClickListener(v -> {
-            startActivity(new Intent(this, ProfilPelangganActivity.class));
-        });
     }
 
-    /**
-     * Fungsi untuk mengambil semua data menu dari server
-     */
+    private void setupFixedCategoryChips() {
+        chipCategoryContainer.removeAllViews();
+
+        for (String category : fixedCategories) {
+            TextView chip = new TextView(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, dpToPx(36));
+            params.setMarginEnd(dpToPx(8));
+            chip.setLayoutParams(params);
+
+            chip.setText(capitalize(category));
+            chip.setTextSize(13);
+            chip.setTypeface(null, android.graphics.Typeface.BOLD);
+            chip.setPadding(dpToPx(16), 0, dpToPx(16), 0);
+            chip.setGravity(android.view.Gravity.CENTER);
+
+            // Cek kondisi aktif
+            if (category.equalsIgnoreCase(activeCategory)) {
+                chip.setBackgroundResource(R.drawable.bg_chip_active);
+                chip.setTextColor(android.graphics.Color.WHITE);
+            } else {
+                chip.setBackgroundResource(R.drawable.bg_chip_inactive);
+                chip.setTextColor(android.graphics.Color.parseColor("#6B7280"));
+            }
+
+            chip.setOnClickListener(v -> {
+                activeCategory = category;
+                refreshChipStyles();
+                if (adapter != null) adapter.filter(etSearchMenu.getText().toString(), activeCategory);
+            });
+
+            chipCategoryContainer.addView(chip);
+        }
+    }
+
+    private void refreshChipStyles() {
+        for (int i = 0; i < chipCategoryContainer.getChildCount(); i++) {
+            TextView chip = (TextView) chipCategoryContainer.getChildAt(i);
+            String category = fixedCategories[i];
+
+            if (category.equalsIgnoreCase(activeCategory)) {
+                chip.setBackgroundResource(R.drawable.bg_chip_active);
+                chip.setTextColor(android.graphics.Color.WHITE);
+            } else {
+                chip.setBackgroundResource(R.drawable.bg_chip_inactive);
+                chip.setTextColor(android.graphics.Color.parseColor("#6B7280"));
+            }
+        }
+    }
+
+    // ✅ Taruh di sini — sejajar dengan fetchAllMenus(), setupFixedCategoryChips(), dll.
+    private void showErrorOnce(String message) {
+        if (!isErrorShown) {
+            isErrorShown = true;
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void fetchAllMenus() {
         ApiClient.getClient().create(ApiService.class).getAllMenus().enqueue(new Callback<MenuListResponse>() {
             @Override
             public void onResponse(Call<MenuListResponse> call, Response<MenuListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // Tampilkan semua menu di RecyclerView
-                    adapter = new ExploreMenuAdapter(ExploreMenuPelangganActivity.this, response.body().getData());
+                    List<MenuListResponse.MenuItem> data = response.body().getData();
+                    adapter = new ExploreMenuAdapter(ExploreMenuPelangganActivity.this, data);
                     rvExploreMenu.setAdapter(adapter);
+                    adapter.filter(etSearchMenu.getText().toString(), activeCategory);
                 }
             }
 
             @Override
             public void onFailure(Call<MenuListResponse> call, Throwable t) {
-                Toast.makeText(ExploreMenuPelangganActivity.this, "Gagal ambil semua menu", Toast.LENGTH_SHORT).show();
+                android.util.Log.e("API_ERROR", "Explore Menu: " + t.getMessage());
+                showErrorOnce("Gagal ambil menu"); // ← sekarang bisa diakses
             }
         });
+    }
+
+    private String capitalize(String text) {
+        if (text == null || text.isEmpty()) return text;
+        return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
+    }
+
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
     }
 }

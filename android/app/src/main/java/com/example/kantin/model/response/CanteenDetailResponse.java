@@ -20,12 +20,28 @@ public class CanteenDetailResponse {
         @SerializedName("is_open")
         private boolean isOpen;
 
-        // Getter
+        // --- TAMBAHKAN INI ---
+        @SerializedName("operating_hours")
+        private OperatingHours operatingHours;
+
+        public OperatingHours getOperatingHours() {
+            return operatingHours;
+        }
+        // ---------------------
+
         public String getId() { return id; }
         public String getName() { return name; }
         public String getDescription() { return description; }
         public String getLocation() { return location; }
         public String getImage() { return image; }
         public boolean isOpen() { return isOpen; }
+
+        // --- TAMBAHKAN CLASS INI DI DALAM SINI ---
+        public static class OperatingHours {
+            private String open;
+            private String close;
+            public String getOpen() { return open; }
+            public String getClose() { return close; }
+        }
     }
 }

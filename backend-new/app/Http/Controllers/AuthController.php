@@ -55,9 +55,9 @@ class AuthController extends Controller
             'status' => $role === 'admin_kantin' ? 'pending' : 'active',
         ]);
 
-        
-        $message = ($role === 'admin_kantin') 
-            ? 'Pendaftaran Berhasil! Akun sedang menunggu persetujuan admin.' 
+
+        $message = ($role === 'admin_kantin')
+            ? 'Pendaftaran Berhasil! Akun sedang menunggu persetujuan admin.'
             : 'Akun Berhasil Dibuat! Silakan masuk untuk melanjutkan.';
 
         // PENTING: Cek kalau requestnya dari JS (AJAX), balikin JSON biar modal tau kalau sukses
@@ -90,10 +90,17 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials, $request->remember)) {
             $request->session()->regenerate();
-            
+
+            // 🔥 URUTKAN ROLE DI SINI
+            if ($user->role === 'admin_global') {
+                return redirect()->intended('/admin/global/dasbor');
+            }
+
             if ($user->role === 'admin_kantin') {
                 return redirect()->intended('/admin/pesanan');
             }
+
+            // default (pembeli)
             return redirect()->intended('/beranda');
         }
 

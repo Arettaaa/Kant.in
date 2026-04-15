@@ -69,67 +69,37 @@ public class ProfilPelangganActivity extends AppCompatActivity {
     }
 
     private void tampilkanDataProfil() {
-        // Ambil data segar dari SessionManager
         String name = sessionManager.getUserName();
         String email = sessionManager.getUserEmail();
         String phone = sessionManager.getUserPhone();
-
-        // Data foto dari session (isinya misal: rfiles/xyz.jpg atau masih kosong "")
         String photoPathFromSession = sessionManager.getPhotoUrl();
 
-        // Pasang Teks ke TextView
         tvNamaProfil.setText(name != null && !name.isEmpty() ? name : "Sobat Kantin");
         tvEmailProfil.setText(email != null && !email.isEmpty() ? email : "Email belum diatur");
         tvPhoneProfil.setText(phone != null && !phone.isEmpty() ? phone : "Belum ada nomor HP");
 
-        // Konversi 20dp ke pixel untuk padding ikon default
         int paddingPx = (int) (20 * getResources().getDisplayMetrics().density);
 
-        // === LOGIKA PENGGABUNGAN URL ===
-
-        // 1. GANTI IP INI dengan IP Laptop/Server API kamu ya!
-        // Jangan lupa diakhiri dengan "/storage/"
-        String BASE_URL_STORAGE = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/";
-        // 2. Gabungkan Base URL dengan path dari session
-        String fullPhotoUrl = BASE_URL_STORAGE + photoPathFromSession;
-
-        // Cek apakah photoPath FromSession kosong (User memang belum punya foto)
-        // Jika photoPath FromSession kosong, fullPhotoUrl isinya cuma BASE_URL_STORAGE doang
         if (photoPathFromSession != null && !photoPathFromSession.isEmpty()) {
-
-            // === JIKA USER PUNYA FOTO DI LARAVEL ===
-
-            // Hapus efek warna oranye supaya foto asli kelihatan natural
             ivFotoProfil.clearColorFilter();
-            // Hapus padding supaya fotonya bisa full satu lingkaran
             ivFotoProfil.setPadding(0, 0, 0, 0);
 
-            // Load foto pakai link lengkap (fullPhotoUrl) yang sudah digabung
+            // Cek dulu, kalau sudah http langsung pakai, kalau belum baru tambah base URL
+            String fullPhotoUrl = photoPathFromSession.startsWith("http")
+                    ? photoPathFromSession
+                    : "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/" + photoPathFromSession;
+
             Glide.with(this)
-                    .load(fullPhotoUrl) // <--- Panggil link gabungan
-                    .circleCrop()       // Biar fotonya jadi bulat
+                    .load(fullPhotoUrl)
+                    .circleCrop()
                     .placeholder(android.R.color.transparent)
                     .error(android.R.color.transparent)
-//                    .placeholder(R.drawable.user)
-//                    .error(R.drawable.user)
                     .into(ivFotoProfil);
-
         } else {
-            // === JIKA USER BELUM PUNYA FOTO (Pakai Icon Default) ===
-
-            // Hapus gambar Glide sebelumnya kalau ada
             Glide.with(this).clear(ivFotoProfil);
-
-            // Set icon user default
             ivFotoProfil.setImageResource(android.R.color.transparent);
-//            ivFotoProfil.setImageResource(R.drawable.user);
-//            // Kembalikan padding supaya iconnya gak kegedean (seperti 20dp di XML awal)
-//            ivFotoProfil.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
-//            // Kasih warna oranye secara manual via Java
-//            ivFotoProfil.setColorFilter(Color.parseColor("#F97316"));
         }
     }
-
     private void showLogoutConfirmation() {
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Konfirmasi Keluar")

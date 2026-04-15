@@ -1,7 +1,11 @@
 package com.example.kantin;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,6 +20,9 @@ import com.example.kantin.model.response.MenuListResponse;
 import com.example.kantin.network.ApiClient;
 import com.example.kantin.network.ApiService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -23,10 +30,15 @@ import retrofit2.Response;
 public class DetailKantinActivity extends AppCompatActivity {
 
     private ImageView btnBackWarung, imgCover;
-    private TextView tvNamaWarung, tvDeskripsiWarung, tvLokasiKantin, tvRatingWarung;
+    private TextView tvNamaWarung, tvDeskripsiWarung, tvLokasiKantin, tvRatingWarung, tvJamOperasional, tvMenuKosong;
     private RecyclerView rvMenu;
+    private EditText etSearchMenu;
     private MenuAdapter menuAdapter;
     private String canteenId;
+    private boolean isErrorShown = false;
+
+    // List untuk menyimpan data menu asli
+    private List<MenuListResponse.MenuItem> originalMenuList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +69,9 @@ public class DetailKantinActivity extends AppCompatActivity {
         tvDeskripsiWarung = findViewById(R.id.tvDeskripsiWarung);
         tvLokasiKantin = findViewById(R.id.tvLokasiKantin);
         tvRatingWarung = findViewById(R.id.tvRatingWarung);
+        tvJamOperasional = findViewById(R.id.tvJamOperasional);
+        etSearchMenu = findViewById(R.id.etSearchMenu);
+        tvMenuKosong = findViewById(R.id.tvMenuKosong);
 
         // Setup RecyclerView Menu
         rvMenu = findViewById(R.id.rvMenuDinamis);
@@ -66,6 +81,54 @@ public class DetailKantinActivity extends AppCompatActivity {
         // Nilai Default
         tvRatingWarung.setText("5.0");
         tvLokasiKantin.setText("Sekolah Vokasi IPB");
+
+        // Tambahkan TextWatcher untuk mendeteksi ketikan di kolom pencarian
+        etSearchMenu.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Panggil fungsi filter setiap kali teks berubah
+                filterMenu(s.toString());
+            }
+        });
+    }
+
+    // Fungsi untuk memfilter list berdasarkan teks pencarian
+    private void filterMenu(String text) {
+        List<MenuListResponse.MenuItem> filteredList = new ArrayList<>();
+
+        for (MenuListResponse.MenuItem item : originalMenuList) {
+            if (item.getName().toLowerCase().contains(text.toLowerCase())) {
+                filteredList.add(item);
+            }
+        }
+
+        // Cek apakah hasil pencarian kosong
+        if (filteredList.isEmpty()) {
+            // Jika kosong: sembunyikan RecyclerView, tampilkan pesan kosong
+            rvMenu.setVisibility(View.GONE);
+            tvMenuKosong.setVisibility(View.VISIBLE);
+        } else {
+            // Jika ada menu: tampilkan RecyclerView, sembunyikan pesan kosong
+            rvMenu.setVisibility(View.VISIBLE);
+            tvMenuKosong.setVisibility(View.GONE);
+        }
+
+        if (menuAdapter != null) {
+            menuAdapter.filterList(filteredList);
+        }
+    }
+
+    private void showErrorOnce(String message) {
+        if (!isErrorShown) {
+            isErrorShown = true;
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void fetchDetailKantin() {
@@ -76,25 +139,32 @@ public class DetailKantinActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     CanteenDetailResponse.CanteenDetail data = response.body().getData();
 
-                    // 1. Set Teks Detail
+                    // 1. Set Nama dan Deskripsi
                     tvNamaWarung.setText(data.getName());
                     tvDeskripsiWarung.setText(data.getDescription());
 
-                    // 2. Logika URL Gambar (Sama seperti di KantinAdapter)
-                    String imageUrl = data.getImage();
+                    // 2. Set Lokasi secara dinamis
+                    tvLokasiKantin.setText(data.getLocation());
 
-                    // Jika URL tidak diawali http, tambahkan path storage backend kamu
+                    if (data.getOperatingHours() != null) {
+                        String jam = data.getOperatingHours().getOpen() + " - " + data.getOperatingHours().getClose();
+                        tvJamOperasional.setText(jam);
+                    } else {
+                        tvJamOperasional.setText("Jam tidak tersedia");
+                    }
+
+                    // 3. Logika URL Gambar
+                    String imageUrl = data.getImage();
                     if (imageUrl != null && !imageUrl.startsWith("http")) {
-                        // Sesuaikan URL ini dengan domain ngrok/server kamu
                         imageUrl = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/" + imageUrl;
                     }
 
-                    // 3. Muat Gambar ke imgCover menggunakan Glide
+                    // 4. Muat Gambar ke imgCover
                     Glide.with(DetailKantinActivity.this)
                             .load(imageUrl)
-                            .placeholder(R.drawable.makanan) // Gambar sementara saat loading
-                            .error(R.drawable.makanan)       // Gambar jika URL salah/error
-                            .centerCrop()                    // Agar gambar memenuhi header dengan rapi
+                            .placeholder(R.drawable.makanan)
+                            .error(R.drawable.makanan)
+                            .centerCrop()
                             .into(imgCover);
                 }
             }
@@ -105,13 +175,17 @@ public class DetailKantinActivity extends AppCompatActivity {
             }
         });
     }
+
     private void fetchMenuKantin() {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         apiService.getCanteenMenus(canteenId).enqueue(new Callback<MenuListResponse>() {
             @Override
             public void onResponse(Call<MenuListResponse> call, Response<MenuListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    menuAdapter = new MenuAdapter(DetailKantinActivity.this, response.body().getData());
+                    // Simpan data ke originalMenuList agar bisa difilter nanti
+                    originalMenuList = response.body().getData();
+
+                    menuAdapter = new MenuAdapter(DetailKantinActivity.this, originalMenuList);
                     rvMenu.setAdapter(menuAdapter);
                 }
             }
@@ -119,7 +193,7 @@ public class DetailKantinActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<MenuListResponse> call, Throwable t) {
                 Log.e("API_ERROR", "Menu Kantin: " + t.getMessage());
-                Toast.makeText(DetailKantinActivity.this, "Gagal memuat menu", Toast.LENGTH_SHORT).show();
+                showErrorOnce("Gagal memuat menu");
             }
         });
     }
