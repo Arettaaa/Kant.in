@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BerandaController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\ProfilController;
 use App\Http\Controllers\KeamananController;
 use App\Http\Controllers\DashboardController;
@@ -13,22 +13,24 @@ use App\Http\Controllers\NotificationController;
 |--------------------------------------------------------------------------
 | Auth Pelanggan (shared login & register dari admin.blade, re-route)
 |--------------------------------------------------------------------------
-*/
-// Halaman Login & Register
-Route::get('/login', fn() => view('auth.login'))->name('pelanggan.login');
-Route::get('/register', fn() => view('auth.register'))->name('pelanggan.register');
+*//*
 
-// Proses Login & Register ke Controller
-Route::post('/login', [AuthController::class, 'processLogin'])->name('login.post');
-Route::post('/register', [AuthController::class, 'processRegister'])->name('register.post');
 
-// Logout
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+// 1. RUTE GET: Untuk menampilkan desain halaman (View Blade)
+Route::get('/login', fn() => view('auth.login'))->name('login'); // Pastikan namanya 'login'
+Route::get('/register', fn() => view('auth.register'))->name('register');
+
+// 2. RUTE POST: Untuk memproses data yang dikirim dari form (API Controller)
+Route::post('/register', [AuthController::class, 'register'])->middleware('web');
+Route::post('/login', [AuthController::class, 'login'])->middleware('web');
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum', 'web');
+
 
 // Lupa kata sandi (Tetap di folder auth)
 Route::get('/lupa-sandi',            fn() => view('auth.lupa-sandi'));
 Route::get('/lupa-sandi/verifikasi', fn() => view('auth.verifikasi-otp'));
 Route::get('/lupa-sandi/reset',      fn() => view('auth.reset-sandi'));
+
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +40,8 @@ Route::get('/lupa-sandi/reset',      fn() => view('auth.reset-sandi'));
 Route::get('/admin/register', fn() => view('admin.register'))->name('admin.register');
 Route::get('/admin/login',    fn() => view('admin.login'))->name('admin.login');
 
+Route::get('/login', fn() => view('auth.login'))->name('login');
+Route::get('/register', fn() => view('auth.register'))->name('register');
 
 /*
 |--------------------------------------------------------------------------
@@ -163,3 +167,4 @@ Route::get('/kantin/{slug}', function ($slug) {
 |--------------------------------------------------------------------------
 */
 Route::redirect('/', '/beranda');
+

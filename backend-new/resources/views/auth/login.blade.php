@@ -63,7 +63,7 @@
             @endif
 
             {{-- PENTING: Gunakan tag <form> dan @csrf --}}
-                <form id="loginForm" action="{{ route('login.post') }}" method="POST" class="space-y-4 mt-4">
+                <form id="loginForm" class="space-y-4 mt-4">
                     @csrf
 
                     {{-- Alamat Email --}}
@@ -135,19 +135,65 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const form = document.getElementById('loginForm');
-        const btn = document.getElementById('btnLogin');
+    const form = document.getElementById('loginForm');
+    const btn = document.getElementById('btnLogin');
+    const errorAlert = document.getElementById('errorAlert');
+    const errorMessage = document.getElementById('errorMessage');
 
-        form.onsubmit = function() {
-            // Tampilkan animasi loading di tombol
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
-            btn.style.opacity = '0.8';
-            btn.style.pointerEvents = 'none';
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault(); // Mencegah form reload bawaan HTML
+
+        // Tampilkan animasi loading
+        const originalBtnText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+        btn.style.opacity = '0.8';
+        btn.style.pointerEvents = 'none';
+        errorAlert.classList.add('hidden'); // Sembunyikan error sebelumnya jika ada
+
+        // Ambil data dari form
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        try {
+            // Tembak endpoint API kamu
+            const response = await fetch('/api/auth/sessions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    // Kirim CSRF token untuk keamanan bawaan Laravel
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value 
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                // Jika gagal login (password salah, belum diapprove, dll)
+                throw new Error(result.message || 'Terjadi kesalahan saat login.');
+            }
+
+            // JIKA BERHASIL: Simpan token ke localStorage
+            localStorage.setItem('auth_token', result.token);
+            localStorage.setItem('user_data', JSON.stringify(result.user));
+
+            // Redirect ke halaman beranda
+            window.location.href = '/beranda';
+
+        } catch (error) {
+            // Tampilkan pesan error dari API
+            errorMessage.textContent = error.message;
+            errorAlert.classList.remove('hidden');
             
-            // Form akan terkirim secara otomatis ke Controller setelah ini
-            return true; 
-        };
+            // Kembalikan tombol ke semula
+            btn.innerHTML = originalBtnText;
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+        }
     });
+});
+
 
     function togglePassword(inputId, eyeId) {
         const input = document.getElementById(inputId);

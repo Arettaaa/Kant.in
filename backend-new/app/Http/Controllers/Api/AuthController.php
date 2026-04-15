@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Models\Canteen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth; // PENTING: Tambahkan ini untuk Web Session
 
 class AuthController extends Controller
 {
@@ -23,14 +23,12 @@ class AuthController extends Controller
             'role' => 'nullable|in:admin_kantin,pembeli',
         ];
 
-        // Tambah validasi canteen_name jika admin_kantin
         if ($role === 'admin_kantin') {
             $rules['canteen_name'] = 'required|string';
         }
 
         $request->validate($rules);
 
-        // Kalau admin_kantin, buat canteen dulu dengan status pending
         $canteenId = null;
         if ($role === 'admin_kantin') {
             $canteen = Canteen::create([
@@ -53,26 +51,31 @@ class AuthController extends Controller
             'status' => $role === 'admin_kantin' ? 'pending' : 'active',
         ]);
 
-        // Admin kantin belum dapat token, harus tunggu approve
         if ($role === 'admin_kantin') {
             return response()->json([
                 'message' => 'Registrasi berhasil! Menunggu persetujuan admin.',
                 'user' => $user,
+                'redirect' => '/login' // Beritahu web untuk ke halaman login
             ], 201);
         }
 
+        // 1. MOBILE: Generate Token
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        // 2. WEB: Langsung login-kan user pakai Session setelah register
+        Auth::login($user);
 
         return response()->json([
             'message' => 'Registrasi berhasil',
             'token' => $token,
             'user' => $this->formatUser($user),
+            'redirect' => '/beranda' // Beritahu web untuk langsung masuk
         ], 201);
     }
 
     public function login(Request $request)
     {
-        $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
@@ -80,38 +83,56 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Email atau password salah.'],
-            ]);
+            return response()->json(['message' => 'Email atau password salah.'], 401);
         }
 
         if ($user->status === 'pending') {
-            return response()->json([
-                'message' => 'Akun kamu belum disetujui oleh admin. Mohon tunggu.',
-            ], 403);
+            return response()->json(['message' => 'Akun kamu belum disetujui oleh admin. Mohon tunggu.'], 403);
         }
 
         if ($user->status === 'rejected') {
-            return response()->json([
-                'message' => 'Akun kamu telah ditolak oleh admin. Silakan hubungi admin untuk informasi lebih lanjut.',
-            ], 403);
+            return response()->json(['message' => 'Akun kamu telah ditolak oleh admin. Silakan hubungi admin untuk informasi lebih lanjut.'], 403);
         }
 
+        // 1. UNTUK MOBILE: Generate API Token
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        // 2. UNTUK WEB: Daftarkan Web Session
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+        }
+
+        // 3. Tentukan rute redirect untuk Web berdasarkan role
+        $redirectUrl = '/beranda';
+        if ($user->role === 'admin_global') {
+            $redirectUrl = '/admin/global/dasbor';
+        } elseif ($user->role === 'admin_kantin') {
+            $redirectUrl = '/admin/pesanan';
+        }
 
         return response()->json([
             'message' => 'Login berhasil',
-            'token' => $token,
+            'token' => $token, // Mobile akan ambil ini
             'user' => $this->formatUser($user),
+            'redirect' => $redirectUrl // Web akan ambil ini
         ]);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        // 1. UNTUK MOBILE: Hapus Token API (jika ada request user)
+        if ($request->user()) {
+            $request->user()->currentAccessToken()->delete();
+        }
+
+        // 2. UNTUK WEB: Hapus Session dan Cookie
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return response()->json([
             'message' => 'Logout berhasil',
+            'redirect' => '/login' // Beritahu Javascript web untuk balik ke login
         ]);
     }
 

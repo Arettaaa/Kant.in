@@ -196,4 +196,21 @@ class MenuController extends Controller
             'data' => $menus
         ]);
     }
+
+    public function show($id)
+{
+    $menu = Menu::find($id);
+    
+    if (!$menu) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Menu tidak ditemukan.'
+        ], 404);
+    }
+
+    return response()->json([
+        'success' => true,
+        'data'    => $this->formatMenu($menu)
+    ]);
+}
 }

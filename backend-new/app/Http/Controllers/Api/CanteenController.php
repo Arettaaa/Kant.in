@@ -14,7 +14,9 @@ class CanteenController extends Controller
     // PUBLIC: GET /canteens
     public function index()
     {
-        $canteens = Canteen::where('is_active', true)->get()
+        $canteens = Canteen::where('is_active', true)
+            ->where('status', 'active') // tambahkan ini
+            ->get()
             ->map(fn($canteen) => $this->formatCanteen($canteen));
 
         return response()->json([
