@@ -215,7 +215,7 @@
                         app:cardCornerRadius="16dp"
                         app:cardElevation="2dp">
                         <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                            <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/makanan" app:tint="#FFFFFF"/>
+                            <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/utensils" app:tint="#FFFFFF"/>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Semua" android:textColor="#FFFFFF" android:textSize="12sp" android:textStyle="bold"/>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
@@ -263,7 +263,7 @@
                         app:cardCornerRadius="16dp"
                         app:cardElevation="2dp">
                         <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
-                            <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/cemilan" app:tint="#F97316"/>
+                            <ImageView android:layout_width="40dp" android:layout_height="40dp" android:src="@drawable/camilan" app:tint="#F97316"/>
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Cemilan" android:textColor="#4B5563" android:textSize="12sp" android:textStyle="bold"/>
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
