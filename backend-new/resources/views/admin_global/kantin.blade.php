@@ -41,6 +41,58 @@
         background-color: rgba(0, 0, 0, 0.4);
         backdrop-filter: blur(4px);
     }
+
+    /* Style untuk Bell Dropdown */
+    .notif-dropdown {
+        position: absolute;
+        top: calc(100% + 12px);
+        right: 0;
+        width: 360px;
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.06);
+        border: 1px solid #f3f4f6;
+        z-index: 100;
+        overflow: hidden;
+        animation: dropIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes dropIn {
+        from {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.97);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .notif-dropdown-item {
+        padding: 14px 16px;
+        cursor: pointer;
+        transition: background 0.15s;
+        border-bottom: 1px solid #f9fafb;
+    }
+
+    .notif-dropdown-item:hover {
+        background-color: #FFFAF7;
+    }
+
+    .notif-dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .notif-icon-wrap {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
 </style>
 @endpush
 
@@ -102,6 +154,15 @@
                 <span
                     class="w-5 h-5 bg-[#FF6900] text-white text-[10px] flex items-center justify-center rounded-full shadow-sm font-black">2</span>
             </a>
+
+            <div class="mt-8 mb-4 px-4 text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Sistem</div>
+            <a href="/admin/global/pengaturan" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Pengaturan
+            </a>
         </nav>
 
         <a href="/admin/login"
@@ -125,12 +186,74 @@
             </div>
 
             <div class="flex items-center gap-6">
-                <button
-                    class="relative w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-[#FF6900] border border-gray-100 transition-all">
-                    <i class="fa-solid fa-bell text-lg"></i>
-                    <span
-                        class="absolute top-2.5 right-3 w-3 h-3 bg-[#FF6900] border-2 border-white rounded-full"></span>
-                </button>
+                {{-- Bell dengan dropdown --}}
+                <div class="relative" id="bellWrapper">
+                    <button onclick="toggleDropdown()"
+                        class="relative w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-[#FF6900] border border-gray-100 transition-all">
+                        <i class="fa-solid fa-bell text-lg"></i>
+                        <span id="bellBadge" class="absolute top-2.5 right-3 w-3 h-3 border-2 border-white rounded-full" style="background-color:#FF6900;"></span>
+                    </button>
+
+                    {{-- Dropdown --}}
+                    <div id="notifDropdown" class="notif-dropdown hidden" style="right:-20px;">
+                        {{-- Header dropdown --}}
+                        <div class="flex items-center justify-between px-5 py-4 border-b border-gray-50">
+                            <span class="text-sm font-extrabold text-gray-900">Notifikasi Terbaru</span>
+                            <span class="text-xs font-black px-2.5 py-1 rounded-xl" style="background-color:#FFF3E8; color:#FF6900;">2 Baru</span>
+                        </div>
+
+                        {{-- Item 1 --}}
+                        <div class="notif-dropdown-item flex items-start gap-3">
+                            <div class="notif-icon-wrap flex-shrink-0" style="background-color:#FFF3E8; width:40px; height:40px; border-radius:12px;">
+                                <i class="fa-solid fa-store text-sm" style="color:#FF6900;"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start justify-between gap-2">
+                                    <p class="text-sm font-extrabold text-gray-900 leading-tight">Pendaftaran Kantin Baru: Warung</p>
+                                    <div class="w-2 h-2 rounded-full flex-shrink-0 mt-1" style="background-color:#FF6900;"></div>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Permohonan pendaftaran kantin baru telah diajukan dan menunggu verifikasi.</p>
+                                <p class="text-[11px] text-gray-300 font-semibold mt-1">10 mnt lalu</p>
+                            </div>
+                        </div>
+
+                        {{-- Item 2 --}}
+                        <div class="notif-dropdown-item flex items-start gap-3">
+                            <div class="notif-icon-wrap flex-shrink-0" style="background-color:#FFF3E8; width:40px; height:40px; border-radius:12px;">
+                                <i class="fa-solid fa-wave-square text-sm" style="color:#FF6900;"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start justify-between gap-2">
+                                    <p class="text-sm font-extrabold text-gray-900 leading-tight">Pembaruan Sistem Selesai</p>
+                                    <div class="w-2 h-2 rounded-full flex-shrink-0 mt-1" style="background-color:#FF6900;"></div>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Sinkronisasi gerbang pembayaran QRIS berhasil diselesaikan tanpa</p>
+                                <p class="text-[11px] text-gray-300 font-semibold mt-1">1 jam lalu</p>
+                            </div>
+                        </div>
+
+                        {{-- Item 3 --}}
+                        <div class="notif-dropdown-item flex items-start gap-3">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+                                <i class="fa-solid fa-shield-halved text-sm text-gray-400"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-extrabold text-gray-700 leading-tight">Akses Admin Baru Diberikan</p>
+                                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Akses admin diberikan kepada budi.admin@kant.in.</p>
+                                <p class="text-[11px] text-gray-300 font-semibold mt-1">3 jam lalu</p>
+                            </div>
+                        </div>
+
+                        {{-- Footer --}}
+                        <div class="px-5 py-3 border-t border-gray-50 text-center">
+                            <a href="/admin/global/notifikasi"
+                                class="text-sm font-extrabold transition-all hover:underline" style="color:#FF6900;">
+                                Lihat Selengkapnya
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="h-10 w-[1px] bg-gray-100"></div>
                 <div class="flex items-center gap-4 group text-start">
                     <div class="text-right text-start">
@@ -419,137 +542,155 @@
 
             @push('scripts')
             <script>
-                document.addEventListener('DOMContentLoaded', function () {
+                document.addEventListener('DOMContentLoaded', function() {
 
-    // ======================
-    // REALTIME DATE
-    // ======================
-    const dateElement = document.getElementById('realtimeDate');
-    if (dateElement) {
-        const now = new Date();
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        dateElement.innerText = now.toLocaleDateString('id-ID', options);
-    }
+                    // ======================
+                    // REALTIME DATE
+                    // ======================
+                    const dateElement = document.getElementById('realtimeDate');
+                    if (dateElement) {
+                        const now = new Date();
+                        const options = {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        };
+                        dateElement.innerText = now.toLocaleDateString('id-ID', options);
+                    }
 
-    // ======================
-    // SEARCH + FILTER
-    // ======================
-    const searchInput = document.getElementById('searchInput');
+                    // ======================
+                    // SEARCH + FILTER
+                    // ======================
+                    const searchInput = document.getElementById('searchInput');
 
-    if (searchInput) {
-        searchInput.addEventListener('input', applyFilter);
-    }
+                    if (searchInput) {
+                        searchInput.addEventListener('input', applyFilter);
+                    }
 
-});
+                });
 
-// ======================
-// MODAL
-// ======================
-function openModal(id) {
-    document.getElementById(id)?.classList.remove('hidden');
-}
+                // ======================
+                // MODAL
+                // ======================
+                function openModal(id) {
+                    document.getElementById(id)?.classList.remove('hidden');
+                }
 
-function closeModal(id) {
-    document.getElementById(id)?.classList.add('hidden');
-}
+                function closeModal(id) {
+                    document.getElementById(id)?.classList.add('hidden');
+                }
 
-// ======================
-// DELETE
-// ======================
-function confirmDelete(id, name) {
-    const form = document.getElementById('formDelete');
-    if (form) {
-        form.action = `/admin/global/kantin-mitra/${id}`;
-    }
+                // ======================
+                // DELETE
+                // ======================
+                function confirmDelete(id, name) {
+                    const form = document.getElementById('formDelete');
+                    if (form) {
+                        form.action = `/admin/global/kantin-mitra/${id}`;
+                    }
 
-    const nameText = document.getElementById('del_name');
-    if (nameText) {
-        nameText.innerText = name;
-    }
+                    const nameText = document.getElementById('del_name');
+                    if (nameText) {
+                        nameText.innerText = name;
+                    }
 
-    openModal('modalHapus');
-}
+                    openModal('modalHapus');
+                }
 
-// ======================
-// EDIT MODAL
-// ======================
-function openEditModal(kantin) {
-    const form = document.getElementById('formEdit'); 
+                // ======================
+                // EDIT MODAL
+                // ======================
+                function openEditModal(kantin) {
+                    const form = document.getElementById('formEdit');
 
-    let kantinId = kantin._id;
+                    let kantinId = kantin._id;
 
-    if (typeof kantinId === 'object' && kantinId !== null) {
-        kantinId = kantinId.$oid;
-    } else if (!kantinId) {
-        kantinId = kantin.id;
-    }
+                    if (typeof kantinId === 'object' && kantinId !== null) {
+                        kantinId = kantinId.$oid;
+                    } else if (!kantinId) {
+                        kantinId = kantin.id;
+                    }
 
-    if (form) {
-        form.action = `/admin/global/kantin-mitra/${kantinId}`;
-    }
+                    if (form) {
+                        form.action = `/admin/global/kantin-mitra/${kantinId}`;
+                    }
 
-    document.getElementById('edit_name').value = kantin.name || '';
-    document.getElementById('edit_location').value = kantin.location || '';
+                    document.getElementById('edit_name').value = kantin.name || '';
+                    document.getElementById('edit_location').value = kantin.location || '';
 
-    // Preview Image (FIXED)
-    const preview = document.getElementById('edit_preview');
-    const previewContainer = preview?.parentElement;
+                    // Preview Image (FIXED)
+                    const preview = document.getElementById('edit_preview');
+                    const previewContainer = preview?.parentElement;
 
-    if (kantin.image) {
-        preview.src = kantin.image; // 🔥 sudah full URL dari controller
-        previewContainer.style.display = 'block';
-    } else {
-        preview.src = '';
-        previewContainer.style.display = 'none';
-    }
+                    if (kantin.image) {
+                        preview.src = kantin.image; // 🔥 sudah full URL dari controller
+                        previewContainer.style.display = 'block';
+                    } else {
+                        preview.src = '';
+                        previewContainer.style.display = 'none';
+                    }
 
-    openModal('modalEdit');
-}
+                    openModal('modalEdit');
+                }
 
-// ======================
-// FILTER
-// ======================
-let currentFilterStatus = 'semua';
+                // ======================
+                // FILTER
+                // ======================
+                let currentFilterStatus = 'semua';
 
-function setFilter(status, element) {
-    currentFilterStatus = status;
+                function setFilter(status, element) {
+                    currentFilterStatus = status;
 
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.className = "filter-btn px-7 py-3 rounded-2xl border border-gray-100 text-gray-400 font-bold text-[12px]";
-    });
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.className = "filter-btn px-7 py-3 rounded-2xl border border-gray-100 text-gray-400 font-bold text-[12px]";
+                    });
 
-    element.className = "filter-btn px-7 py-3 rounded-2xl border border-orange-200 bg-[#FFF3E8] text-[#FF6900] font-black text-[12px] shadow-sm";
-}
+                    element.className = "filter-btn px-7 py-3 rounded-2xl border border-orange-200 bg-[#FFF3E8] text-[#FF6900] font-black text-[12px] shadow-sm";
+                }
 
-function applyFilter() {
-    let searchVal = document.getElementById('searchInput')?.value.toLowerCase() || '';
+                function applyFilter() {
+                    let searchVal = document.getElementById('searchInput')?.value.toLowerCase() || '';
 
-    document.querySelectorAll('.kantin-card').forEach(card => {
-        let n = card.querySelector('.name-target')?.innerText.toLowerCase() || '';
-        let o = card.querySelector('.owner-target')?.innerText.toLowerCase() || '';
-        let cardStatus = card.getAttribute('data-status');
+                    document.querySelectorAll('.kantin-card').forEach(card => {
+                        let n = card.querySelector('.name-target')?.innerText.toLowerCase() || '';
+                        let o = card.querySelector('.owner-target')?.innerText.toLowerCase() || '';
+                        let cardStatus = card.getAttribute('data-status');
 
-        let matchSearch = n.includes(searchVal) || o.includes(searchVal);
-        let matchFilter = (currentFilterStatus === 'semua') || (cardStatus === currentFilterStatus);
+                        let matchSearch = n.includes(searchVal) || o.includes(searchVal);
+                        let matchFilter = (currentFilterStatus === 'semua') || (cardStatus === currentFilterStatus);
 
-        card.style.display = (matchSearch && matchFilter) ? "flex" : "none";
-    });
+                        card.style.display = (matchSearch && matchFilter) ? "flex" : "none";
+                    });
 
-    closeModal('modalFilter');
-}
+                    closeModal('modalFilter');
+                }
 
-function resetFilter() {
-    document.getElementById('btnFilterSemua')?.click();
-    applyFilter();
-}
+                function resetFilter() {
+                    document.getElementById('btnFilterSemua')?.click();
+                    applyFilter();
+                }
 
-// ======================
-// ALERT
-// ======================
-@if(session('success'))
-    alert("{{ session('success') }}");
-@endif
+                // ======================
+                // ALERT
+                // ======================
+                @if(session('success'))
+                alert("{{ session('success') }}");
+                @endif
 
+                //dropdown bell
+                function toggleDropdown() {
+                    const dd = document.getElementById('notifDropdown');
+                    dd.classList.toggle('hidden');
+                }
+
+                window.addEventListener('click', function(e) {
+                    const wrapper = document.getElementById('bellWrapper');
+                    const dropdown = document.getElementById('notifDropdown');
+                    if (wrapper && !wrapper.contains(e.target)) {
+                        if (dropdown) dropdown.classList.add('hidden');
+                    }
+                });
             </script>
             @endpush
             @endsection
