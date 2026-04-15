@@ -23,10 +23,11 @@ import retrofit2.Response;
 public class DetailKantinActivity extends AppCompatActivity {
 
     private ImageView btnBackWarung, imgCover;
-    private TextView tvNamaWarung, tvDeskripsiWarung, tvLokasiKantin, tvRatingWarung;
+    private TextView tvNamaWarung, tvDeskripsiWarung, tvLokasiKantin, tvRatingWarung, tvJamOperasional;
     private RecyclerView rvMenu;
     private MenuAdapter menuAdapter;
     private String canteenId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +58,7 @@ public class DetailKantinActivity extends AppCompatActivity {
         tvDeskripsiWarung = findViewById(R.id.tvDeskripsiWarung);
         tvLokasiKantin = findViewById(R.id.tvLokasiKantin);
         tvRatingWarung = findViewById(R.id.tvRatingWarung);
+        tvJamOperasional = findViewById(R.id.tvJamOperasional); // Inisialisasi ID baru
 
         // Setup RecyclerView Menu
         rvMenu = findViewById(R.id.rvMenuDinamis);
@@ -76,25 +78,35 @@ public class DetailKantinActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     CanteenDetailResponse.CanteenDetail data = response.body().getData();
 
-                    // 1. Set Teks Detail
+                    // 1. Set Nama dan Deskripsi
                     tvNamaWarung.setText(data.getName());
                     tvDeskripsiWarung.setText(data.getDescription());
 
-                    // 2. Logika URL Gambar (Sama seperti di KantinAdapter)
-                    String imageUrl = data.getImage();
+                    // 2. Set Lokasi secara dinamis (Menggantikan "Sekolah Vokasi IPB")
+                    tvLokasiKantin.setText(data.getLocation());
 
-                    // Jika URL tidak diawali http, tambahkan path storage backend kamu
+                    if (data.getOperatingHours() != null) {
+                        String jam = data.getOperatingHours().getOpen() + " - " + data.getOperatingHours().getClose();
+                        tvJamOperasional.setText(jam);
+                    } else {
+                        tvJamOperasional.setText("Jam tidak tersedia");
+                    }
+
+                    // --- BAGIAN JAM OPERASIONAL DIHAPUS / TIDAK DIPAKAI ---
+                    // tvEstimasiWaktu.setText(...) dihapus sesuai request kamu
+
+                    // 3. Logika URL Gambar
+                    String imageUrl = data.getImage();
                     if (imageUrl != null && !imageUrl.startsWith("http")) {
-                        // Sesuaikan URL ini dengan domain ngrok/server kamu
                         imageUrl = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/" + imageUrl;
                     }
 
-                    // 3. Muat Gambar ke imgCover menggunakan Glide
+                    // 4. Muat Gambar ke imgCover
                     Glide.with(DetailKantinActivity.this)
                             .load(imageUrl)
-                            .placeholder(R.drawable.makanan) // Gambar sementara saat loading
-                            .error(R.drawable.makanan)       // Gambar jika URL salah/error
-                            .centerCrop()                    // Agar gambar memenuhi header dengan rapi
+                            .placeholder(R.drawable.makanan)
+                            .error(R.drawable.makanan)
+                            .centerCrop()
                             .into(imgCover);
                 }
             }
