@@ -46,7 +46,7 @@
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_close" android:tint="#757575"
+        android:src="@drawable/ic_close"
         app:layout_constraintBottom_toBottomOf="@+id/tvSubtitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/tvTitle" />
@@ -82,7 +82,8 @@
             app:cardCornerRadius="12dp"
             app:cardElevation="0dp"
             app:strokeColor="#FF6D00"
-            app:strokeWidth="2dp">
+            app:strokeWidth="2dp"
+            app:cardBackgroundColor="#FFF7ED">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -117,7 +118,8 @@
             app:cardCornerRadius="12dp"
             app:cardElevation="0dp"
             app:strokeColor="#E0E0E0"
-            app:strokeWidth="1dp">
+            app:strokeWidth="1dp"
+            app:cardBackgroundColor="#FFFFFF">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -175,7 +177,8 @@
                 android:layout_marginBottom="4dp"
                 android:text="Tanggal Mulai"
                 android:textColor="#757575"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                android:textStyle="bold"/>
 
             <EditText
                 android:id="@+id/etTanggalMulai"
@@ -201,7 +204,8 @@
                 android:layout_marginBottom="4dp"
                 android:text="Tanggal Selesai"
                 android:textColor="#757575"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                android:textStyle="bold"/>
 
             <EditText
                 android:id="@+id/etTanggalSelesai"
