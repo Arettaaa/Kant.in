@@ -40,6 +40,9 @@
     /* Action buttons */
     .action-btn-primary {
         transition: all 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
     .action-btn-primary:hover {
         filter: brightness(1.08);
@@ -83,7 +86,7 @@
 @endpush
 
 @section('content')
-<div class="flex w-full h-screen bg-[#F9FAFB] overflow-hidden">
+<div class="flex w-full h-screen bg-[#F9FAFB] overflow-hidden text-start font-sans">
 
     {{-- ======================== SIDEBAR ======================== --}}
     <aside class="w-[260px] h-screen bg-white flex flex-col py-8 px-6 shadow-sm flex-shrink-0 z-20 border-r border-gray-100">
@@ -127,10 +130,13 @@
             </a>
         </nav>
 
-        <a href="/admin/login" class="flex items-center gap-3 px-4 py-4 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border-t border-gray-50 mt-auto">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-            Keluar
-        </a>
+        <form action="{{ route('logout') }}" method="POST" class="mt-auto">
+            @csrf
+            <button type="submit" class="w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border-t border-gray-50 text-start">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                Keluar
+            </button>
+        </form>
     </aside>
 
     {{-- ======================== MAIN ======================== --}}
@@ -146,66 +152,34 @@
                 {{-- Bell dengan dropdown --}}
                 <div class="relative" id="bellWrapper">
                     <button onclick="toggleDropdown()"
-                            class="relative w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-[#FF6900] border border-gray-100 transition-all">
+                            class="relative w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-[#FF6900] border border-gray-100 transition-all focus:outline-none">
                         <i class="fa-solid fa-bell text-lg"></i>
                         <span id="bellBadge" class="absolute top-2.5 right-3 w-3 h-3 border-2 border-white rounded-full" style="background-color:#FF6900;"></span>
                     </button>
 
                     {{-- Dropdown --}}
                     <div id="notifDropdown" class="notif-dropdown hidden" style="right:-20px;">
-                        {{-- Header dropdown --}}
                         <div class="flex items-center justify-between px-5 py-4 border-b border-gray-50">
                             <span class="text-sm font-extrabold text-gray-900">Notifikasi Terbaru</span>
                             <span class="text-xs font-black px-2.5 py-1 rounded-xl" style="background-color:#FFF3E8; color:#FF6900;">2 Baru</span>
                         </div>
 
-                        {{-- Item 1 - unread --}}
                         <div class="notif-dropdown-item flex items-start gap-3">
                             <div class="notif-icon-wrap flex-shrink-0" style="background-color:#FFF3E8; width:40px; height:40px; border-radius:12px;">
                                 <i class="fa-solid fa-store text-sm" style="color:#FF6900;"></i>
                             </div>
-                            <div class="flex-1 min-w-0">
+                            <div class="flex-1 min-w-0 text-start">
                                 <div class="flex items-start justify-between gap-2">
                                     <p class="text-sm font-extrabold text-gray-900 leading-tight">Pendaftaran Kantin Baru: Warung</p>
                                     <div class="w-2 h-2 rounded-full flex-shrink-0 mt-1" style="background-color:#FF6900;"></div>
                                 </div>
-                                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Permohonan pendaftaran kantin baru telah diajukan dan menunggu verifikasi.</p>
+                                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Permohonan pendaftaran kantin baru telah diajukan.</p>
                                 <p class="text-[11px] text-gray-300 font-semibold mt-1">10 mnt lalu</p>
                             </div>
                         </div>
 
-                        {{-- Item 2 - unread --}}
-                        <div class="notif-dropdown-item flex items-start gap-3">
-                            <div class="notif-icon-wrap flex-shrink-0" style="background-color:#FFF3E8; width:40px; height:40px; border-radius:12px;">
-                                <i class="fa-solid fa-wave-square text-sm" style="color:#FF6900;"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-start justify-between gap-2">
-                                    <p class="text-sm font-extrabold text-gray-900 leading-tight">Pembaruan Sistem Selesai</p>
-                                    <div class="w-2 h-2 rounded-full flex-shrink-0 mt-1" style="background-color:#FF6900;"></div>
-                                </div>
-                                <p class="text-xs text-gray-400 mt-1 leading-relaxed">Sinkronisasi gerbang pembayaran QRIS berhasil diselesaikan tanpa</p>
-                                <p class="text-[11px] text-gray-300 font-semibold mt-1">1 jam lalu</p>
-                            </div>
-                        </div>
-
-                        {{-- Item 3 - read --}}
-                        <div class="notif-dropdown-item flex items-start gap-3">
-                            <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
-                                <i class="fa-solid fa-shield-halved text-sm text-gray-400"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-extrabold text-gray-700 leading-tight">Akses Admin Baru Diberikan</p>
-                                <p class="text-xs text-gray-400 mt-1">Akses admin diberikan kepada budi.admin@kant.in.</p>
-                            </div>
-                        </div>
-
-                        {{-- Footer --}}
                         <div class="px-5 py-3 border-t border-gray-50 text-center">
-                            <a href="/admin/global/notifikasi"
-                               class="text-sm font-extrabold transition-all hover:underline" style="color:#FF6900;">
-                                Lihat Selengkapnya
-                            </a>
+                            <a href="/admin/global/notifikasi" class="text-sm font-extrabold transition-all hover:underline" style="color:#FF6900;">Lihat Selengkapnya</a>
                         </div>
                     </div>
                 </div>
@@ -223,18 +197,16 @@
         </header>
 
         {{-- Content --}}
-        <div class="p-10 space-y-4 max-w-4xl w-full">
+        <div class="p-10 space-y-4 max-w-4xl w-full text-start">
 
-            {{-- Title + Tandai Semua --}}
             <div class="flex items-center justify-between mb-6">
                 <h1 class="text-2xl font-black text-gray-900">Notifikasi</h1>
-                <button onclick="tandaiSemuaDibaca()"
-                        class="text-sm font-extrabold hover:underline transition-all" style="color:#FF6900;">
+                <button onclick="tandaiSemuaDibaca()" class="text-sm font-extrabold hover:underline transition-all" style="color:#FF6900;">
                     Tandai Semua Dibaca
                 </button>
             </div>
 
-            {{-- Notif 1 — Unread, ada action --}}
+            {{-- Notif 1 — REVISI: HREF DITAMBAHKAN --}}
             <div id="notif-1" class="notif-card unread rounded-3xl border p-5 flex items-start gap-4">
                 <div class="notif-icon-wrap" style="background-color:#FFF3E8;">
                     <i class="fa-solid fa-store text-lg" style="color:#FF6900;"></i>
@@ -249,13 +221,13 @@
                     </div>
                     <p class="text-sm text-gray-500 font-medium mt-1 leading-relaxed">Permohonan pendaftaran kantin baru telah diajukan dan menunggu verifikasi.</p>
                     <div class="flex items-center gap-2 mt-3">
-                        <button onclick="markRead(1)"
-                                class="action-btn-primary px-4 py-2 rounded-2xl text-white text-xs font-extrabold shadow-sm"
-                                style="background-color:#FF6900;">
+                        {{-- HREF MENGARAH KE HALAMAN REVIEW --}}
+                        <a href="{{ route('admin.global.rev-pendaftaran') }}"
+                           class="action-btn-primary px-5 py-2.5 rounded-2xl text-white text-xs font-extrabold shadow-sm"
+                           style="background-color:#FF6900;">
                             Review Pendaftaran
-                        </button>
-                        <button onclick="markRead(1)"
-                                class="action-btn-secondary px-4 py-2 rounded-2xl border border-gray-200 text-xs font-bold text-gray-600">
+                        </a>
+                        <button onclick="markRead(1)" class="action-btn-secondary px-5 py-2.5 rounded-2xl border border-gray-200 text-xs font-bold text-gray-600 bg-white">
                             Tutup
                         </button>
                     </div>
@@ -293,56 +265,24 @@
                 </div>
             </div>
 
-            {{-- Notif 4 — Read --}}
-            <div id="notif-4" class="notif-card read rounded-3xl border border-gray-100 p-5 flex items-start gap-4">
-                <div class="notif-icon-wrap bg-gray-100">
-                    <i class="fa-solid fa-triangle-exclamation text-lg text-gray-400"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-start justify-between gap-3">
-                        <p class="text-sm font-extrabold text-gray-700">Peringatan Transaksi Tinggi</p>
-                        <span class="text-xs text-gray-400 font-semibold flex-shrink-0">5 jam lalu</span>
-                    </div>
-                    <p class="text-sm text-gray-400 font-medium mt-1">Lonjakan volume transaksi yang tidak normal terdeteksi dari Ayam Geprek Bensu.</p>
-                </div>
-            </div>
-
-            {{-- Notif 5 — Read --}}
-            <div id="notif-5" class="notif-card read rounded-3xl border border-gray-100 p-5 flex items-start gap-4">
-                <div class="notif-icon-wrap bg-gray-100">
-                    <i class="fa-regular fa-circle-check text-lg text-gray-400"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-start justify-between gap-3">
-                        <p class="text-sm font-extrabold text-gray-700">Laporan Mingguan Dibuat</p>
-                        <span class="text-xs text-gray-400 font-semibold flex-shrink-0">1 hari lalu</span>
-                    </div>
-                    <p class="text-sm text-gray-400 font-medium mt-1">Laporan pendapatan dan pesanan mingguan siap diunduh.</p>
-                </div>
-            </div>
-
         </div>
     </main>
 </div>
-
 @endsection
 
 @push('scripts')
 <script>
-    // ---- Real time date ----
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('realtimeDate').textContent = new Date().toLocaleDateString('id-ID', {
             weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         });
     });
 
-    // ---- Bell dropdown ----
     function toggleDropdown() {
         const dd = document.getElementById('notifDropdown');
         dd.classList.toggle('hidden');
     }
 
-    // Tutup dropdown kalau klik di luar
     document.addEventListener('click', function(e) {
         const wrapper = document.getElementById('bellWrapper');
         if (wrapper && !wrapper.contains(e.target)) {
@@ -350,53 +290,40 @@
         }
     });
 
-    // ---- Mark read per card ----
     function markRead(id) {
         const card = document.getElementById(`notif-${id}`);
         if (!card) return;
-        // Hilangkan styling unread
         card.classList.remove('unread');
         card.classList.add('read');
         card.style.backgroundColor = 'white';
         card.style.borderColor = '#f3f4f6';
-
-        // Hapus dot + action buttons
-        const dot  = card.querySelector('.rounded-full.flex-shrink-0');
+        const dot  = card.querySelector('.w-2\\.5.h-2\\.5.rounded-full.flex-shrink-0');
         const btns = card.querySelector('.flex.items-center.gap-2.mt-3');
-        if (dot)  dot.remove();
+        if (dot) dot.remove();
         if (btns) btns.remove();
-
-        // Update badge count
         updateBadge();
     }
 
-    // ---- Tandai semua dibaca ----
     function tandaiSemuaDibaca() {
         document.querySelectorAll('.notif-card.unread').forEach(card => {
-            card.classList.remove('unread');
-            card.classList.add('read');
-            card.style.backgroundColor = 'white';
-            card.style.borderColor = '#f3f4f6';
-
-            const dot  = card.querySelector('.w-2\\.5.h-2\\.5.rounded-full.flex-shrink-0');
-            const btns = card.querySelector('.flex.items-center.gap-2.mt-3');
-            if (dot)  dot.remove();
-            if (btns) btns.remove();
+            const id = card.id.replace('notif-', '');
+            markRead(id);
         });
-        updateBadge();
     }
 
     function updateBadge() {
         const unreadCount = document.querySelectorAll('.notif-card.unread').length;
-        const badge       = document.getElementById('sidebarBadge');
-        const bellBadge   = document.getElementById('bellBadge');
+        const badge = document.getElementById('sidebarBadge');
+        const bellBadge = document.getElementById('bellBadge');
 
         if (unreadCount === 0) {
-            badge.classList.add('hidden');
+            if (badge) badge.classList.add('hidden');
             if (bellBadge) bellBadge.style.display = 'none';
         } else {
-            badge.textContent = unreadCount;
-            badge.classList.remove('hidden');
+            if (badge) {
+                badge.textContent = unreadCount;
+                badge.classList.remove('hidden');
+            }
         }
     }
 </script>

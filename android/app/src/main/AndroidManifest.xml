@@ -19,6 +19,21 @@
         <activity android:name=".SearchActivity" />
 
         <activity
+            android:name=".FilterTransaksiActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CancelOrderActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UpdateStatusPesananActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DetaiTransaksiActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TransaksiAdminActivity"
+            android:exported="false" />
+        <activity
             android:name=".DetailPesanan"
             android:exported="false" />
         <activity
