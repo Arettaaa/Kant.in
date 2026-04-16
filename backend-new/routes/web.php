@@ -56,14 +56,20 @@ Route::middleware(['auth'])->prefix('admin/global')->name('admin.global.')->grou
     // Transaksi & Notifikasi
     Route::get('/transaksi', [TransactionController::class, 'index'])->name('transaksi');
     Route::get('/notifikasi', [NotificationController::class, 'index'])->name('notifikasi');
+    // Ubah 'review-pendaftaran' jadi 'rev-pendaftaran'
+    Route::get('/notifikasi/review', fn() => view('admin_global.rev-pendaftaran'))->name('rev-pendaftaran');
+
 
     // Profil & Keamanan
     Route::get('/profil', [ProfilController::class, 'index'])->name('profil');
+    Route::put('/profil', [ProfilController::class, 'update'])->name('profil.update');
     Route::get('/keamanan', [KeamananController::class, 'index'])->name('keamanan');
 
     Route::post('/kantin-mitra', [CanteenController::class, 'store'])->name('kantin.store');
     Route::put('/kantin-mitra/{id}', [CanteenController::class, 'update'])->name('kantin.update');
     Route::delete('/kantin-mitra/{id}', [CanteenController::class, 'destroy'])->name('kantin.destroy');
+    
+    Route::get('/pengaturan', [DashboardController::class, 'pengaturan'])->name('pengaturan');
 
 });
 /*

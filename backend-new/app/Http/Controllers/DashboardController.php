@@ -10,4 +10,9 @@ class DashboardController extends Controller
     {
         return view('admin_global.dasbor');
     }
+
+    public function pengaturan()
+    {
+        return view('admin_global.pengaturan');
+    }
 }
