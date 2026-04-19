@@ -8,69 +8,78 @@
     android:background="#F9FAFB"
     tools:context=".DetailPesanan">
 
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:elevation="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_back"
+            app:tint="#4B5563" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Detail Pesanan"
+                android:textColor="#111827"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="#ORD-089"
+                android:textColor="#F97316"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
+        android:paddingTop="16dp"
         android:paddingBottom="20dp"
         app:layout_constraintBottom_toTopOf="@+id/bottomButtonBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/headerLayout">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:layout_marginBottom="24dp">
-
-                <ImageView
-                    android:id="@+id/btnBack"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/ic_back"
-                    app:tint="#4B5563" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Detail Pesanan"
-                        android:textColor="#111827"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="#ORD-089"
-                        android:textColor="#F97316"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </LinearLayout>
+            android:paddingHorizontal="20dp">
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#E5E7EB"
+                app:cardElevation="2dp"
+                app:strokeColor="#F5F5F5"
                 app:strokeWidth="1dp">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -122,43 +131,61 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/imgAvatar" />
 
-                    <TextView
-                        android:id="@+id/lblWaktu"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                    <ImageView
+                        android:id="@+id/icWaktu"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:layout_marginTop="16dp"
-                        android:text="Waktu"
-                        android:textColor="#4B5563"
-                        app:drawableStartCompat="@drawable/clock"
-                        android:drawablePadding="8dp"
-                        app:drawableTint="#4B5563"
+                        android:src="@drawable/clock"
+                        app:tint="#4B5563"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/divider1" />
 
                     <TextView
+                        android:id="@+id/lblWaktu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Waktu"
+                        android:textColor="#4B5563"
+                        app:layout_constraintBottom_toBottomOf="@id/icWaktu"
+                        app:layout_constraintStart_toEndOf="@id/icWaktu"
+                        app:layout_constraintTop_toTopOf="@id/icWaktu" />
+
+                    <TextView
+                        android:id="@+id/valWaktu"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="09.54"
                         android:textColor="#111827"
                         android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="@id/lblWaktu"
+                        app:layout_constraintBottom_toBottomOf="@id/icWaktu"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/lblWaktu" />
+                        app:layout_constraintTop_toTopOf="@id/icWaktu" />
+
+                    <ImageView
+                        android:id="@+id/icMetode"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginTop="16dp"
+                        android:src="@drawable/ic_bike"
+                        app:tint="#4B5563"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/icWaktu" />
 
                     <TextView
                         android:id="@+id/lblMetode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginStart="8dp"
                         android:text="Metode"
                         android:textColor="#4B5563"
-                        app:drawableStartCompat="@drawable/ic_bike"
-                        android:drawablePadding="8dp"
-                        app:drawableTint="#4B5563"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/lblWaktu" />
+                        app:layout_constraintBottom_toBottomOf="@id/icMetode"
+                        app:layout_constraintStart_toEndOf="@id/icMetode"
+                        app:layout_constraintTop_toTopOf="@id/icMetode" />
 
                     <TextView
+                        android:id="@+id/valMetode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_badge_blue_light"
@@ -168,24 +195,33 @@
                         android:textColor="#2563EB"
                         android:textSize="10sp"
                         android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="@id/lblMetode"
+                        app:layout_constraintBottom_toBottomOf="@id/icMetode"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/lblMetode" />
+                        app:layout_constraintTop_toTopOf="@id/icMetode" />
+
+                    <ImageView
+                        android:id="@+id/icAlamat"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginTop="16dp"
+                        android:src="@drawable/mappin"
+                        app:tint="#4B5563"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/icMetode" />
 
                     <TextView
                         android:id="@+id/lblAlamat"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
+                        android:layout_marginStart="8dp"
                         android:text="Alamat"
                         android:textColor="#4B5563"
-                        app:drawableStartCompat="@drawable/mappin"
-                        android:drawablePadding="8dp"
-                        app:drawableTint="#4B5563"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/lblMetode" />
+                        app:layout_constraintBottom_toBottomOf="@id/icAlamat"
+                        app:layout_constraintStart_toEndOf="@id/icAlamat"
+                        app:layout_constraintTop_toTopOf="@id/icAlamat" />
 
                     <TextView
+                        android:id="@+id/valAlamat"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
@@ -193,10 +229,10 @@
                         android:text="Gedung CA RPL"
                         android:textColor="#111827"
                         android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="@id/lblAlamat"
+                        app:layout_constraintBottom_toBottomOf="@id/icAlamat"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toEndOf="@id/lblAlamat"
-                        app:layout_constraintTop_toTopOf="@id/lblAlamat" />
+                        app:layout_constraintTop_toTopOf="@id/icAlamat" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -205,8 +241,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
+                app:cardElevation="2dp"
                 app:strokeColor="#F5F5F5"
                 app:strokeWidth="1dp">
 
@@ -256,8 +293,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
+                app:cardElevation="2dp"
                 app:strokeColor="#F5F5F5"
                 app:strokeWidth="1dp">
 
@@ -336,9 +374,10 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:cardBackgroundColor="#FFFFFF"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#E5E7EB"
+                app:cardElevation="2dp"
+                app:strokeColor="#F5F5F5"
                 app:strokeWidth="1dp">
 
                 <LinearLayout
@@ -382,8 +421,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="200dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/img_struk_placeholder"
-                        app:shapeAppearanceOverlay="@style/RoundedImageView" />
+                        android:background="#E5E7EB"
+                        app:cornerFamily="rounded"
+                        app:cornerSize="12dp"
+                        tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
                     <LinearLayout
                         android:id="@+id/layVerifikasiCheck"
@@ -448,6 +489,7 @@
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:text="Tolak"
+            android:textStyle="bold"
             android:textAllCaps="false"
             android:textColor="#FB2C36"
             app:backgroundTint="#FFE2E2"
@@ -465,6 +507,7 @@
             android:layout_weight="1"
             android:backgroundTint="#00C950"
             android:text="Terima"
+            android:textStyle="bold"
             android:textAllCaps="false"
             app:cornerRadius="12dp"
             app:icon="@drawable/ic_check"
