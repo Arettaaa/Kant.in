@@ -71,20 +71,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Semua"
-            android:checked="true"
-            app:chipBackgroundColor="@color/color_chip_state" /> <com.google.android.material.chip.Chip
+            android:checked="true" /> <com.google.android.material.chip.Chip
         android:id="@+id/chip_selesai"
         style="@style/Widget.MaterialComponents.Chip.Choice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Selesai" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_menunggu"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Menunggu" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/chip_dibatalkan"
@@ -108,6 +100,7 @@
             android:layout_height="56dp"
             android:layout_weight="1"
             android:text="Atur Ulang"
+            android:textStyle="bold"
             android:textColor="#757575"
             android:layout_marginEnd="8dp"
             app:backgroundTint="#F5F5F5"
@@ -123,7 +116,8 @@
             app:backgroundTint="#00C853"
             app:icon="@drawable/ic_check"
             app:iconGravity="textStart"
-            app:cornerRadius="12dp" />
+            app:cornerRadius="12dp"
+            android:textStyle="bold"/>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
