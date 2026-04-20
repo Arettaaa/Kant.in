@@ -24,6 +24,8 @@ import com.example.kantin.model.response.DashboardResponse;
 import com.example.kantin.model.response.RegisterResponse;
 
 // Import library Retrofit & OkHttp
+import java.util.List;
+
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
@@ -347,8 +349,17 @@ public interface ApiService {
     Call<CartResponse> removeCartItem(@Path("itemId") String itemId);
 
     /** 2. PESANAN (Order & Checkout) **/
+
+    @Multipart
     @POST("buyers/checkouts")
-    Call<OrderDetailResponse> checkout(@Body CheckoutRequest request);
+    Call<OrderDetailResponse> checkout(
+            @Part("canteen_id") RequestBody canteenId,
+            @Part("delivery_method") RequestBody deliveryMethod,
+            @Part("location_note") RequestBody locationNote, // bisa null
+            @Part("order_notes") RequestBody orderNotes, // bisa null
+            @Part("menu_ids[]") List<RequestBody> menuIds,
+            @Part MultipartBody.Part paymentProof
+    );
 
     @GET("buyers/orders/histories")
     Call<OrderListResponse> getOrderHistory();
@@ -358,7 +369,6 @@ public interface ApiService {
 
     @POST("buyers/orders/{orderId}/cancellations")
     Call<BaseResponse> cancelOrder(@Path("orderId") String orderId);
-
     /** 3. PROFIL (Pelanggan) **/
     @GET("buyers/profiles")
     Call<ProfileResponse> getBuyerProfile(@Header("Authorization") String token);
