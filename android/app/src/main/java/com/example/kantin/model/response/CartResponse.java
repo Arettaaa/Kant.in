@@ -74,11 +74,21 @@ public class CartResponse {
         @SerializedName("image")
         private String image;
 
-        public String getMenuId() { return menuId; }
-        public String getName() { return name; }
-        public double getPrice() { return price; }
-        public int getQuantity() { return quantity; }
-        public double getSubtotal() { return subtotal; }
-        public String getImage() { return image; }
+        // ← TAMBAH INI (tidak dari JSON, diisi manual saat parsing)
+        private String canteenId;
+        private String canteenName;
+
+        public String getMenuId()    { return menuId; }
+        public String getName()      { return name; }
+        public double getPrice()     { return price; }
+        public int getQuantity()     { return quantity; }
+        public double getSubtotal()  { return subtotal; }
+        public String getImage()     { return image; }
+
+        // ← TAMBAH INI
+        public void setCanteenId(String canteenId)     { this.canteenId = canteenId; }
+        public void setCanteenName(String canteenName) { this.canteenName = canteenName; }
+        public String getCanteenId()                   { return canteenId; }
+        public String getCanteenName()                 { return canteenName; }
     }
 }

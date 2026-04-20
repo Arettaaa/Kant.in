@@ -1,5 +1,6 @@
 package com.example.kantin;
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -9,13 +10,13 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatCheckBox;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.kantin.model.response.CanteenDetailResponse;
 import com.example.kantin.model.response.CartResponse;
 import com.example.kantin.network.ApiClient;
 import com.example.kantin.network.ApiService;
@@ -33,20 +34,26 @@ import retrofit2.Response;
 public class KeranjangPelangganActivity extends AppCompatActivity
         implements CartAdapter.OnCartChangedListener {
 
+    // ── Views ─────────────────────────────────────────────────
     private ImageView btnBack, btnDelete;
-    private TextView tvTotalBayar, tvTotalBottom, tvSubtotalBelanja, tvOngkir, btnCheckout;
+    private TextView tvTotalBayar, tvTotalBottom, tvSubtotalBelanja, tvOngkir;
+    private TextView tvOngkirKurir, btnCheckout;
     private LinearLayout layoutAmbilSendiri, layoutAntarKurir;
+    private LinearLayout layoutWarningMultiKantin;
     private RadioButton radioAmbilSendiri, radioAntarKurir;
     private AppCompatCheckBox cbSelectAll;
     private RecyclerView rvCart;
     private View layoutKosong;
     private TextView tvMenuKosong;
 
+    // ── State ─────────────────────────────────────────────────
+    private double deliveryFeeFlat = 0;
     private int biayaOngkir = 0;
     private String token;
     private List<CartResponse.CartItem> allItems = new ArrayList<>();
+    private List<CartResponse.CanteenCart> allCanteens = new ArrayList<>();
     private CartAdapter cartAdapter;
-    private boolean isUpdatingSelectAll = false; // flag hindari loop
+    private boolean isUpdatingSelectAll = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,22 +67,26 @@ public class KeranjangPelangganActivity extends AppCompatActivity
         fetchCart();
     }
 
+    // ── Init ──────────────────────────────────────────────────
+
     private void initViews() {
-        btnBack            = findViewById(R.id.btnBack);
-        btnDelete          = findViewById(R.id.btnDelete);
-        btnCheckout        = findViewById(R.id.btnCheckout);
-        tvTotalBayar       = findViewById(R.id.tvTotalBayar);
-        tvTotalBottom      = findViewById(R.id.tvTotalBottom);
-        tvSubtotalBelanja  = findViewById(R.id.tvSubtotalBelanja);
-        tvOngkir           = findViewById(R.id.tvOngkir);
-        layoutAmbilSendiri = findViewById(R.id.layoutAmbilSendiri);
-        layoutAntarKurir   = findViewById(R.id.layoutAntarKurir);
-        radioAmbilSendiri  = findViewById(R.id.radioAmbilSendiri);
-        radioAntarKurir    = findViewById(R.id.radioAntarKurir);
-        cbSelectAll        = findViewById(R.id.cbSelectAll);
-        rvCart             = findViewById(R.id.rvCart);
-        layoutKosong       = findViewById(R.id.layoutKosong);
-        tvMenuKosong       = findViewById(R.id.tvMenuKosong);
+        btnBack                  = findViewById(R.id.btnBack);
+        btnDelete                = findViewById(R.id.btnDelete);
+        btnCheckout              = findViewById(R.id.btnCheckout);
+        tvTotalBayar             = findViewById(R.id.tvTotalBayar);
+        tvTotalBottom            = findViewById(R.id.tvTotalBottom);
+        tvSubtotalBelanja        = findViewById(R.id.tvSubtotalBelanja);
+        tvOngkir                 = findViewById(R.id.tvOngkir);
+        tvOngkirKurir            = findViewById(R.id.tvOngkirKurir);
+        layoutAmbilSendiri       = findViewById(R.id.layoutAmbilSendiri);
+        layoutAntarKurir         = findViewById(R.id.layoutAntarKurir);
+        layoutWarningMultiKantin = findViewById(R.id.layoutWarningMultiKantin);
+        radioAmbilSendiri        = findViewById(R.id.radioAmbilSendiri);
+        radioAntarKurir          = findViewById(R.id.radioAntarKurir);
+        cbSelectAll              = findViewById(R.id.cbSelectAll);
+        rvCart                   = findViewById(R.id.rvCart);
+        layoutKosong             = findViewById(R.id.layoutKosong);
+        tvMenuKosong             = findViewById(R.id.tvMenuKosong);
 
         rvCart.setLayoutManager(new LinearLayoutManager(this));
     }
@@ -89,23 +100,26 @@ public class KeranjangPelangganActivity extends AppCompatActivity
         layoutAntarKurir.setOnClickListener(v -> selectAntarKurir());
         radioAntarKurir.setOnClickListener(v -> selectAntarKurir());
 
-        // Select All checkbox
         cbSelectAll.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isUpdatingSelectAll) return;
             if (cartAdapter != null) {
                 cartAdapter.setSelectAll(isChecked);
                 updateTotal();
                 updateCheckoutButton();
+                updateWarningMultiKantin();
             }
         });
 
-        // Checkout button
         btnCheckout.setOnClickListener(v -> {
             if (cartAdapter == null || !cartAdapter.hasSelectedItem()) {
                 Toast.makeText(this, "Pilih minimal 1 item dulu", Toast.LENGTH_SHORT).show();
                 return;
             }
-            // TODO: lanjut ke halaman checkout/konfirmasi
+            if (getSelectedCanteenId() == null) {
+                Toast.makeText(this, "Checkout hanya bisa dari 1 kantin", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // TODO: lanjut ke halaman checkout
             Toast.makeText(this, "Lanjut checkout!", Toast.LENGTH_SHORT).show();
         });
     }
@@ -122,9 +136,22 @@ public class KeranjangPelangganActivity extends AppCompatActivity
         updateTotal();
         updateCheckoutButton();
         syncSelectAllCheckbox();
+        updateWarningMultiKantin();
+
+        // Kalau mode Antar Kurir, refresh ongkir sesuai centangan baru
+        if (radioAntarKurir.isChecked()) {
+            String selectedCanteenId = getSelectedCanteenId();
+            if (selectedCanteenId != null) {
+                fetchDeliveryFee(selectedCanteenId);
+            } else {
+                deliveryFeeFlat = 0;
+                biayaOngkir = 0;
+                updateTotal();
+            }
+        }
     }
 
-    // ── Fetch data ────────────────────────────────────────────
+    // ── Fetch cart ────────────────────────────────────────────
 
     private void fetchCart() {
         ApiClient.getAuthClient(token).create(ApiService.class)
@@ -137,9 +164,17 @@ public class KeranjangPelangganActivity extends AppCompatActivity
 
                             CartResponse.CartData cart = response.body().getData();
                             allItems.clear();
+                            allCanteens.clear();
+
                             if (cart.getCanteens() != null) {
+                                allCanteens.addAll(cart.getCanteens());
                                 for (CartResponse.CanteenCart canteen : cart.getCanteens()) {
-                                    allItems.addAll(canteen.getItems());
+                                    for (CartResponse.CartItem item : canteen.getItems()) {
+                                        // Inject canteen info ke tiap item
+                                        item.setCanteenId(canteen.getCanteenId());
+                                        item.setCanteenName(canteen.getCanteenName());
+                                        allItems.add(item);
+                                    }
                                 }
                             }
 
@@ -156,6 +191,7 @@ public class KeranjangPelangganActivity extends AppCompatActivity
                                 updateTotal();
                                 updateCheckoutButton();
                                 syncSelectAllCheckbox();
+                                updateWarningMultiKantin();
                             }
                         } else {
                             showKosong();
@@ -170,7 +206,60 @@ public class KeranjangPelangganActivity extends AppCompatActivity
                 });
     }
 
-    // ── Hitung & update total ─────────────────────────────────
+    // ── Fetch delivery fee dari API kantin ────────────────────
+
+    private void fetchDeliveryFee(String canteenId) {
+        ApiClient.getAuthClient(token).create(ApiService.class)
+                .getCanteenDetail(canteenId)
+                .enqueue(new Callback<CanteenDetailResponse>() {
+                    @Override
+                    public void onResponse(Call<CanteenDetailResponse> call,
+                                           Response<CanteenDetailResponse> response) {
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().getData() != null) {
+                            deliveryFeeFlat = response.body().getData().getDeliveryFeeFlat();
+                        } else {
+                            deliveryFeeFlat = 0;
+                        }
+                        biayaOngkir = (int) deliveryFeeFlat;
+                        tvOngkirKurir.setText("+" + formatRupiah(deliveryFeeFlat));
+                        updateTotal();
+                    }
+
+                    @Override
+                    public void onFailure(Call<CanteenDetailResponse> call, Throwable t) {
+                        Toast.makeText(KeranjangPelangganActivity.this,
+                                "Gagal ambil ongkos kirim", Toast.LENGTH_SHORT).show();
+                        deliveryFeeFlat = 0;
+                        biayaOngkir = 0;
+                        updateTotal();
+                    }
+                });
+    }
+
+    // ── Helper: canteen_id dari item yang dicentang ───────────
+
+    /**
+     * Return canteen_id jika semua item yang dicentang dari 1 kantin.
+     * Return null jika tidak ada item dipilih atau >1 kantin.
+     */
+    private String getSelectedCanteenId() {
+        if (cartAdapter == null) return null;
+        String foundId = null;
+        for (int i = 0; i < allItems.size(); i++) {
+            if (cartAdapter.isItemSelected(i)) {
+                String cid = allItems.get(i).getCanteenId();
+                if (foundId == null) {
+                    foundId = cid;
+                } else if (!foundId.equals(cid)) {
+                    return null; // lebih dari 1 kantin
+                }
+            }
+        }
+        return foundId;
+    }
+
+    // ── Update UI ─────────────────────────────────────────────
 
     private void updateTotal() {
         if (cartAdapter == null) return;
@@ -185,16 +274,23 @@ public class KeranjangPelangganActivity extends AppCompatActivity
     }
 
     private void updateCheckoutButton() {
-        if (cartAdapter != null && cartAdapter.hasSelectedItem()) {
-            btnCheckout.setAlpha(1.0f);
-            btnCheckout.setEnabled(true);
-        } else {
-            btnCheckout.setAlpha(0.5f);
-            btnCheckout.setEnabled(false);
-        }
+        boolean canCheckout = cartAdapter != null
+                && cartAdapter.hasSelectedItem()
+                && getSelectedCanteenId() != null; // hanya 1 kantin
+
+        btnCheckout.setAlpha(canCheckout ? 1.0f : 0.5f);
+        btnCheckout.setEnabled(canCheckout);
     }
 
-    /** Sync cbSelectAll tanpa trigger listener-nya */
+    private void updateWarningMultiKantin() {
+        if (cartAdapter == null || layoutWarningMultiKantin == null) return;
+
+        boolean hasSelected = cartAdapter.hasSelectedItem();
+        boolean isMultiKantin = hasSelected && getSelectedCanteenId() == null;
+
+        layoutWarningMultiKantin.setVisibility(isMultiKantin ? View.VISIBLE : View.GONE);
+    }
+
     private void syncSelectAllCheckbox() {
         if (cartAdapter == null) return;
         isUpdatingSelectAll = true;
@@ -206,6 +302,7 @@ public class KeranjangPelangganActivity extends AppCompatActivity
 
     private void selectAmbilSendiri() {
         biayaOngkir = 0;
+        deliveryFeeFlat = 0;
         radioAmbilSendiri.setChecked(true);
         radioAntarKurir.setChecked(false);
         radioAmbilSendiri.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#F97316")));
@@ -216,22 +313,29 @@ public class KeranjangPelangganActivity extends AppCompatActivity
     }
 
     private void selectAntarKurir() {
-        biayaOngkir = 5000;
         radioAntarKurir.setChecked(true);
         radioAmbilSendiri.setChecked(false);
         radioAntarKurir.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#F97316")));
         radioAmbilSendiri.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#D1D5DB")));
         layoutAntarKurir.setBackgroundResource(R.drawable.bg_border_orange);
         layoutAmbilSendiri.setBackgroundResource(R.drawable.bg_border_gray);
-        updateTotal();
+
+        String selectedCanteenId = getSelectedCanteenId();
+        if (selectedCanteenId != null) {
+            fetchDeliveryFee(selectedCanteenId);
+        } else {
+            deliveryFeeFlat = 0;
+            biayaOngkir = 0;
+            updateTotal();
+        }
     }
 
-    // ── Show/hide state ───────────────────────────────────────
+    // ── Show / hide ───────────────────────────────────────────
 
     private void showKosong() {
         Intent intent = new Intent(this, EmptyCartActivity.class);
         startActivity(intent);
-        finish(); // tutup KeranjangPelangganActivity supaya tidak numpuk
+        finish();
     }
 
     private void showCart() {
@@ -239,10 +343,9 @@ public class KeranjangPelangganActivity extends AppCompatActivity
         layoutKosong.setVisibility(View.GONE);
     }
 
-    // ── Dialog hapus semua ────────────────────────────────────
+    // ── Dialog hapus ──────────────────────────────────────────
 
     private void tampilkanDialogHapus() {
-        // Kumpulkan item yang sedang dicentang
         List<CartResponse.CartItem> selectedItems = new ArrayList<>();
         if (cartAdapter != null) {
             for (int i = 0; i < allItems.size(); i++) {
@@ -252,7 +355,6 @@ public class KeranjangPelangganActivity extends AppCompatActivity
             }
         }
 
-        // Kalau tidak ada yang dipilih
         if (selectedItems.isEmpty()) {
             Toast.makeText(this, "Pilih item yang ingin dihapus dulu", Toast.LENGTH_SHORT).show();
             return;
@@ -281,11 +383,12 @@ public class KeranjangPelangganActivity extends AppCompatActivity
             }
             dialog.dismiss();
             Toast.makeText(this, selectedItems.size() + " item dihapus", Toast.LENGTH_SHORT).show();
-            fetchCart(); // refresh
+            fetchCart();
         });
 
         dialog.show();
     }
+
     // ── Helper ────────────────────────────────────────────────
 
     private String formatRupiah(double harga) {
