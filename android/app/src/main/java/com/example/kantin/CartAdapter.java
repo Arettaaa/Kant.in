@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,12 +33,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
     public interface OnCartChangedListener {
         void onCartChanged();
-        void onSelectionChanged(); // dipanggil saat checkbox berubah
+        void onSelectionChanged();
     }
 
     private final Context context;
     private final List<CartResponse.CartItem> items;
-    private final List<Boolean> selectedStates; // status centang tiap item
+    private final List<Boolean> selectedStates;
     private final OnCartChangedListener listener;
     private final String token;
     private final String BASE_URL_STORAGE = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/";
@@ -45,13 +46,13 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     public boolean isItemSelected(int position) {
         return selectedStates.get(position);
     }
+
     public CartAdapter(Context context, List<CartResponse.CartItem> items, OnCartChangedListener listener) {
         this.context = context;
         this.items = items;
         this.listener = listener;
         this.token = new SessionManager(context).getToken();
 
-        // Default: semua item tercentang
         this.selectedStates = new ArrayList<>();
         for (int i = 0; i < items.size(); i++) {
             selectedStates.add(true);
@@ -73,11 +74,47 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.tvHarga.setText(formatRupiah(item.getPrice()));
         holder.tvQty.setText(String.valueOf(item.getQuantity()));
 
-        // Set state checkbox
-        holder.cbSelectItem.setOnCheckedChangeListener(null); // hindari trigger saat bind
+        // ==========================================
+        // LOGIKA GROUPING KANTIN ALA SHOPEE
+        // ==========================================
+        boolean isFirstOfKantin = false;
+
+        // Cek apakah ini item pertama dari suatu kantin
+        if (position == 0) {
+            isFirstOfKantin = true;
+        } else {
+            CartResponse.CartItem prevItem = items.get(position - 1);
+            if (!item.getCanteenId().equals(prevItem.getCanteenId())) {
+                isFirstOfKantin = true;
+            }
+        }
+
+        if (isFirstOfKantin) {
+            holder.layoutHeaderKantin.setVisibility(View.VISIBLE);
+            holder.tvNamaKantin.setText(item.getCanteenName());
+
+            // Set status checkbox header kantin
+            boolean isAllKantinSelected = isAllItemsInKantinSelected(item.getCanteenId());
+            holder.cbKantin.setOnCheckedChangeListener(null);
+            holder.cbKantin.setChecked(isAllKantinSelected);
+
+            // Aksi kalau checkbox header kantin diklik
+            holder.cbKantin.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                selectAllItemsInKantin(item.getCanteenId(), isChecked);
+            });
+        } else {
+            // Sembunyikan header jika bukan item pertama di kantin tersebut
+            holder.layoutHeaderKantin.setVisibility(View.GONE);
+        }
+        // ==========================================
+
+        // Set state checkbox item
+        holder.cbSelectItem.setOnCheckedChangeListener(null);
         holder.cbSelectItem.setChecked(selectedStates.get(position));
         holder.cbSelectItem.setOnCheckedChangeListener((buttonView, isChecked) -> {
             selectedStates.set(position, isChecked);
+            // Paksa adapter refresh untuk mengupdate status centang Header Kantin
+            notifyItemRangeChanged(0, items.size());
             listener.onSelectionChanged();
         });
 
@@ -86,17 +123,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         if (imageUrl != null && !imageUrl.startsWith("http")) {
             imageUrl = BASE_URL_STORAGE + imageUrl;
         }
-        Glide.with(context)
-                .load(imageUrl)
-                .placeholder(R.drawable.makanan)
-                .error(R.drawable.makanan)
-                .centerCrop()
-                .into(holder.imgMenu);
+        Glide.with(context).load(imageUrl).placeholder(R.drawable.makanan).error(R.drawable.makanan).centerCrop().into(holder.imgMenu);
 
-        // Tombol plus
         holder.btnPlus.setOnClickListener(v -> updateItem(item.getMenuId(), item.getQuantity() + 1));
-
-        // Tombol minus
         holder.btnMinus.setOnClickListener(v -> {
             if (item.getQuantity() <= 1) {
                 removeItem(item.getMenuId());
@@ -106,9 +135,29 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         });
     }
 
-    // ── Public helpers untuk Activity ────────────────────────
+    // --- HELPER UNTUK CHECKBOX KANTIN ---
+    private boolean isAllItemsInKantinSelected(String canteenId) {
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).getCanteenId().equals(canteenId)) {
+                if (!selectedStates.get(i)) {
+                    return false; // Ada 1 item yang gak kecentang, kembalikan false
+                }
+            }
+        }
+        return true;
+    }
 
-    /** Hitung subtotal hanya dari item yang dicentang */
+    private void selectAllItemsInKantin(String canteenId, boolean isChecked) {
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).getCanteenId().equals(canteenId)) {
+                selectedStates.set(i, isChecked);
+            }
+        }
+        notifyDataSetChanged(); // Refresh UI
+        listener.onSelectionChanged(); // Hitung ulang total bayar
+    }
+    // -------------------------------------
+
     public double getSelectedSubtotal() {
         double total = 0;
         for (int i = 0; i < items.size(); i++) {
@@ -119,7 +168,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         return total;
     }
 
-    /** Cek apakah ada minimal 1 item yang dipilih */
     public boolean hasSelectedItem() {
         for (Boolean selected : selectedStates) {
             if (selected) return true;
@@ -127,7 +175,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         return false;
     }
 
-    /** Select / deselect semua item */
     public void setSelectAll(boolean selectAll) {
         for (int i = 0; i < selectedStates.size(); i++) {
             selectedStates.set(i, selectAll);
@@ -135,15 +182,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         notifyDataSetChanged();
     }
 
-    /** Cek apakah semua item tercentang (untuk sync cbSelectAll) */
     public boolean isAllSelected() {
         for (Boolean selected : selectedStates) {
             if (!selected) return false;
         }
         return true;
     }
-
-    // ── API calls ─────────────────────────────────────────────
 
     private void updateItem(String menuId, int newQty) {
         ApiClient.getAuthClient(token).create(ApiService.class)
@@ -183,15 +227,20 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         return fmt.format(harga).replace(",00", "");
     }
 
-    // ── ViewHolder ────────────────────────────────────────────
-
     static class CartViewHolder extends RecyclerView.ViewHolder {
-        CheckBox cbSelectItem;
+        CheckBox cbSelectItem, cbKantin;
         ImageView imgMenu;
-        TextView tvNama, tvHarga, tvQty, btnPlus, btnMinus;
+        TextView tvNama, tvHarga, tvQty, btnPlus, btnMinus, tvNamaKantin;
+        LinearLayout layoutHeaderKantin;
 
         CartViewHolder(@NonNull View itemView) {
             super(itemView);
+            // Komponen Header Kantin
+            layoutHeaderKantin = itemView.findViewById(R.id.layoutHeaderKantin);
+            cbKantin           = itemView.findViewById(R.id.cbKantin);
+            tvNamaKantin       = itemView.findViewById(R.id.tvNamaKantin);
+
+            // Komponen Item Menu
             cbSelectItem = itemView.findViewById(R.id.cbSelectItem);
             imgMenu      = itemView.findViewById(R.id.imgMenu);
             tvNama       = itemView.findViewById(R.id.tvNamaMenu);
