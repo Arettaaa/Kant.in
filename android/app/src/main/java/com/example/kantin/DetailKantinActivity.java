@@ -36,6 +36,7 @@ public class DetailKantinActivity extends AppCompatActivity {
     private MenuAdapter menuAdapter;
     private String canteenId;
     private boolean isErrorShown = false;
+    private boolean canteenIsOpen = true;
 
     // List untuk menyimpan data menu asli
     private List<MenuListResponse.MenuItem> originalMenuList = new ArrayList<>();
@@ -53,7 +54,6 @@ public class DetailKantinActivity extends AppCompatActivity {
 
         if (canteenId != null) {
             fetchDetailKantin();
-            fetchMenuKantin();
         } else {
             Toast.makeText(this, "ID Kantin tidak ditemukan", Toast.LENGTH_SHORT).show();
             finish();
@@ -139,11 +139,8 @@ public class DetailKantinActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     CanteenDetailResponse.CanteenDetail data = response.body().getData();
 
-                    // 1. Set Nama dan Deskripsi
                     tvNamaWarung.setText(data.getName());
                     tvDeskripsiWarung.setText(data.getDescription());
-
-                    // 2. Set Lokasi secara dinamis
                     tvLokasiKantin.setText(data.getLocation());
 
                     if (data.getOperatingHours() != null) {
@@ -153,29 +150,34 @@ public class DetailKantinActivity extends AppCompatActivity {
                         tvJamOperasional.setText("Jam tidak tersedia");
                     }
 
-                    // 3. Logika URL Gambar
                     String imageUrl = data.getImage();
                     if (imageUrl != null && !imageUrl.startsWith("http")) {
                         imageUrl = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/" + imageUrl;
                     }
-
-                    // 4. Muat Gambar ke imgCover
                     Glide.with(DetailKantinActivity.this)
                             .load(imageUrl)
                             .placeholder(R.drawable.makanan)
                             .error(R.drawable.makanan)
                             .centerCrop()
                             .into(imgCover);
+
+                    canteenIsOpen = data.isOpen();
+                                       fetchMenuKantin();
+
                 }
+
             }
 
+
             @Override
+
             public void onFailure(Call<CanteenDetailResponse> call, Throwable t) {
                 Log.e("API_ERROR", "Detail Kantin: " + t.getMessage());
+                // tetap fetch menu meski detail gagal
+                fetchMenuKantin();
             }
         });
     }
-
     private void fetchMenuKantin() {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         apiService.getCanteenMenus(canteenId).enqueue(new Callback<MenuListResponse>() {
@@ -184,8 +186,7 @@ public class DetailKantinActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     // Simpan data ke originalMenuList agar bisa difilter nanti
                     originalMenuList = response.body().getData();
-
-                    menuAdapter = new MenuAdapter(DetailKantinActivity.this, originalMenuList);
+                    menuAdapter = new MenuAdapter(DetailKantinActivity.this, originalMenuList, canteenIsOpen);
                     rvMenu.setAdapter(menuAdapter);
                 }
             }
@@ -197,4 +198,6 @@ public class DetailKantinActivity extends AppCompatActivity {
             }
         });
     }
+
+
 }

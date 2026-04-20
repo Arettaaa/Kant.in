@@ -20,16 +20,30 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
+import com.example.kantin.model.request.AddToCartRequest;
+import com.example.kantin.model.response.CartResponse;
+import com.example.kantin.network.ApiClient;
+import com.example.kantin.network.ApiService;
+import com.example.kantin.utils.SessionManager;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder> {
 
     private Context context;
     private List<MenuListResponse.MenuItem> listMenu;
+    private boolean isCanteenOpen; // ← tambah ini
+
     private final String BASE_URL_STORAGE = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/";
 
-    public MenuAdapter(Context context, List<MenuListResponse.MenuItem> listMenu) {
+    public MenuAdapter(Context context, List<MenuListResponse.MenuItem> listMenu, boolean canteenIsOpen) {
         this.context = context;
         this.listMenu = listMenu;
+        this.isCanteenOpen = canteenIsOpen; // ← pastikan ini ada!
     }
+
+
 
     @NonNull
     @Override
@@ -69,9 +83,6 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
         holder.itemView.setOnClickListener(v -> {
             String menuId = menu.getId(); // atau String.valueOf(menu.getId()) kalau tipenya int
 
-            // Tambahkan log ini dulu untuk cek nilai ID
-            Log.d("MENU_DEBUG", "ID menu yang diklik: " + menuId);
-
             // Guard: jangan buka activity kalau ID tidak valid
             if (menuId == null || menuId.isEmpty() || menuId.equals("0")) {
                 Toast.makeText(context, "ID menu tidak valid", Toast.LENGTH_SHORT).show();
@@ -85,8 +96,45 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
 
         // 5. Tombol Tambah (Add to Cart)
         holder.btnAddMenu.setOnClickListener(v -> {
-            // Logika Keranjang (Akan diimplementasikan nanti)
+            if (!isCanteenOpen) {
+                Toast.makeText(context, "Kantin sedang tutup", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // tambah ke keranjang
+            String menuId = menu.getId();
+            String token = new SessionManager(context).getToken();
+            AddToCartRequest request = new AddToCartRequest(menuId, 1);
+
+            ApiClient.getAuthClient(token).create(ApiService.class)
+                    .addToCart(request)
+                    .enqueue(new Callback<CartResponse>() {
+                        @Override
+                        public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
+                            if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                                Toast.makeText(context, "1x " + menu.getName() + " berhasil ditambahkan!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(context, "Gagal menambahkan ke keranjang", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<CartResponse> call, Throwable t) {
+                            Toast.makeText(context, "Gagal terhubung ke server", Toast.LENGTH_SHORT).show();
+                        }
+                    });
         });
+
+// tampilan tombol sesuai status kantin
+        if (isCanteenOpen) {
+            holder.btnAddMenu.setAlpha(1.0f);
+            holder.btnAddMenu.setClickable(true);
+            holder.btnAddMenu.setCardBackgroundColor(android.graphics.Color.parseColor("#FFF7ED"));
+        } else {
+            holder.btnAddMenu.setAlpha(0.4f);
+            holder.btnAddMenu.setClickable(false);
+            holder.btnAddMenu.setCardBackgroundColor(android.graphics.Color.parseColor("#E5E7EB"));
+        }
+
     }
 
     @Override
@@ -103,7 +151,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
     public static class MenuViewHolder extends RecyclerView.ViewHolder {
         ImageView imgMenu;
         TextView tvNamaMenu, tvDeskripsiMenu, tvHargaMenu;
-        View btnAddMenu;
+        androidx.cardview.widget.CardView btnAddMenu; // ← ganti dari View ke CardView
 
         public MenuViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -113,5 +161,10 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
             tvHargaMenu = itemView.findViewById(R.id.tvHargaMenu);
             btnAddMenu = itemView.findViewById(R.id.btnAddMenu);
         }
+    }
+    // Di MenuAdapter.java
+    public void setCanteenOpen(boolean isOpen) {
+        this.isCanteenOpen = isOpen;
+        notifyDataSetChanged();
     }
 }

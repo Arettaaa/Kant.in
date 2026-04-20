@@ -315,17 +315,36 @@ public interface ApiService {
 //    Call<BaseResponse> register(@Body RegisterPelangganRequest request);
 
     /** 1. KERANJANG (Cart) **/
+//    @GET("buyers/carts")
+//    Call<CartResponse> getMyCart();
+//
+//    @POST("buyers/carts/items")
+//    Call<BaseResponse> addToCart(@Body AddToCartRequest request);
+//
+//    @PUT("buyers/carts/items/{itemId}")
+//    Call<BaseResponse> updateCartItem(@Path("itemId") String itemId, @Body UpdateCartRequest request);
+//
+//    @DELETE("buyers/carts/items/{itemId}")
+//    Call<BaseResponse> removeFromCart(@Path("itemId") String itemId);
+
+    // GET cart
     @GET("buyers/carts")
-    Call<CartResponse> getMyCart();
+    Call<CartResponse> getCart();
 
+    // POST add item
     @POST("buyers/carts/items")
-    Call<BaseResponse> addToCart(@Body AddToCartRequest request);
+    Call<CartResponse> addToCart(@Body AddToCartRequest request);
 
+    // PUT update quantity
     @PUT("buyers/carts/items/{itemId}")
-    Call<BaseResponse> updateCartItem(@Path("itemId") String itemId, @Body UpdateCartRequest request);
+    Call<CartResponse> updateCartItem(
+            @Path("itemId") String itemId,
+            @Body UpdateCartRequest request   // { "quantity": int }
+    );
 
+    // DELETE remove item
     @DELETE("buyers/carts/items/{itemId}")
-    Call<BaseResponse> removeFromCart(@Path("itemId") String itemId);
+    Call<CartResponse> removeCartItem(@Path("itemId") String itemId);
 
     /** 2. PESANAN (Order & Checkout) **/
     @POST("buyers/checkouts")

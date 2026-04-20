@@ -41,7 +41,7 @@ public class EmptyCartActivity extends AppCompatActivity {
         // 4. Aksi Tombol Cari Makanan (Pindah ke halaman Home/Menu)
         btnCariMakanan.setOnClickListener(v -> {
             // Ganti 'HomeActivity.class' dengan nama halaman Menu/Utama milikmu
-            Intent intent = new Intent(EmptyCartActivity.this, BerandaPelangganActivity.class);
+            Intent intent = new Intent(EmptyCartActivity.this, ExploreMenuPelangganActivity.class);
             // Tambahkan flag agar tidak numpuk halamannya (opsional)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);

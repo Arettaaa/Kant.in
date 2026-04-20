@@ -1,225 +1,295 @@
 package com.example.kantin;
 
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.Intent;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatCheckBox; // Ingat import yang ini
+import androidx.appcompat.widget.AppCompatCheckBox;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.kantin.model.response.CartResponse;
+import com.example.kantin.network.ApiClient;
+import com.example.kantin.network.ApiService;
+import com.example.kantin.utils.SessionManager;
+
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
-public class KeranjangPelangganActivity extends AppCompatActivity {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class KeranjangPelangganActivity extends AppCompatActivity
+        implements CartAdapter.OnCartChangedListener {
 
     private ImageView btnBack, btnDelete;
-    private TextView btnMinus1, btnPlus1, tvQty1, btnCheckout;
-    private TextView tvTotalBayar, tvTotalBottom; // Tambahan untuk total
+    private TextView tvTotalBayar, tvTotalBottom, tvSubtotalBelanja, tvOngkir, btnCheckout;
     private LinearLayout layoutAmbilSendiri, layoutAntarKurir;
     private RadioButton radioAmbilSendiri, radioAntarKurir;
-    private AppCompatCheckBox cbSelectAll, cbSelectItem1; // Tambahan CheckBox
+    private AppCompatCheckBox cbSelectAll;
+    private RecyclerView rvCart;
+    private View layoutKosong;
+    private TextView tvMenuKosong;
 
-    // Data dummy awal
-    private int quantity1 = 2;
-    private final int hargaSatuan = 25000;
-    private int biayaOngkir = 0; // Default 0 (Ambil Sendiri)
+    private int biayaOngkir = 0;
+    private String token;
+    private List<CartResponse.CartItem> allItems = new ArrayList<>();
+    private CartAdapter cartAdapter;
+    private boolean isUpdatingSelectAll = false; // flag hindari loop
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Menghilangkan action bar bawaan
         if (getSupportActionBar() != null) getSupportActionBar().hide();
-
         setContentView(R.layout.activity_keranjangpelanggan);
 
-        // Inisialisasi ID dari XML
-        btnBack = findViewById(R.id.btnBack);
-        btnDelete = findViewById(R.id.btnDelete);
-        btnMinus1 = findViewById(R.id.btnMinus1);
-        btnPlus1 = findViewById(R.id.btnPlus1);
-        tvQty1 = findViewById(R.id.tvQty1);
-        btnCheckout = findViewById(R.id.btnCheckout);
+        token = new SessionManager(this).getToken();
+        initViews();
+        setupListeners();
+        fetchCart();
+    }
 
+    private void initViews() {
+        btnBack            = findViewById(R.id.btnBack);
+        btnDelete          = findViewById(R.id.btnDelete);
+        btnCheckout        = findViewById(R.id.btnCheckout);
+        tvTotalBayar       = findViewById(R.id.tvTotalBayar);
+        tvTotalBottom      = findViewById(R.id.tvTotalBottom);
+        tvSubtotalBelanja  = findViewById(R.id.tvSubtotalBelanja);
+        tvOngkir           = findViewById(R.id.tvOngkir);
         layoutAmbilSendiri = findViewById(R.id.layoutAmbilSendiri);
-        layoutAntarKurir = findViewById(R.id.layoutAntarKurir);
-        radioAmbilSendiri = findViewById(R.id.radioAmbilSendiri);
-        radioAntarKurir = findViewById(R.id.radioAntarKurir);
+        layoutAntarKurir   = findViewById(R.id.layoutAntarKurir);
+        radioAmbilSendiri  = findViewById(R.id.radioAmbilSendiri);
+        radioAntarKurir    = findViewById(R.id.radioAntarKurir);
+        cbSelectAll        = findViewById(R.id.cbSelectAll);
+        rvCart             = findViewById(R.id.rvCart);
+        layoutKosong       = findViewById(R.id.layoutKosong);
+        tvMenuKosong       = findViewById(R.id.tvMenuKosong);
 
-        // ID Baru untuk CheckBox dan Total
-        cbSelectAll = findViewById(R.id.cbSelectAll);
-        cbSelectItem1 = findViewById(R.id.cbSelectItem1);
-        tvTotalBayar = findViewById(R.id.tvTotalBayar);
-        tvTotalBottom = findViewById(R.id.tvTotalBottom);
+        rvCart.setLayoutManager(new LinearLayoutManager(this));
+    }
 
-        // Hitung total pertama kali saat halaman dibuka
-        hitungTotalHarga();
-
-        // --- LOGIKA CHECKBOX ---
-
-        // 1. Jika "Pilih Semua" diklik
-        cbSelectAll.setOnClickListener(v -> {
-            boolean isChecked = cbSelectAll.isChecked();
-            cbSelectItem1.setChecked(isChecked);
-            hitungTotalHarga();
-        });
-
-        // 2. Jika "Item Makanan" diklik
-        cbSelectItem1.setOnClickListener(v -> {
-            boolean isChecked = cbSelectItem1.isChecked();
-            // Kalau item dilepas centangnya, otomatis "Pilih Semua" juga dilepas
-            if (!isChecked) {
-                cbSelectAll.setChecked(false);
-            } else {
-                cbSelectAll.setChecked(true); // Karena cuma 1 item, kalau dicentang = pilih semua
-            }
-            hitungTotalHarga();
-        });
-
-        // --- LOGIKA QUANTITY ---
-
-        btnPlus1.setOnClickListener(v -> {
-            quantity1++;
-            tvQty1.setText(String.valueOf(quantity1));
-            hitungTotalHarga(); // Update harga saat ditambah
-        });
-
-        btnMinus1.setOnClickListener(v -> {
-            if (quantity1 > 1) {
-                quantity1--;
-                tvQty1.setText(String.valueOf(quantity1));
-                hitungTotalHarga(); // Update harga saat dikurang
-            } else {
-                Toast.makeText(this, "Minimal pesanan adalah 1", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // --- LOGIKA METODE PESANAN ---
+    private void setupListeners() {
+        btnBack.setOnClickListener(v -> onBackPressed());
+        btnDelete.setOnClickListener(v -> tampilkanDialogHapus());
 
         layoutAmbilSendiri.setOnClickListener(v -> selectAmbilSendiri());
         radioAmbilSendiri.setOnClickListener(v -> selectAmbilSendiri());
-
         layoutAntarKurir.setOnClickListener(v -> selectAntarKurir());
         radioAntarKurir.setOnClickListener(v -> selectAntarKurir());
 
-        // --- LOGIKA TOMBOL LAINNYA ---
-
-        btnBack.setOnClickListener(v -> onBackPressed()); // Pakai onBackPressed biar sinkron sama sebelumnya
-
-        btnDelete.setOnClickListener(v -> {
-            // Cek apakah CheckBox item makanan sedang dicentang
-            if (cbSelectItem1.isChecked()) {
-                // Jika dicentang, tampilkan pop-up modal hapus
-                tampilkanDialogHapus();
-            } else {
-                // Jika belum ada yang dicentang, kasih peringatan ke user
-                Toast.makeText(this, "Pilih item yang ingin dihapus terlebih dahulu!", Toast.LENGTH_SHORT).show();
+        // Select All checkbox
+        cbSelectAll.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isUpdatingSelectAll) return;
+            if (cartAdapter != null) {
+                cartAdapter.setSelectAll(isChecked);
+                updateTotal();
+                updateCheckoutButton();
             }
         });
 
+        // Checkout button
         btnCheckout.setOnClickListener(v -> {
-            if (!cbSelectItem1.isChecked()) {
-                Toast.makeText(this, "Pilih makanan yang ingin di-checkout terlebih dahulu!", Toast.LENGTH_SHORT).show();
-            } else {
-                Intent intent = new Intent(KeranjangPelangganActivity.this, CheckoutActivity.class);
-                startActivity(intent);
+            if (cartAdapter == null || !cartAdapter.hasSelectedItem()) {
+                Toast.makeText(this, "Pilih minimal 1 item dulu", Toast.LENGTH_SHORT).show();
+                return;
             }
+            // TODO: lanjut ke halaman checkout/konfirmasi
+            Toast.makeText(this, "Lanjut checkout!", Toast.LENGTH_SHORT).show();
         });
     }
 
-    // --- FUNGSI UPDATE HARGA ---
-    private void hitungTotalHarga() {
-        int totalBayar = 0;
+    // ── CartAdapter.OnCartChangedListener ─────────────────────
 
-        // Cek apakah item makanan dicentang?
-        if (cbSelectItem1.isChecked()) {
-            // Hitung harga makanan: qty * harga satuan
-            int subtotal = quantity1 * hargaSatuan;
-            // Tambahkan ongkir (kalau Antar Kurir = 5000, kalau Ambil Sendiri = 0)
-            totalBayar = subtotal + biayaOngkir;
-        } else {
-            // Kalau centang dilepas, total bayar jadi 0
-            totalBayar = 0;
-        }
-
-        // Format angka jadi Rupiah (contoh: 55000 -> Rp 55.000)
-        NumberFormat formatRupiah = NumberFormat.getNumberInstance(new Locale("in", "ID"));
-        String hargaFormatted = "Rp " + formatRupiah.format(totalBayar);
-
-        // Ubah teks di layar
-        tvTotalBayar.setText(hargaFormatted);
-        tvTotalBottom.setText(hargaFormatted);
+    @Override
+    public void onCartChanged() {
+        fetchCart();
     }
 
-    // --- FUNGSI GANTI METODE ---
+    @Override
+    public void onSelectionChanged() {
+        updateTotal();
+        updateCheckoutButton();
+        syncSelectAllCheckbox();
+    }
+
+    // ── Fetch data ────────────────────────────────────────────
+
+    private void fetchCart() {
+        ApiClient.getAuthClient(token).create(ApiService.class)
+                .getCart()
+                .enqueue(new Callback<CartResponse>() {
+                    @Override
+                    public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().getData() != null) {
+
+                            CartResponse.CartData cart = response.body().getData();
+                            allItems.clear();
+                            if (cart.getCanteens() != null) {
+                                for (CartResponse.CanteenCart canteen : cart.getCanteens()) {
+                                    allItems.addAll(canteen.getItems());
+                                }
+                            }
+
+                            if (allItems.isEmpty()) {
+                                showKosong();
+                            } else {
+                                cartAdapter = new CartAdapter(
+                                        KeranjangPelangganActivity.this,
+                                        allItems,
+                                        KeranjangPelangganActivity.this
+                                );
+                                rvCart.setAdapter(cartAdapter);
+                                showCart();
+                                updateTotal();
+                                updateCheckoutButton();
+                                syncSelectAllCheckbox();
+                            }
+                        } else {
+                            showKosong();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CartResponse> call, Throwable t) {
+                        Toast.makeText(KeranjangPelangganActivity.this,
+                                "Gagal memuat keranjang", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    // ── Hitung & update total ─────────────────────────────────
+
+    private void updateTotal() {
+        if (cartAdapter == null) return;
+
+        double subtotal = cartAdapter.getSelectedSubtotal();
+        double total = subtotal + biayaOngkir;
+
+        tvSubtotalBelanja.setText(formatRupiah(subtotal));
+        tvOngkir.setText(biayaOngkir == 0 ? "Gratis" : formatRupiah(biayaOngkir));
+        tvTotalBayar.setText(formatRupiah(total));
+        tvTotalBottom.setText(formatRupiah(total));
+    }
+
+    private void updateCheckoutButton() {
+        if (cartAdapter != null && cartAdapter.hasSelectedItem()) {
+            btnCheckout.setAlpha(1.0f);
+            btnCheckout.setEnabled(true);
+        } else {
+            btnCheckout.setAlpha(0.5f);
+            btnCheckout.setEnabled(false);
+        }
+    }
+
+    /** Sync cbSelectAll tanpa trigger listener-nya */
+    private void syncSelectAllCheckbox() {
+        if (cartAdapter == null) return;
+        isUpdatingSelectAll = true;
+        cbSelectAll.setChecked(cartAdapter.isAllSelected());
+        isUpdatingSelectAll = false;
+    }
+
+    // ── Metode pesanan ────────────────────────────────────────
 
     private void selectAmbilSendiri() {
-        biayaOngkir = 0; // Nol rupiah
+        biayaOngkir = 0;
         radioAmbilSendiri.setChecked(true);
         radioAntarKurir.setChecked(false);
-
         radioAmbilSendiri.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#F97316")));
         radioAntarKurir.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#D1D5DB")));
-
         layoutAmbilSendiri.setBackgroundResource(R.drawable.bg_border_orange);
         layoutAntarKurir.setBackgroundResource(R.drawable.bg_border_gray);
-
-        hitungTotalHarga(); // Langsung update harga
+        updateTotal();
     }
 
     private void selectAntarKurir() {
-        biayaOngkir = 5000; // Nambah ceban
+        biayaOngkir = 5000;
         radioAntarKurir.setChecked(true);
         radioAmbilSendiri.setChecked(false);
-
         radioAntarKurir.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#F97316")));
         radioAmbilSendiri.setButtonTintList(ColorStateList.valueOf(Color.parseColor("#D1D5DB")));
-
         layoutAntarKurir.setBackgroundResource(R.drawable.bg_border_orange);
         layoutAmbilSendiri.setBackgroundResource(R.drawable.bg_border_gray);
-
-        hitungTotalHarga(); // Langsung update harga
+        updateTotal();
     }
 
+    // ── Show/hide state ───────────────────────────────────────
+
+    private void showKosong() {
+        Intent intent = new Intent(this, EmptyCartActivity.class);
+        startActivity(intent);
+        finish(); // tutup KeranjangPelangganActivity supaya tidak numpuk
+    }
+
+    private void showCart() {
+        rvCart.setVisibility(View.VISIBLE);
+        layoutKosong.setVisibility(View.GONE);
+    }
+
+    // ── Dialog hapus semua ────────────────────────────────────
+
     private void tampilkanDialogHapus() {
-        // Membuat Dialog
+        // Kumpulkan item yang sedang dicentang
+        List<CartResponse.CartItem> selectedItems = new ArrayList<>();
+        if (cartAdapter != null) {
+            for (int i = 0; i < allItems.size(); i++) {
+                if (cartAdapter.isItemSelected(i)) {
+                    selectedItems.add(allItems.get(i));
+                }
+            }
+        }
+
+        // Kalau tidak ada yang dipilih
+        if (selectedItems.isEmpty()) {
+            Toast.makeText(this, "Pilih item yang ingin dihapus dulu", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         android.app.Dialog dialog = new android.app.Dialog(this);
         dialog.setContentView(R.layout.dialog_hapus);
+        dialog.getWindow().setBackgroundDrawable(
+                new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setLayout(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
 
-        // Membuat background bawaan dialog jadi transparan agar sudut lengkung CardView terlihat
-        dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
-
-        // Mengatur lebar dialog agar ada jarak margin di kiri kanan layarnya
-        dialog.getWindow().setLayout(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        // Inisialisasi tombol di dalam dialog
         TextView btnDialogBatal = dialog.findViewById(R.id.btnDialogBatal);
         TextView btnDialogHapus = dialog.findViewById(R.id.btnDialogHapus);
 
-        // Kalau "Batal" diklik, tutup pop-up nya
-        btnDialogBatal.setOnClickListener(v -> {
-            dialog.dismiss();
-        });
-
-        // Kalau "Ya, Hapus" diklik
+        btnDialogBatal.setOnClickListener(v -> dialog.dismiss());
         btnDialogHapus.setOnClickListener(v -> {
-            // Logika menghapus keranjang:
-            // Misalnya kita uncheck semua dan set harganya jadi 0
-            cbSelectItem1.setChecked(false);
-            cbSelectAll.setChecked(false);
-            hitungTotalHarga();
-
-            // Tutup dialog
+            for (CartResponse.CartItem item : selectedItems) {
+                ApiClient.getAuthClient(token).create(ApiService.class)
+                        .removeCartItem(item.getMenuId())
+                        .enqueue(new Callback<CartResponse>() {
+                            @Override public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {}
+                            @Override public void onFailure(Call<CartResponse> call, Throwable t) {}
+                        });
+            }
             dialog.dismiss();
-
-            Toast.makeText(this, "Keranjang berhasil dikosongkan", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, selectedItems.size() + " item dihapus", Toast.LENGTH_SHORT).show();
+            fetchCart(); // refresh
         });
 
-        // Tampilkan dialognya ke layar
         dialog.show();
+    }
+    // ── Helper ────────────────────────────────────────────────
+
+    private String formatRupiah(double harga) {
+        NumberFormat fmt = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
+        return fmt.format(harga).replace(",00", "");
     }
 }

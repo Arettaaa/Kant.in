@@ -1,6 +1,7 @@
 package com.example.kantin;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -9,10 +10,14 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.example.kantin.model.request.AddToCartRequest;
+import com.example.kantin.model.response.CanteenDetailResponse;
+import com.example.kantin.model.response.CartResponse;
 import com.example.kantin.model.response.MenuDetailResponse;
 import com.example.kantin.model.response.MenuListResponse;
 import com.example.kantin.network.ApiClient;
 import com.example.kantin.network.ApiService;
+import com.example.kantin.utils.SessionManager;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -26,7 +31,9 @@ public class DetailMenuActivity extends AppCompatActivity {
     private ImageView imgFood, btnBack, btnMinus, btnPlus;
     private TextView tvNamaMenu, tvHarga, tvDeskripsi, tvQuantity, tvEstimasiWaktu;
     private LinearLayout btnTambahKeranjang;
-    private boolean isErrorShown = false; // ← tambah ini
+    private boolean isErrorShown = false;
+    private boolean isCanteenOpen = true; // ← tambah ini
+    private TextView tvTambahKeranjang;
 
 
     private int quantity = 1;
@@ -39,7 +46,6 @@ public class DetailMenuActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_detailmakananpelanggan);
 
-        // Inisialisasi view (sama seperti sebelumnya + tambahan)
         btnBack            = findViewById(R.id.btnBack);
         btnMinus           = findViewById(R.id.btnMinus);
         btnPlus            = findViewById(R.id.btnPlus);
@@ -49,12 +55,12 @@ public class DetailMenuActivity extends AppCompatActivity {
         tvNamaMenu         = findViewById(R.id.tvNamaMenu);
         tvHarga            = findViewById(R.id.tvHarga);
         tvDeskripsi        = findViewById(R.id.tvDeskripsi);
-        tvEstimasiWaktu = findViewById(R.id.tvEstimasiWaktu);
+        tvEstimasiWaktu    = findViewById(R.id.tvEstimasiWaktu);
 
-        // Tombol back — sama seperti sebelumnya
+        tvTambahKeranjang = findViewById(R.id.tvTambahKeranjang);
+
         btnBack.setOnClickListener(v -> onBackPressed());
 
-        // Kurangi qty — sama seperti sebelumnya
         btnMinus.setOnClickListener(v -> {
             if (quantity > 1) {
                 quantity--;
@@ -62,32 +68,58 @@ public class DetailMenuActivity extends AppCompatActivity {
             }
         });
 
-        // Tambah qty — sama seperti sebelumnya
         btnPlus.setOnClickListener(v -> {
             quantity++;
             tvQuantity.setText(String.valueOf(quantity));
         });
 
-        // Tambah ke keranjang
         btnTambahKeranjang.setOnClickListener(v -> {
-            Toast.makeText(this, quantity + "x " + menuName + " masuk ke keranjang!", Toast.LENGTH_SHORT).show();
-            finish();
+            // ← cek dulu apakah kantin buka
+            if (!isCanteenOpen) {
+                Toast.makeText(this, "Kantin sedang tutup", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String menuId = getIntent().getStringExtra("MENU_ID");
+            String token = new SessionManager(this).getToken();
+            AddToCartRequest request = new AddToCartRequest(menuId, quantity);
+
+            ApiClient.getAuthClient(token).create(ApiService.class)
+                    .addToCart(request)
+                    .enqueue(new Callback<CartResponse>() {
+                        @Override
+                        public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
+                            if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                                Toast.makeText(DetailMenuActivity.this,
+                                        quantity + "x " + menuName + " berhasil ditambahkan!",
+                                        Toast.LENGTH_SHORT).show();
+                                finish();
+                            } else {
+                                try {
+                                    String errorBody = response.errorBody().string();
+                                    Log.e("CART_ERROR", "error: " + errorBody);
+                                } catch (Exception e) {
+                                    Log.e("CART_ERROR", "Gagal baca error body");
+                                }
+                                Toast.makeText(DetailMenuActivity.this,
+                                        "Gagal menambahkan ke keranjang", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<CartResponse> call, Throwable t) {
+                            Toast.makeText(DetailMenuActivity.this,
+                                    "Gagal terhubung ke server", Toast.LENGTH_SHORT).show();
+                        }
+                    });
         });
 
-        // Ambil MENU_ID dari Intent, lalu fetch ke API
         String menuId = getIntent().getStringExtra("MENU_ID");
         if (menuId != null) {
             fetchMenuDetail(menuId);
         } else {
             Toast.makeText(this, "Menu tidak ditemukan", Toast.LENGTH_SHORT).show();
             finish();
-        }
-    }
-
-    private void showErrorOnce(String message) {
-        if (!isErrorShown) {
-            isErrorShown = true;
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -98,20 +130,57 @@ public class DetailMenuActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<MenuDetailResponse> call, Response<MenuDetailResponse> response) {
                         if (response.isSuccessful() && response.body() != null) {
-                            bindData(response.body().getData());
+                            MenuListResponse.MenuItem menu = response.body().getData();
+                            bindData(menu);
+
+                            // ← setelah dapat menu, fetch status kantin
+                            if (menu.getCanteenId() != null) {
+                                fetchCanteenStatus(menu.getCanteenId());
+                            }
                         } else {
-                            // ✅ Ganti Toast biasa → showErrorOnce
                             showErrorOnce("Gagal memuat detail menu");
                         }
                     }
 
                     @Override
                     public void onFailure(Call<MenuDetailResponse> call, Throwable t) {
-                        android.util.Log.e("API_ERROR", "Detail Menu: " + t.getMessage());
-                        // ✅ Ganti Toast biasa → showErrorOnce
+                        Log.e("API_ERROR", "Detail Menu: " + t.getMessage());
                         showErrorOnce("Gagal terhubung ke server");
                     }
                 });
+    }
+
+    // ← fungsi baru untuk cek status kantin
+    private void fetchCanteenStatus(String canteenId) {
+        ApiClient.getClient().create(ApiService.class)
+                .getCanteenDetail(canteenId)
+                .enqueue(new Callback<CanteenDetailResponse>() {
+                    @Override
+                    public void onResponse(Call<CanteenDetailResponse> call, Response<CanteenDetailResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            isCanteenOpen = response.body().getData().isOpen();
+                            updateTambahKeranjangButton();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CanteenDetailResponse> call, Throwable t) {
+                        Log.e("API_ERROR", "Canteen status: " + t.getMessage());
+                    }
+                });
+    }
+
+    // ← update tampilan tombol sesuai status kantin
+    private void updateTambahKeranjangButton() {
+        if (isCanteenOpen) {
+            btnTambahKeranjang.setAlpha(1.0f);
+            btnTambahKeranjang.setEnabled(true);
+            tvTambahKeranjang.setText("Tambah Keranjang");
+        } else {
+            btnTambahKeranjang.setAlpha(0.4f);
+            btnTambahKeranjang.setEnabled(false);
+            tvTambahKeranjang.setText("Kantin Sedang Tutup");
+        }
     }
 
     private void bindData(MenuListResponse.MenuItem menu) {
@@ -121,22 +190,26 @@ public class DetailMenuActivity extends AppCompatActivity {
         tvNamaMenu.setText(menuName);
         tvDeskripsi.setText(menu.getDescription());
         tvHarga.setText(formatRupiah(basePrice));
-
         tvEstimasiWaktu.setText("Siap dalam " + menu.getEstimatedCookingTime() + " menit");
 
-        // ✅ Fix URL gambar — sama seperti adapter lain
         String imageUrl = menu.getImage();
         if (imageUrl != null && !imageUrl.startsWith("http")) {
             imageUrl = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/" + imageUrl;
         }
 
-        Glide.with(DetailMenuActivity.this) // ← pakai this eksplisit
+        Glide.with(DetailMenuActivity.this)
                 .load(imageUrl)
                 .placeholder(R.drawable.makanan)
                 .error(R.drawable.makanan)
                 .into(imgFood);
     }
 
+    private void showErrorOnce(String message) {
+        if (!isErrorShown) {
+            isErrorShown = true;
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
+    }
 
     private String formatRupiah(double harga) {
         NumberFormat fmt = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));

@@ -89,6 +89,7 @@
         <activity android:name=".HistoryActivity" />
         <activity android:name=".ProfilPelangganActivity" />
         <activity android:name=".KeranjangPelangganActivity" />
+        <activity android:name=".EmptyCartActivity" />
         <activity android:name=".ExploreMenuPelangganActivity" />
         <activity android:name=".ExploreKantinPelangganActivity" />
         <activity android:name=".DetailMenuActivity" />
