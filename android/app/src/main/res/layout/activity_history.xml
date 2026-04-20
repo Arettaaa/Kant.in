@@ -142,7 +142,7 @@
                         <ImageView
                             android:layout_width="17dp"
                             android:layout_height="17dp"
-                            android:src="@drawable/checkcircle"
+                            android:src="@drawable/checkcirclee"
                             app:tint="#10B981" />
                         <TextView
                             android:layout_width="wrap_content"
@@ -404,7 +404,7 @@
                         <ImageView
                             android:layout_width="17dp"
                             android:layout_height="17dp"
-                            android:src="@drawable/checkcircle"
+                            android:src="@drawable/checkcirclee"
                             app:tint="#10B981" />
                         <TextView
                             android:layout_width="wrap_content"

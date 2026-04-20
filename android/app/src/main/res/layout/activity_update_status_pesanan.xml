@@ -141,7 +141,7 @@
                             android:id="@+id/ivSiap"
                             android:layout_width="48dp"
                             android:layout_height="48dp"
-                            android:src="@drawable/checkcircle"
+                            android:src="@drawable/checkcirclee"
                             app:tint="#BDBDBD" />
 
                         <TextView

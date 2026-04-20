@@ -41,17 +41,20 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         Order order = orderList.get(position);
 
         // 1. SET DATA UMUM (Nama, ID, Waktu)
-        holder.tvCustomerName.setText(order.getCustomerName());
-        holder.tvOrderId.setText(order.getOrderId());
-        holder.tvOrderTime.setText(order.getTime());
+        if (holder.tvCustomerName != null) {
+            holder.tvCustomerName.setText(order.getCustomerName());
+        }
+        if (holder.tvOrderId != null) {
+            holder.tvOrderId.setText(order.getOrderId());
+        }
+        if (holder.tvOrderTime != null) {
+            holder.tvOrderTime.setText(order.getTime());
+        }
 
         // 2. LOGIKA TAB PESANAN MASUK (Harga & Ringkasan Menu)
         if (!isProsesTab) {
             if (holder.tvTotalPrice != null) {
                 holder.tvTotalPrice.setText(order.getTotalHarga());
-            }
-            if (holder.tvMenuSummary != null) {
-                holder.tvMenuSummary.setText(order.getMenuSummary());
             }
         }
 
@@ -69,7 +72,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             else if ("ready".equalsIgnoreCase(status) || "Siap".equalsIgnoreCase(status)) {
                 holder.tvStatusText.setText("Siap");
                 holder.tvStatusText.setTextColor(ContextCompat.getColor(context, R.color.green_primary));
-                holder.ivStatusIcon.setImageResource(R.drawable.checkcircle); // Ikon centang
+                holder.ivStatusIcon.setImageResource(R.drawable.checkcirclee); // Ikon centang
                 holder.ivStatusIcon.setColorFilter(ContextCompat.getColor(context, R.color.green_primary));
                 holder.layoutStatusBadge.setBackgroundResource(R.drawable.admin_badge_green_light);
             }
@@ -100,24 +103,30 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     public static class OrderViewHolder extends RecyclerView.ViewHolder {
         // Variabel gabungan untuk kedua layout
-        TextView tvCustomerName, tvOrderId, tvOrderTime, tvTotalPrice, tvMenuSummary;
-        TextView tvStatusText, tvTotalItemProses;
-        AppCompatButton btnTerima, btnTolak;
+        TextView tvCustomerName, tvOrderId, tvOrderTime, tvTotalPrice;
+        TextView tvStatusText;
+        View btnTerima, btnTolak;
         ImageView ivStatusIcon;
         LinearLayout layoutStatusBadge;
 
         public OrderViewHolder(@NonNull View itemView) {
             super(itemView);
-            // ID Umum
-            tvCustomerName = itemView.findViewById(R.id.tvCustomerName);
-            tvOrderId = itemView.findViewById(R.id.tvOrderId);
-            tvOrderTime = itemView.findViewById(R.id.tvOrderTime);
+            // ID Umum (Coba mapping sesuai layout yang tersedia)
+            
+            // Tab Masuk uses underscores, Tab Proses uses CamelCase
+            tvCustomerName = itemView.findViewById(R.id.tv_customer_name);
+            if (tvCustomerName == null) tvCustomerName = itemView.findViewById(R.id.tvCustomerNameProses);
+            
+            tvOrderId = itemView.findViewById(R.id.tv_order_id);
+            if (tvOrderId == null) tvOrderId = itemView.findViewById(R.id.tvOrderIdProses);
+            
+            tvOrderTime = itemView.findViewById(R.id.tv_order_time);
+            if (tvOrderTime == null) tvOrderTime = itemView.findViewById(R.id.tvOrderTimeProses);
 
             // ID Khusus Tab Masuk
-            tvTotalPrice = itemView.findViewById(R.id.tvTotalPrice);
-            tvMenuSummary = itemView.findViewById(R.id.tvMenuSummary);
-            btnTerima = itemView.findViewById(R.id.btnTerima);
-            btnTolak = itemView.findViewById(R.id.btnTolak);
+            tvTotalPrice = itemView.findViewById(R.id.tv_total_price);
+            btnTerima = itemView.findViewById(R.id.btn_terima);
+            btnTolak = itemView.findViewById(R.id.btn_tolak);
 
             // ID Khusus Tab Proses
             tvStatusText = itemView.findViewById(R.id.tvStatusText);

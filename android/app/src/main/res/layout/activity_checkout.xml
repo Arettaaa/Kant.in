@@ -368,7 +368,7 @@
                         <ImageView
                             android:layout_width="14dp"
                             android:layout_height="14dp"
-                            android:src="@drawable/checkcircle"
+                            android:src="@drawable/checkcirclee"
                             app:tint="#10B981" />
 
                         <TextView

@@ -212,12 +212,23 @@ public class BerandaPelangganActivity extends AppCompatActivity {
         apiService.getAllMenus().enqueue(new Callback<MenuListResponse>() {
             @Override
             public void onResponse(Call<MenuListResponse> call, Response<MenuListResponse> response) {
+                Log.d("DEBUG_KANTIN", "Response Code: " + response.code()); // Cek status code
+
                 if (response.isSuccessful() && response.body() != null) {
                     List<MenuListResponse.MenuItem> allMenu = response.body().getData();
+
+                    Log.d("DEBUG_KANTIN", "Jumlah data menu: " + (allMenu != null ? allMenu.size() : "null"));
+
                     if (allMenu != null && !allMenu.isEmpty()) {
                         List<MenuListResponse.MenuItem> displayList = allMenu.size() > 3 ? allMenu.subList(0, 3) : allMenu;
                         menuPopulerAdapter = new MenuPopulerAdapter(BerandaPelangganActivity.this, displayList);
                         rvMenuPopuler.setAdapter(menuPopulerAdapter);
+
+                        // Tambahkan ini untuk memastikan UI refresh
+                        menuPopulerAdapter.notifyDataSetChanged();
+                        Log.d("DEBUG_KANTIN", "Adapter berhasil dipasang!");
+                    } else {
+                        Log.d("DEBUG_KANTIN", "Data menu kosong dari server");
                     }
                 }
             }
@@ -226,7 +237,6 @@ public class BerandaPelangganActivity extends AppCompatActivity {
             }
         });
     }
-
     private void preloadSearchData() {
         ApiService api = ApiClient.getClient().create(ApiService.class);
 
