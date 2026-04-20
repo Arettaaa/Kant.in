@@ -13,7 +13,7 @@ class MenuController extends Controller
     public function index(Request $request, $canteenId)
     {
         $canteen = Canteen::find($canteenId);
-        
+
         // Tambahkan pengecekan is_active dan status di sini
         if (!$canteen || !$canteen->is_active || $canteen->status !== 'active') {
             return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan atau sedang tidak aktif.'], 404);
@@ -178,27 +178,32 @@ class MenuController extends Controller
 
     public function allMenus(Request $request)
     {
-        // 1. Dapatkan semua ID kantin yang aktif dan statusnya active
-        $activeCanteenIds = Canteen::where('is_active', true)
+        // 1. Ambil semua kantin yang aktif
+        $activeCanteens = Canteen::where('is_active', true)
             ->where('status', 'active')
-            ->pluck('_id')
-            ->map(fn($id) => (string) $id) // Pastikan berupa string
-            ->toArray();
+            ->get();
 
-        // 2. Tampilkan menu yang HANYA dimiliki oleh kantin-kantin aktif tersebut
+        // 2. Trik Kebal Peluru MongoDB: Masukkan format asli (ObjectId) DAN format String
+        $activeCanteenIds = [];
+        foreach ($activeCanteens as $canteen) {
+            $activeCanteenIds[] = $canteen->_id;           // Format Asli
+            $activeCanteenIds[] = (string) $canteen->_id;  // Format String
+        }
+
+        // 3. Tampilkan menu berdasarkan kumpulan ID kebal peluru tadi
         $query = Menu::whereIn('canteen_id', $activeCanteenIds);
 
-        // Tetap bisa cari makanan (misal: cari "Ayam")
-        if ($request->has('search')) {
+        // Filter Pencarian Makanan
+        if ($request->has('search') && $request->search != '') {
             $query->where('name', 'regex', '/' . $request->search . '/i');
         }
 
-        // Tetap bisa filter kategori (misal: "makanan")
-        if ($request->has('category')) {
+        // Filter Kategori (Abaikan jika "Semua" atau kosong)
+        if ($request->has('category') && $request->category !== 'Semua') {
             $query->where('category', $request->category);
         }
 
-        // Ambil data dan format gambarnya
+        // Ambil data dan format
         $menus = $query->get()->map(fn($menu) => $this->formatMenu($menu));
 
         return response()->json([
