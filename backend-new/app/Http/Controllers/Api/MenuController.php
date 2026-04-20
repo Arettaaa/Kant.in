@@ -13,8 +13,10 @@ class MenuController extends Controller
     public function index(Request $request, $canteenId)
     {
         $canteen = Canteen::find($canteenId);
-        if (!$canteen) {
-            return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan.'], 404);
+        
+        // Tambahkan pengecekan is_active dan status di sini
+        if (!$canteen || !$canteen->is_active || $canteen->status !== 'active') {
+            return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan atau sedang tidak aktif.'], 404);
         }
 
         $query = Menu::where('canteen_id', $canteenId);
@@ -176,8 +178,15 @@ class MenuController extends Controller
 
     public function allMenus(Request $request)
     {
-        // Ambil semua menu tanpa filter canteen_id
-        $query = Menu::query();
+        // 1. Dapatkan semua ID kantin yang aktif dan statusnya active
+        $activeCanteenIds = Canteen::where('is_active', true)
+            ->where('status', 'active')
+            ->pluck('_id')
+            ->map(fn($id) => (string) $id) // Pastikan berupa string
+            ->toArray();
+
+        // 2. Tampilkan menu yang HANYA dimiliki oleh kantin-kantin aktif tersebut
+        $query = Menu::whereIn('canteen_id', $activeCanteenIds);
 
         // Tetap bisa cari makanan (misal: cari "Ayam")
         if ($request->has('search')) {
@@ -189,7 +198,7 @@ class MenuController extends Controller
             $query->where('category', $request->category);
         }
 
-        // Ambil data dan format gambarnya (pakai fungsi formatMenu yang sudah kamu punya)
+        // Ambil data dan format gambarnya
         $menus = $query->get()->map(fn($menu) => $this->formatMenu($menu));
 
         return response()->json([
@@ -197,7 +206,6 @@ class MenuController extends Controller
             'data' => $menus
         ]);
     }
-
     public function show($id)
     {
         $menu = Menu::find($id);
