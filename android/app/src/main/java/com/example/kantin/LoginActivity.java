@@ -204,7 +204,7 @@ public class LoginActivity extends AppCompatActivity {
         // Karena session hanya disimpan jika sudah Aktif/Pelanggan,
         // kita cukup cek role-nya saja di sini.
         if (sessionManager.isAdminKantin()) {
-            startActivity(new Intent(LoginActivity.this, ActivityAdminDashboard.class));
+            startActivity(new Intent(LoginActivity.this, AdminDashboardActivity.class));
         } else {
             startActivity(new Intent(LoginActivity.this, BerandaPelangganActivity.class));
         }

@@ -125,8 +125,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
             // ID Khusus Tab Masuk
             tvTotalPrice = itemView.findViewById(R.id.tv_total_price);
-            btnTerima = itemView.findViewById(R.id.btn_terima);
-            btnTolak = itemView.findViewById(R.id.btn_tolak);
+//            btnTerima = itemView.findViewById(R.id.btn_terima);
+//            btnTolak = itemView.findViewById(R.id.btn_tolak);
 
             // ID Khusus Tab Proses
             tvStatusText = itemView.findViewById(R.id.tvStatusText);

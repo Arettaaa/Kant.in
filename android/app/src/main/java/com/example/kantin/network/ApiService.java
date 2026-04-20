@@ -8,6 +8,7 @@ import com.example.kantin.model.request.CheckoutRequest;
 import com.example.kantin.model.request.UpdateStatusOrderRequest;
 
 // Import untuk Response (Data yang diterima dari Laravel)
+import com.example.kantin.model.response.AdminOrderListResponse;
 import com.example.kantin.model.response.BaseResponse;
 import com.example.kantin.model.response.CanteenDetailResponse;
 import com.example.kantin.model.response.LoginResponse;
@@ -391,5 +392,11 @@ public interface ApiService {
             @Part("old_password") RequestBody oldPassword,
             @Part("password") RequestBody password,
             @Part("password_confirmation") RequestBody confirmation
+    );
+
+    @GET("canteens/{canteenId}/orders")
+    Call<AdminOrderListResponse> getAdminOrders(
+            @Path("canteenId") String canteenId,
+            @Query("status") String status
     );
 }
