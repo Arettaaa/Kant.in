@@ -3,6 +3,7 @@ package com.example.kantin;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.kantin.model.response.CanteenListResponse;
+import com.example.kantin.model.response.CartResponse;
 import com.example.kantin.model.response.MenuListResponse;
 import com.example.kantin.network.ApiClient;
 import com.example.kantin.network.ApiService;
@@ -41,6 +43,7 @@ public class BerandaPelangganActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private ImageView ivFotoProfil;
     private TextView tvHaloUser;
+    private TextView tvBadgeKeranjang;
 
     // Pastikan BASE_URL sesuai dengan link Ngrok aktif
     private final String BASE_URL_STORAGE = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/";
@@ -69,6 +72,8 @@ public class BerandaPelangganActivity extends AppCompatActivity {
         chipMakanan  = findViewById(R.id.chip_makanan);
         chipMinuman  = findViewById(R.id.chip_minuman);
         chipCemilan  = findViewById(R.id.chip_cemilan);
+
+        tvBadgeKeranjang = findViewById(R.id.tv_badge_keranjang);
 
         ImageView btnHistoryTop = findViewById(R.id.btn_history_top);
         FrameLayout btnKeranjang = findViewById(R.id.btn_keranjang);
@@ -237,6 +242,53 @@ public class BerandaPelangganActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void fetchCartCount() {
+        // Ambil token dari SessionManager
+        String token = sessionManager.getToken(); // Pastikan method ini sesuai dengan SessionManager kamu
+
+        // Gunakan getAuthClient(token), JANGAN getClient()
+        ApiService apiService = ApiClient.getAuthClient(token).create(ApiService.class);
+
+        apiService.getCart().enqueue(new Callback<CartResponse>() {
+            @Override
+            public void onResponse(Call<CartResponse> call, Response<CartResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    CartResponse.CartData cartData = response.body().getData();
+
+                    int totalItems = 0;
+
+                    if (cartData != null && cartData.getCanteens() != null) {
+                        for (CartResponse.CanteenCart canteen : cartData.getCanteens()) {
+                            if (canteen.getItems() != null) {
+                                // Menghitung "macam" menu (Ayam Bakar 2, Es Teh 1 = dihitung 2)
+                                totalItems += canteen.getItems().size();
+                            }
+                        }
+                    } else if (cartData != null) {
+                        Log.e("DEBUG_BADGE", "List kantinnya (getCanteens) NULL! Cek penamaan array di Laravel.");
+                    }
+
+                    Log.d("DEBUG_BADGE", "Total item yang dihitung untuk badge: " + totalItems);
+
+                    // Update UI
+                    if (totalItems > 0) {
+                        tvBadgeKeranjang.setText(String.valueOf(totalItems));
+                        tvBadgeKeranjang.setVisibility(View.VISIBLE);
+                    } else {
+                        tvBadgeKeranjang.setVisibility(View.GONE);
+                    }
+                } else {
+                    Log.e("DEBUG_BADGE", "Response gagal terbaca. Code: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CartResponse> call, Throwable t) {
+                Log.e("API_ERROR", "Gagal load jumlah keranjang: " + t.getMessage());
+            }
+        });
+    }
     private void preloadSearchData() {
         ApiService api = ApiClient.getClient().create(ApiService.class);
 
@@ -324,5 +376,9 @@ public class BerandaPelangganActivity extends AppCompatActivity {
         if (chipSemua != null) {
             updateKategoriUI(chipSemua);
         }
+
+        // Panggil fungsi ini agar badge keranjang selalu update!
+        fetchCartCount();
     }
+
 }
