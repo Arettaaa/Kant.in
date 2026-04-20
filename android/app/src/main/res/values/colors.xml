@@ -9,6 +9,13 @@
     <color name="orange_primary">#F97316</color>
     <color name="purple_primary">#8B5CF6</color>
     <color name="red_danger">#EF4444</color>
+    <color name="colorPrimary">#FF6D00</color>
+    <color name="colorAccept">#00C853</color>
+    <color name="colorRejectText">#D32F2F</color>
+    <color name="colorRejectBg">#FFEBEE</color>
+    <color name="colorBadgeBlue">#5DADE2</color> <color name="colorBadgePurple">#D500F9</color> <color name="colorBackground">#F8F9FA</color>
+    <color name="colorOverlay">#99E0E0E0</color> <color name="colorTextPrimary">#212121</color>
+    <color name="colorTextSecondary">#757575</color>
 
 
 </resources>
