@@ -53,6 +53,7 @@ Route::middleware(['auth:sanctum', 'role:pembeli'])->prefix('buyers')->group(fun
     Route::get('/orders/{orderId}', [OrderController::class, 'show']);
     Route::get('/orders/{orderId}/statuses', [OrderController::class, 'status']);
     Route::post('/orders/{orderId}/cancellations', [OrderController::class, 'cancel']);
+    Route::post('/orders/{orderId}/completions', [OrderController::class, 'complete']);
 
     // Profile
     Route::get('/profiles', [ProfileController::class, 'show']);

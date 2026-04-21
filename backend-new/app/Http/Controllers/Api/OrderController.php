@@ -370,4 +370,27 @@ class OrderController extends Controller
             'data' => $order->fresh(),
         ]);
     }
+
+    public function complete(Request $request, $orderId)
+    {
+        $order = Order::where('_id', $orderId)
+            ->where('customer_snapshot.user_id', (string) $request->user()->_id)
+            ->first();
+
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Pesanan tidak ditemukan.'], 404);
+        }
+
+        if ($order->status !== 'ready') {
+            return response()->json(['success' => false, 'message' => 'Pesanan belum siap diambil.'], 422);
+        }
+
+        $order->update(['status' => Order::STATUS_COMPLETED]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pesanan berhasil dikonfirmasi.',
+            'data' => $order->fresh(),
+        ]);
+    }
 }
