@@ -3,40 +3,55 @@ package com.example.kantin;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.kantin.model.response.BaseResponse;
+import com.example.kantin.network.ApiClient;
+import com.example.kantin.network.ApiService;
+import com.example.kantin.utils.SessionManager;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CancelPaymentActivity extends AppCompatActivity {
 
     private ImageView btnBack;
     private TextView tvTimer;
+    private TextView tvOrderId; // tambah ini
+
     private MaterialButton btnCancelOrder;
     private CountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
+        if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_cancelpayment);
 
         btnBack = findViewById(R.id.btnBack);
         tvTimer = findViewById(R.id.tvTimer);
+        tvOrderId = findViewById(R.id.tvOrderId);
         btnCancelOrder = findViewById(R.id.btnCancelOrder);
 
-        btnBack.setOnClickListener(v -> {
-            onBackPressed(); // Berfungsi sama dengan tombol back bawaan HP
-        });
-
-        startTimer(31000); // Set timer 30 detik
-
+        // Tampilkan ORDER_CODE di UI (bukan ORDER_ID)
+        // Di onCreate, setelah ambil intent
+        String orderCode = getIntent().getStringExtra("ORDER_CODE");
+        String orderId = getIntent().getStringExtra("ORDER_ID");
+        Log.d("CANCEL_DEBUG", "ORDER_CODE: " + orderCode);
+        Log.d("CANCEL_DEBUG", "ORDER_ID: " + orderId);
+        if (orderCode != null) {
+            tvOrderId.setText(orderCode);
+        }
+        btnBack.setOnClickListener(v -> onBackPressed());
+        startTimer(31000);
         btnCancelOrder.setOnClickListener(v -> showCancelBottomSheetDialog());
     }
 
@@ -45,23 +60,18 @@ public class CancelPaymentActivity extends AppCompatActivity {
         countDownTimer = new CountDownTimer(durationInMillis, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                // Konversi milidetik ke detik
                 long secondsLeft = millisUntilFinished / 1000;
-
-                // Format teks menjadi "00:XX"
-                String timeFormatted = String.format("00:%02d", secondsLeft);
-                tvTimer.setText(timeFormatted);
+                tvTimer.setText(String.format("00:%02d", secondsLeft));
             }
 
-            // DI SINI LETAK onFinish() YANG BENAR (Di dalam CountDownTimer)
             @Override
             public void onFinish() {
                 tvTimer.setText("00:00");
-
-                // Langsung pindah ke halaman Validasi Admin otomatis
                 Intent intent = new Intent(CancelPaymentActivity.this, ValidasiAdminActivity.class);
+                intent.putExtra("ORDER_CODE", getIntent().getStringExtra("ORDER_CODE"));
+                intent.putExtra("ORDER_ID", getIntent().getStringExtra("ORDER_ID"));
                 startActivity(intent);
-                finish(); // Tutup halaman cancel agar user tidak bisa back ke halaman ini lagi
+                finish();
             }
         }.start();
     }
@@ -88,12 +98,34 @@ public class CancelPaymentActivity extends AppCompatActivity {
             bottomSheetDialog.dismiss();
             if (countDownTimer != null) countDownTimer.cancel();
 
-            Toast.makeText(this, "Pesanan dibatalkan", Toast.LENGTH_SHORT).show();
+            String orderId = getIntent().getStringExtra("ORDER_ID");
+            Log.d("CANCEL_DEBUG", "ORDER_ID yang dikirim ke API: " + orderId); // tambah ini
 
-            // UBAH BAGIAN INI
-            Intent intent = new Intent(CancelPaymentActivity.this, PesananDibatalkanActivity.class);
-            startActivity(intent);
-            finish();
+            String token = new SessionManager(this).getToken();
+            Log.d("CANCEL_DEBUG", "Token: " + token); // tambah ini
+            ApiClient.getAuthClient(token).create(ApiService.class)
+                    .cancelOrder(orderId)
+                    .enqueue(new Callback<BaseResponse>() {
+                        @Override
+                        public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
+                            if (response.isSuccessful()) {
+                                Toast.makeText(CancelPaymentActivity.this, "Pesanan dibatalkan", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(CancelPaymentActivity.this, "Gagal membatalkan, tapi tetap lanjut", Toast.LENGTH_SHORT).show();
+                            }
+                            Intent intent = new Intent(CancelPaymentActivity.this, PesananDibatalkanActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+
+                        @Override
+                        public void onFailure(Call<BaseResponse> call, Throwable t) {
+                            Toast.makeText(CancelPaymentActivity.this, "Error jaringan", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(CancelPaymentActivity.this, PesananDibatalkanActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
         });
 
         // Aksi jika user klik "Kembali" di dialog

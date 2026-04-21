@@ -67,6 +67,11 @@ public class OrderListResponse {
         @SerializedName("updated_at")
         private String updatedAt;
 
+        @SerializedName("id")
+        private String idAlias; // untuk response yang pakai "id" bukan "_id"
+
+        public String getIdAlias() { return idAlias; }
+
         public String getId()                         { return id; }
         public String getOrderCode()                  { return orderCode; }
         public CustomerSnapshot getCustomerSnapshot() { return customerSnapshot; }
@@ -113,6 +118,8 @@ public class OrderListResponse {
     public static class CustomerSnapshot {
         @SerializedName("user_id")
         private String userId;
+
+
 
         @SerializedName("name")
         private String name;

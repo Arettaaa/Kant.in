@@ -77,6 +77,7 @@
                         android:textSize="15sp" />
 
                     <TextView
+                        android:id="@+id/tvItemCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -103,6 +104,7 @@
                         android:textSize="14sp" />
 
                     <TextView
+                        android:id="@+id/tvSubtotal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -124,6 +126,7 @@
                         android:textSize="14sp" />
 
                     <TextView
+                        android:id="@+id/tvOngkir"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -153,6 +156,7 @@
                         android:textSize="15sp" />
 
                     <TextView
+                        android:id="@+id/tvTotal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -266,6 +270,36 @@
                     android:text="Kant.in Main Food Court"
                     android:textColor="#1A1A1A"
                     android:textSize="13sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutAlamat"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:textStyle="bold"
+                    android:text="Alamat Pengiriman (Catatan Lokasi)"
+                    android:textColor="#1A1A1A"
+                    android:textSize="15sp" />
+
+                <EditText
+                    android:id="@+id/etAlamat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_input_field"
+                    android:hint="Contoh: Gedung SV, Lantai 2, Ruang D..."
+                    android:padding="16dp"
+                    android:textColor="#1A1A1A"
+                    android:textSize="14sp"
+                    android:minLines="2"
+                    android:gravity="top|start" />
             </LinearLayout>
 
             <TextView

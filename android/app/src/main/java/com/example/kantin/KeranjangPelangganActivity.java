@@ -115,12 +115,39 @@ public class KeranjangPelangganActivity extends AppCompatActivity
                 Toast.makeText(this, "Pilih minimal 1 item dulu", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (getSelectedCanteenId() == null) {
+
+            String canteenId = getSelectedCanteenId();
+            if (canteenId == null) {
                 Toast.makeText(this, "Checkout hanya bisa dari 1 kantin", Toast.LENGTH_SHORT).show();
                 return;
             }
-            // TODO: lanjut ke halaman checkout
-            Toast.makeText(this, "Lanjut checkout!", Toast.LENGTH_SHORT).show();
+
+            // 1. Kumpulkan ID menu yang dicentang
+            ArrayList<String> selectedMenuIds = new ArrayList<>();
+            for (int i = 0; i < allItems.size(); i++) {
+                if (cartAdapter.isItemSelected(i)) {
+                    selectedMenuIds.add(allItems.get(i).getMenuId());
+                }
+            }
+
+            // 2. Tentukan metode pengiriman
+            String deliveryMethod = radioAntarKurir.isChecked() ? "delivery" : "pickup";
+
+            // ... (kode sebelumnya sama) ...
+
+            // 3. Pindah ke Halaman Checkout dan bawa datanya
+            Intent intent = new Intent(KeranjangPelangganActivity.this, CheckoutActivity.class);
+            intent.putExtra("CANTEEN_ID", canteenId);
+            intent.putStringArrayListExtra("MENU_IDS", selectedMenuIds);
+            intent.putExtra("DELIVERY_METHOD", deliveryMethod);
+
+            // --- TAMBAHAN BARU: Bawa detail harga & item ---
+            intent.putExtra("ITEM_COUNT", selectedMenuIds.size());
+            intent.putExtra("SUBTOTAL", cartAdapter.getSelectedSubtotal());
+            intent.putExtra("ONGKIR", (double) biayaOngkir);
+            intent.putExtra("TOTAL_BAYAR", cartAdapter.getSelectedSubtotal() + biayaOngkir);
+
+            startActivity(intent);
         });
     }
 
