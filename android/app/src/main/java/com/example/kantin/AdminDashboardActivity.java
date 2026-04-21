@@ -77,9 +77,15 @@ public class AdminDashboardActivity extends AppCompatActivity {
         // Setup ViewPager2 + Tab
         AdminPagerAdapter pagerAdapter = new AdminPagerAdapter(this);
         viewPager.setAdapter(pagerAdapter);
-        new TabLayoutMediator(tabLayout, viewPager, (tab, position) ->
-                tab.setText(position == 0 ? "Pesanan Masuk" : "Diproses")
-        ).attach();
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+            View view = getLayoutInflater().inflate(R.layout.tab_item, tabLayout, false);
+            TextView title = view.findViewById(R.id.tv_tab_title);
+            TextView badge = view.findViewById(R.id.tv_badge);
+
+            title.setText(position == 0 ? "Pesanan Masuk" : "Diproses");
+
+            tab.setCustomView(view);
+        }).attach();
 
         setupSwitchListener();
     }
@@ -93,23 +99,19 @@ public class AdminDashboardActivity extends AppCompatActivity {
         tabLayout = findViewById(R.id.tab_layout);
     }
 
-    public void updateTabCount(int tab, int count) {
-        TabLayout.Tab t = tabLayout.getTabAt(tab);
-        if (t != null) {
-            String label = tab == 0 ? "Pesanan Masuk" : "Diproses";
+    public void updateTabCount(int tabIndex, int count) {
+        TabLayout.Tab tab = tabLayout.getTabAt(tabIndex);
+        if (tab != null && tab.getCustomView() != null) {
+            TextView badge = tab.getCustomView().findViewById(R.id.tv_badge);
+
             if (count > 0) {
-                SpannableString span = new SpannableString(label + "  " + count);
-                span.setSpan(new ForegroundColorSpan(Color.WHITE),
-                        label.length() + 2, span.length(), 0);
-                span.setSpan(new BackgroundColorSpan(Color.parseColor("#F97316")),
-                        label.length() + 2, span.length(), 0);
-                t.setText(span);
+                badge.setText(String.valueOf(count));
+                badge.setVisibility(View.VISIBLE);
             } else {
-                t.setText(label);
+                badge.setVisibility(View.GONE);
             }
         }
     }
-
     @SuppressWarnings("deprecation")
     private void setupSwitchListener() {
         switchKantin.setOnCheckedChangeListener((buttonView, isChecked) -> {

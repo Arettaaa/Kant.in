@@ -137,13 +137,14 @@
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/tab_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:background="@android:color/transparent"
-                    app:tabBackground="@drawable/selector_tab_background"
-                    app:tabIndicatorHeight="0dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_tab"
+
+                    app:tabIndicatorColor="#F97316"
+                    app:tabIndicatorHeight="4dp"
+                    app:tabIndicatorFullWidth="false"
+
                     app:tabRippleColor="@null"
-                    app:tabSelectedTextColor="#000000"
-                    app:tabTextColor="#888888"
                     app:tabMode="fixed"/>
             </LinearLayout>
 
