@@ -1,27 +1,28 @@
 package com.example.kantin;
 
 import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
+import android.graphics.Color;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.kantin.model.OrderModel; // <-- IMPORT BARU
-import com.example.kantin.model.response.AdminOrderListResponse;
+import com.bumptech.glide.Glide;
 import com.example.kantin.model.response.BaseResponse;
 import com.example.kantin.network.ApiClient;
 import com.example.kantin.network.ApiService;
 import com.example.kantin.utils.SessionManager;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -34,13 +35,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
     private CheckBox switchKantin;
     private View overlayTutup;
-    private TextView tvStatusBadge;
-    private RecyclerView rvOrders;
-
-    private OrderMasukAdapter adapter;
-
-    // PERBAIKAN 1: Menggunakan OrderModel
-    private final List<OrderModel> pendingOrders = new ArrayList<>();
+    private TextView tvStatusBadge, tvShopName;
+    private ViewPager2 viewPager;
+    private TabLayout tabLayout;
 
     private String canteenId;
     private ApiService apiService;
@@ -52,64 +49,67 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
         initViews();
 
-        // BERSIH — pakai SessionManager saja, hapus baris prefs & token lama
         SessionManager sessionManager = new SessionManager(this);
         String token = sessionManager.getToken();
         canteenId = sessionManager.getCanteenId();
 
+        String fullName = sessionManager.getUserName();
+        String firstName;
+        if (fullName != null && fullName.split(" ").length >= 2) {
+            String[] parts = fullName.split(" ");
+            firstName = parts[0] + " " + parts[1]; // "Bu Vivi"
+        } else {
+            firstName = fullName;
+        }
+        tvShopName.setText(firstName != null ? firstName : "Admin");
+        // Foto profil
+        ImageView ivFotoAdmin = findViewById(R.id.iv_shop_icon);
+        String BASE_URL_STORAGE = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/";
+        String path = sessionManager.getPhotoUrl();
+        if (path != null && !path.isEmpty()) {
+            String fullUrl = path.startsWith("http") ? path : BASE_URL_STORAGE + path;
+            Glide.with(this).load(fullUrl).circleCrop()
+                    .placeholder(R.drawable.avatar).into(ivFotoAdmin);
+        }
+
         apiService = ApiClient.getAuthClient(token).create(ApiService.class);
 
-        rvOrders.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new OrderMasukAdapter(this, pendingOrders);
-        rvOrders.setAdapter(adapter);
+        // Setup ViewPager2 + Tab
+        AdminPagerAdapter pagerAdapter = new AdminPagerAdapter(this);
+        viewPager.setAdapter(pagerAdapter);
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) ->
+                tab.setText(position == 0 ? "Pesanan Masuk" : "Diproses")
+        ).attach();
 
         setupSwitchListener();
-    }
-    // PERBAIKAN 2: Tambahkan onResume agar otomatis refresh
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Setiap kali admin kembali ke halaman ini, list pesanan akan diperbarui
-        fetchPendingOrders();
     }
 
     private void initViews() {
         switchKantin = findViewById(R.id.switch_kantin_status);
         overlayTutup = findViewById(R.id.view_overlay_tutup);
         tvStatusBadge = findViewById(R.id.tv_status_badge);
-        rvOrders = findViewById(R.id.rv_orders);
+        tvShopName = findViewById(R.id.tv_shop_name);
+        viewPager = findViewById(R.id.view_pager);
+        tabLayout = findViewById(R.id.tab_layout);
     }
 
-    // ==========================================
-    // 1. API CALL: Ambil Pesanan Masuk (Pending)
-    // ==========================================
-    private void fetchPendingOrders() {
-        apiService.getAdminOrders(canteenId, "pending").enqueue(new Callback<>() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onResponse(@NonNull Call<AdminOrderListResponse> call, @NonNull Response<AdminOrderListResponse> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    pendingOrders.clear();
-
-                    if (response.body().getData() != null) {
-                        pendingOrders.addAll(response.body().getData());
-                    }
-                    adapter.notifyDataSetChanged();
-                } else {
-                    Toast.makeText(AdminDashboardActivity.this, "Gagal memuat pesanan", Toast.LENGTH_SHORT).show();
-                }
+    public void updateTabCount(int tab, int count) {
+        TabLayout.Tab t = tabLayout.getTabAt(tab);
+        if (t != null) {
+            String label = tab == 0 ? "Pesanan Masuk" : "Diproses";
+            if (count > 0) {
+                SpannableString span = new SpannableString(label + "  " + count);
+                span.setSpan(new ForegroundColorSpan(Color.WHITE),
+                        label.length() + 2, span.length(), 0);
+                span.setSpan(new BackgroundColorSpan(Color.parseColor("#F97316")),
+                        label.length() + 2, span.length(), 0);
+                t.setText(span);
+            } else {
+                t.setText(label);
             }
-
-            @Override
-            public void onFailure(@NonNull Call<AdminOrderListResponse> call, @NonNull Throwable t) {
-                Toast.makeText(AdminDashboardActivity.this, "Koneksi Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        }
     }
 
-    // ==========================================
-    // 2. API CALL: Update Status Kantin
-    // ==========================================
     @SuppressWarnings("deprecation")
     private void setupSwitchListener() {
         switchKantin.setOnCheckedChangeListener((buttonView, isChecked) -> {

@@ -9,8 +9,10 @@
         android:id="@+id/rvOrderMasuk"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:paddingHorizontal="16dp"
         android:clipToPadding="false"
         android:paddingTop="10dp"
         android:paddingBottom="80dp"
-        tools:listitem="@layout/item_order_masuk" />
+        tools:listitem="@layout/item_order_masuk"
+        />
 </FrameLayout>

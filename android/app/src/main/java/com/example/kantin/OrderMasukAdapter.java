@@ -45,8 +45,11 @@ public class OrderMasukAdapter extends RecyclerView.Adapter<OrderMasukAdapter.Vi
 
         // 1. Set Header Info
         if (order.getCustomerSnapshot() != null) {
-            holder.tvCustomerName.setText(order.getCustomerSnapshot().getName());
-        } else {
+            String fullName = order.getCustomerSnapshot().getName();
+            String firstName = (fullName != null && fullName.contains(" "))
+                    ? fullName.split(" ")[0] : fullName;
+            holder.tvCustomerName.setText(firstName);        }
+        else {
             holder.tvCustomerName.setText("Pelanggan");
         }
 

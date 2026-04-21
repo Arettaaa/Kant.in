@@ -13,19 +13,20 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+        <!-- Header: nama, waktu, order id, delivery badge -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/cv_profile"
+                android:id="@+id/cv_profile_proses"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 app:cardCornerRadius="22dp"
                 app:cardElevation="0dp">
-
                 <ImageView
-                    android:id="@+id/iv_customer_profile"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
@@ -35,25 +36,25 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toEndOf="@id/cv_profile"
+                android:layout_toEndOf="@id/cv_profile_proses"
                 android:layout_marginStart="12dp"
                 android:layout_centerVertical="true"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_customer_name"
+                    android:id="@+id/tvCustomerNameProses"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Rina Putri"
+                    android:text="Nama Pelanggan"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:textColor="#000"/>
 
                 <TextView
-                    android:id="@+id/tv_order_time"
+                    android:id="@+id/tvOrderTimeProses"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="10:42 AM"
+                    android:text="10:42"
                     android:textSize="12sp"
                     android:textColor="#888"/>
             </LinearLayout>
@@ -67,15 +68,15 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/tv_order_id"
+                    android:id="@+id/tvOrderIdProses"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="#ORD-085"
+                    android:text="#ORD-001"
                     android:textStyle="bold"
                     android:textColor="#666"/>
 
                 <TextView
-                    android:id="@+id/tv_delivery_type"
+                    android:id="@+id/tvDeliveryTypeProses"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -85,34 +86,60 @@
                     android:paddingHorizontal="6dp"
                     android:paddingVertical="2dp"
                     android:background="#F3E5F5"
-                    android:textColor="#9C27B0" />
+                    android:textColor="#9C27B0"/>
             </LinearLayout>
         </RelativeLayout>
 
+        <!-- Divider -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#EEEEEE"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"/>
 
+        <!-- Menu list container -->
+        <LinearLayout
+            android:id="@+id/llMenuContainerProses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+
+        <TextView
+            android:id="@+id/tvMoreItemsProses"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+ 1 item lainnya"
+            android:textSize="12sp"
+            android:textColor="#888"
+            android:visibility="gone"/>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#EEEEEE"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Footer: total + status badge -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/tv_item_count"
+                android:id="@+id/tvTotalProses"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:text="2 item"
+                android:text="Rp 25.000"
                 android:textSize="15sp"
-                android:textColor="#444"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:textColor="#000"/>
 
             <TextView
-                android:id="@+id/tv_status_badge"
+                android:id="@+id/tvStatusText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -120,15 +147,10 @@
                 android:text="Dimasak"
                 android:textStyle="bold"
                 android:textSize="13sp"
-                android:textColor="#FF8C00"
-
-                android:background="@drawable/bg_badge_dimasak"
-
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="6dp"
-                android:drawablePadding="6dp"
-                android:drawableStart="@drawable/flame"
-                android:drawableTint="@color/orange_primary" /> </RelativeLayout>
+                android:textColor="#F97316"/>
+        </RelativeLayout>
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

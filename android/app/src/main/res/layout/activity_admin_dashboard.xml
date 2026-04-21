@@ -5,14 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8F9FA"
-    tools:ignore="HardcodedText"> <LinearLayout
+    tools:ignore="HardcodedText"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
     android:id="@+id/header_section"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="20dp"
     android:background="@android:color/white"
-    android:elevation="4dp">
+    android:elevation="4dp"
+    >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -143,12 +147,10 @@
                     app:tabMode="fixed"/>
             </LinearLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_orders"
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/view_pager"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingHorizontal="16dp"
-                android:clipToPadding="false" />
+                android:layout_height="match_parent" />
         </LinearLayout>
 
         <View
