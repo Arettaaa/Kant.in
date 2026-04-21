@@ -16,13 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Kantin"
         android:usesCleartextTraffic="true">
-        <activity
-            android:name=".ActivityAdminDashboard"
-            android:exported="false" />
+
         <activity android:name=".SearchActivity" />
-        <activity
-            android:name=".FilterTransaksiActivity"
-            android:exported="false" />
         <activity
             android:name=".CancelOrderActivity"
             android:exported="false" />
@@ -81,6 +76,7 @@
         <activity
             android:name=".LoginActivity"
             android:exported="false" />
+        <activity android:name=".AdminDashboardActivity" />
         <activity android:name=".RegisterAdminActivity" />
         <activity android:name=".BerandaPelangganActivity" />
         <activity

@@ -114,49 +114,33 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 btnLogin.setEnabled(true);
-                btnLogin.setText("MASUK");
+                btnLogin.setText("Masuk Kembali");
 
                 if (response.isSuccessful() && response.body() != null) {
                     LoginResponse data = response.body();
                     LoginResponse.UserData user = data.getUser();
 
-                    // 1. CEK STATUS AKTIF DULU (Khusus Admin Kantin)
-                    // Jika dia Admin tapi isActive-nya FALSE (atau 0)
                     if (user.getRole().equalsIgnoreCase("admin_kantin") && !user.isActive()) {
-
-                        // JANGAN simpan session, biarkan dia tetap logout
-                        // Tampilkan dialog pemberitahuan saja
                         new MaterialAlertDialogBuilder(LoginActivity.this)
                                 .setTitle("Akun Belum Aktif")
-                                .setMessage("Maaf, akun Admin Kantin Anda belum divalidasi atau belum menyelesaikan pembayaran. Silakan hubungi Admin Global.")
-                                .setPositiveButton("Mengerti", null) // Cuma tutup dialog, tetap di Login
+                                .setMessage("Akun belum divalidasi. Hubungi Admin Global.")
+                                .setPositiveButton("Mengerti", null)
                                 .show();
-
-                        // Aktifkan kembali tombol login agar bisa coba akun lain
-                        btnLogin.setEnabled(true);
-                        btnLogin.setText("MASUK");
-
                     } else {
-                        // 2. JIKA PELANGGAN ATAU ADMIN YANG SUDAH AKTIF
-                        // Simpan semua data ke SessionManager
-                        sessionManager.saveSession(
-                                data.getToken(),
-                                user.getId(),
-                                user.getCanteenId(),
-                                user.getRole()
-                        );
+                        sessionManager.saveSession(data.getToken(), user.getId(),
+                                user.getCanteenId(), user.getRole());
                         sessionManager.saveUserInfo(user.getName(), user.getEmail(), user.getPhone());
                         sessionManager.savePhotoUrl(user.getPhotoProfile());
-
-                        // Langsung tampilkan sukses dan pindah ke Dashboard/Beranda
                         tampilkanDialogSukses(user.getName());
                     }
+
+                } else if (response.code() == 403) {
+                    tampilkanDialogMenungguValidasi(); // Sudah ada tapi belum dipanggil!
 
                 } else {
                     tampilkanDialogError("Login Gagal", "Email atau password salah.");
                 }
             }
-
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 btnLogin.setEnabled(true);
