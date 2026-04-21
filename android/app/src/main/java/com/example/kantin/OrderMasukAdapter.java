@@ -2,6 +2,8 @@ package com.example.kantin;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,18 +13,20 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.kantin.model.OrderModel; // Import Model
+import com.example.kantin.model.OrderItem;  // Import OrderItem
+
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
 
 public class OrderMasukAdapter extends RecyclerView.Adapter<OrderMasukAdapter.ViewHolder> {
 
-    // Menambahkan 'final' untuk mengatasi warning
     private final Context context;
-    private final List<ApiOrder> orderList;
+    private final List<OrderModel> orderList; // Gunakan OrderModel
 
     // Constructor
-    public OrderMasukAdapter(Context context, List<ApiOrder> orderList) {
+    public OrderMasukAdapter(Context context, List<OrderModel> orderList) {
         this.context = context;
         this.orderList = orderList;
     }
@@ -34,17 +38,24 @@ public class OrderMasukAdapter extends RecyclerView.Adapter<OrderMasukAdapter.Vi
         return new ViewHolder(view);
     }
 
-    // Menambahkan Anotasi ini untuk mematikan warning "Do not concatenate text"
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ApiOrder order = orderList.get(position);
+        OrderModel order = orderList.get(position); // Gunakan OrderModel
 
         // 1. Set Header Info
-        holder.tvCustomerName.setText(order.getCustomerSnapshot().getName());
+        if (order.getCustomerSnapshot() != null) {
+            holder.tvCustomerName.setText(order.getCustomerSnapshot().getName());
+        } else {
+            holder.tvCustomerName.setText("Pelanggan");
+        }
+
         holder.tvOrderId.setText(order.getOrderCode());
         holder.tvTotal.setText(formatRupiah(order.getTotalAmount()));
-        holder.tvTime.setText(order.getCreatedAt());
+
+        // Memotong jam dari format tanggal (misal: "2026-04-21 15:30:00" menjadi "15:30")
+        String rawDate = order.getCreatedAt();
+        holder.tvTime.setText(rawDate != null && rawDate.length() >= 16 ? rawDate.substring(11, 16) : "-");
 
         // 2. Set Delivery Badge
         if (order.getDeliveryDetails() != null && "pickup".equals(order.getDeliveryDetails().getMethod())) {
@@ -59,13 +70,13 @@ public class OrderMasukAdapter extends RecyclerView.Adapter<OrderMasukAdapter.Vi
 
         // 3. Logic Maksimal 2 Menu List
         holder.llMenuContainer.removeAllViews();
-        List<ApiOrder.OrderItem> items = order.getItems();
+        List<OrderItem> items = order.getItems(); // Gunakan OrderItem
 
         if (items != null) {
             int maxItemsToShow = Math.min(items.size(), 2);
 
             for (int i = 0; i < maxItemsToShow; i++) {
-                ApiOrder.OrderItem item = items.get(i);
+                OrderItem item = items.get(i);
                 View rowView = LayoutInflater.from(context).inflate(R.layout.item_menu_row, holder.llMenuContainer, false);
 
                 TextView tvQty = rowView.findViewById(R.id.tv_qty);
@@ -87,11 +98,18 @@ public class OrderMasukAdapter extends RecyclerView.Adapter<OrderMasukAdapter.Vi
             }
         }
 
-        // 5. Aksi Klik Card
+        // 5. Aksi Klik Card (Lempar ke DetailPesanan)
         holder.itemView.setOnClickListener(v -> {
-            // Intent intent = new Intent(context, DetailPesananActivity.class);
-            // intent.putExtra("ORDER_ID", order.getId());
-            // context.startActivity(intent);
+            Intent intent = new Intent(context, DetailPesanan.class); // Nama Activity Detail
+
+            // Ambil Canteen ID yang tersimpan di SharedPreferences
+            SharedPreferences prefs = context.getSharedPreferences("KantinApp", Context.MODE_PRIVATE);
+            String canteenId = prefs.getString("CANTEEN_ID", "");
+
+            intent.putExtra("CANTEEN_ID", canteenId);
+            intent.putExtra("ORDER_DATA", order); // Mengirim seluruh data OrderModel
+
+            context.startActivity(intent);
         });
     }
 

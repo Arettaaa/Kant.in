@@ -101,7 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="PDF Dokumen"
+                android:text="PDF"
                 android:textColor="#FF6D00"
                 android:textStyle="bold" />
             </LinearLayout>
@@ -137,7 +137,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="CSV Excel"
+                android:text="Excel"
                 android:textColor="#757575"
                 android:textStyle="bold" />
             </LinearLayout>
@@ -224,7 +224,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_marginTop="32dp"
-        android:text="Unduh PDF"
+        android:text="Unduh Laporan"
         android:textColor="@color/white"
         android:textSize="16sp"
         app:backgroundTint="#FF6D00"

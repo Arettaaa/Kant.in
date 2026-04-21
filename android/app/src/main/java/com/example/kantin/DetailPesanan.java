@@ -193,14 +193,51 @@ public class DetailPesanan extends AppCompatActivity {
         // 3. ACTION: TOMBOL VERIFIKASI & TERIMA
         btnVerifikasi.setOnClickListener(v -> {
             if (cbVerifikasi.isChecked()) {
-                Intent intent = new Intent(DetailPesanan.this, UpdateStatusPesananActivity.class);
-                intent.putExtra("ORDER_ID", currentOrder.getId());
-                intent.putExtra("CANTEEN_ID", canteenId);
 
-                // Meneruskan parameter agar halaman update status langsung mengaktifkan opsi "Dimasak"
-                intent.putExtra("DEFAULT_STATUS", "Dimasak");
+                // Nonaktifkan tombol sementara agar tidak diklik dua kali (double-submit)
+                btnVerifikasi.setEnabled(false);
 
-                startActivity(intent);
+                ApiService apiService = ApiClient.getClient().create(ApiService.class);
+
+                // Panggil API Verify Payment
+                Call<BaseResponse> call = apiService.verifyPayment(canteenId, currentOrder.getId());
+
+                call.enqueue(new Callback<BaseResponse>() {
+                    @Override
+                    public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
+                        btnVerifikasi.setEnabled(true); // Aktifkan tombol lagi
+
+                        if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                            Toast.makeText(DetailPesanan.this, "Pembayaran berhasil diverifikasi!", Toast.LENGTH_SHORT).show();
+
+                            // Pindah ke halaman Update Status Pesanan
+                            Intent intent = new Intent(DetailPesanan.this, UpdateStatusPesananActivity.class);
+                            intent.putExtra("ORDER_ID", currentOrder.getId());
+                            intent.putExtra("CANTEEN_ID", canteenId);
+
+                            // PENTING: Bawa data pesanannya agar bisa ditampilkan di halaman update status
+                            intent.putExtra("ORDER_DATA", currentOrder);
+
+                            startActivity(intent);
+
+                            // Tutup halaman detail ini agar saat admin menekan back,
+                            // tidak kembali ke halaman pesanan yang sudah diterima
+                            finish();
+                        } else {
+                            Toast.makeText(DetailPesanan.this, "Gagal memverifikasi pembayaran.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<BaseResponse> call, Throwable t) {
+                        btnVerifikasi.setEnabled(true);
+                        Toast.makeText(DetailPesanan.this, "Koneksi bermasalah: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            } else {
+                // (Opsional) Pesan jika admin klik terima tapi belum centang checkbox
+                Toast.makeText(DetailPesanan.this, "Silakan centang verifikasi pembayaran terlebih dahulu.", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.kantin.model.OrderModel; // <-- IMPORT BARU
 import com.example.kantin.model.response.AdminOrderListResponse;
 import com.example.kantin.model.response.BaseResponse;
 import com.example.kantin.network.ApiClient;
@@ -36,7 +37,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
     private RecyclerView rvOrders;
 
     private OrderMasukAdapter adapter;
-    private final List<ApiOrder> pendingOrders = new ArrayList<>();
+
+    // PERBAIKAN 1: Menggunakan OrderModel
+    private final List<OrderModel> pendingOrders = new ArrayList<>();
 
     private String canteenId;
     private ApiService apiService;
@@ -55,10 +58,21 @@ public class AdminDashboardActivity extends AppCompatActivity {
         apiService = ApiClient.getAuthClient(token).create(ApiService.class);
 
         rvOrders.setLayoutManager(new LinearLayoutManager(this));
+
+        // Pastikan OrderMasukAdapter sudah diubah untuk menerima List<OrderModel>
         adapter = new OrderMasukAdapter(this, pendingOrders);
         rvOrders.setAdapter(adapter);
 
         setupSwitchListener();
+
+        // Catatan: fetchPendingOrders() dihapus dari sini karena sudah dipanggil di onResume()
+    }
+
+    // PERBAIKAN 2: Tambahkan onResume agar otomatis refresh
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Setiap kali admin kembali ke halaman ini, list pesanan akan diperbarui
         fetchPendingOrders();
     }
 
@@ -73,7 +87,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
     // 1. API CALL: Ambil Pesanan Masuk (Pending)
     // ==========================================
     private void fetchPendingOrders() {
-        // PERBAIKAN: Menggunakan diamond <> (singkat) sesuai saran Android Studio
         apiService.getAdminOrders(canteenId, "pending").enqueue(new Callback<>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
@@ -108,7 +121,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
             RequestBody method = RequestBody.create(MediaType.parse("text/plain"), "PUT");
             RequestBody isOpen = RequestBody.create(MediaType.parse("text/plain"), isChecked ? "1" : "0");
 
-            // PERBAIKAN: Menggunakan diamond <> (singkat) sesuai saran Android Studio
             apiService.toggleCanteenOpen(canteenId, method, isOpen).enqueue(new Callback<>() {
                 @Override
                 public void onResponse(@NonNull Call<BaseResponse> call, @NonNull Response<BaseResponse> response) {
