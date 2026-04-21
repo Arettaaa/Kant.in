@@ -33,7 +33,7 @@
             android:name=".DetaiTransaksiActivity"
             android:exported="false" />
         <activity
-            android:name=".TransaksiAdminActivity"
+            android:name=".TransaksiActivity"
             android:exported="false" />
         <activity
             android:name=".DetailPesanan"
