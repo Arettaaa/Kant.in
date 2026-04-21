@@ -84,7 +84,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/logo_kantin" />
+                        android:src="@drawable/avatar" />
                 </androidx.cardview.widget.CardView>
 
                 <ImageView
@@ -261,7 +261,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/user" />
+                            android:src="@drawable/avatar" />
                     </androidx.cardview.widget.CardView>
                     <ImageView
                         android:id="@+id/btnEditAdminPhoto"
@@ -328,7 +328,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:background="@drawable/bg_btn_orange_solid"
-            android:text="✓ Simpan Perubahan"
+            android:text="Simpan Perubahan"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
