@@ -244,6 +244,13 @@ class OrderController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Tambahkan nama kantin ke setiap order
+        $orders = $orders->map(function ($order) {
+            $canteen = Canteen::find($order->canteen_id);
+            $order->canteen_name = $canteen ? $canteen->name : 'Kantin';
+            return $order;
+        });
+
         return response()->json(['success' => true, 'data' => $orders]);
     }
 
