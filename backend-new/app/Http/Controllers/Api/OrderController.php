@@ -129,7 +129,7 @@ class OrderController extends Controller
             'payment' => [
                 'method' => 'qris',
                 'status' => 'pending_verification',
-                'proof' => asset('storage/' . $paymentProofPath),
+                'proof' => $paymentProofPath, // <--- Cukup simpan nama filenya aja
                 'paid_at' => null,
             ],
             'status' => Order::STATUS_PENDING,
@@ -143,7 +143,6 @@ class OrderController extends Controller
             'message' => 'Pesanan berhasil dibuat. Menunggu verifikasi pembayaran.',
             'data' => $order,
         ], 201);
-
     }
 
     // Helper: hapus item yang sudah di-checkout dari cart
@@ -364,6 +363,4 @@ class OrderController extends Controller
             'data' => $order->fresh(),
         ]);
     }
-
-
 }
