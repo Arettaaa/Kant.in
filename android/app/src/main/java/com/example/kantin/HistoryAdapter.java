@@ -61,10 +61,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         if ("completed".equals(order.getStatus())) {
             // Badge hijau Selesai
             holder.layoutBadgeStatus.setBackgroundResource(R.drawable.bg_badge_green_light);
-            holder.imgBadgeIcon.setImageResource(R.drawable.checkcirclee);
+            holder.imgBadgeIcon.setImageResource(R.drawable.checkcircle);
             holder.imgBadgeIcon.setColorFilter(context.getResources().getColor(android.R.color.holo_green_dark));
             holder.tvBadgeStatus.setText("Selesai");
-            holder.tvBadgeStatus.setTextColor(0xFF10B981);
 
             // Tampilkan tombol Nilai + Pesan Lagi
             holder.layoutBtnCompleted.setVisibility(View.VISIBLE);

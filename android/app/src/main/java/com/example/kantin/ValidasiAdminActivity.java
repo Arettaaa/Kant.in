@@ -32,7 +32,7 @@ public class ValidasiAdminActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> onBackPressed());
 
         btnLihatPesanan.setOnClickListener(v -> {
-            Intent intent = new Intent(ValidasiAdminActivity.this, HistoryActivity.class);
+            Intent intent = new Intent(ValidasiAdminActivity.this, ActiveOrdersActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
