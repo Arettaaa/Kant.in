@@ -18,6 +18,7 @@ import com.example.kantin.model.response.AdminOrderListResponse;
 import com.example.kantin.model.response.BaseResponse;
 import com.example.kantin.network.ApiClient;
 import com.example.kantin.network.ApiService;
+import com.example.kantin.utils.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,23 +52,19 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
         initViews();
 
-        SharedPreferences prefs = getSharedPreferences("KantinApp", MODE_PRIVATE);
-        String token = prefs.getString("TOKEN", "");
-        canteenId = prefs.getString("CANTEEN_ID", "");
+        // BERSIH — pakai SessionManager saja, hapus baris prefs & token lama
+        SessionManager sessionManager = new SessionManager(this);
+        String token = sessionManager.getToken();
+        canteenId = sessionManager.getCanteenId();
 
         apiService = ApiClient.getAuthClient(token).create(ApiService.class);
 
         rvOrders.setLayoutManager(new LinearLayoutManager(this));
-
-        // Pastikan OrderMasukAdapter sudah diubah untuk menerima List<OrderModel>
         adapter = new OrderMasukAdapter(this, pendingOrders);
         rvOrders.setAdapter(adapter);
 
         setupSwitchListener();
-
-        // Catatan: fetchPendingOrders() dihapus dari sini karena sudah dipanggil di onResume()
     }
-
     // PERBAIKAN 2: Tambahkan onResume agar otomatis refresh
     @Override
     protected void onResume() {
