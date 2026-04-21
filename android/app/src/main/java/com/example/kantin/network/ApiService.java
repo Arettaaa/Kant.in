@@ -370,6 +370,10 @@ public interface ApiService {
 
     @POST("buyers/orders/{orderId}/cancellations")
     Call<BaseResponse> cancelOrder(@Path("orderId") String orderId);
+
+    @POST("buyers/orders/{orderId}/completions")
+    Call<BaseResponse> completeOrder(@Path("orderId") String orderId);
+
     /** 3. PROFIL (Pelanggan) **/
     @GET("buyers/profiles")
     Call<ProfileResponse> getBuyerProfile(@Header("Authorization") String token);

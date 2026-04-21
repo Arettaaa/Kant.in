@@ -210,4 +210,17 @@
         android:textColor="#6B7280"
         android:textSize="13sp" />
 
+    <!-- Tombol konfirmasi, hanya muncul saat status ready -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnKonfirmasiTerima"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:text="Konfirmasi Terima Pesanan"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:visibility="gone"
+        app:backgroundTint="#F97316"
+        app:cornerRadius="12dp" />
+
 </LinearLayout>

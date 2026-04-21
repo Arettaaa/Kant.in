@@ -6,12 +6,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import com.example.kantin.model.response.BaseResponse;
 import com.example.kantin.model.response.OrderListResponse;
+import com.example.kantin.network.ApiClient;
+import com.example.kantin.network.ApiService;
+import com.example.kantin.utils.SessionManager;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ActiveOrderAdapter extends RecyclerView.Adapter<ActiveOrderAdapter.ViewHolder> {
 
@@ -32,8 +40,7 @@ public class ActiveOrderAdapter extends RecyclerView.Adapter<ActiveOrderAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        OrderListResponse.OrderItem order = orderList.get(position);
-
+        final OrderListResponse.OrderItem order = orderList.get(position);
         // Order code & total
         holder.tvOrderCode.setText(order.getOrderCode());
         holder.tvTotalBayar.setText(formatRupiah(order.getTotalAmount()));
@@ -56,10 +63,10 @@ public class ActiveOrderAdapter extends RecyclerView.Adapter<ActiveOrderAdapter.
         holder.tvNamaKantin.setText(order.getCanteenName() != null ? order.getCanteenName() : "Kantin");
 
         // Update step tracker berdasarkan status
-        updateStepTracker(holder, order.getStatus());
+        updateStepTracker(holder, order.getStatus(), order);
     }
 
-    private void updateStepTracker(ViewHolder holder, String status) {
+    private void updateStepTracker(ViewHolder holder, String status, OrderListResponse.OrderItem order) {
         // Reset semua ke abu-abu dulu
         setStepInactive(holder.iconMenunggu, holder.tvMenunggu);
         setStepInactive(holder.iconDimasak, holder.tvDimasak);
@@ -69,27 +76,61 @@ public class ActiveOrderAdapter extends RecyclerView.Adapter<ActiveOrderAdapter.
 
         switch (status) {
             case "pending":
-                // Hanya Menunggu aktif
                 setStepActive(holder.iconMenunggu, holder.tvMenunggu);
                 holder.tvStatusText.setText("Menunggu verifikasi pembayaran...");
+                holder.btnKonfirmasiTerima.setVisibility(View.GONE); // tambah ini
                 break;
 
             case "processing":
-                // Menunggu + Dimasak aktif, line1 oranye
                 setStepActive(holder.iconMenunggu, holder.tvMenunggu);
                 setStepActive(holder.iconDimasak, holder.tvDimasak);
                 holder.line1.setBackgroundColor(0xFFF97316);
                 holder.tvStatusText.setText("Pesanan sedang dimasak...");
+                holder.btnKonfirmasiTerima.setVisibility(View.GONE); // tambah ini
                 break;
 
             case "ready":
-                // Semua aktif, semua garis oranye
                 setStepActive(holder.iconMenunggu, holder.tvMenunggu);
                 setStepActive(holder.iconDimasak, holder.tvDimasak);
                 setStepActive(holder.iconSiap, holder.tvSiap);
                 holder.line1.setBackgroundColor(0xFFF97316);
                 holder.line2.setBackgroundColor(0xFFF97316);
                 holder.tvStatusText.setText("Pesanan siap diambil!");
+
+                // Tampilkan tombol konfirmasi
+                holder.btnKonfirmasiTerima.setVisibility(View.VISIBLE);
+                holder.btnKonfirmasiTerima.setOnClickListener(v -> {
+                    holder.btnKonfirmasiTerima.setEnabled(false);
+                    holder.btnKonfirmasiTerima.setText("Memproses...");
+
+                    String token = new SessionManager(context).getToken();
+                    ApiClient.getAuthClient(token).create(ApiService.class)
+                            .completeOrder(order.getId() != null ? order.getId() : order.getIdAlias())                            .enqueue(new Callback<BaseResponse>() {
+                                @Override
+                                public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
+                                    if (response.isSuccessful()) {
+                                        Toast.makeText(context, "Pesanan dikonfirmasi!", Toast.LENGTH_SHORT).show();
+                                        // Hapus dari list
+                                        int pos = orderList.indexOf(order);
+                                        if (pos != -1) {
+                                            orderList.remove(pos);
+                                            notifyItemRemoved(pos);
+                                        }
+                                    } else {
+                                        holder.btnKonfirmasiTerima.setEnabled(true);
+                                        holder.btnKonfirmasiTerima.setText("Konfirmasi Terima Pesanan");
+                                        Toast.makeText(context, "Gagal konfirmasi", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<BaseResponse> call, Throwable t) {
+                                    holder.btnKonfirmasiTerima.setEnabled(true);
+                                    holder.btnKonfirmasiTerima.setText("Konfirmasi Terima Pesanan");
+                                    Toast.makeText(context, "Error jaringan", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                });
                 break;
         }
     }
@@ -137,6 +178,9 @@ public class ActiveOrderAdapter extends RecyclerView.Adapter<ActiveOrderAdapter.
         View line1, line2;
         TextView tvMenunggu, tvDimasak, tvSiap;
 
+        com.google.android.material.button.MaterialButton btnKonfirmasiTerima;
+
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvOrderCode = itemView.findViewById(R.id.tvOrderCode);
@@ -153,6 +197,8 @@ public class ActiveOrderAdapter extends RecyclerView.Adapter<ActiveOrderAdapter.
             tvMenunggu = itemView.findViewById(R.id.tvMenunggu);
             tvDimasak = itemView.findViewById(R.id.tvDimasak);
             tvSiap = itemView.findViewById(R.id.tvSiap);
+            btnKonfirmasiTerima = itemView.findViewById(R.id.btnKonfirmasiTerima);
+
         }
     }
 }

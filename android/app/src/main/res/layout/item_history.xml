@@ -34,7 +34,7 @@
                 android:id="@+id/imgBadgeIcon"
                 android:layout_width="17dp"
                 android:layout_height="17dp"
-                android:src="@drawable/checkcirclee"
+                android:src="@drawable/checkcircle"
                 app:tint="#10B981" />
 
             <TextView
