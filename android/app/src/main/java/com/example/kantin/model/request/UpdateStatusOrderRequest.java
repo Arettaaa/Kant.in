@@ -7,9 +7,16 @@ public class UpdateStatusOrderRequest {
     @SerializedName("status")
     private String status;
 
-    public void UpdateOrderStatusRequest(String status) {
+    // Perbaikan: Hapus 'void' dan pastikan nama sama dengan Class
+    public UpdateStatusOrderRequest(String status) {
         this.status = status;
     }
 
-    public String getStatus() { return status; }
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

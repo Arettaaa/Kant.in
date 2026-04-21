@@ -1,37 +1,34 @@
-package com.example.kantin;
+package com.example.kantin; // Sesuaikan package kamu
 
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.kantin.R;
+import com.example.kantin.CancelOrderMenuAdapter;
+import com.example.kantin.model.OrderModel;
 
 public class CancelOrderActivity extends AppCompatActivity {
 
     private ImageView btnBack;
-    private TextView tvOrderId, tvCustomerName, tvTime, tvQuantity, tvMenuName, tvNotes;
+    private TextView tvOrderId, tvCustomerName, tvTime;
+    private RecyclerView rvOrderItems;
+
+    private OrderModel orderData; // Menyimpan data pesanan yang dikirim dari DetailPesanan
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cancel_order);
 
-        // 1. Inisialisasi View
         initViews();
-
-        // 2. Set listener untuk tombol kembali
-        btnBack.setOnClickListener(v -> {
-            // Menutup activity ini dan kembali ke halaman sebelumnya (misal: Detail Pesanan atau Home)
-            finish();
-        });
-
-        // 3. (Opsional) Mengambil data dari Intent yang dikirim oleh halaman sebelumnya
-        // loadDataFromIntent();
+        getIntentData();
+        setupListeners();
     }
 
     private void initViews() {
@@ -39,23 +36,50 @@ public class CancelOrderActivity extends AppCompatActivity {
         tvOrderId = findViewById(R.id.tv_order_id);
         tvCustomerName = findViewById(R.id.tv_customer_name);
         tvTime = findViewById(R.id.tv_time);
-        tvQuantity = findViewById(R.id.tv_quantity);
-        tvMenuName = findViewById(R.id.tv_menu_name);
-        tvNotes = findViewById(R.id.tv_notes);
+
+        rvOrderItems = findViewById(R.id.rv_order_items);
+        rvOrderItems.setLayoutManager(new LinearLayoutManager(this));
+        // Mencegah scroll ganda jika RecyclerView berada di dalam NestedScrollView
+        rvOrderItems.setNestedScrollingEnabled(false);
     }
 
-    private void loadDataFromIntent() {
-        // Contoh implementasi jika data dikirim melalui intent
-        if (getIntent() != null) {
-            String orderId = getIntent().getStringExtra("ORDER_ID");
-            String customerName = getIntent().getStringExtra("CUSTOMER_NAME");
-            String menuName = getIntent().getStringExtra("MENU_NAME");
-            String notes = getIntent().getStringExtra("NOTES");
+    private void getIntentData() {
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("ORDER_DATA")) {
+            // Menangkap objek OrderModel yang dikirim dari DetailPesanan
+            orderData = (OrderModel) intent.getSerializableExtra("ORDER_DATA");
 
-            if(orderId != null) tvOrderId.setText(orderId);
-            if(customerName != null) tvCustomerName.setText(customerName);
-            if(menuName != null) tvMenuName.setText(menuName);
-            if(notes != null) tvNotes.setText("Catatan: " + notes);
+            if (orderData != null) {
+                populateUI();
+            }
         }
+    }
+
+    private void populateUI() {
+        // 1. Set Nomor Order
+        tvOrderId.setText(orderData.getOrderCode() != null ? orderData.getOrderCode() : "#ORD-XXX");
+
+        // 2. Set Nama Customer
+        if(orderData.getCustomerSnapshot() != null){
+            tvCustomerName.setText(orderData.getCustomerSnapshot().getName());
+        }
+
+        // 3. Set Waktu (Format sederhana ambil jam:menit dari created_at)
+        if(orderData.getCreatedAt() != null && orderData.getCreatedAt().length() >= 16){
+            tvTime.setText(orderData.getCreatedAt().substring(11, 16));
+        } else {
+            tvTime.setText("-");
+        }
+
+        // 4. Set Daftar Menu ke RecyclerView
+        if(orderData.getItems() != null && !orderData.getItems().isEmpty()){
+            CancelOrderMenuAdapter adapter = new CancelOrderMenuAdapter(orderData.getItems());
+            rvOrderItems.setAdapter(adapter);
+        }
+    }
+
+    private void setupListeners() {
+        // Tombol kembali
+        btnBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
     }
 }
