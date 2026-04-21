@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\TransactionController;
+use App\Http\Controllers\Api\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -106,4 +107,10 @@ Route::middleware(['auth:sanctum', 'role:admin_global'])->group(function () {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/canteens/{id}/transactions', [TransactionController::class, 'index']);
     Route::get('/canteens/{id}/dashboard', [TransactionController::class, 'dashboard']);
+});
+
+Route::middleware(['auth:sanctum', 'role:admin_kantin'])->group(function () {
+    
+    Route::get('/canteens/{id}/export', [ReportController::class, 'export']);
+    
 });
