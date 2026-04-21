@@ -181,6 +181,17 @@ public interface ApiService {
             @Path("canteenId") String canteenId,
             @Path("menuId") String menuId
     );
+    @GET("canteens/{id}/menus")
+    Call<MenuListResponse> getMenuByCanteen(@Path("id") String canteenId);
+
+    @Multipart
+    @POST("canteens/{canteenId}/menus/{menuId}/availabilities")
+    Call<MenuDetailResponse> updateMenuAvailability(
+            @Path("canteenId") String canteenId,
+            @Path("menuId") String menuId,
+            @Part("_method") RequestBody method,
+            @Part("is_available") RequestBody isAvailable
+    );
 
     // ================================================================
     // 3. PESANAN — OrderController

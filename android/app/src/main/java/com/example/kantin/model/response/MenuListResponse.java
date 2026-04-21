@@ -50,5 +50,9 @@ public class MenuListResponse extends BaseResponse {
             try { return Double.parseDouble(price.toString()); }
             catch (NumberFormatException e) { return 0; }
         }
+
+        public void setAvailable(boolean available) {
+            isAvailable = available;
+        }
     }
 }

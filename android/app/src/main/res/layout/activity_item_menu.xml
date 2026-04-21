@@ -33,12 +33,16 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
                 <TextView
                     android:id="@+id/tvMenuName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_toStartOf="@id/btnEditMenu"
+                    android:layout_marginEnd="8dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:text="Nama Makanan"
                     android:textColor="#111827"
                     android:textSize="16sp"
@@ -49,8 +53,10 @@
                     android:layout_width="36dp"
                     android:layout_height="36dp"
                     android:layout_alignParentEnd="true"
-                    android:background="@drawable/bg_badge_gray_light"
-                    android:padding="10dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="6dp"
                     android:src="@drawable/button_pencil" />
             </RelativeLayout>
 
@@ -67,7 +73,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Rp 0"
-                    android:textColor="#F97316"
+                    android:textColor="#FF6900"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -77,16 +83,20 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:text="TERSEDIA"
-                    android:textColor="#10B981"
+                    android:textColor="#00C950"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/switchAvailability"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:track="@drawable/switch_track_selector"
-                    app:thumbTint="#FFFFFF" />
+                    android:layout_width="56dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:thumb="@null"
+                    android:track="@drawable/switch_track_final"
+                    app:thumbTint="@null"
+                    app:trackTint="@null" />
+
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

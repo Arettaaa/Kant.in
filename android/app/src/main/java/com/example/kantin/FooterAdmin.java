@@ -18,8 +18,8 @@ public class FooterAdmin {
         if (menuMenu != null) {
             menuMenu.setOnClickListener(v -> {
                 // Cek biar kalau udah di halaman Kelola Menu, gak usah buka halaman baru lagi
-                if (!(activity instanceof KelolaMenu)) {
-                    activity.startActivity(new Intent(activity, KelolaMenu.class));
+                if (!(activity instanceof KelolaMenuActivity)) {
+                    activity.startActivity(new Intent(activity, KelolaMenuActivity.class));
                 } else {
                     Toast.makeText(activity, "Kamu sudah di Menu", Toast.LENGTH_SHORT).show();
                 }

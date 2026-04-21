@@ -49,7 +49,7 @@
             android:name=".ItemMenu"
             android:exported="false" />
         <activity
-            android:name=".KelolaMenu"
+            android:name=".KelolaMenuActivity"
             android:exported="false" />
         <activity
             android:name=".PusatBantuan"
