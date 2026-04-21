@@ -45,6 +45,7 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tvOrderCode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="#ORD-089"
@@ -315,12 +316,14 @@
 
                     <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Subtotal" android:textColor="#6B7280" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="Rp 68.000" android:textColor="#111827" android:textStyle="bold" />
+
+                        <TextView android:id="@+id/valSubtotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="Rp 68.000" android:textColor="#111827" android:textStyle="bold" />
                     </RelativeLayout>
 
                     <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Biaya Ongkir" android:textColor="#6B7280" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="Rp 5.000" android:textColor="#111827" android:textStyle="bold" />
+
+                        <TextView android:id="@+id/valOngkir" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="Rp 5.000" android:textColor="#111827" android:textStyle="bold" />
                     </RelativeLayout>
 
                     <View
@@ -331,7 +334,8 @@
 
                     <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="16dp">
                         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Pembayaran" android:textColor="#111827" android:textStyle="bold" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="Rp 73.000" android:textColor="#F97316" android:textSize="18sp" android:textStyle="bold" />
+
+                        <TextView android:id="@+id/valTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="Rp 73.000" android:textColor="#F97316" android:textSize="18sp" android:textStyle="bold" />
                     </RelativeLayout>
 
                     <LinearLayout

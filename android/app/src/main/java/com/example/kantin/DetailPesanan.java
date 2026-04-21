@@ -1,24 +1,166 @@
 package com.example.kantin;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.example.kantin.R;
+import com.example.kantin.MenuPesananAdapter;
+import com.example.kantin.model.OrderModel;
+import com.example.kantin.network.ApiClient;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.imageview.ShapeableImageView;
+
+import java.text.NumberFormat;
+import java.util.Locale;
 
 public class DetailPesanan extends AppCompatActivity {
+
+    private ImageView btnBack, imgAvatar;
+    private ShapeableImageView imgBuktiTransfer;
+    private TextView tvOrderCode, tvCustomerName, tvCustomerPhone, valWaktu, valMetode, valAlamat, tvTotalItemHeader;
+    private TextView valSubtotal, valOngkir, valTotal;
+    private CheckBox cbVerifikasi;
+    private MaterialButton btnTolak, btnVerifikasi;
+    private RecyclerView rvMenuPesanan;
+
+    private String canteenId = "";
+    private OrderModel currentOrder; // Menyimpan data pesanan saat ini
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_detail_pesanan);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+
+        initViews();
+        getIntentData();
+        setupListeners();
+    }
+
+    private void initViews() {
+        btnBack = findViewById(R.id.btnBack);
+        imgAvatar = findViewById(R.id.imgAvatar);
+        imgBuktiTransfer = findViewById(R.id.imgBuktiTransfer);
+
+        tvOrderCode = findViewById(R.id.tvOrderCode);
+        tvCustomerName = findViewById(R.id.tvCustomerName);
+        tvCustomerPhone = findViewById(R.id.tvCustomerPhone);
+        valWaktu = findViewById(R.id.valWaktu);
+        valMetode = findViewById(R.id.valMetode);
+        valAlamat = findViewById(R.id.valAlamat);
+        tvTotalItemHeader = findViewById(R.id.tvTotalItemHeader);
+
+        valSubtotal = findViewById(R.id.valSubtotal);
+        valOngkir = findViewById(R.id.valOngkir);
+        valTotal = findViewById(R.id.valTotal);
+
+        cbVerifikasi = findViewById(R.id.cbVerifikasi);
+        btnTolak = findViewById(R.id.btnTolak);
+        btnVerifikasi = findViewById(R.id.btnVerifikasi);
+
+        rvMenuPesanan = findViewById(R.id.rvMenuPesanan);
+        rvMenuPesanan.setLayoutManager(new LinearLayoutManager(this));
+        rvMenuPesanan.setNestedScrollingEnabled(false);
+
+        btnVerifikasi.setEnabled(false);
+    }
+
+    private void getIntentData() {
+        Intent intent = getIntent();
+        if (intent != null) {
+            canteenId = intent.getStringExtra("CANTEEN_ID");
+            // Mengambil objek OrderModel yang dikirim dari Activity sebelumnya
+            currentOrder = (OrderModel) intent.getSerializableExtra("ORDER_DATA");
+
+            if (currentOrder != null) {
+                populateDataToUI();
+            } else {
+                Toast.makeText(this, "Data pesanan tidak ditemukan", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+    }
+
+    private void populateDataToUI() {
+        NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
+
+        // Header & Customer Info
+        tvOrderCode.setText(currentOrder.getOrderCode() != null ? currentOrder.getOrderCode() : "#ORD-XXX");
+
+        if (currentOrder.getCustomerSnapshot() != null) {
+            tvCustomerName.setText(currentOrder.getCustomerSnapshot().getName());
+            tvCustomerPhone.setText(currentOrder.getCustomerSnapshot().getPhone());
+        }
+
+        // Waktu (Bisa diformat lebih lanjut menggunakan SimpleDateFormat jika perlu)
+        String rawDate = currentOrder.getCreatedAt();
+        valWaktu.setText(rawDate != null ? rawDate.substring(11, 16) : "Baru saja"); // Ambil jam:menit kasar
+
+        // Delivery Info
+        if (currentOrder.getDeliveryDetails() != null) {
+            String method = currentOrder.getDeliveryDetails().getMethod();
+            valMetode.setText(method != null && method.equals("delivery") ? "Antar Kurir" : "Ambil Sendiri");
+
+            String alamat = currentOrder.getDeliveryDetails().getLocationNote();
+            valAlamat.setText(alamat != null && !alamat.isEmpty() ? alamat : "-");
+        }
+
+        // Daftar Menu (RecyclerView)
+        if (currentOrder.getItems() != null) {
+            tvTotalItemHeader.setText(currentOrder.getItems().size() + " ITEM");
+            MenuPesananAdapter adapter = new MenuPesananAdapter(currentOrder.getItems());
+            rvMenuPesanan.setAdapter(adapter);
+        }
+
+        // Ringkasan Pembayaran
+        valSubtotal.setText(formatRupiah.format(currentOrder.getSubtotalAmount()));
+        valOngkir.setText(formatRupiah.format(currentOrder.getDeliveryDetails() != null ? currentOrder.getDeliveryDetails().getFee() : 0));
+        valTotal.setText(formatRupiah.format(currentOrder.getTotalAmount()));
+
+        // Bukti Pembayaran
+        if (currentOrder.getPayment() != null && currentOrder.getPayment().getProof() != null) {
+            // URL Base server + direktori storage Laravel
+            String imageUrl = ApiClient.BASE_URL.replace("api/", "") + "storage/" + currentOrder.getPayment().getProof();
+
+            Glide.with(this)
+                    .load(imageUrl)
+                    .into(imgBuktiTransfer);
+        }
+    }
+
+    private void setupListeners() {
+        btnBack.setOnClickListener(v -> onBackPressed());
+
+        cbVerifikasi.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            btnVerifikasi.setEnabled(isChecked);
+        });
+
+        // Tombol Tolak
+        btnTolak.setOnClickListener(v -> {
+            Intent intent = new Intent(DetailPesanan.this, CancelOrderActivity.class);
+            intent.putExtra("ORDER_ID", currentOrder.getId());
+            intent.putExtra("CANTEEN_ID", canteenId);
+            startActivity(intent);
+        });
+
+        // Tombol Verifikasi & Terima
+        btnVerifikasi.setOnClickListener(v -> {
+            if (cbVerifikasi.isChecked()) {
+                Intent intent = new Intent(DetailPesanan.this, UpdateStatusPesananActivity.class);
+                intent.putExtra("ORDER_ID", currentOrder.getId());
+                intent.putExtra("CANTEEN_ID", canteenId);
+                intent.putExtra("DEFAULT_STATUS", "Dimasak");
+                startActivity(intent);
+            }
         });
     }
 }
