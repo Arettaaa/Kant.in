@@ -18,6 +18,7 @@ import com.example.kantin.model.OrderModel;
 import com.example.kantin.model.response.BaseResponse;
 import com.example.kantin.network.ApiClient;
 import com.example.kantin.network.ApiService;
+import com.example.kantin.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 
@@ -80,18 +81,25 @@ public class DetailPesanan extends AppCompatActivity {
     }
 
     private void getIntentData() {
+        // ambil dari session (langsung)
+        SessionManager session = new SessionManager(this);
+        canteenId = session.getCanteenId();
+
+        // ambil order dari intent (ini masih perlu)
         Intent intent = getIntent();
         if (intent != null) {
-            canteenId = intent.getStringExtra("CANTEEN_ID");
-            // Mengambil objek OrderModel yang dikirim dari Activity sebelumnya
             currentOrder = (OrderModel) intent.getSerializableExtra("ORDER_DATA");
+        }
 
-            if (currentOrder != null) {
-                populateDataToUI();
-            } else {
-                Toast.makeText(this, "Data pesanan tidak ditemukan", Toast.LENGTH_SHORT).show();
-                finish();
-            }
+        // debug biar yakin
+        android.util.Log.d("DEBUG", "canteenId = " + canteenId);
+        android.util.Log.d("DEBUG", "orderId = " + (currentOrder != null ? currentOrder.getId() : "null"));
+
+        if (currentOrder != null) {
+            populateDataToUI();
+        } else {
+            Toast.makeText(this, "Data pesanan tidak ditemukan", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 
@@ -157,7 +165,8 @@ public class DetailPesanan extends AppCompatActivity {
             // Nonaktifkan tombol sementara biar gak diklik dobel
             btnTolak.setEnabled(false);
 
-            ApiService apiService = ApiClient.getClient().create(ApiService.class);
+            SessionManager session = new SessionManager(DetailPesanan.this);
+            ApiService apiService = ApiClient.getAuthClient(session.getToken()).create(ApiService.class);
             Call<BaseResponse> call = apiService.rejectPayment(canteenId, currentOrder.getId());
 
             call.enqueue(new Callback<BaseResponse>() {
@@ -197,8 +206,8 @@ public class DetailPesanan extends AppCompatActivity {
                 // Nonaktifkan tombol sementara agar tidak diklik dua kali (double-submit)
                 btnVerifikasi.setEnabled(false);
 
-                ApiService apiService = ApiClient.getClient().create(ApiService.class);
-
+                SessionManager session = new SessionManager(DetailPesanan.this);
+                ApiService apiService = ApiClient.getAuthClient(session.getToken()).create(ApiService.class);
                 // Panggil API Verify Payment
                 Call<BaseResponse> call = apiService.verifyPayment(canteenId, currentOrder.getId());
 

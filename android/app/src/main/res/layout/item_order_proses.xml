@@ -6,140 +6,186 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="10dp"
-    app:cardCornerRadius="24dp"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="20dp"
     app:cardElevation="2dp"
     app:cardBackgroundColor="#FFFFFF"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?attr/selectableItemBackground"> <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="20dp">
+    android:foreground="?attr/selectableItemBackground">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardProfileProses"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            app:cardCornerRadius="22dp"
-            app:cardElevation="0dp">
-            <ImageView
-                android:id="@+id/ivCustomerProses"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                tools:src="@tools:sample/avatars" />
-        </androidx.cardview.widget.CardView>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
-            android:layout_toEndOf="@id/cardProfileProses"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/tvCustomerNameProses"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Rina Putri"
-                android:textColor="#111827"
-                android:textSize="17sp"
-                android:fontFamily="@font/inter_bold" />
-            <TextView
-                android:id="@+id/tvOrderTimeProses"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:drawableStart="@drawable/clock"
-                android:drawablePadding="4dp"
-                android:text="10:42 AM"
-                android:textColor="#9CA3AF"
-                android:textSize="13sp"
-                android:fontFamily="@font/inter_regular" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:gravity="end"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/tvOrderIdProses"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="#ORD-085"
-                android:textColor="#6B7280"
-                android:textSize="14sp"
-                android:fontFamily="@font/inter_medium" />
-            <TextView
-                android:id="@+id/tvTypeBadgeProses"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/admin_badge_purple_light"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="2dp"
-                android:text="Ambil Sendiri"
-                android:textColor="#8B5CF6"
-                android:textSize="10sp"
-                android:fontFamily="@font/inter_bold" />
-        </LinearLayout>
-    </RelativeLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginVertical="18dp"
-        android:background="#F3F4F6" />
-
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:padding="20dp">
 
-        <TextView
-            android:id="@+id/tvTotalItemProses"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="2 item"
-            android:textColor="#4B5563"
-            android:textSize="16sp"
-            android:fontFamily="@font/inter_medium" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:id="@+id/layoutStatusBadge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:background="@drawable/admin_badge_orange_light"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="8dp"
-            android:gravity="center_vertical">
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardProfileProses"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                android:layout_centerVertical="true">
+                <ImageView
+                    android:id="@+id/ivCustomerProses"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/avatar" />
+            </androidx.cardview.widget.CardView>
 
-            <ImageView
-                android:id="@+id/ivStatusIcon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/flame"
-                app:tint="#F54900" />
-
-            <TextView
-                android:id="@+id/tvStatusText"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Dimasak"
-                android:textColor="#F54900"
-                android:textSize="14sp"
-                android:fontFamily="@font/inter_extrabold" />
-        </LinearLayout>
-    </RelativeLayout>
+                android:layout_marginStart="14dp"
+                android:layout_toEndOf="@id/cardProfileProses"
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
 
-</LinearLayout>
+                <TextView
+                    android:id="@+id/tvCustomerNameProses"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rina Putri"
+                    android:textColor="#111827"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvOrderTimeProses"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    app:drawableStartCompat="@drawable/clock"
+                    android:drawablePadding="6dp"
+                    android:text="10:42 AM"
+                    android:textColor="#6B7280"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:gravity="end"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvOrderIdProses"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="#ORD-085"
+                    android:textColor="#6B7280"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvDeliveryTypeProses"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/admin_badge_purple_light"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:text="Ambil Sendiri"
+                    android:textColor="#8B5CF6"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="16dp"
+            android:background="#F3F4F6" />
+
+        <LinearLayout
+            android:id="@+id/llMenuContainerProses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <TextView
+            android:id="@+id/tvMoreItemsProses"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+ 1 item lainnya"
+            android:textSize="12sp"
+            android:textColor="#9CA3AF"
+            android:layout_marginTop="6dp"
+            android:textStyle="italic"
+            android:visibility="gone"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="16dp"
+            android:background="#F3F4F6" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_centerVertical="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Harga"
+                    android:textColor="#6B7280"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tvTotalProses"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rp 25.000"
+                    android:textColor="#111827"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutStatusBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/admin_badge_orange_light"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="8dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/ivStatusIcon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/flame"
+                    app:tint="#F54900" />
+
+                <TextView
+                    android:id="@+id/tvStatusText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="Dimasak"
+                    android:textColor="#F54900"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </RelativeLayout>
+
+    </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -1,6 +1,9 @@
 package com.example.kantin.model.response;
 
+import com.example.kantin.model.OrderModel;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.Collection;
 import java.util.List;
 
 /**

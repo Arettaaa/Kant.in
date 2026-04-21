@@ -18,6 +18,7 @@ import com.example.kantin.model.request.UpdateStatusOrderRequest;
 import com.example.kantin.model.response.BaseResponse;
 import com.example.kantin.network.ApiClient;
 import com.example.kantin.network.ApiService;
+import com.example.kantin.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 
@@ -79,41 +80,60 @@ public class UpdateStatusPesananActivity extends AppCompatActivity {
         rvMenuPesanan.setLayoutManager(new LinearLayoutManager(this));
         rvMenuPesanan.setNestedScrollingEnabled(false);
 
-        apiService = ApiClient.getClient().create(ApiService.class);
+        // 🔥 INI YANG HARUS DIGANTI
+        SessionManager session = new SessionManager(this);
+        apiService = ApiClient.getAuthClient(session.getToken()).create(ApiService.class);
     }
-
     private void getIntentData() {
         Intent intent = getIntent();
+
         if (intent != null) {
             orderId = intent.getStringExtra("ORDER_ID");
-            canteenId = intent.getStringExtra("CANTEEN_ID");
             currentOrder = (OrderModel) intent.getSerializableExtra("ORDER_DATA");
-
-            // Default awal dari tombol Terima adalah status 'processing' (Dimasak)
-            updateUIByStatus("processing");
-            populateOrderData();
         }
+
+        // 🔥 ambil dari session (fix utama)
+        SessionManager session = new SessionManager(this);
+        canteenId = session.getCanteenId();
+
+        updateUIByStatus("processing");
+        populateOrderData();
     }
 
     private void populateOrderData() {
         if (currentOrder != null) {
-            tvOrderId.setText(currentOrder.getOrderCode());
-            tvCustomerName.setText(currentOrder.getCustomerSnapshot().getName());
+            // 1. Cek aman untuk Order Code
+            tvOrderId.setText(currentOrder.getOrderCode() != null ? currentOrder.getOrderCode() : "-");
 
-            String method = currentOrder.getDeliveryDetails().getMethod();
-            tvOrderType.setText(method.equals("delivery") ? "Antar Kurir" : "Ambil Sendiri");
-
-            if (currentOrder.getCreatedAt() != null && currentOrder.getCreatedAt().length() >= 16) {
-                tvTime.setText(currentOrder.getCreatedAt().substring(11, 16));
+            // 2. Cek aman untuk Customer Name
+            if (currentOrder.getCustomerSnapshot() != null && currentOrder.getCustomerSnapshot().getName() != null) {
+                tvCustomerName.setText(currentOrder.getCustomerSnapshot().getName());
+            } else {
+                tvCustomerName.setText("Pelanggan");
             }
 
+            // 3. Cek aman untuk Delivery Method
+            if (currentOrder.getDeliveryDetails() != null && currentOrder.getDeliveryDetails().getMethod() != null) {
+                String method = currentOrder.getDeliveryDetails().getMethod();
+                tvOrderType.setText(method.equals("delivery") ? "Antar Kurir" : "Ambil Sendiri");
+            } else {
+                tvOrderType.setText("Ambil Sendiri"); // Default kalau kosong
+            }
+
+            // 4. Waktu
+            if (currentOrder.getCreatedAt() != null && currentOrder.getCreatedAt().length() >= 16) {
+                tvTime.setText(currentOrder.getCreatedAt().substring(11, 16));
+            } else {
+                tvTime.setText("-");
+            }
+
+            // 5. Menu
             if (currentOrder.getItems() != null) {
                 CancelOrderMenuAdapter adapter = new CancelOrderMenuAdapter(currentOrder.getItems());
                 rvMenuPesanan.setAdapter(adapter);
             }
         }
     }
-
     private void setupListeners() {
         btnBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 

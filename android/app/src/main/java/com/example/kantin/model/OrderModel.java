@@ -6,7 +6,7 @@ import java.util.List;
 
 public class OrderModel implements Serializable {
 
-    @SerializedName("_id")
+    @SerializedName("id")
     private String id;
 
     @SerializedName("order_code")
