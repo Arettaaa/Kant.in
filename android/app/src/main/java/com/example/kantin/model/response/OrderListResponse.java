@@ -67,10 +67,16 @@ public class OrderListResponse {
         @SerializedName("updated_at")
         private String updatedAt;
 
+        @SerializedName("canteen_name")
+        private String canteenName;
+
+        public String getCanteenName() { return canteenName; }
+
         @SerializedName("id")
         private String idAlias; // untuk response yang pakai "id" bukan "_id"
 
         public String getIdAlias() { return idAlias; }
+
 
         public String getId()                         { return id; }
         public String getOrderCode()                  { return orderCode; }

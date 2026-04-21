@@ -53,7 +53,7 @@ public class ActiveOrderAdapter extends RecyclerView.Adapter<ActiveOrderAdapter.
         }
 
         // Nama kantin — sementara pakai canteen_id, nanti bisa diganti nama kantin
-        holder.tvNamaKantin.setText(order.getCanteenId());
+        holder.tvNamaKantin.setText(order.getCanteenName() != null ? order.getCanteenName() : "Kantin");
 
         // Update step tracker berdasarkan status
         updateStepTracker(holder, order.getStatus());
@@ -89,7 +89,7 @@ public class ActiveOrderAdapter extends RecyclerView.Adapter<ActiveOrderAdapter.
                 setStepActive(holder.iconSiap, holder.tvSiap);
                 holder.line1.setBackgroundColor(0xFFF97316);
                 holder.line2.setBackgroundColor(0xFFF97316);
-                holder.tvStatusText.setText("Pesanan siap diambil! 🎉");
+                holder.tvStatusText.setText("Pesanan siap diambil!");
                 break;
         }
     }
@@ -156,3 +156,8 @@ public class ActiveOrderAdapter extends RecyclerView.Adapter<ActiveOrderAdapter.
         }
     }
 }
+
+
+//pending → masih nunggu verifikasi (user sudah di halaman ValidasiAdmin)
+//processing → sudah diverifikasi, sedang dimasak
+//ready → siap diambil
