@@ -1,8 +1,7 @@
-package com.example.kantin;
+package com.example.kantin; // Sesuaikan jika kamu memindahkannya ke dalam folder ui/admin
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,12 +15,18 @@ import com.bumptech.glide.Glide;
 import com.example.kantin.R;
 import com.example.kantin.MenuPesananAdapter;
 import com.example.kantin.model.OrderModel;
+import com.example.kantin.model.response.BaseResponse;
 import com.example.kantin.network.ApiClient;
+import com.example.kantin.network.ApiService;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.text.NumberFormat;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DetailPesanan extends AppCompatActivity {
 
@@ -101,7 +106,7 @@ public class DetailPesanan extends AppCompatActivity {
             tvCustomerPhone.setText(currentOrder.getCustomerSnapshot().getPhone());
         }
 
-        // Waktu (Bisa diformat lebih lanjut menggunakan SimpleDateFormat jika perlu)
+        // Waktu
         String rawDate = currentOrder.getCreatedAt();
         valWaktu.setText(rawDate != null ? rawDate.substring(11, 16) : "Baru saja"); // Ambil jam:menit kasar
 
@@ -138,27 +143,63 @@ public class DetailPesanan extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        btnBack.setOnClickListener(v -> onBackPressed());
+        // 1. Perbaikan Tombol Back (Tidak lagi memakai fungsi deprecated)
+        btnBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
+        // Buka kunci tombol terima jika checkbox dicentang
         cbVerifikasi.setOnCheckedChangeListener((buttonView, isChecked) -> {
             btnVerifikasi.setEnabled(isChecked);
         });
 
-        // Tombol Tolak
+        // 2. ACTION: TOMBOL TOLAK (Hit API Laravel, lalu ke halaman Cancel)
         btnTolak.setOnClickListener(v -> {
-            Intent intent = new Intent(DetailPesanan.this, CancelOrderActivity.class);
-            intent.putExtra("ORDER_ID", currentOrder.getId());
-            intent.putExtra("CANTEEN_ID", canteenId);
-            startActivity(intent);
+
+            // Nonaktifkan tombol sementara biar gak diklik dobel
+            btnTolak.setEnabled(false);
+
+            ApiService apiService = ApiClient.getClient().create(ApiService.class);
+            Call<BaseResponse> call = apiService.rejectPayment(canteenId, currentOrder.getId());
+
+            call.enqueue(new Callback<BaseResponse>() {
+                @Override
+                public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
+                    btnTolak.setEnabled(true); // Aktifkan lagi tombolnya
+
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        Toast.makeText(DetailPesanan.this, "Pesanan berhasil ditolak", Toast.LENGTH_SHORT).show();
+
+                        // Pindah ke halaman CancelOrderActivity jika sukses
+                        Intent intent = new Intent(DetailPesanan.this, CancelOrderActivity.class);
+                        // Kirim data pesanan agar bisa ditampilkan di halaman pembatalan
+                        intent.putExtra("ORDER_DATA", currentOrder);
+                        startActivity(intent);
+
+                        // Menutup halaman DetailPesanan ini agar saat user back dari CancelOrderActivity
+                        // mereka kembali ke halaman List Pesanan, bukan ke Detail yang sudah ditolak.
+                        finish();
+                    } else {
+                        Toast.makeText(DetailPesanan.this, "Gagal menolak pesanan", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<BaseResponse> call, Throwable t) {
+                    btnTolak.setEnabled(true);
+                    Toast.makeText(DetailPesanan.this, "Koneksi bermasalah: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
-        // Tombol Verifikasi & Terima
+        // 3. ACTION: TOMBOL VERIFIKASI & TERIMA
         btnVerifikasi.setOnClickListener(v -> {
             if (cbVerifikasi.isChecked()) {
                 Intent intent = new Intent(DetailPesanan.this, UpdateStatusPesananActivity.class);
                 intent.putExtra("ORDER_ID", currentOrder.getId());
                 intent.putExtra("CANTEEN_ID", canteenId);
+
+                // Meneruskan parameter agar halaman update status langsung mengaktifkan opsi "Dimasak"
                 intent.putExtra("DEFAULT_STATUS", "Dimasak");
+
                 startActivity(intent);
             }
         });
