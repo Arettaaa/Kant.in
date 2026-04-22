@@ -8,7 +8,6 @@
     android:gravity="center"
     android:orientation="horizontal">
 
-    <!-- Tab Order -->
     <LinearLayout
         android:id="@+id/menuOrder"
         android:layout_width="0dp"
@@ -19,19 +18,18 @@
         android:clickable="true"
         android:focusable="true">
         <ImageView
-            android:layout_width="24dp"
+            android:id="@+id/ivNavOrder" android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/listordered"
             app:tint="@color/footer_item_color" />
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/tvNavOrder" android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Order"
             android:textColor="@color/footer_item_color"
             android:textSize="10sp" />
     </LinearLayout>
 
-    <!-- Tab Menu -->
     <LinearLayout
         android:id="@+id/menuMenu"
         android:layout_width="0dp"
@@ -42,19 +40,18 @@
         android:clickable="true"
         android:focusable="true">
         <ImageView
-            android:layout_width="24dp"
+            android:id="@+id/ivNavMenu" android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/utensilscrossed"
             app:tint="@color/footer_item_color" />
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/tvNavMenu" android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Menu"
             android:textColor="@color/footer_item_color"
             android:textSize="10sp" />
     </LinearLayout>
 
-    <!-- Tab Profil -->
     <LinearLayout
         android:id="@+id/menuProfile"
         android:layout_width="0dp"
@@ -65,12 +62,12 @@
         android:clickable="true"
         android:focusable="true">
         <ImageView
-            android:layout_width="24dp"
+            android:id="@+id/ivNavProfile" android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/user"
             app:tint="@color/footer_item_color" />
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/tvNavProfile" android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Profil"
             android:textColor="@color/footer_item_color"

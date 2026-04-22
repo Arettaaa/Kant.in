@@ -50,7 +50,6 @@
                     android:layout_height="36dp"
                     android:layout_alignParentEnd="true"
                     android:background="@drawable/bg_badge_gray_light"
-                    android:padding="10dp"
                     android:src="@drawable/button_pencil" />
             </RelativeLayout>
 
@@ -77,16 +76,16 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:text="TERSEDIA"
-                    android:textColor="#10B981"
+                    android:textColor="#00C950"
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
-                <androidx.appcompat.widget.SwitchCompat
+                <CheckBox
                     android:id="@+id/switchAvailability"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:track="@drawable/switch_track_selector"
-                    app:thumbTint="#FFFFFF" />
+                    android:layout_width="56dp"
+                    android:layout_height="32dp"
+                    android:button="@null"
+                    android:background="@drawable/switch_track_final" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

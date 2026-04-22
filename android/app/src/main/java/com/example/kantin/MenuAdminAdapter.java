@@ -100,7 +100,7 @@ public class MenuAdminAdapter extends RecyclerView.Adapter<MenuAdminAdapter.Menu
     static class MenuViewHolder extends RecyclerView.ViewHolder {
         ImageView ivMenuImage, btnEditMenu;
         TextView tvMenuName, tvMenuPrice, tvStatusLabel;
-        SwitchCompat switchAvailability;
+        android.widget.CheckBox switchAvailability;
 
         MenuViewHolder(@NonNull View itemView) {
             super(itemView);
