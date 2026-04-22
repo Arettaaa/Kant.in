@@ -70,11 +70,16 @@
         <div
             class="relative z-10 w-full h-full overflow-y-auto hide-scrollbar px-10 pt-36 pb-20 flex flex-col items-center">
 
+
             <div
                 class="w-full max-w-4xl bg-white rounded-[40px] p-8 shadow-sm border border-gray-100 mb-10 text-center">
+                @php
+                $foto = is_array($user) ? ($user['photo_profile'] ?? null) : ($user->photo_profile ?? null);
+                @endphp
+
                 <div class="relative w-28 h-28 mx-auto mb-4">
-                    @if($user->photo_profile)
-                    <img src="{{ asset('storage/'.$user->photo_profile) }}"
+                    @if($foto)
+                    <img src="{{ $foto }}"
                         class="w-full h-full rounded-full object-cover border-4 border-white shadow-md">
                     @else
                     <div

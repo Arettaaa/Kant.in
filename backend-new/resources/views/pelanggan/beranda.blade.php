@@ -134,7 +134,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            Masuk
+            Keluar
         </a>
         @endauth
     </aside>
@@ -182,11 +182,19 @@
 
                 {{-- Avatar --}}
                 <a href="/profil"
-                    class="w-10 h-10 rounded-full overflow-hidden border-2 border-orange-100 bg-orange-50 flex items-center justify-center cursor-pointer">
-                    <svg class="w-5 h-5 text-orange-300" fill="currentColor" viewBox="0 0 24 24">
-                        <path
-                            d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
-                    </svg>
+                    class="w-10 h-10 rounded-full overflow-hidden border-2 border-orange-100 bg-orange-50 flex-shrink-0 cursor-pointer"
+                    style="display:block; width:40px; height:40px;">
+                    @if($foto)
+                    <img src="{{ $foto }}"
+                        style="width:40px; height:40px; object-fit:cover; border-radius:50%; display:block;">
+                    @else
+                    <div class="w-full h-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-orange-300" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
+                        </svg>
+                    </div>
+                    @endif
                 </a>
             </div>
         </div>
@@ -213,25 +221,25 @@
                 <h2 class="text-lg font-extrabold text-gray-900 mb-4">Kategori</h2>
                 <div class="grid grid-cols-4 gap-3">
 
-                    {{-- Nasi (active) --}}
-                    <button onclick="setCategory(this, 'nasi')"
+                    {{-- Semua --}}
+                    <button onclick="setCategory(this, 'semua')"
                         class="category-card active flex flex-col items-center gap-2 py-5 px-3 rounded-2xl border border-transparent"
-                        data-cat="nasi">
+                        data-cat="semua">
                         <div class="cat-icon-wrap w-11 h-11 rounded-2xl flex items-center justify-center"
                             style="background-color:rgba(255,255,255,0.25);">
-                            <i class="fa-solid fa-fire text-lg text-white"></i>
+                            <i class="fa-solid fa-border-all text-lg text-white"></i>
                         </div>
-                        <span class="cat-label text-[13px] font-bold text-white">Nasi</span>
+                        <span class="cat-label text-[13px] font-bold text-white">Semua</span>
                     </button>
 
-                    {{-- Mie --}}
-                    <button onclick="setCategory(this, 'mie')"
+                    {{-- Makanan --}}
+                    <button onclick="setCategory(this, 'makanan')"
                         class="category-card flex flex-col items-center gap-2 py-5 px-3 rounded-2xl bg-white border border-gray-100"
-                        data-cat="mie">
+                        data-cat="makanan">
                         <div class="cat-icon-wrap w-11 h-11 rounded-2xl flex items-center justify-center bg-orange-50">
-                            <i class="fa-solid fa-pizza-slice text-lg" style="color:#FF6900;"></i>
+                            <i class="fa-solid fa-utensils text-lg" style="color:#FF6900;"></i>
                         </div>
-                        <span class="cat-label text-[13px] font-bold text-gray-500">Mie</span>
+                        <span class="cat-label text-[13px] font-bold text-gray-500">Makanan</span>
                     </button>
 
                     {{-- Minuman --}}
@@ -249,7 +257,7 @@
                         class="category-card flex flex-col items-center gap-2 py-5 px-3 rounded-2xl bg-white border border-gray-100"
                         data-cat="camilan">
                         <div class="cat-icon-wrap w-11 h-11 rounded-2xl flex items-center justify-center bg-orange-50">
-                            <i class="fa-solid fa-store text-lg" style="color:#FF6900;"></i>
+                            <i class="fa-solid fa-cookie-bite text-lg" style="color:#FF6900;"></i>
                         </div>
                         <span class="cat-label text-[13px] font-bold text-gray-500">Camilan</span>
                     </button>

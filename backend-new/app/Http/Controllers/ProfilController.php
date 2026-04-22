@@ -1,90 +1,130 @@
 <?php
+// app/Http/Controllers/ProfilController.php
 
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Session;
 
 class ProfilController extends Controller
 {
-    // Menampilkan Halaman Profil Utama
-    public function index(Request $request)
+    private function apiUrl(string $path): string
     {
-        $user = $request->user();
+        $base = env('API_INTERNAL_URL', config('app.url'));
+        return rtrim($base, '/') . '/api' . $path;
+    }
+
+    private function apiToken(): string
+    {
+        return Session::get('api_token', '');
+    }
+
+    private function fetchUser(): ?object
+    {
+        $user = Session::get('user');
+        if (!$user) return null;
+
+        $role = $user['role'] ?? 'pembeli';
+        $prefix = $role === 'admin_kantin' ? '/admin' : '/buyers';
+        $endpoint = $prefix . '/profiles';
+
+        $response = Http::timeout(15)
+            ->withToken($this->apiToken())
+            ->get($this->apiUrl($endpoint));
+
+        if (!$response->successful()) return (object) $user;
+
+        $data = $response->json('data');
+
+        // Sync session supaya nama di beranda ikut terupdate
+        Session::put('user', $data);
+
+        return (object) $data;
+    }
+
+    public function index()
+    {
+        $user = $this->fetchUser();
+        if (!$user) return redirect()->route('pelanggan.login');
 
         $views = [
             'admin_global' => 'admin_global.profil',
             'admin_kantin' => 'admin_kantin.profil',
-            'pembeli' => 'pelanggan.profil',
+            'pembeli'      => 'pelanggan.profil',
         ];
 
         $view = $views[$user->role] ?? 'pelanggan.profil';
-
-        return view($view, ['user' => $user]);
+        return view($view, compact('user'));
     }
 
-    // Menampilkan Halaman Form Edit
-    public function edit(Request $request)
+    public function edit()
     {
-        $user = $request->user();
+        $user = $this->fetchUser();
+        if (!$user) return redirect()->route('pelanggan.login');
 
         $views = [
             'admin_global' => 'admin_global.edit-profil',
             'admin_kantin' => 'admin_kantin.edit-profil',
-            'pembeli' => 'pelanggan.edit-profil',
+            'pembeli'      => 'pelanggan.edit-profil',
         ];
 
         $view = $views[$user->role] ?? 'pelanggan.edit-profil';
-
-        return view($view, ['user' => $user]);
+        return view($view, compact('user'));
     }
-    // Menampilkan Halaman Detail Data Diri
-    public function dataDiri(Request $request)
+
+    public function dataDiri()
     {
-        $user = $request->user();
+        $user = $this->fetchUser();
+        if (!$user) return redirect()->route('pelanggan.login');
 
         $views = [
             'admin_global' => 'admin_global.data-diri',
             'admin_kantin' => 'admin_kantin.data-diri',
-            'pembeli' => 'pelanggan.data-diri',
+            'pembeli'      => 'pelanggan.data-diri',
         ];
 
         $view = $views[$user->role] ?? 'pelanggan.data-diri';
-
-        return view($view, ['user' => $user]);
+        return view($view, compact('user'));
     }
 
     public function update(Request $request)
     {
-        $user = $request->user();
+        $user = Session::get('user');
+        if (!$user) return redirect()->route('pelanggan.login');
 
-        // 1. Validasi Input dan simpan hasilnya ke variabel $validated
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'email' => ['required', 'email', Rule::unique('users')->ignore($user->_id)],
-            'photo_profile' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+        $role     = $user['role'] ?? 'pembeli';
+        $prefix   = $role === 'admin_kantin' ? '/admin' : '/buyers';
+        $endpoint = $prefix . '/profiles';
+
+        $request->validate([
+            'name'          => 'required|string|max:255',
+            'phone'         => 'nullable|string|max:20',
+            'photo_profile' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        try {
-            // 2. Cek dan Proses Upload Foto
-            if ($request->hasFile('photo_profile')) {
-                // Hapus foto lama jika ada
-                if ($user->photo_profile) {
-                    Storage::disk('public')->delete($user->photo_profile);
-                }
+        $http = Http::timeout(15)->withToken($this->apiToken());
 
-                // Timpa nilai 'photo_profile' di array $validated dengan path file yang baru
-                $validated['photo_profile'] = $request->file('photo_profile')->store('profiles', 'public');
-            }
-
-            // 3. Simpan perubahan menggunakan Mass Assignment
-            $user->update($validated);
-
-            return back()->with('success_update', true);
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Gagal menyimpan: ' . $e->getMessage()]);
+        if ($request->hasFile('photo_profile')) {
+            $http = $http->attach(
+                'photo_profile',
+                file_get_contents($request->file('photo_profile')->getRealPath()),
+                $request->file('photo_profile')->getClientOriginalName()
+            );
         }
+
+        $response = $http->post($this->apiUrl($endpoint), [
+            'name'  => $request->name,
+            'phone' => $request->phone,
+        ]);
+
+        if (!$response->successful()) {
+            $message = $response->json('message') ?? 'Gagal menyimpan profil.';
+            return back()->withErrors(['error' => $message]);
+        }
+
+        Session::put('user', $response->json('data'));
+
+        return back()->with('success_update', true);
     }
 }

@@ -2,24 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Canteen;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
+    private function apiUrl(string $path): string
+    {
+        $base = env('API_INTERNAL_URL', config('app.url'));
+        return rtrim($base, '/') . '/api' . $path;
+    }
+
     public function processRegister(Request $request)
     {
         $role = $request->role ?? 'pembeli';
 
         $rules = [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            // PENTING: Validasi kata sandi kuat (Min 8 char, ada huruf besar, huruf kecil, & angka)
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email',
             'password' => ['required', 'min:8', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[0-9]/'],
-            'phone' => 'required|string',
+            'phone'    => 'required|string',
         ];
 
         if ($role === 'admin_kantin') {
@@ -27,91 +30,89 @@ class AuthController extends Controller
         }
 
         $request->validate($rules, [
-            'email.unique' => 'Email ini sudah terdaftar, silakan gunakan email lain.',
-            'password.min' => 'Kata sandi minimal 8 karakter.',
-            'password.regex' => 'Kata sandi harus mengandung kombinasi huruf besar, huruf kecil, dan angka.'
+            'email.unique'   => 'Email ini sudah terdaftar.',
+            'password.min'   => 'Kata sandi minimal 8 karakter.',
+            'password.regex' => 'Kata sandi harus mengandung huruf besar, huruf kecil, dan angka.',
         ]);
 
-        $canteenId = null;
-        if ($role === 'admin_kantin') {
-            $canteen = Canteen::create([
-                'name' => $request->canteen_name,
-                'is_active' => false,
-                'status' => 'pending',
-                'delivery_fee_flat' => 0,
-                'operating_hours' => ['open' => '08:00', 'close' => '17:00'],
-            ]);
-            $canteenId = (string) $canteen->_id;
+        $response = Http::timeout(15)->post($this->apiUrl('/auth/register'), [
+            'name'         => $request->name,
+            'email'        => $request->email,
+            'password'     => $request->password,
+            'phone'        => $request->phone,
+            'role'         => $role,
+            'canteen_name' => $request->canteen_name,
+        ]);
+
+        $data = $response->json();
+
+        if (!$response->successful()) {
+            $errors = $data['errors'] ?? ['message' => [$data['message'] ?? 'Terjadi kesalahan.']];
+
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['errors' => $errors], $response->status());
+            }
+
+            return back()->withErrors($errors)->withInput();
         }
 
-        // Simpan User dengan Field Phone
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone, // DISIMPAN DI SINI
-            'password' => Hash::make($request->password),
-            'role' => $role,
-            'canteen_id' => $canteenId,
-            'status' => $role === 'admin_kantin' ? 'pending' : 'active',
-        ]);
-
-
-        $message = ($role === 'admin_kantin')
-            ? 'Pendaftaran Berhasil! Akun sedang menunggu persetujuan admin.'
-            : 'Akun Berhasil Dibuat! Silakan masuk untuk melanjutkan.';
-
-        // PENTING: Cek kalau requestnya dari JS (AJAX), balikin JSON biar modal tau kalau sukses
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
-                'success' => true,
+                'success'  => true,
                 'redirect' => '/login',
             ]);
         }
 
-        return redirect('/login')->with('success', $message);
+        $msg = $role === 'admin_kantin'
+            ? 'Pendaftaran berhasil! Akun sedang menunggu persetujuan admin.'
+            : 'Akun berhasil dibuat! Silakan masuk.';
+
+        return redirect('/login')->with('success', $msg);
     }
 
     public function processLogin(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
+        $request->validate([
+            'email'    => 'required|email',
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $response = Http::timeout(15)->post($this->apiUrl('/auth/sessions'), [
+            'email'    => $request->email,
+            'password' => $request->password,
+        ]);
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return back()->withErrors(['message' => 'Email atau kata sandi salah.'])->withInput();
+        $data = $response->json();
+
+        if (!$response->successful()) {
+            $message = $data['message'] ?? 'Email atau kata sandi salah.';
+            return back()->withErrors(['message' => $message])->withInput();
         }
 
-        if ($user->status === 'pending') {
-            return back()->withErrors(['message' => 'Akun kamu belum disetujui oleh admin. Mohon tunggu.']);
-        }
+        Session::put('api_token', $data['token']);
+        Session::put('user', $data['user']);
 
-        if (Auth::attempt($credentials, $request->remember)) {
-            $request->session()->regenerate();
+        $role = $data['user']['role'] ?? 'pembeli';
 
-            // 🔥 URUTKAN ROLE DI SINI
-            if ($user->role === 'admin_global') {
-                return redirect()->intended('/admin/global/dasbor');
-            }
-
-            if ($user->role === 'admin_kantin') {
-                return redirect()->intended('/admin/pesanan');
-            }
-
-            // default (pembeli)
-            return redirect()->intended('/beranda');
-        }
-
-        return back()->withErrors(['message' => 'Terjadi kesalahan sistem, silakan coba lagi.']);
+        return match($role) {
+            'admin_global' => redirect()->intended('/admin/global/dasbor'),
+            'admin_kantin' => redirect()->intended('/admin/pesanan'),
+            default        => redirect()->intended('/beranda'),
+        };
     }
 
     public function logout(Request $request)
     {
-        Auth::logout();
+        $token = Session::get('api_token');
+
+        if ($token) {
+            Http::timeout(15)->withToken($token)->delete($this->apiUrl('/auth/sessions'));
+        }
+
+        Session::forget(['api_token', 'user']);
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect()->route('pelanggan.login');
     }
 }

@@ -184,14 +184,16 @@
                     {{-- Avatar --}}
                     <div class="flex justify-center mb-10">
                         <div class="avatar-wrap" onclick="document.getElementById('avatarInput').click()">
+                            @php
+                            $foto = is_array($user) ? ($user['photo_profile'] ?? null) : ($user->photo_profile ?? null);
+                            @endphp
+
                             <div id="previewCircle"
                                 class="w-24 h-24 rounded-full flex items-center justify-center border-4 border-white shadow-md overflow-hidden bg-[#FEF3E2]"
-                                style="{{ $user->photo_profile ? 'background-image:url('.asset('storage/'.$user->photo_profile).'); background-size:cover; background-position:center;' : '' }}">
-
-                                @if(!$user->photo_profile)
+                                style="{{ $foto ? 'background-image:url('.$foto.'); background-size:cover; background-position:center;' : '' }}">
+                                @if(!$foto)
                                 <i class="fa-solid fa-user text-orange-200 text-4xl"></i>
                                 @endif
-
                             </div>
                             <div class="avatar-overlay">
                                 <i class="fa-solid fa-camera text-white text-sm"></i>
@@ -228,9 +230,11 @@
                             <label class="text-sm font-bold text-gray-700 mb-2 block ml-1">Email</label>
                             <div class="input-wrap">
                                 <i class="fa-regular fa-envelope icon"></i>
-                                <input type="email" name="email" class="input-field"
-                                    value="{{ old('email', $user->email) }}" required>
+                                <input type="email" class="input-field"
+                                    value="{{ $user->email ?? $user['email'] ?? '' }}" readonly
+                                    style="color:#9ca3af; cursor:not-allowed;">
                             </div>
+                            <p class="text-xs text-gray-400 ml-1 mt-1.5">Email tidak dapat diubah.</p>
                         </div>
 
                         <button type="submit"

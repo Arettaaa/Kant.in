@@ -183,6 +183,7 @@ class CanteenController extends Controller
     private function formatCanteen($canteen)
     {
         $data = $canteen->toArray();
+        $data['_id'] = (string) $canteen->_id; // ← tambah ini
         if (!empty($data['image'])) {
             $data['image'] = asset('storage/' . $data['image']);
         }

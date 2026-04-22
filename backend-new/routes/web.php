@@ -9,6 +9,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CanteenController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\JelajahController;
+use App\Http\Controllers\DetailMenuController;
+use App\Http\Controllers\DetailKantinController;
+
+
 /*
 |--------------------------------------------------------------------------
 | Auth Pelanggan (shared login & register dari admin.blade, re-route)
@@ -105,17 +110,21 @@ Route::get('/admin/pusat-bantuan', fn() => view('admin.support'))->name('admin.s
 | Pelanggan Routes
 |--------------------------------------------------------------------------
 */
-Route::get('/beranda', [BerandaController::class, 'index'])->name('pelanggan.beranda');Route::get('/keranjang',                fn() => view('pelanggan.keranjang'))->name('pelanggan.keranjang');
-Route::get('/menu/{slug}',              fn() => view('pelanggan.detail-menu'))->name('pelanggan.detail-menu');
+Route::get('/beranda', [BerandaController::class, 'index'])->name('pelanggan.beranda');
+Route::get('/keranjang',                fn() => view('pelanggan.keranjang'))->name('pelanggan.keranjang');
+Route::get('/menu/{id}', [DetailMenuController::class, 'index'])->name('pelanggan.detail-menu');
+Route::get('/kantin/{id}', [DetailKantinController::class, 'index'])->name('pelanggan.detail-kantin');
+
+
 Route::get('/pembayaran',               fn() => view('pelanggan.pembayaran'))->name('pelanggan.pembayaran');
-Route::get('/jelajah',                  fn() => view('pelanggan.jelajah'))->name('pelanggan.jelajah');
+Route::get('/jelajah', [JelajahController::class, 'index'])->name('pelanggan.jelajah');
 Route::get('/pesanan',                  fn() => view('pelanggan.pesanan'))->name('pelanggan.pesanan');
 Route::get('/profil', [ProfilController::class, 'index'])->name('pelanggan.profil');
 Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('pelanggan.edit-profil');
 Route::get('/profil/data-diri', [ProfilController::class, 'dataDiri'])->name('pelanggan.data-diri');
 
 
-Route::middleware('auth')->group(function () {
+Route::middleware('check.session')->group(function () {
     Route::get('/profil', [ProfilController::class, 'index'])->name('pelanggan.profil');
     Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('pelanggan.edit-profil');
     Route::get('/profil/data-diri', [ProfilController::class, 'dataDiri'])->name('pelanggan.data-diri');
@@ -129,39 +138,6 @@ Route::middleware('auth')->group(function () {
 | Pelanggan Routes detail kantin
 |--------------------------------------------------------------------------
 */
-Route::get('/kantin/{slug}', function ($slug) {
-
-    $kantins = [
-        'warung-bu-ani' => [
-            'nama' => 'Warung Bu Ani',
-            'deskripsi' => 'Menyediakan nasi goreng khas dengan bumbu rempah pilihan.',
-            'rating' => 4.8
-        ],
-        'noodle-ninja' => [
-            'nama' => 'Noodle Ninja',
-            'deskripsi' => 'Mie Jepang autentik dengan kuah khas.',
-            'rating' => 4.6
-        ],
-        'fresh-sip' => [
-            'nama' => 'Fresh Sip',
-            'deskripsi' => 'Minuman segar dan dessert kekinian.',
-            'rating' => 4.9
-        ],
-        'asian-bowl-house' => [
-            'nama' => 'Asian Bowl House',
-            'deskripsi' => 'Menu rice bowl khas Asia.',
-            'rating' => 4.5
-        ],
-    ];
-
-    $kantin = $kantins[$slug] ?? null;
-
-    if (!$kantin) {
-        abort(404);
-    }
-
-    return view('pelanggan.detail-kantin', compact('kantin'));
-})->name('pelanggan.detail-kantin');
 
 /*
 |--------------------------------------------------------------------------

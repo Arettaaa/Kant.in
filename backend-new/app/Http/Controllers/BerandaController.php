@@ -3,22 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class BerandaController extends Controller
 {
     public function index()
     {
-        // Cek apakah ada user yang login
-        if (Auth::check()) {
-            $user = Auth::user();
-            $namaDepan = explode(' ', $user->name)[0];
-        } else {
-            $namaDepan = "Sobat Kant.in";
+        $user = Session::get('user');
+
+        $namaDepan = 'Sobat Kantin';
+        if ($user && !empty($user['name'])) {
+            $namaDepan = explode(' ', trim($user['name']))[0];
         }
-        
-        return view('pelanggan.beranda', [
-            'namaDepan' => $namaDepan
-        ]);
+
+        $foto = $user['photo_profile'] ?? null;
+
+        return view('pelanggan.beranda', compact('namaDepan', 'foto'));
     }
 }

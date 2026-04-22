@@ -178,33 +178,37 @@ class MenuController extends Controller
 
     public function allMenus(Request $request)
     {
-        // 1. Ambil semua kantin yang aktif
         $activeCanteens = Canteen::where('is_active', true)
             ->where('status', 'active')
             ->get();
 
-        // 2. Trik Kebal Peluru MongoDB: Masukkan format asli (ObjectId) DAN format String
-        $activeCanteenIds = [];
+        // Buat map id => name untuk lookup cepat
+        $canteenMap = [];
         foreach ($activeCanteens as $canteen) {
-            $activeCanteenIds[] = $canteen->_id;           // Format Asli
-            $activeCanteenIds[] = (string) $canteen->_id;  // Format String
+            $canteenMap[(string) $canteen->_id] = $canteen->name;
         }
 
-        // 3. Tampilkan menu berdasarkan kumpulan ID kebal peluru tadi
+        $activeCanteenIds = [];
+        foreach ($activeCanteens as $canteen) {
+            $activeCanteenIds[] = $canteen->_id;
+            $activeCanteenIds[] = (string) $canteen->_id;
+        }
+
         $query = Menu::whereIn('canteen_id', $activeCanteenIds);
 
-        // Filter Pencarian Makanan
         if ($request->has('search') && $request->search != '') {
             $query->where('name', 'regex', '/' . $request->search . '/i');
         }
 
-        // Filter Kategori (Abaikan jika "Semua" atau kosong)
         if ($request->has('category') && $request->category !== 'Semua') {
             $query->where('category', $request->category);
         }
 
-        // Ambil data dan format
-        $menus = $query->get()->map(fn($menu) => $this->formatMenu($menu));
+        $menus = $query->get()->map(function ($menu) use ($canteenMap) {
+            $data = $this->formatMenu($menu);
+            $data['canteen_name'] = $canteenMap[(string) $menu->canteen_id] ?? 'Kantin';
+            return $data;
+        });
 
         return response()->json([
             'success' => true,
