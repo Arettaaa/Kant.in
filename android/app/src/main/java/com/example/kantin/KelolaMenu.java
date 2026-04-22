@@ -12,6 +12,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout; // Tambahan
 
 import com.example.kantin.MenuAdminAdapter;
 import com.example.kantin.model.response.MenuListResponse;
@@ -36,6 +37,10 @@ public class KelolaMenu extends AppCompatActivity {
     private LinearLayout btnKeluar;
     private android.widget.ImageView fabAdd;
 
+    // --- TAMBAHAN DARI XML ---
+    private SwipeRefreshLayout swipeRefresh;
+    private LinearLayout layoutEmpty;
+
     private ApiService apiService;
     private SessionManager sessionManager;
     private MenuAdminAdapter adapter;
@@ -46,11 +51,15 @@ public class KelolaMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kelola_menu);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+        // Tambahan pengaman null check agar tidak crash jika R.id.main belum ada di XML
+        View mainView = findViewById(R.id.main);
+        if (mainView != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, insets) -> {
+                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+                return insets;
+            });
+        }
 
         sessionManager = new SessionManager(this);
         apiService = ApiClient.getAuthClient(sessionManager.getToken()).create(ApiService.class);
@@ -58,7 +67,7 @@ public class KelolaMenu extends AppCompatActivity {
         initViews();
         setupAdapter();
         setupListeners();
-        FooterAdmin.setupFooter(this);
+        FooterAdmin.setupFooter(this, "MENU");
 
         fetchMenus();
     }
@@ -75,6 +84,10 @@ public class KelolaMenu extends AppCompatActivity {
         tvCountMenu = findViewById(R.id.tvCountMenu);
         btnKeluar   = findViewById(R.id.btnKeluar);
         fabAdd      = findViewById(R.id.fabAdd);
+
+        // --- TAMBAHAN INISIALISASI ---
+        swipeRefresh = findViewById(R.id.swipeRefresh);
+        layoutEmpty  = findViewById(R.id.layoutEmpty);
     }
 
     private void setupAdapter() {
@@ -103,41 +116,60 @@ public class KelolaMenu extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        // Tombol Keluar (Logout)
+        // PERBAIKAN: Karena ini halaman kelola menu, tombol panah kiri seharusnya hanya untuk KEMBALI, bukan LOGOUT.
         if (btnKeluar != null) {
-            btnKeluar.setOnClickListener(v -> {
-                sessionManager.clearSession();
-                Intent intent = new Intent(this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
-            });
+            btnKeluar.setOnClickListener(v -> finish());
         }
 
         // Tombol Tambah Menu
-        fabAdd.setOnClickListener(v -> {
-            startActivity(new Intent(this, TambahMenu.class));
-        });
+        if (fabAdd != null) {
+            fabAdd.setOnClickListener(v -> {
+                startActivity(new Intent(this, TambahMenu.class));
+            });
+        }
+
+        // --- TAMBAHAN LISTENER SWIPE REFRESH ---
+        if (swipeRefresh != null) {
+            swipeRefresh.setOnRefreshListener(this::fetchMenus);
+        }
     }
 
     private void fetchMenus() {
         String canteenId = sessionManager.getCanteenId();
         if (canteenId == null || canteenId.isEmpty()) {
             Toast.makeText(this, "ID Kantin tidak ditemukan", Toast.LENGTH_SHORT).show();
+            if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
             return;
         }
+
+        // Tampilkan loading saat fetch
+        if (swipeRefresh != null) swipeRefresh.setRefreshing(true);
 
         apiService.getMenus(canteenId, null, null).enqueue(new Callback<MenuListResponse>() {
             @Override
             public void onResponse(Call<MenuListResponse> call, Response<MenuListResponse> response) {
+                // Matikan loading
+                if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
+
                 if (response.isSuccessful() && response.body() != null) {
                     List<MenuListResponse.MenuItem> data = response.body().getData();
-                    if (data != null) {
-                        menuList.clear();
+                    menuList.clear();
+
+                    if (data != null && !data.isEmpty()) {
                         menuList.addAll(data);
-                        adapter.notifyDataSetChanged();
                         tvCountMenu.setText("Menampilkan " + data.size() + " Menu");
+
+                        // Sembunyikan pesan kosong
+                        if (layoutEmpty != null) layoutEmpty.setVisibility(View.GONE);
+                        rvMenu.setVisibility(View.VISIBLE);
+                    } else {
+                        tvCountMenu.setText("Menampilkan 0 Menu");
+
+                        // Tampilkan pesan kosong
+                        if (layoutEmpty != null) layoutEmpty.setVisibility(View.VISIBLE);
+                        rvMenu.setVisibility(View.GONE);
                     }
+                    adapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(KelolaMenu.this, "Gagal memuat menu", Toast.LENGTH_SHORT).show();
                 }
@@ -145,6 +177,7 @@ public class KelolaMenu extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<MenuListResponse> call, Throwable t) {
+                if (swipeRefresh != null) swipeRefresh.setRefreshing(false);
                 Toast.makeText(KelolaMenu.this, "Koneksi error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });

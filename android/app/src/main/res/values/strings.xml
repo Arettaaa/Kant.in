@@ -30,6 +30,12 @@
     <string name="cb_verify_desc">Saya mengkonfirmasi bahwa jumlah dan detail pengirim sudah sesuai dengan riwayat mutasi.</string>
     <string name="btn_reject">✕ Tolak</string>
     <string name="btn_verify_accept">✓ Verifikasi &amp; Terima</string>
+    <string-array name="kategori_menu">
+        <item>Pilih Kategori...</item>
+        <item>Makanan</item>
+        <item>Minuman</item>
+        <item>Camilan</item>
+    </string-array>
 
 
     <string name="lorem_ipsum">

@@ -144,18 +144,21 @@ public interface ApiService {
      * PUT /api/canteens/{canteenId}/menus/{menuId}
      * Laravel tidak support PUT multipart → pakai POST + _method: PUT
      */
+
+    // UPDATE MENU (Laravel butuh @POST + _method=PUT jika ada file Multipart)
     @Multipart
     @POST("canteens/{canteenId}/menus/{menuId}")
     Call<MenuDetailResponse> updateMenu(
             @Path("canteenId") String canteenId,
             @Path("menuId") String menuId,
-            @Part("_method") RequestBody method,  // isi: "PUT"
+            @Part("_method") RequestBody method, // WAJIB UNTUK LARAVEL
             @Part("name") RequestBody name,
-            @Part("description") RequestBody description,
             @Part("price") RequestBody price,
             @Part("category") RequestBody category,
-            @Part("estimated_cooking_time") RequestBody estimatedCookingTime,
-            @Part MultipartBody.Part image         // nullable
+            @Part("estimated_cooking_time") RequestBody cookingTime,
+            @Part("description") RequestBody description,
+            @Part("is_available") RequestBody isAvailable,
+            @Part MultipartBody.Part image // Opsional jika foto diganti
     );
 
     /**
@@ -403,4 +406,19 @@ public interface ApiService {
             @Path("canteenId") String canteenId,
             @Query("status") String status
     );
+
+    @Multipart
+    @POST("canteens/{canteenId}/menus")
+    Call<MenuDetailResponse> createMenu(
+            @Path("canteenId") String canteenId,
+            @Part("name") RequestBody name,
+            @Part("price") RequestBody price,
+            @Part("category") RequestBody category,
+            @Part("estimated_cooking_time") RequestBody cookingTime,
+            @Part("description") RequestBody description,
+            @Part("is_available") RequestBody isAvailable,
+            @Part MultipartBody.Part image
+    );
+
+
 }
