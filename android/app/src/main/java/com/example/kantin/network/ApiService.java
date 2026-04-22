@@ -403,4 +403,17 @@ public interface ApiService {
             @Path("canteenId") String canteenId,
             @Query("status") String status
     );
+
+    @Multipart
+    @POST("canteens/{canteenId}/menus")
+    Call<MenuDetailResponse> createMenu(
+            @Path("canteenId") String canteenId,
+            @Part("name") RequestBody name,
+            @Part("price") RequestBody price,
+            @Part("category") RequestBody category,
+            @Part("estimated_cooking_time") RequestBody cookingTime,
+            @Part("description") RequestBody description,
+            @Part("is_available") RequestBody isAvailable,
+            @Part MultipartBody.Part image
+    );
 }

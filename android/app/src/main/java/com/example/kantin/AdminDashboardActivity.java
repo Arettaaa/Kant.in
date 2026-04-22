@@ -88,7 +88,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
         }).attach();
 
         setupSwitchListener();
-        FooterAdmin.setupFooter(this);
+        FooterAdmin.setupFooter(this, "ORDER");
     }
 
     private void initViews() {

@@ -51,7 +51,7 @@ public class ProfilAdminKantin extends AppCompatActivity {
         sessionManager = new SessionManager(this);
         apiService = ApiClient.getAuthClient(sessionManager.getToken()).create(ApiService.class);
 
-        FooterAdmin.setupFooter(this);
+        FooterAdmin.setupFooter(this, "PROFIL");
         fetchProfileData();
         setupListeners();
     }

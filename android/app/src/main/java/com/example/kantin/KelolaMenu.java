@@ -67,7 +67,7 @@ public class KelolaMenu extends AppCompatActivity {
         initViews();
         setupAdapter();
         setupListeners();
-        FooterAdmin.setupFooter(this);
+        FooterAdmin.setupFooter(this, "MENU");
 
         fetchMenus();
     }
