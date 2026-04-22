@@ -122,8 +122,7 @@ public class ProfilAdminKantin extends AppCompatActivity {
         });
 
         btnEditCanteen.setOnClickListener(v -> {
-            // startActivity(new Intent(this, EditProfilActivity.class));
-            Toast.makeText(this, "Buka Edit Profil", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(ProfilAdminKantin.this, UbahProfilKantin.class));
         });
 
         // ✅ FIX 4: Ganti sessionManager.logout() → sessionManager.clearSession()
