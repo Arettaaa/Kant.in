@@ -62,10 +62,9 @@ public class OrderProsesAdapter extends RecyclerView.Adapter<OrderProsesAdapter.
             holder.tvOrderId.setText(order.getOrderCode() != null ? order.getOrderCode() : "-");
         }
 
-        // 3. Waktu
+        // 3. Waktu (Otomatis WIB)
         if (holder.tvTime != null) {
-            String rawDate = order.getCreatedAt();
-            holder.tvTime.setText(rawDate != null && rawDate.length() >= 16 ? rawDate.substring(11, 16) : "-");
+            holder.tvTime.setText(formatWaktuWIB(order.getCreatedAt()));
         }
 
         // 4. Total
@@ -154,6 +153,29 @@ public class OrderProsesAdapter extends RecyclerView.Adapter<OrderProsesAdapter.
         Locale localeID = new Locale("in", "ID");
         NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(localeID);
         return formatRupiah.format(number).replace("Rp", "Rp ");
+    }
+
+    // Fungsi Ajaib Konversi UTC ke WIB (Jam:Menit)
+    private String formatWaktuWIB(String createdAt) {
+        if (createdAt == null || createdAt.isEmpty()) return "-";
+        try {
+            // Bersihkan format (Misal "2026-04-21T01:20:39.980000Z" jadi "2026-04-21 01:20:39")
+            String cleanDate = createdAt.split("\\.")[0].replace("T", " ");
+
+            // Beritahu Android kalau waktu aslinya adalah UTC
+            java.text.SimpleDateFormat inputFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault());
+            inputFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+            java.util.Date date = inputFormat.parse(cleanDate);
+
+            // Ubah ke WIB (Asia/Jakarta) dengan format HH:mm (24 Jam)
+            java.text.SimpleDateFormat outputFormat = new java.text.SimpleDateFormat("HH:mm", new java.util.Locale("id", "ID"));
+            outputFormat.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Jakarta"));
+
+            return outputFormat.format(date);
+        } catch (Exception e) {
+            // Kalau gagal, kembali ke cara potong string biasa
+            return createdAt.length() >= 16 ? createdAt.substring(11, 16) : "-";
+        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

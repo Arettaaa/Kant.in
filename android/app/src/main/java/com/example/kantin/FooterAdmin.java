@@ -40,8 +40,8 @@ public class FooterAdmin {
         // 3. Logika Klik Order (Dashboard)
         if (menuOrder != null) {
             menuOrder.setOnClickListener(v -> {
-                if (!(activity instanceof DashboardAdmin)) {
-                    activity.startActivity(new Intent(activity, DashboardAdmin.class));
+                if (!(activity instanceof AdminDashboardActivity)) {
+                    activity.startActivity(new Intent(activity, AdminDashboardActivity.class));
                 } else {
                     Toast.makeText(activity, "Kamu sudah di Dashboard Order", Toast.LENGTH_SHORT).show();
                 }

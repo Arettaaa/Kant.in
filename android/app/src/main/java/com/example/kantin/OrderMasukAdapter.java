@@ -43,24 +43,27 @@ public class OrderMasukAdapter extends RecyclerView.Adapter<OrderMasukAdapter.Vi
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         OrderModel order = orderList.get(position); // Gunakan OrderModel
 
+        if (order == null) return; // Mencegah crash
+
         // 1. Set Header Info
         if (order.getCustomerSnapshot() != null) {
             String fullName = order.getCustomerSnapshot().getName();
             String firstName = (fullName != null && fullName.contains(" "))
                     ? fullName.split(" ")[0] : fullName;
-            holder.tvCustomerName.setText(firstName);        }
-        else {
+            holder.tvCustomerName.setText(firstName);
+        } else {
             holder.tvCustomerName.setText("Pelanggan");
         }
 
         holder.tvOrderId.setText(order.getOrderCode());
         holder.tvTotal.setText(formatRupiah(order.getTotalAmount()));
 
-        // Memotong jam dari format tanggal (misal: "2026-04-21 15:30:00" menjadi "15:30")
-        String rawDate = order.getCreatedAt();
-        holder.tvTime.setText(rawDate != null && rawDate.length() >= 16 ? rawDate.substring(11, 16) : "-");
+        // 2. Set Waktu (Otomatis konversi ke WIB)
+        if (holder.tvTime != null) {
+            holder.tvTime.setText(formatWaktuWIB(order.getCreatedAt()));
+        }
 
-        // 2. Set Delivery Badge
+        // 3. Set Delivery Badge
         if (order.getDeliveryDetails() != null && "pickup".equals(order.getDeliveryDetails().getMethod())) {
             holder.tvDeliveryType.setText("Ambil Sendiri");
             holder.tvDeliveryType.setTextColor(Color.parseColor("#9C27B0"));
@@ -71,7 +74,7 @@ public class OrderMasukAdapter extends RecyclerView.Adapter<OrderMasukAdapter.Vi
             holder.tvDeliveryType.setBackgroundResource(R.drawable.bg_order_label_blue);
         }
 
-        // 3. Logic Maksimal 2 Menu List
+        // 4. Logic Maksimal 2 Menu List
         holder.llMenuContainer.removeAllViews();
         List<OrderItem> items = order.getItems(); // Gunakan OrderItem
 
@@ -91,7 +94,7 @@ public class OrderMasukAdapter extends RecyclerView.Adapter<OrderMasukAdapter.Vi
                 holder.llMenuContainer.addView(rowView);
             }
 
-            // 4. Logic "+ X item lainnya"
+            // 5. Logic "+ X item lainnya"
             if (items.size() > 2) {
                 int remaining = items.size() - 2;
                 holder.tvMoreItems.setText("+ " + remaining + " item lainnya");
@@ -101,7 +104,7 @@ public class OrderMasukAdapter extends RecyclerView.Adapter<OrderMasukAdapter.Vi
             }
         }
 
-        // 5. Aksi Klik Card (Lempar ke DetailPesanan)
+        // 6. Aksi Klik Card (Lempar ke DetailPesanan)
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, DetailPesanan.class); // Nama Activity Detail
 
@@ -125,6 +128,29 @@ public class OrderMasukAdapter extends RecyclerView.Adapter<OrderMasukAdapter.Vi
         Locale localeID = new Locale("in", "ID");
         NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(localeID);
         return formatRupiah.format(number).replace("Rp", "Rp ");
+    }
+
+    // Fungsi Ajaib Konversi UTC ke WIB (Jam:Menit)
+    private String formatWaktuWIB(String createdAt) {
+        if (createdAt == null || createdAt.isEmpty()) return "-";
+        try {
+            // Bersihkan format (Misal "2026-04-21T01:20:39.980000Z" jadi "2026-04-21 01:20:39")
+            String cleanDate = createdAt.split("\\.")[0].replace("T", " ");
+
+            // Beritahu Android kalau waktu aslinya adalah UTC
+            java.text.SimpleDateFormat inputFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault());
+            inputFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+            java.util.Date date = inputFormat.parse(cleanDate);
+
+            // Ubah ke WIB (Asia/Jakarta) dengan format HH:mm (24 Jam)
+            java.text.SimpleDateFormat outputFormat = new java.text.SimpleDateFormat("HH:mm", new java.util.Locale("id", "ID"));
+            outputFormat.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Jakarta"));
+
+            return outputFormat.format(date);
+        } catch (Exception e) {
+            // Kalau gagal, kembali ke cara potong string biasa
+            return createdAt.length() >= 16 ? createdAt.substring(11, 16) : "-";
+        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

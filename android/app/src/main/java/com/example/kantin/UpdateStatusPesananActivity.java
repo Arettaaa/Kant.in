@@ -41,6 +41,9 @@ public class UpdateStatusPesananActivity extends AppCompatActivity {
     private OrderModel currentOrder;
     private ApiService apiService;
 
+    // 🔥 Variabel untuk nyimpen status sementara sebelum tombol ditekan
+    private String selectedStatus = "processing";
+
     // Warna State UI
     private final String COLOR_ORANGE = "#FF6F00";
     private final String COLOR_GREEN = "#00C950";
@@ -80,10 +83,10 @@ public class UpdateStatusPesananActivity extends AppCompatActivity {
         rvMenuPesanan.setLayoutManager(new LinearLayoutManager(this));
         rvMenuPesanan.setNestedScrollingEnabled(false);
 
-        // 🔥 INI YANG HARUS DIGANTI
         SessionManager session = new SessionManager(this);
         apiService = ApiClient.getAuthClient(session.getToken()).create(ApiService.class);
     }
+
     private void getIntentData() {
         Intent intent = getIntent();
 
@@ -92,7 +95,6 @@ public class UpdateStatusPesananActivity extends AppCompatActivity {
             currentOrder = (OrderModel) intent.getSerializableExtra("ORDER_DATA");
         }
 
-        // 🔥 ambil dari session (fix utama)
         SessionManager session = new SessionManager(this);
         canteenId = session.getCanteenId();
 
@@ -102,70 +104,83 @@ public class UpdateStatusPesananActivity extends AppCompatActivity {
 
     private void populateOrderData() {
         if (currentOrder != null) {
-            // 1. Cek aman untuk Order Code
             tvOrderId.setText(currentOrder.getOrderCode() != null ? currentOrder.getOrderCode() : "-");
 
-            // 2. Cek aman untuk Customer Name
             if (currentOrder.getCustomerSnapshot() != null && currentOrder.getCustomerSnapshot().getName() != null) {
                 tvCustomerName.setText(currentOrder.getCustomerSnapshot().getName());
             } else {
                 tvCustomerName.setText("Pelanggan");
             }
 
-            // 3. Cek aman untuk Delivery Method
             if (currentOrder.getDeliveryDetails() != null && currentOrder.getDeliveryDetails().getMethod() != null) {
                 String method = currentOrder.getDeliveryDetails().getMethod();
                 tvOrderType.setText(method.equals("delivery") ? "Antar Kurir" : "Ambil Sendiri");
             } else {
-                tvOrderType.setText("Ambil Sendiri"); // Default kalau kosong
+                tvOrderType.setText("Ambil Sendiri");
             }
 
-            // 4. Waktu
             if (currentOrder.getCreatedAt() != null && currentOrder.getCreatedAt().length() >= 16) {
                 tvTime.setText(currentOrder.getCreatedAt().substring(11, 16));
             } else {
                 tvTime.setText("-");
             }
 
-            // 5. Menu
             if (currentOrder.getItems() != null) {
                 CancelOrderMenuAdapter adapter = new CancelOrderMenuAdapter(currentOrder.getItems());
                 rvMenuPesanan.setAdapter(adapter);
             }
         }
     }
+
     private void setupListeners() {
         btnBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
-        // Klik kartu SIAP (Mengubah status di DB menjadi 'ready')
-        cardSiap.setOnClickListener(v -> updateStatusToBackend("ready"));
+        // 🔥 KLIK KARTU DIMASAK: Hanya ubah UI jadi oranye, tombol ilang
+        cardDimasak.setOnClickListener(v -> {
+            selectedStatus = "processing";
+            updateUIByStatus("processing");
+        });
 
-        // Klik tombol SELESAI (Mengubah status di DB menjadi 'completed')
-        btnSelesaiPesanan.setOnClickListener(v -> updateStatusToBackend("completed"));
+        // 🔥 KLIK KARTU SIAP: Hanya ubah UI jadi hijau, munculin tombol (API BELUM DITEMBAK)
+        cardSiap.setOnClickListener(v -> {
+            selectedStatus = "ready";
+            updateUIByStatus("ready");
+        });
+
+        // 🔥 KLIK TOMBOL BAWAH: Nembak API untuk ubah jadi "ready"
+        btnSelesaiPesanan.setOnClickListener(v -> {
+            if (selectedStatus.equals("ready")) {
+                updateStatusToBackend("ready");
+            }
+        });
     }
 
     private void updateStatusToBackend(String newStatus) {
+        // Matikan tombol sementara biar gak diklik dobel
+        btnSelesaiPesanan.setEnabled(false);
+        btnSelesaiPesanan.setText("Menyimpan Status...");
+
         UpdateStatusOrderRequest request = new UpdateStatusOrderRequest(newStatus);
 
-        // Memanggil PUT /canteens/{id}/orders/{orderId}/statuses
         Call<BaseResponse> call = apiService.updateOrderStatus(canteenId, orderId, request);
         call.enqueue(new Callback<BaseResponse>() {
             @Override
             public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    updateUIByStatus(newStatus);
+                btnSelesaiPesanan.setEnabled(true);
 
-                    if (newStatus.equals("completed")) {
-                        Toast.makeText(UpdateStatusPesananActivity.this, "Pesanan Selesai & Masuk Riwayat", Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    Toast.makeText(UpdateStatusPesananActivity.this, "Pesanan siap diambil/diantar!", Toast.LENGTH_SHORT).show();
+                    finish(); // 🔥 Balik otomatis ke halaman sebelumnya (Dashboard)
                 } else {
+                    btnSelesaiPesanan.setText("Konfirmasi Pesanan Siap");
                     Toast.makeText(UpdateStatusPesananActivity.this, "Gagal memperbarui status", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<BaseResponse> call, Throwable t) {
+                btnSelesaiPesanan.setEnabled(true);
+                btnSelesaiPesanan.setText("Konfirmasi Pesanan Siap");
                 Toast.makeText(UpdateStatusPesananActivity.this, "Kesalahan Jaringan: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -187,7 +202,7 @@ public class UpdateStatusPesananActivity extends AppCompatActivity {
             cardSiap.setCardElevation(0f);
 
             tvStatusKeterangan.setText("Pelanggan melihat: Pesananmu sedang disiapkan...");
-            btnSelesaiPesanan.setVisibility(View.GONE);
+            btnSelesaiPesanan.setVisibility(View.GONE); // Sembunyikan tombol
 
         } else if (status.equals("ready")) {
             // UI State: DIMASAK (Mati)
@@ -203,8 +218,9 @@ public class UpdateStatusPesananActivity extends AppCompatActivity {
             tvSiap.setTextColor(Color.parseColor(COLOR_WHITE));
             cardSiap.setCardElevation(8f);
 
-            tvStatusKeterangan.setText("Pelanggan melihat: Makananmu sudah siap!");
-            btnSelesaiPesanan.setVisibility(View.VISIBLE);
+            tvStatusKeterangan.setText("Klik tombol di bawah untuk memberitahu pelanggan.");
+            btnSelesaiPesanan.setText("Konfirmasi Pesanan Siap"); // Ubah teks tombol
+            btnSelesaiPesanan.setVisibility(View.VISIBLE); // Munculkan tombol
         }
     }
 }
