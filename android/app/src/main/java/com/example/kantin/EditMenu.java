@@ -1,6 +1,5 @@
 package com.example.kantin;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,7 +37,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class EditMenu extends AppCompatActivity {
+public class EditMenu extends AppCompatActivity implements HapusMenuDialog.OnHapusMenuListener {
 
     // UI Components
     private CardView btnBack, btnChangeFoto, btnSave;
@@ -191,8 +190,7 @@ public class EditMenu extends AppCompatActivity {
         btnSave.setEnabled(false);
         Toast.makeText(this, "Memperbarui menu...", Toast.LENGTH_SHORT).show();
 
-        // Urutan sesuai ApiService baris 423:
-        // method, name, price, category, cookingTime, description, isAvailable, image
+        // Urutan sesuai ApiService: method, name, price, category, cookingTime, description, isAvailable, image
         RequestBody methodBody      = RequestBody.create("PUT",                    MediaType.parse("text/plain"));
         RequestBody nameBody        = RequestBody.create(name,                     MediaType.parse("text/plain"));
         RequestBody priceBody       = RequestBody.create(price,                    MediaType.parse("text/plain"));
@@ -240,13 +238,17 @@ public class EditMenu extends AppCompatActivity {
         });
     }
 
+    // Tampilkan dialog custom hapus menu
     private void showDeleteConfirmationDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Hapus Menu")
-                .setMessage("Apakah Anda yakin ingin menghapus menu ini secara permanen?")
-                .setPositiveButton("Hapus", (dialog, which) -> deleteMenu())
-                .setNegativeButton("Batal", null)
-                .show();
+        HapusMenuDialog dialog = HapusMenuDialog.newInstance();
+        dialog.setOnHapusMenuListener(this);
+        dialog.show(getSupportFragmentManager(), "HapusMenuDialog");
+    }
+
+    // Callback dari HapusMenuDialog saat user pencet "Ya, Hapus"
+    @Override
+    public void onKonfirmasiHapus() {
+        deleteMenu();
     }
 
     private void deleteMenu() {
