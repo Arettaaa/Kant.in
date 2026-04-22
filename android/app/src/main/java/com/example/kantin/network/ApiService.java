@@ -421,4 +421,23 @@ public interface ApiService {
     );
 
 
+
+    // Update Data Kantin (Multipart untuk handling foto & QRIS)
+    @Multipart
+    @POST("canteens/{id}?_method=PUT") // Laravel sering butuh _method=PUT di POST untuk Multipart
+    Call<BaseResponse> updateCanteen(
+            @Path("id") String canteenId,
+            @Part("name") RequestBody name,
+            @Part("location") RequestBody location,
+            @Part("description") RequestBody description,
+            @Part("delivery_fee_flat") RequestBody deliveryFee,
+            @Part("operating_hours[open]") RequestBody openTime,
+            @Part("operating_hours[close]") RequestBody closeTime,
+            @Part MultipartBody.Part image,    // Logo Kantin
+            @Part MultipartBody.Part qris_image // Foto QRIS
+    );
+
+
+
+
 }

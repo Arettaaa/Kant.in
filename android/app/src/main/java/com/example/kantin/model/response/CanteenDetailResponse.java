@@ -26,8 +26,11 @@ public class CanteenDetailResponse {
         @SerializedName("location")
         private String location;
 
-        @SerializedName("image")
+        @SerializedName("image") // Tetap pakai "image" agar kode temanmu aman
         private String image;
+
+        @SerializedName("qris_url") // Tambahan baru untuk fitur QRIS kamu
+        private String qrisUrl;
 
         @SerializedName("is_open")
         private boolean isOpen;
@@ -43,6 +46,7 @@ public class CanteenDetailResponse {
         public String getDescription()     { return description; }
         public String getLocation()        { return location; }
         public String getImage()           { return image; }
+        public String getQrisUrl()         { return qrisUrl; } // Getter QRIS
         public boolean isOpen()            { return isOpen; }
         public double getDeliveryFeeFlat() { return deliveryFeeFlat; }
         public OperatingHours getOperatingHours() { return operatingHours; }
