@@ -32,12 +32,20 @@ public class SessionManager {
     public static final String ROLE_PEMBELI      = "buyer";
     public static final String ROLE_ADMIN_GLOBAL = "admin_global";
 
+    private static final String KEY_CANTEEN_NAME = "canteen_name";
+
     private final SharedPreferences prefs;
     private final SharedPreferences.Editor editor;
 
     public SessionManager(Context context) {
         prefs  = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         editor = prefs.edit();
+    }
+
+    /** Simpan Nama Kantin */
+    public void saveCanteenName(String canteenName) {
+        editor.putString(KEY_CANTEEN_NAME, canteenName);
+        editor.apply();
     }
 
     // ================================================================
@@ -93,6 +101,9 @@ public class SessionManager {
         return ROLE_ADMIN_KANTIN.equals(getUserRole());
     }
 
+    public String getCanteenName() {
+        return prefs.getString(KEY_CANTEEN_NAME, null);
+    }
     // ================================================================
     // 3. FUNGSI HAPUS (LOGOUT)
     // ================================================================
@@ -101,4 +112,6 @@ public class SessionManager {
         editor.clear();
         editor.apply();
     }
+
+
 }

@@ -128,7 +128,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/user" />
+                        android:src="@drawable/user"
+                       />
                 </androidx.cardview.widget.CardView>
 
                 <LinearLayout
@@ -141,7 +142,7 @@
                         android:layout_height="wrap_content"
                         android:text="OWNER"
                         android:textColor="#9CA3AF"
-                        android:textSize="10sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
                     <TextView
                         android:id="@+id/tvOwnerName"
