@@ -21,7 +21,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
-import com.example.kantin.model.response.BaseResponse;
 import com.example.kantin.model.response.CanteenDetailResponse;
 import com.example.kantin.model.response.ProfileAdminResponse;
 import com.example.kantin.network.ApiClient;
@@ -30,7 +29,9 @@ import com.example.kantin.utils.SessionManager;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import okhttp3.MediaType;
@@ -79,9 +80,9 @@ public class UbahProfilKantin extends AppCompatActivity {
         apiService = ApiClient.getAuthClient(sessionManager.getToken()).create(ApiService.class);
 
         initViews();
-        loadDataAwal();
-        syncDataFromServer();
         setupListeners();
+
+        loadCanteenSettings();
     }
 
     private void initViews() {
@@ -105,60 +106,87 @@ public class UbahProfilKantin extends AppCompatActivity {
         btnSubmitAll = findViewById(R.id.btnSubmitAll);
         btnBack = findViewById(R.id.btnBack);
 
+        etCanteenName.setEnabled(false);
+        etCanteenLocation.setEnabled(false);
         etAdminEmail.setEnabled(false);
     }
 
-    private void loadDataAwal() {
-        etAdminName.setText(sessionManager.getUserName());
-        etAdminEmail.setText(sessionManager.getUserEmail());
-        etAdminPhone.setText(sessionManager.getUserPhone());
+    // ==========================================================
+    // BAGIAN GET DATA (READ)
+    // ==========================================================
 
-        String photoUrl = sessionManager.getPhotoUrl();
-        if (photoUrl != null && !photoUrl.isEmpty()) {
-            Glide.with(this).load(photoUrl).circleCrop().placeholder(R.drawable.avatar).into(ivAdminPhoto);
-        }
-    }
-
-    private void syncDataFromServer() {
+    private void loadCanteenSettings() {
         String canteenId = sessionManager.getCanteenId();
-        if (canteenId != null && !canteenId.isEmpty()) {
-            apiService.getCanteenDetail(canteenId).enqueue(new Callback<CanteenDetailResponse>() {
-                @Override
-                public void onResponse(@NonNull Call<CanteenDetailResponse> call, @NonNull Response<CanteenDetailResponse> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        // Menggunakan CanteenDetail sesuai struktur modelmu
-                        CanteenDetailResponse.CanteenDetail data = response.body().getData();
-                        if (data != null) {
-                            etCanteenName.setText(data.getName());
-                            etCanteenLocation.setText(data.getLocation());
-                            etCanteenDescription.setText(data.getDescription());
-                            etDeliveryFee.setText(String.valueOf((int) data.getDeliveryFeeFlat()));
+        if (canteenId == null || canteenId.isEmpty()) return;
 
-                            if (data.getOperatingHours() != null) {
-                                etOpenTime.setText(data.getOperatingHours().getOpen());
-                                etCloseTime.setText(data.getOperatingHours().getClose());
-                            }
+        apiService.getCanteenSettings(canteenId).enqueue(new Callback<CanteenDetailResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<CanteenDetailResponse> call, @NonNull Response<CanteenDetailResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    CanteenDetailResponse.CanteenDetail data = response.body().getData();
+                    if (data != null) {
+                        etCanteenName.setText(data.getName());
+                        etCanteenLocation.setText(data.getLocation());
+                        etCanteenDescription.setText(data.getDescription());
+                        etDeliveryFee.setText(String.valueOf((int) data.getDeliveryFeeFlat()));
 
-                            // Menggunakan getImage() dan getQrisUrl()
-                            if (fileLogo == null && data.getImage() != null) {
-                                Glide.with(UbahProfilKantin.this).load(data.getImage()).into(ivCanteenLogo);
-                            }
+                        if (data.getOperatingHours() != null) {
+                            etOpenTime.setText(data.getOperatingHours().getOpen());
+                            etCloseTime.setText(data.getOperatingHours().getClose());
+                        }
 
-                            if (fileQris == null && data.getQrisUrl() != null) {
-                                ivQrisImage.clearColorFilter();
-                                Glide.with(UbahProfilKantin.this).load(data.getQrisUrl()).into(ivQrisImage);
-                            }
+                        if (data.getImage() != null) {
+                            Glide.with(UbahProfilKantin.this).load(data.getImage()).into(ivCanteenLogo);
+                        }
+                        if (data.getQrisUrl() != null) {
+                            ivQrisImage.clearColorFilter();
+                            Glide.with(UbahProfilKantin.this).load(data.getQrisUrl()).into(ivQrisImage);
                         }
                     }
                 }
+                loadAdminProfile();
+            }
 
-                @Override
-                public void onFailure(@NonNull Call<CanteenDetailResponse> call, @NonNull Throwable t) {
-                    Log.e("SYNC_CANTEEN", t.getMessage() != null ? t.getMessage() : "Unknown error");
-                }
-            });
-        }
+            @Override
+            public void onFailure(@NonNull Call<CanteenDetailResponse> call, @NonNull Throwable t) {
+                Log.e("API_ERROR", "Gagal load kantin: " + t.getMessage());
+                loadAdminProfile();
+            }
+        });
     }
+
+    private void loadAdminProfile() {
+        apiService.getProfile().enqueue(new Callback<ProfileAdminResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<ProfileAdminResponse> call, @NonNull Response<ProfileAdminResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    ProfileAdminResponse.AdminProfile admin = response.body().getData();
+                    if (admin != null) {
+                        etAdminName.setText(admin.getName());
+                        etAdminPhone.setText(admin.getPhone());
+                        etAdminEmail.setText(admin.getEmail());
+
+                        if (admin.getPhotoProfile() != null && !admin.getPhotoProfile().isEmpty()) {
+                            Glide.with(UbahProfilKantin.this)
+                                    .load(admin.getPhotoProfile())
+                                    .circleCrop()
+                                    .placeholder(R.drawable.avatar)
+                                    .into(ivAdminPhoto);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ProfileAdminResponse> call, @NonNull Throwable t) {
+                Log.e("API_ERROR", "Gagal load profil: " + t.getMessage());
+            }
+        });
+    }
+
+    // ==========================================================
+    // BAGIAN EVENT LISTENER & IMAGE PICKER
+    // ==========================================================
 
     private void setupListeners() {
         btnBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
@@ -184,9 +212,18 @@ public class UbahProfilKantin extends AppCompatActivity {
 
     private void bukaGaleri(int type) {
         currentImageType = type;
-        ImagePicker.Builder picker = ImagePicker.with(this).compress(1024).maxResultSize(1080, 1080);
-        if (type == TYPE_LOGO || type == TYPE_ADMIN) picker.cropSquare();
-        else picker.crop();
+
+        ImagePicker.Builder picker = ImagePicker.with(this)
+                .compress(1024)
+                .maxResultSize(1080, 1080)
+                .galleryOnly();
+
+        if (type == TYPE_LOGO || type == TYPE_ADMIN) {
+            picker.cropSquare();
+        } else if (type == TYPE_QRIS) {
+            picker.crop();
+        }
+
         picker.start();
     }
 
@@ -213,66 +250,79 @@ public class UbahProfilKantin extends AppCompatActivity {
         }
     }
 
+    // ==========================================================
+    // BAGIAN SIMPAN DATA
+    // ==========================================================
+
     @SuppressWarnings("SetTextI18n")
     private void validasiDanSimpan() {
-        String cName = etCanteenName.getText().toString().trim();
-        String cLoc = etCanteenLocation.getText().toString().trim();
         String aName = etAdminName.getText().toString().trim();
         String aPhone = etAdminPhone.getText().toString().trim();
 
-        if (cName.isEmpty()) { etCanteenName.setError("Wajib diisi"); etCanteenName.requestFocus(); return; }
-        if (cLoc.isEmpty()) { etCanteenLocation.setError("Wajib diisi"); etCanteenLocation.requestFocus(); return; }
-        if (aName.isEmpty()) { etAdminName.setError("Wajib diisi"); etAdminName.requestFocus(); return; }
+        if (aName.isEmpty()) {
+            etAdminName.setError("Nama wajib diisi");
+            etAdminName.requestFocus();
+            return;
+        }
 
         btnSubmitAll.setEnabled(false);
         btnSubmitAll.setText("Menyimpan...");
 
-        simpanKantinKeServer(cName, cLoc, aName, aPhone);
+        simpanKantinKeServer(aName, aPhone);
     }
 
-    @SuppressWarnings({"deprecation", "SetTextI18n"})
-    private void simpanKantinKeServer(String cName, String cLoc, String aName, String aPhone) {
-        RequestBody name = RequestBody.create(MediaType.parse("text/plain"), cName);
-        RequestBody loc = RequestBody.create(MediaType.parse("text/plain"), cLoc);
-        RequestBody desc = RequestBody.create(MediaType.parse("text/plain"), etCanteenDescription.getText().toString());
-        RequestBody fee = RequestBody.create(MediaType.parse("text/plain"), etDeliveryFee.getText().toString());
-        RequestBody open = RequestBody.create(MediaType.parse("text/plain"), etOpenTime.getText().toString());
-        RequestBody close = RequestBody.create(MediaType.parse("text/plain"), etCloseTime.getText().toString());
+    @SuppressWarnings("SetTextI18n")
+    private void simpanKantinKeServer(String aName, String aPhone) {
+        // Tidak perlu _method = PUT karena ApiService sudah pakai @PUT
+        RequestBody desc        = RequestBody.create(MediaType.parse("text/plain"), etCanteenDescription.getText().toString());
+        RequestBody fee         = RequestBody.create(MediaType.parse("text/plain"), etDeliveryFee.getText().toString());
+        RequestBody open        = RequestBody.create(MediaType.parse("text/plain"), etOpenTime.getText().toString());
+        RequestBody close       = RequestBody.create(MediaType.parse("text/plain"), etCloseTime.getText().toString());
+        RequestBody phoneKantin = RequestBody.create(MediaType.parse("text/plain"), "");
 
-        MultipartBody.Part partLogo = prepareFilePart("image", fileLogo);
-        MultipartBody.Part partQris = prepareFilePart("qris_image", fileQris);
+        // Hanya masukkan file yang tidak null
+        List<MultipartBody.Part> files = new ArrayList<>();
+        if (fileLogo != null) files.add(prepareFilePart("image", fileLogo));
+        if (fileQris != null) files.add(prepareFilePart("qris_image", fileQris));
 
-        apiService.updateCanteen(sessionManager.getCanteenId(), name, loc, desc, fee, open, close, partLogo, partQris)
-                .enqueue(new Callback<BaseResponse>() {
-                    @Override
-                    public void onResponse(@NonNull Call<BaseResponse> call, @NonNull Response<BaseResponse> response) {
-                        if (response.isSuccessful()) {
-                            simpanProfilKeServer(aName, aPhone);
-                        } else {
-                            btnSubmitAll.setEnabled(true);
-                            btnSubmitAll.setText("Simpan Perubahan");
-                            Toast.makeText(UbahProfilKantin.this, "Gagal simpan data kantin", Toast.LENGTH_SHORT).show();
-                        }
-                    }
+        apiService.updateCanteenSettings(
+                sessionManager.getCanteenId(),
+                desc,
+                phoneKantin,
+                fee,
+                open,
+                close,
+                files
+        ).enqueue(new Callback<CanteenDetailResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<CanteenDetailResponse> call, @NonNull Response<CanteenDetailResponse> response) {
+                if (response.isSuccessful()) {
+                    simpanProfilKeServer(aName, aPhone);
+                } else {
+                    btnSubmitAll.setEnabled(true);
+                    btnSubmitAll.setText("Simpan Perubahan");
+                    Toast.makeText(UbahProfilKantin.this, "Gagal menyimpan data kantin", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-                    @Override
-                    public void onFailure(@NonNull Call<BaseResponse> call, @NonNull Throwable t) {
-                        btnSubmitAll.setEnabled(true);
-                        btnSubmitAll.setText("Simpan Perubahan");
-                        Toast.makeText(UbahProfilKantin.this, "Error koneksi kantin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+            @Override
+            public void onFailure(@NonNull Call<CanteenDetailResponse> call, @NonNull Throwable t) {
+                btnSubmitAll.setEnabled(true);
+                btnSubmitAll.setText("Simpan Perubahan");
+                Toast.makeText(UbahProfilKantin.this, "Error koneksi kantin", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    @SuppressWarnings({"deprecation", "SetTextI18n"})
+    @SuppressWarnings("SetTextI18n")
     private void simpanProfilKeServer(String name, String phone) {
-        RequestBody methodPut = RequestBody.create(MediaType.parse("text/plain"), "PUT");
-        RequestBody rbName    = RequestBody.create(MediaType.parse("text/plain"), name);
-        RequestBody rbPhone   = RequestBody.create(MediaType.parse("text/plain"), phone);
+        RequestBody rbName  = RequestBody.create(MediaType.parse("text/plain"), name);
+        RequestBody rbPhone = RequestBody.create(MediaType.parse("text/plain"), phone);
 
-        MultipartBody.Part partPhoto = prepareFilePart("photo_profile", fileAdmin);
+        // Hanya kirim foto jika ada file baru dipilih
+        MultipartBody.Part partPhoto = (fileAdmin != null) ? prepareFilePart("photo_profile", fileAdmin) : null;
 
-        apiService.updateProfile(methodPut, rbName, rbPhone, partPhoto)
+        apiService.updateProfile(rbName, rbPhone, partPhoto)
                 .enqueue(new Callback<ProfileAdminResponse>() {
                     @Override
                     public void onResponse(@NonNull Call<ProfileAdminResponse> call, @NonNull Response<ProfileAdminResponse> response) {
@@ -285,10 +335,10 @@ public class UbahProfilKantin extends AppCompatActivity {
                                 sessionManager.saveUserInfo(data.getName(), data.getEmail(), data.getPhone());
                                 sessionManager.savePhotoUrl(data.getPhotoProfile());
                             }
-                            Toast.makeText(UbahProfilKantin.this, "Kantin & Profil diperbarui!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(UbahProfilKantin.this, "Data Kantin & Profil diperbarui!", Toast.LENGTH_SHORT).show();
                             finish();
                         } else {
-                            Toast.makeText(UbahProfilKantin.this, "Gagal menyimpan profil admin", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(UbahProfilKantin.this, "Settings Kantin berhasil, tapi Profil gagal diperbarui", Toast.LENGTH_LONG).show();
                         }
                     }
 
@@ -296,12 +346,11 @@ public class UbahProfilKantin extends AppCompatActivity {
                     public void onFailure(@NonNull Call<ProfileAdminResponse> call, @NonNull Throwable t) {
                         btnSubmitAll.setEnabled(true);
                         btnSubmitAll.setText("Simpan Perubahan");
-                        Toast.makeText(UbahProfilKantin.this, "Kesalahan jaringan pada profil", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UbahProfilKantin.this, "Kesalahan jaringan saat update profil", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    @SuppressWarnings("deprecation")
     private MultipartBody.Part prepareFilePart(String partName, File file) {
         if (file == null) return null;
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
