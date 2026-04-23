@@ -154,12 +154,11 @@ public class ActiveOrderAdapter extends RecyclerView.Adapter<ActiveOrderAdapter.
 
     private String formatTanggal(String createdAt) {
         try {
-            // Format: "2026-04-21T01:20:39.980000Z" → "21 Apr 2026 • 08:20 AM"
-            java.text.SimpleDateFormat inputFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+            java.text.SimpleDateFormat inputFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault());
             inputFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
             java.util.Date date = inputFormat.parse(createdAt);
 
-            java.text.SimpleDateFormat outputFormat = new java.text.SimpleDateFormat("dd MMM yyyy • hh:mm a", new Locale("id", "ID"));
+            java.text.SimpleDateFormat outputFormat = new java.text.SimpleDateFormat("dd MMM yyyy • HH:mm 'WIB'", new Locale("id", "ID"));
             outputFormat.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Jakarta"));
             return outputFormat.format(date);
         } catch (Exception e) {
