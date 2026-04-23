@@ -318,4 +318,73 @@ class CanteenController extends Controller
             'data' => $this->formatCanteen($canteen),
         ]);
     }
+
+    // ADMIN KANTIN: GET /canteens/{id}/settings
+    public function showSettings(Request $request, $id)
+    {
+        $user = $request->user();
+        $canteen = Canteen::find($id);
+
+        if (!$canteen) {
+            return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan.'], 404);
+        }
+
+        if ((string) $user->canteen_id !== (string) $id) {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $this->formatCanteen($canteen),
+        ]);
+    }
+
+    // ADMIN KANTIN: PUT /canteens/{id}/settings
+    public function updateSettings(Request $request, $id)
+    {
+        $user = $request->user();
+        $canteen = Canteen::find($id);
+
+        if (!$canteen) {
+            return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan.'], 404);
+        }
+
+        // Pastikan admin kantin hanya bisa update kantinnya sendiri
+        if ((string) $user->canteen_id !== (string) $id) {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
+        }
+
+        $validated = $request->validate([
+            'description' => 'nullable|string',
+            'phone' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'qris_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'delivery_fee_flat' => 'sometimes|integer|min:0',
+            'operating_hours' => 'sometimes|array',
+            'operating_hours.open' => 'sometimes|string',
+            'operating_hours.close' => 'sometimes|string',
+        ]);
+
+        if ($request->hasFile('image')) {
+            if ($canteen->image) {
+                Storage::disk('public')->delete($canteen->image);
+            }
+            $validated['image'] = $request->file('image')->store('canteens', 'public');
+        }
+
+        if ($request->hasFile('qris_image')) {
+            if ($canteen->qris_image) {
+                Storage::disk('public')->delete($canteen->qris_image);
+            }
+            $validated['qris_image'] = $request->file('qris_image')->store('qris', 'public');
+        }
+
+        $canteen->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengaturan kantin berhasil diperbarui.',
+            'data' => $this->formatCanteen($canteen->fresh()),
+        ]);
+    }
 }
