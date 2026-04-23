@@ -123,4 +123,54 @@ class AuthController extends Controller
         }
         return $data;
     }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string',
+        ]);
+
+        $user = User::where('email', $request->email)
+            ->orWhere('phone', $request->email)
+            ->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email atau nomor HP tidak ditemukan',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Email ditemukan',
+            'email'   => $user->email,
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email'                 => 'required|string',
+            'password'              => 'required|min:6',
+            'password_confirmation' => 'required|same:password',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User tidak ditemukan',
+            ], 404);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kata sandi berhasil diperbarui',
+        ]);
+    }
 }

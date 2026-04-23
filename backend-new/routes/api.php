@@ -19,6 +19,8 @@ use App\Http\Controllers\Api\ReportController;
 // Public (tanpa login)
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/sessions', [AuthController::class, 'login']);
+Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);   // ← tambah di sini
+Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);     // ← dan ini
 
 // Protected (harus login)
 Route::middleware('auth:sanctum')->group(function () {
