@@ -85,6 +85,9 @@ Route::middleware(['auth:sanctum', 'role:admin_kantin'])->group(function () {
     Route::put('/canteens/{id}/availability', [CanteenController::class, 'toggleOpen']);
 
     Route::get('/canteens/{id}/export', [ReportController::class, 'export']);
+
+    Route::get('/canteens/{id}/settings', [CanteenController::class, 'showSettings']);
+    Route::put('/canteens/{id}/settings', [CanteenController::class, 'updateSettings']);
 });
 
 /*
