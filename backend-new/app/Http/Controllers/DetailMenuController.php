@@ -23,17 +23,36 @@ class DetailMenuController extends Controller
 
         $menu = $menuResponse->json('data');
 
-        // Ambil nama kantin via endpoint canteen
+        $canteen     = null;
         $canteenName = 'Kantin';
         $canteenId   = $menu['canteen_id'] ?? null;
 
         if ($canteenId) {
             $canteenResponse = Http::timeout(15)->get($this->apiUrl('/canteens/' . $canteenId));
             if ($canteenResponse->successful()) {
-                $canteenName = $canteenResponse->json('data.name') ?? 'Kantin';
+                $canteen     = $canteenResponse->json('data');
+                $canteenName = $canteen['name'] ?? 'Kantin';
             }
         }
 
-        return view('pelanggan.detail-menu', compact('menu', 'canteenName'));
+        $bisaPesan = false;
+        $isOpen    = $canteen['is_open'] ?? false;
+        $open      = $canteen['operating_hours']['open']  ?? '00:00';
+        $close     = $canteen['operating_hours']['close'] ?? '23:59';
+
+        if ($isOpen) {
+            $now       = now(); // sudah Jakarta karena timezone di config sudah diubah
+            $nowMins   = ($now->hour * 60) + $now->minute;
+
+            [$openH, $openM]   = explode(':', $open);
+            [$closeH, $closeM] = explode(':', $close);
+
+            $openMins  = (int)$openH  * 60 + (int)$openM;
+            $closeMins = (int)$closeH * 60 + (int)$closeM;
+
+            $bisaPesan = $nowMins >= $openMins && $nowMins < $closeMins;
+        }
+
+        return view('pelanggan.detail-menu', compact('menu', 'canteen', 'canteenName', 'bisaPesan', 'open', 'close', 'isOpen'));
     }
 }

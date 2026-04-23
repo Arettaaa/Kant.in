@@ -12,7 +12,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\JelajahController;
 use App\Http\Controllers\DetailMenuController;
 use App\Http\Controllers\DetailKantinController;
-
+use App\Http\Controllers\CartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -111,10 +111,16 @@ Route::get('/admin/pusat-bantuan', fn() => view('admin.support'))->name('admin.s
 |--------------------------------------------------------------------------
 */
 Route::get('/beranda', [BerandaController::class, 'index'])->name('pelanggan.beranda');
-Route::get('/keranjang',                fn() => view('pelanggan.keranjang'))->name('pelanggan.keranjang');
 Route::get('/menu/{id}', [DetailMenuController::class, 'index'])->name('pelanggan.detail-menu');
 Route::get('/kantin/{id}', [DetailKantinController::class, 'index'])->name('pelanggan.detail-kantin');
 
+// Keranjang
+Route::get('/keranjang', [CartController::class, 'index'])->name('pelanggan.keranjang');
+Route::post('/keranjang/items', [CartController::class, 'addItem'])->name('pelanggan.keranjang.add');
+Route::put('/keranjang/items/{menuId}', [CartController::class, 'updateItem'])->name('pelanggan.keranjang.update');
+Route::delete('/keranjang/items/{menuId}', [CartController::class, 'removeItem'])->name('pelanggan.keranjang.remove');
+Route::delete('/keranjang', [CartController::class, 'clearSelected'])->name('pelanggan.keranjang.clear');
+Route::get('/keranjang/ongkir/{canteenId}', [CartController::class, 'getOngkir'])->name('pelanggan.keranjang.ongkir');
 
 Route::get('/pembayaran',               fn() => view('pelanggan.pembayaran'))->name('pelanggan.pembayaran');
 Route::get('/jelajah', [JelajahController::class, 'index'])->name('pelanggan.jelajah');

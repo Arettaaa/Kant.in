@@ -157,8 +157,8 @@
         {{-- ======================== BOTTOM BAR ======================== --}}
         <div class="sticky bottom-0 bg-white border-t border-gray-100 px-8 py-5 flex items-center gap-4">
 
-            {{-- Qty controls --}}
-            <div class="flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-2.5">
+            <div
+                class="flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-2.5 {{ !$bisaPesan ? 'opacity-40 pointer-events-none' : '' }}">
                 <button type="button" onclick="changeQty(-1)"
                     class="qty-btn w-8 h-8 rounded-full border-2 border-gray-200 bg-white flex items-center justify-center text-gray-400 flex-shrink-0">
                     <i class="fa-solid fa-minus text-xs"></i>
@@ -170,39 +170,141 @@
                 </button>
             </div>
 
-            {{-- Add to cart button --}}
-            {{-- Add to cart button --}}
-            <a href="/keranjang" id="addCartBtn"
+            @if($bisaPesan)
+            <button id="addCartBtn" onclick="addToCart()"
                 class="add-cart-btn flex-1 py-4 rounded-2xl text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-2"
                 style="background: linear-gradient(135deg, #FF6900, #ea580c);">
                 <i class="fa-solid fa-bag-shopping text-base"></i>
                 <span>Tambah ke Keranjang</span>
-                <span id="totalPrice" class="font-extrabold">· Rp {{ number_format($menu['price'], 0, ',', '.')
-                    }}</span>
-            </a>
+                <span id="totalPrice">· Rp {{ number_format($menu['price'], 0, ',', '.') }}</span>
+            </button>
+            @else
+            <div
+                class="flex-1 py-4 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 bg-gray-100 text-gray-400 cursor-not-allowed">
+                <i class="fa-solid fa-store-slash text-base"></i>
+                <span>
+                    @if(!$isOpen)
+                    Kantin Sedang Tutup
+                    @else
+                    Di Luar Jam Operasional ({{ $open }} - {{ $close }})
+                    @endif
+                </span>
+            </div>
+            @endif
 
         </div>
+
     </div>
 
-</div>
+    @endsection
 
-@endsection
-
-@push('scripts')
-<script>
-    const basePrice = {{ $menu['price'] }};
+    @push('scripts')
+    <script>
+        const basePrice = {{ $menu['price'] }};
+    const menuId    = '{{ $menu['_id'] }}';
     let qty = 1;
 
     function changeQty(delta) {
         qty = Math.max(1, qty + delta);
         document.getElementById('qtyDisplay').textContent = qty;
-        updateTotal();
+        document.getElementById('totalPrice').textContent =
+            '· Rp ' + (basePrice * qty).toLocaleString('id-ID');
     }
 
-    function updateTotal() {
-        const total = basePrice * qty;
-        document.getElementById('totalPrice').textContent =
-            '· Rp ' + total.toLocaleString('id-ID');
+    function showToast(message, type = 'success') {
+    const existing = document.getElementById('toastNotif');
+    if (existing) existing.remove();
+
+    const colors = type === 'success'
+        ? 'background: linear-gradient(135deg, #22c55e, #16a34a);'
+        : 'background: linear-gradient(135deg, #ef4444, #dc2626);';
+
+    const icon = type === 'success' ? 'fa-check' : 'fa-xmark';
+
+    const toast = document.createElement('div');
+    toast.id = 'toastNotif';
+    toast.style.cssText = `
+        position: fixed; top: 24px; right: 24px; z-index: 9999;
+        display: flex; align-items: center; gap: 12px;
+        padding: 14px 20px; border-radius: 16px; color: white;
+        font-size: 14px; font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s ease; ${colors}
+    `;
+    toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+    function addToCart() {
+    const btn = document.getElementById('addCartBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Menambahkan...</span>';
+
+    fetch('/keranjang/items', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({ menu_id: menuId, quantity: qty }),
+    })
+    .then(r => {
+        if (r.ok) {
+            // Sukses — animasi hijau sebentar lalu balik ke normal
+            btn.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
+            btn.innerHTML = '<i class="fa-solid fa-check"></i><span>Ditambahkan!</span>';
+            showToast('Berhasil ditambahkan ke keranjang!', 'success');
+
+            // Balik ke tampilan normal setelah 1.5 detik
+            setTimeout(() => resetBtn(), 1500);
+        } else {
+            return r.json().then(data => {
+                resetBtn();
+                showToast(data.message ?? 'Gagal menambahkan ke keranjang.', 'error');
+            });
+        }
+    })
+    .catch(() => {
+        resetBtn();
+        showToast('Terjadi kesalahan. Coba lagi.', 'error');
+    });
+}
+
+    function resetBtn() {
+        const btn = document.getElementById('addCartBtn');
+        btn.disabled = false;
+        btn.style.background = 'linear-gradient(135deg, #FF6900, #ea580c)';
+        btn.innerHTML = `<i class="fa-solid fa-bag-shopping text-base"></i><span>Tambah ke Keranjang</span><span>· Rp ${(basePrice * qty).toLocaleString('id-ID')}</span>`;
     }
-</script>
-@endpush
+    </script>
+
+    <style>
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+        }
+    </style>
+    @endpush

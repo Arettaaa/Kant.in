@@ -26,32 +26,39 @@ class JelajahController extends Controller
 
         if ($tab === 'makanan') {
             $params = [];
-            if ($category !== 'Semua') $params['category'] = $category;
-            if ($search !== '')        $params['search']   = $search;
+            if ($search !== '') $params['search'] = $search;
 
             $response = Http::timeout(15)->get($this->apiUrl('/menus'), $params);
             if ($response->successful()) {
                 $menus = $response->json('data') ?? [];
             }
+
+            // Filter category di sisi web, sama seperti Android
+            if ($category !== 'Semua') {
+                $menus = array_filter(
+                    $menus,
+                    fn($m) => strtolower($m['category'] ?? '') === strtolower($category)
+                );
+                $menus = array_values($menus);
+            }
         } else {
             $statusFilter = $request->get('status', 'semua');
+            $searchKantin = $request->get('search', '');
 
             $response = Http::timeout(15)->get($this->apiUrl('/canteens'));
             if ($response->successful()) {
                 $canteens = $response->json('data') ?? [];
             }
 
-            // Filter buka/tutup & search di sisi web (karena API tidak support filter ini)
-            $searchKantin = $request->get('search', '');
-
+            // Filter search di sisi web
             if ($searchKantin !== '') {
                 $canteens = array_filter(
                     $canteens,
-                    fn($k) =>
-                    str_contains(strtolower($k['name'] ?? ''), strtolower($searchKantin))
+                    fn($k) => str_contains(strtolower($k['name'] ?? ''), strtolower($searchKantin))
                 );
             }
 
+            // Filter buka/tutup di sisi web, sama seperti Android
             if ($statusFilter === 'buka') {
                 $canteens = array_filter($canteens, fn($k) => $k['is_open'] ?? false);
             } elseif ($statusFilter === 'tutup') {
