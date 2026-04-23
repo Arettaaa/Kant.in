@@ -285,7 +285,7 @@ public interface ApiService {
     Call<ProfileAdminResponse> updateProfile(
             @Part("name") RequestBody name,
             @Part("phone") RequestBody phone,
-            @Part MultipartBody.Part photoProfile
+            @Part List<MultipartBody.Part> photoProfile  // kosong jika tidak ada foto baru
     );
 
     /**
@@ -434,16 +434,16 @@ public interface ApiService {
     Call<CanteenDetailResponse> getCanteenSettings(@Path("id") String canteenId);
 
     @Multipart
-    @PUT("canteens/{id}/settings")
+    @POST("canteens/{id}/settings")
     Call<CanteenDetailResponse> updateCanteenSettings(
             @Path("id") String canteenId,
+            @Part("_method") RequestBody method,          // WAJIB: isi "PUT"
             @Part("description") RequestBody description,
             @Part("phone") RequestBody phone,
             @Part("delivery_fee_flat") RequestBody deliveryFee,
             @Part("operating_hours[open]") RequestBody openTime,
             @Part("operating_hours[close]") RequestBody closeTime,
-            @Part List<MultipartBody.Part> files  
-    );
+            @Part List<MultipartBody.Part> files);
 
 
 
