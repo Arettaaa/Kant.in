@@ -117,8 +117,7 @@ public class ProfilAdminKantin extends AppCompatActivity {
 
     private void setupListeners() {
         btnHistory.setOnClickListener(v -> {
-            // startActivity(new Intent(this, TransaksiActivity.class));
-            Toast.makeText(this, "Buka Riwayat Transaksi", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(ProfilAdminKantin.this, TransaksiActivity.class));
         });
 
         btnEditCanteen.setOnClickListener(v -> {
