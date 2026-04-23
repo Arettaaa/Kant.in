@@ -31,6 +31,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import android.util.Log;
+
 public class KeranjangPelangganActivity extends AppCompatActivity
         implements CartAdapter.OnCartChangedListener {
 
@@ -122,26 +124,32 @@ public class KeranjangPelangganActivity extends AppCompatActivity
                 return;
             }
 
-            // 1. Kumpulkan ID menu yang dicentang
             ArrayList<String> selectedMenuIds = new ArrayList<>();
+            ArrayList<Integer> quantities = new ArrayList<>();
+            ArrayList<String> notes = new ArrayList<>();
+
             for (int i = 0; i < allItems.size(); i++) {
                 if (cartAdapter.isItemSelected(i)) {
                     selectedMenuIds.add(allItems.get(i).getMenuId());
+                    quantities.add(allItems.get(i).getQuantity());
+                    notes.add(allItems.get(i).getNotes() != null ? allItems.get(i).getNotes() : "");
                 }
             }
 
-            // 2. Tentukan metode pengiriman
+            // DEBUG LOG
+            Log.d("KERANJANG_DEBUG", "menu_ids: " + selectedMenuIds);
+            Log.d("KERANJANG_DEBUG", "quantities: " + quantities);
+            Log.d("KERANJANG_DEBUG", "notes: " + notes);
+
             String deliveryMethod = radioAntarKurir.isChecked() ? "delivery" : "pickup";
 
-            // ... (kode sebelumnya sama) ...
-
-            // 3. Pindah ke Halaman Checkout dan bawa datanya
             Intent intent = new Intent(KeranjangPelangganActivity.this, CheckoutActivity.class);
             intent.putExtra("CANTEEN_ID", canteenId);
             intent.putStringArrayListExtra("MENU_IDS", selectedMenuIds);
+            intent.putIntegerArrayListExtra("QUANTITIES", quantities);
+            intent.putStringArrayListExtra("NOTES", notes);
             intent.putExtra("DELIVERY_METHOD", deliveryMethod);
 
-            // --- TAMBAHAN BARU: Bawa detail harga & item ---
             intent.putExtra("ITEM_COUNT", selectedMenuIds.size());
             intent.putExtra("SUBTOTAL", cartAdapter.getSelectedSubtotal());
             intent.putExtra("ONGKIR", (double) biayaOngkir);

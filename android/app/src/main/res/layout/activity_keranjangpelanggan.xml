@@ -6,7 +6,6 @@
     android:background="#FAFAFA"
     android:fitsSystemWindows="true">
 
-    <!-- Header -->
     <RelativeLayout
         android:id="@+id/headerContainer"
         android:layout_width="match_parent"
@@ -54,7 +53,6 @@
         android:layout_below="@id/headerContainer"
         android:background="#E5E7EB" />
 
-    <!-- Select All -->
     <LinearLayout
         android:id="@+id/layoutSelectAll"
         android:layout_width="match_parent"
@@ -83,7 +81,6 @@
         android:layout_below="@id/layoutSelectAll"
         android:background="#E5E7EB" />
 
-    <!-- Scrollable content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -96,17 +93,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:padding="16dp"> <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:visibility="gone" />
 
-            <!-- RecyclerView item keranjang -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvCart"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:visibility="gone" />
-
-            <!-- Warning multi kantin -->
             <LinearLayout
                 android:id="@+id/layoutWarningMultiKantin"
                 android:layout_width="match_parent"
@@ -135,7 +128,6 @@
                     android:textSize="13sp" />
             </LinearLayout>
 
-            <!-- Empty state -->
             <LinearLayout
                 android:id="@+id/layoutKosong"
                 android:layout_width="match_parent"
@@ -155,7 +147,6 @@
                     android:gravity="center" />
             </LinearLayout>
 
-            <!-- Metode Pesanan -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -166,7 +157,6 @@
                 android:textStyle="bold"
                 android:textSize="18sp" />
 
-            <!-- Ambil Sendiri -->
             <LinearLayout
                 android:id="@+id/layoutAmbilSendiri"
                 android:layout_width="match_parent"
@@ -224,7 +214,6 @@
                     app:buttonTint="#F97316" />
             </LinearLayout>
 
-            <!-- Antar Kurir -->
             <LinearLayout
                 android:id="@+id/layoutAntarKurir"
                 android:layout_width="match_parent"
@@ -273,7 +262,6 @@
                         android:textSize="13sp" />
                 </LinearLayout>
 
-                <!-- Dynamic ongkir dari API -->
                 <TextView
                     android:id="@+id/tvOngkirKurir"
                     android:layout_width="wrap_content"
@@ -292,7 +280,6 @@
                     app:buttonTint="#F97316" />
             </LinearLayout>
 
-            <!-- Ringkasan Harga -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -371,7 +358,6 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- Bottom Bar -->
     <LinearLayout
         android:id="@+id/bottomBarContainer"
         android:layout_width="match_parent"

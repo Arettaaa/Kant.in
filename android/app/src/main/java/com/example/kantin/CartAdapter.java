@@ -29,6 +29,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import android.widget.EditText;
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
     public interface OnCartChangedListener {
@@ -73,6 +74,23 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.tvNama.setText(item.getName());
         holder.tvHarga.setText(formatRupiah(item.getPrice()));
         holder.tvQty.setText(String.valueOf(item.getQuantity()));
+
+        holder.etNoteItem.setTag(position);
+        holder.etNoteItem.removeTextChangedListener((android.text.TextWatcher) holder.etNoteItem.getTag(R.id.tag_watcher));
+        holder.etNoteItem.setText(item.getNotes() != null ? item.getNotes() : "");
+
+// ← TAMBAH WATCHER INI
+        android.text.TextWatcher watcher = new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+                int pos = (int) holder.etNoteItem.getTag();
+                items.get(pos).setNotes(s.toString());
+            }
+        };
+        holder.etNoteItem.setTag(R.id.tag_watcher, watcher);
+        holder.etNoteItem.addTextChangedListener(watcher);
 
         // ==========================================
         // LOGIKA GROUPING KANTIN ALA SHOPEE
@@ -232,22 +250,21 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         ImageView imgMenu;
         TextView tvNama, tvHarga, tvQty, btnPlus, btnMinus, tvNamaKantin;
         LinearLayout layoutHeaderKantin;
+        EditText etNoteItem; // ← TAMBAH INI
 
         CartViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Komponen Header Kantin
             layoutHeaderKantin = itemView.findViewById(R.id.layoutHeaderKantin);
             cbKantin           = itemView.findViewById(R.id.cbKantin);
             tvNamaKantin       = itemView.findViewById(R.id.tvNamaKantin);
-
-            // Komponen Item Menu
-            cbSelectItem = itemView.findViewById(R.id.cbSelectItem);
-            imgMenu      = itemView.findViewById(R.id.imgMenu);
-            tvNama       = itemView.findViewById(R.id.tvNamaMenu);
-            tvHarga      = itemView.findViewById(R.id.tvHargaMenu);
-            tvQty        = itemView.findViewById(R.id.tvQty);
-            btnPlus      = itemView.findViewById(R.id.btnPlus);
-            btnMinus     = itemView.findViewById(R.id.btnMinus);
+            cbSelectItem       = itemView.findViewById(R.id.cbSelectItem);
+            imgMenu            = itemView.findViewById(R.id.imgMenu);
+            tvNama             = itemView.findViewById(R.id.tvNamaMenu);
+            tvHarga            = itemView.findViewById(R.id.tvHargaMenu);
+            tvQty              = itemView.findViewById(R.id.tvQty);
+            btnPlus            = itemView.findViewById(R.id.btnPlus);
+            btnMinus           = itemView.findViewById(R.id.btnMinus);
+            etNoteItem         = itemView.findViewById(R.id.etNoteItem); // ← TAMBAH INI
         }
     }
 }

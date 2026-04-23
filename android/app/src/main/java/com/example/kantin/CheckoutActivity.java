@@ -21,6 +21,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.example.kantin.model.response.CartResponse;
 import com.example.kantin.model.response.OrderDetailResponse;
 import com.example.kantin.network.ApiClient;
 import com.example.kantin.network.ApiService;
@@ -220,68 +221,77 @@ public class CheckoutActivity extends AppCompatActivity {
     // --- FUNGSI TEMBAK API CHECKOUT ---
     private void prosesCheckout(File fileBuktiBayar) {
         String canteenId = getIntent().getStringExtra("CANTEEN_ID");
-        // deliveryMethod sudah diambil di onCreate, jadi tidak perlu diambil lagi
         ArrayList<String> menuIds = getIntent().getStringArrayListExtra("MENU_IDS");
+        ArrayList<Integer> quantities = getIntent().getIntegerArrayListExtra("QUANTITIES");
+        ArrayList<String> notes = getIntent().getStringArrayListExtra("NOTES");
 
-        if (canteenId == null || deliveryMethod == null || menuIds == null) {
+// DEBUG
+        Log.d("CHECKOUT_DEBUG", "quantities: " + quantities);
+        Log.d("CHECKOUT_DEBUG", "notes: " + notes);
+
+// SAFETY BIAR NGGAK CRASH
+        if (quantities == null) quantities = new ArrayList<>();
+        if (notes == null) notes = new ArrayList<>();
+
+        if (canteenId == null || deliveryMethod == null || menuIds == null || menuIds.isEmpty()) {
             Toast.makeText(this, "Data keranjang tidak lengkap!", Toast.LENGTH_SHORT).show();
-            btnKonfirmasi.setText("Konfirmasi Pembayaran");
-            btnKonfirmasi.setEnabled(true);
+            resetTombolKonfirmasi();
             return;
         }
 
-        // --- LOGIKA BARU UNTUK ALAMAT PENGIRIMAN ---
+        // Validasi alamat kalau delivery
         String locationNoteText = "";
         if ("delivery".equals(deliveryMethod)) {
             locationNoteText = etAlamat.getText().toString().trim();
             if (locationNoteText.isEmpty()) {
                 Toast.makeText(this, "Alamat pengiriman wajib diisi!", Toast.LENGTH_SHORT).show();
-                btnKonfirmasi.setText("Konfirmasi Pembayaran");
-                btnKonfirmasi.setEnabled(true);
-                return; // <-- ini penting, harus ada!
+                resetTombolKonfirmasi();
+                return;
             }
         }
 
-        // 2. Konversi teks menjadi RequestBody
-        RequestBody canteenIdPart = RequestBody.create(okhttp3.MultipartBody.FORM, canteenId);
-        RequestBody deliveryMethodPart = RequestBody.create(okhttp3.MultipartBody.FORM, deliveryMethod);
+        // Build multipart body
+        RequestBody canteenIdPart       = RequestBody.create(okhttp3.MultipartBody.FORM, canteenId);
+        RequestBody deliveryMethodPart  = RequestBody.create(okhttp3.MultipartBody.FORM, deliveryMethod);
+        RequestBody locationNotePart    = RequestBody.create(okhttp3.MultipartBody.FORM, locationNoteText);
+        RequestBody orderNotesPart      = RequestBody.create(okhttp3.MultipartBody.FORM, "");
 
-        // Masukkan alamat yang sudah ditangkap (locationNoteText)
-        RequestBody locationNotePart = RequestBody.create(okhttp3.MultipartBody.FORM, locationNoteText);
-        RequestBody orderNotesPart = RequestBody.create(okhttp3.MultipartBody.FORM, ""); // Kosongkan pesanan sementara
+        // Build menu_ids, quantities, notes sebagai list RequestBody
+        List<RequestBody> menuIdParts   = new ArrayList<>();
+        List<RequestBody> qtyParts      = new ArrayList<>();
+        List<RequestBody> notesParts    = new ArrayList<>();
 
-        List<RequestBody> menuIdParts = new ArrayList<>();
-        for (String id : menuIds) {
-            menuIdParts.add(RequestBody.create(okhttp3.MultipartBody.FORM, id));
+        for (int i = 0; i < menuIds.size(); i++) {
+            menuIdParts.add(RequestBody.create(okhttp3.MultipartBody.FORM, menuIds.get(i)));
+            qtyParts.add(RequestBody.create(okhttp3.MultipartBody.FORM, String.valueOf(quantities.get(i))));
+            notesParts.add(RequestBody.create(okhttp3.MultipartBody.FORM,
+                    notes != null && i < notes.size() ? notes.get(i) : ""));
         }
 
         RequestBody requestFile = RequestBody.create(okhttp3.MediaType.parse("image/*"), fileBuktiBayar);
-        MultipartBody.Part paymentProofPart = MultipartBody.Part.createFormData("payment_proof", fileBuktiBayar.getName(), requestFile);
+        MultipartBody.Part paymentProofPart = MultipartBody.Part.createFormData(
+                "payment_proof", fileBuktiBayar.getName(), requestFile);
 
-        // Tambahkan di dalam prosesCheckout(), sebelum ApiClient.getAuthClient(...)
-        Log.d("CHECKOUT_DEBUG", "location_note: '" + locationNoteText + "'");
-        Log.d("CHECKOUT_DEBUG", "fileBuktiBayar size: " + fileBuktiBayar.length() + " bytes");
-        Log.d("CHECKOUT_DEBUG", "fileBuktiBayar name: " + fileBuktiBayar.getName());
+        Log.d("CHECKOUT_DEBUG", "canteen_id: " + canteenId);
+        Log.d("CHECKOUT_DEBUG", "delivery_method: " + deliveryMethod);
+        Log.d("CHECKOUT_DEBUG", "location_note: " + locationNoteText);
+        Log.d("CHECKOUT_DEBUG", "menu_ids: " + menuIds);
+        Log.d("CHECKOUT_DEBUG", "notes: " + notes);
 
         String token = new SessionManager(this).getToken();
         ApiClient.getAuthClient(token).create(ApiService.class)
-                .checkout(canteenIdPart, deliveryMethodPart, locationNotePart, orderNotesPart, menuIdParts, paymentProofPart)
+                .checkout(canteenIdPart, deliveryMethodPart, locationNotePart, orderNotesPart,
+                        menuIdParts, paymentProofPart)
                 .enqueue(new Callback<OrderDetailResponse>() {
                     @Override
                     public void onResponse(Call<OrderDetailResponse> call, Response<OrderDetailResponse> response) {
-                        btnKonfirmasi.setText("Konfirmasi Pembayaran");
-                        btnKonfirmasi.setEnabled(true);
-
+                        resetTombolKonfirmasi();
                         if (response.isSuccessful() && response.body() != null) {
                             Toast.makeText(CheckoutActivity.this, "Pesanan Berhasil Dibuat!", Toast.LENGTH_SHORT).show();
 
                             String orderCode = response.body().getData().getOrderCode();
                             String orderId = response.body().getData().getId();
-                            if (orderId == null) {
-                                orderId = response.body().getData().getIdAlias();
-                            }
-
-                            // HAPUS baris ini --> intent.putExtra("ORDER_ID", orderId);
+                            if (orderId == null) orderId = response.body().getData().getIdAlias();
 
                             Intent intent = new Intent(CheckoutActivity.this, CancelPaymentActivity.class);
                             intent.putExtra("ORDER_CODE", orderCode);
@@ -293,8 +303,8 @@ public class CheckoutActivity extends AppCompatActivity {
                             try {
                                 String errorBody = response.errorBody().string();
                                 org.json.JSONObject json = new org.json.JSONObject(errorBody);
-                                String message = json.optString("message", "Gagal Checkout!");
-                                Toast.makeText(CheckoutActivity.this, message, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(CheckoutActivity.this,
+                                        json.optString("message", "Gagal Checkout!"), Toast.LENGTH_SHORT).show();
                             } catch (Exception e) {
                                 Toast.makeText(CheckoutActivity.this, "Gagal Checkout!", Toast.LENGTH_SHORT).show();
                             }
@@ -303,13 +313,11 @@ public class CheckoutActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(Call<OrderDetailResponse> call, Throwable t) {
-                        btnKonfirmasi.setText("Konfirmasi Pembayaran");
-                        btnKonfirmasi.setEnabled(true);
+                        resetTombolKonfirmasi();
                         Toast.makeText(CheckoutActivity.this, "Error jaringan", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
-
     private void cekKantinBukaDanCheckout(File fileBuktiBayar) {
         String canteenId = getIntent().getStringExtra("CANTEEN_ID");
         ApiClient.getClient().create(ApiService.class).getAllCanteens()

@@ -74,9 +74,11 @@ public class CartResponse {
         @SerializedName("image")
         private String image;
 
-        // ← TAMBAH INI (tidak dari JSON, diisi manual saat parsing)
         private String canteenId;
         private String canteenName;
+
+        // ← TAMBAH INI
+        private String notes;
 
         public String getMenuId()    { return menuId; }
         public String getName()      { return name; }
@@ -85,10 +87,13 @@ public class CartResponse {
         public double getSubtotal()  { return subtotal; }
         public String getImage()     { return image; }
 
-        // ← TAMBAH INI
         public void setCanteenId(String canteenId)     { this.canteenId = canteenId; }
         public void setCanteenName(String canteenName) { this.canteenName = canteenName; }
         public String getCanteenId()                   { return canteenId; }
         public String getCanteenName()                 { return canteenName; }
+
+        // ← TAMBAH INI
+        public String getNotes()              { return notes; }
+        public void setNotes(String notes)    { this.notes = notes; }
     }
 }
