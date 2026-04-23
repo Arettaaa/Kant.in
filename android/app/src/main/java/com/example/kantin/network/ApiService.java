@@ -274,10 +274,9 @@ public interface ApiService {
     @Multipart
     @POST("admin/profiles")
     Call<ProfileAdminResponse> updateProfile(
-            @Part("_method") RequestBody method,          // "PUT"
             @Part("name") RequestBody name,
             @Part("phone") RequestBody phone,
-            @Part MultipartBody.Part photoProfile         // nullable
+            @Part MultipartBody.Part photoProfile
     );
 
     /**
@@ -422,19 +421,21 @@ public interface ApiService {
 
 
 
-    // Update Data Kantin (Multipart untuk handling foto & QRIS)
+    @GET("canteens/{id}/settings")
+    Call<CanteenDetailResponse> getCanteenSettings(@Path("id") String canteenId);
+
     @Multipart
-    @POST("canteens/{id}?_method=PUT") // Laravel sering butuh _method=PUT di POST untuk Multipart
-    Call<BaseResponse> updateCanteen(
+    @POST("canteens/{id}/settings")
+    Call<CanteenDetailResponse> updateCanteenSettings(
             @Path("id") String canteenId,
-            @Part("name") RequestBody name,
-            @Part("location") RequestBody location,
+            @Part("_method") RequestBody method, // Diisi "PUT"
             @Part("description") RequestBody description,
+            @Part("phone") RequestBody phone,
             @Part("delivery_fee_flat") RequestBody deliveryFee,
             @Part("operating_hours[open]") RequestBody openTime,
             @Part("operating_hours[close]") RequestBody closeTime,
-            @Part MultipartBody.Part image,    // Logo Kantin
-            @Part MultipartBody.Part qris_image // Foto QRIS
+            @Part MultipartBody.Part image,
+            @Part MultipartBody.Part qris_image
     );
 
 

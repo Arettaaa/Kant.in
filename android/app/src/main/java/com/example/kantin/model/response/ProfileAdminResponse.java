@@ -44,7 +44,7 @@ public class ProfileAdminResponse {
     // ======================================================================
     public static class AdminProfile {
 
-        @SerializedName("_id")
+        @SerializedName("id") // Ubah _id menjadi id
         private String id;
 
         @SerializedName("name")
