@@ -19,6 +19,7 @@ import com.example.kantin.model.TransactionOrder;
 import com.example.kantin.model.response.TransactionListResponse;
 import com.example.kantin.network.ApiClient;
 import com.example.kantin.network.ApiService;
+import com.example.kantin.utils.SessionManager;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -153,9 +154,15 @@ public class TransaksiActivity extends AppCompatActivity {
     // API & FILTER LOGIC
     // ====================================================================
     private void fetchTransactions() {
-        // Ganti dengan logic token/ID dari SessionManager kamu
-        String token = "MASUKKAN_TOKEN_DISINI";
-        String canteenId = "MASUKKAN_ID_KANTIN_DISINI";
+        SessionManager sessionManager = new SessionManager(this);
+        String token = sessionManager.getToken();
+        String canteenId = sessionManager.getCanteenId(); // ✅ method ini ada di SessionManager kamu
+
+        if (token.isEmpty() || canteenId.isEmpty()) {
+            Toast.makeText(this, "Sesi tidak valid, silakan login ulang.", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
         ApiService api = ApiClient.getAuthClient(token).create(ApiService.class);
         api.getTransactions(canteenId).enqueue(new Callback<TransactionListResponse>() {
@@ -169,11 +176,10 @@ public class TransaksiActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(@NonNull Call<TransactionListResponse> call, @NonNull Throwable t) {
-                Toast.makeText(TransaksiActivity.this, "Gagal memuat data: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(TransaksiActivity.this, "Gagal: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
-
     private void applyFilters(String query, String period) {
         List<TransactionOrder> filteredList = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault());

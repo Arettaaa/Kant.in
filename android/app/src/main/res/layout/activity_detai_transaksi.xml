@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8F9FA"
-    tools:ignore="HardcodedText, Typos, ContentDescription">
+    tools:ignore="HardcodedText, Typos, ContentDescription"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:layout_width="match_parent"

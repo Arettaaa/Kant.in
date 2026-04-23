@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import android.content.Intent;
+import java.util.ArrayList;
+
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.ViewHolder> {
 
     private List<TransactionOrder> orders;
@@ -43,10 +46,49 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         TransactionOrder order = ordersFiltered.get(position);
 
         holder.tvNama.setText(order.getCustomerName());
-        holder.tvDetail.setText(order.getOrderCode() + " • " + order.getItemCount() + " items");
-
+        holder.tvDetail.setText(order.getOrderCode());
+        holder.tvJumlahItem.setText("• " + order.getItemCount() + " items");
         NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
         holder.tvHarga.setText(formatRupiah.format(order.getTotalAmount()));
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), DetaiTransaksiActivity.class);
+            intent.putExtra("order_code", order.getOrderCode());
+            intent.putExtra("customer_name", order.getCustomerName());
+            intent.putExtra("status", order.getStatus());
+            intent.putExtra("created_at", order.getCreatedAt());
+            intent.putExtra("total_amount", order.getTotalAmount());
+            intent.putExtra("subtotal_amount", order.getSubtotalAmount());
+            intent.putExtra("delivery_fee", order.getDeliveryDetails() != null ? order.getDeliveryDetails().fee : 0);
+            intent.putExtra("payment_method", order.getPayment() != null ? order.getPayment().method : "-");
+
+            // Kirim items
+            ArrayList<String> names     = new ArrayList<>();
+            ArrayList<String> prices    = new ArrayList<>();
+            ArrayList<Integer> qtys     = new ArrayList<>();
+            ArrayList<String> subtotals = new ArrayList<>();
+            ArrayList<String> notes = new ArrayList<>();
+
+
+            if (order.getItems() != null) {
+                for (TransactionOrder.OrderItem item : order.getItems()) {
+                    names.add(item.name);
+                    prices.add(String.valueOf(item.price));
+                    qtys.add(item.quantity);
+                    subtotals.add(String.valueOf(item.subtotal));
+                    notes.add(item.notes != null ? item.notes : "");
+
+                }
+            }
+
+            intent.putStringArrayListExtra("item_names", names);
+            intent.putStringArrayListExtra("item_prices", prices);
+            intent.putIntegerArrayListExtra("item_qtys", qtys);
+            intent.putStringArrayListExtra("item_subtotals", subtotals);
+            intent.putStringArrayListExtra("item_notes", notes);
+
+            v.getContext().startActivity(intent);
+        });
 
         String status = order.getStatus();
         if (status != null) {
@@ -70,13 +112,16 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvNama, tvDetail, tvHarga, tvStatus;
+        // Di ViewHolder
+        TextView tvNama, tvDetail, tvJumlahItem, tvHarga, tvStatus;
+
         public ViewHolder(View itemView) {
             super(itemView);
-            tvNama = itemView.findViewById(R.id.tvNamaPelanggan);
-            tvDetail = itemView.findViewById(R.id.tvDetailOrder);
-            tvHarga = itemView.findViewById(R.id.tvTotalHarga);
-            tvStatus = itemView.findViewById(R.id.tvStatus);
+            tvNama       = itemView.findViewById(R.id.tvNamaPelanggan);
+            tvDetail     = itemView.findViewById(R.id.tvDetailPesanan);
+            tvJumlahItem = itemView.findViewById(R.id.tvJumlahItem);   // ← tambah ini
+            tvHarga      = itemView.findViewById(R.id.tvTotalHarga);
+            tvStatus     = itemView.findViewById(R.id.tvStatus);
         }
     }
 }
