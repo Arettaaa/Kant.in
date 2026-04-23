@@ -425,17 +425,15 @@ public interface ApiService {
     Call<CanteenDetailResponse> getCanteenSettings(@Path("id") String canteenId);
 
     @Multipart
-    @POST("canteens/{id}/settings")
+    @PUT("canteens/{id}/settings")
     Call<CanteenDetailResponse> updateCanteenSettings(
             @Path("id") String canteenId,
-            @Part("_method") RequestBody method, // Diisi "PUT"
             @Part("description") RequestBody description,
             @Part("phone") RequestBody phone,
             @Part("delivery_fee_flat") RequestBody deliveryFee,
             @Part("operating_hours[open]") RequestBody openTime,
             @Part("operating_hours[close]") RequestBody closeTime,
-            @Part MultipartBody.Part image,
-            @Part MultipartBody.Part qris_image
+            @Part List<MultipartBody.Part> files  
     );
 
 

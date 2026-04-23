@@ -29,7 +29,9 @@ import com.example.kantin.utils.SessionManager;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import okhttp3.MediaType;
@@ -80,7 +82,6 @@ public class UbahProfilKantin extends AppCompatActivity {
         initViews();
         setupListeners();
 
-        // Memulai rentetan Load Data: Kantin dulu, baru Profil Admin
         loadCanteenSettings();
     }
 
@@ -105,7 +106,6 @@ public class UbahProfilKantin extends AppCompatActivity {
         btnSubmitAll = findViewById(R.id.btnSubmitAll);
         btnBack = findViewById(R.id.btnBack);
 
-        // KUNCI Input yang tidak boleh diedit oleh Admin Kantin
         etCanteenName.setEnabled(false);
         etCanteenLocation.setEnabled(false);
         etAdminEmail.setEnabled(false);
@@ -144,22 +144,18 @@ public class UbahProfilKantin extends AppCompatActivity {
                         }
                     }
                 }
-
-                // 2. Setelah selesai data Kantin, ambil data Profil Admin
                 loadAdminProfile();
             }
 
             @Override
             public void onFailure(@NonNull Call<CanteenDetailResponse> call, @NonNull Throwable t) {
                 Log.e("API_ERROR", "Gagal load kantin: " + t.getMessage());
-                // Tetap coba load profil jika kantin gagal
                 loadAdminProfile();
             }
         });
     }
 
     private void loadAdminProfile() {
-        // Mengambil profil menggunakan endpoint yang sudah temanmu kerjakan
         apiService.getProfile().enqueue(new Callback<ProfileAdminResponse>() {
             @Override
             public void onResponse(@NonNull Call<ProfileAdminResponse> call, @NonNull Response<ProfileAdminResponse> response) {
@@ -187,7 +183,6 @@ public class UbahProfilKantin extends AppCompatActivity {
             }
         });
     }
-
 
     // ==========================================================
     // BAGIAN EVENT LISTENER & IMAGE PICKER
@@ -219,19 +214,13 @@ public class UbahProfilKantin extends AppCompatActivity {
         currentImageType = type;
 
         ImagePicker.Builder picker = ImagePicker.with(this)
-                .compress(1024)            // Kompres ukuran agar tidak terlalu besar di server
-                .maxResultSize(1080, 1080) // Maksimal resolusi HD
-                .galleryOnly();            // (Opsional) Jika ingin langsung buka galeri tanpa opsi kamera, atau hapus baris ini jika ingin ada opsi jepret kamera
+                .compress(1024)
+                .maxResultSize(1080, 1080)
+                .galleryOnly();
 
         if (type == TYPE_LOGO || type == TYPE_ADMIN) {
-            // Untuk Logo dan Profil, paksa pengguna memotong dalam bentuk kotak (1:1)
             picker.cropSquare();
         } else if (type == TYPE_QRIS) {
-            // Untuk QRIS, gunakan crop() biasa.
-            // Ini akan membuka halaman editor dimana pengguna bisa:
-            // - Menggeser foto (Pan)
-            // - Mencubit layar untuk memperbesar/memperkecil foto (Zoom)
-            // - Menarik sudut-sudut kotak pemotong secara bebas (Free Form)
             picker.crop();
         }
 
@@ -261,74 +250,78 @@ public class UbahProfilKantin extends AppCompatActivity {
         }
     }
 
-
     // ==========================================================
-    // BAGIAN SIMPAN DATA (POST/PUT BERUNTUN)
+    // BAGIAN SIMPAN DATA
     // ==========================================================
 
     @SuppressWarnings("SetTextI18n")
     private void validasiDanSimpan() {
-        // Karena Canteen Name & Location dikunci, kita hanya memvalidasi Profil saja.
         String aName = etAdminName.getText().toString().trim();
         String aPhone = etAdminPhone.getText().toString().trim();
 
-        if (aName.isEmpty()) { etAdminName.setError("Nama wajib diisi"); etAdminName.requestFocus(); return; }
+        if (aName.isEmpty()) {
+            etAdminName.setError("Nama wajib diisi");
+            etAdminName.requestFocus();
+            return;
+        }
 
         btnSubmitAll.setEnabled(false);
         btnSubmitAll.setText("Menyimpan...");
 
-        // Panggil fungsi simpan kantin terlebih dahulu
         simpanKantinKeServer(aName, aPhone);
     }
 
-    @SuppressWarnings({"deprecation", "SetTextI18n"})
+    @SuppressWarnings("SetTextI18n")
     private void simpanKantinKeServer(String aName, String aPhone) {
-        // 1. Settings Kantin butuh _method = PUT
-        RequestBody methodPut = RequestBody.create(MediaType.parse("text/plain"), "PUT");
-        RequestBody desc = RequestBody.create(MediaType.parse("text/plain"), etCanteenDescription.getText().toString());
-        RequestBody fee = RequestBody.create(MediaType.parse("text/plain"), etDeliveryFee.getText().toString());
-        RequestBody open = RequestBody.create(MediaType.parse("text/plain"), etOpenTime.getText().toString());
-        RequestBody close = RequestBody.create(MediaType.parse("text/plain"), etCloseTime.getText().toString());
-
-        // Canteen Controller menerima parameter 'phone' tapi di XML kita pakai phone untuk Admin.
-        // Kita kirim string kosong atau null agar tidak error di API Kantin.
+        // Tidak perlu _method = PUT karena ApiService sudah pakai @PUT
+        RequestBody desc        = RequestBody.create(MediaType.parse("text/plain"), etCanteenDescription.getText().toString());
+        RequestBody fee         = RequestBody.create(MediaType.parse("text/plain"), etDeliveryFee.getText().toString());
+        RequestBody open        = RequestBody.create(MediaType.parse("text/plain"), etOpenTime.getText().toString());
+        RequestBody close       = RequestBody.create(MediaType.parse("text/plain"), etCloseTime.getText().toString());
         RequestBody phoneKantin = RequestBody.create(MediaType.parse("text/plain"), "");
 
-        MultipartBody.Part partLogo = prepareFilePart("image", fileLogo);
-        MultipartBody.Part partQris = prepareFilePart("qris_image", fileQris);
+        // Hanya masukkan file yang tidak null
+        List<MultipartBody.Part> files = new ArrayList<>();
+        if (fileLogo != null) files.add(prepareFilePart("image", fileLogo));
+        if (fileQris != null) files.add(prepareFilePart("qris_image", fileQris));
 
-        apiService.updateCanteenSettings(sessionManager.getCanteenId(), methodPut, desc, phoneKantin, fee, open, close, partLogo, partQris)
-                .enqueue(new Callback<CanteenDetailResponse>() {
-                    @Override
-                    public void onResponse(@NonNull Call<CanteenDetailResponse> call, @NonNull Response<CanteenDetailResponse> response) {
-                        if (response.isSuccessful()) {
-                            // 2. Jika sukses, lanjut simpan profil admin
-                            simpanProfilKeServer(aName, aPhone);
-                        } else {
-                            btnSubmitAll.setEnabled(true);
-                            btnSubmitAll.setText("Simpan Perubahan");
-                            Toast.makeText(UbahProfilKantin.this, "Gagal menyimpan data kantin", Toast.LENGTH_SHORT).show();
-                        }
-                    }
+        apiService.updateCanteenSettings(
+                sessionManager.getCanteenId(),
+                desc,
+                phoneKantin,
+                fee,
+                open,
+                close,
+                files
+        ).enqueue(new Callback<CanteenDetailResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<CanteenDetailResponse> call, @NonNull Response<CanteenDetailResponse> response) {
+                if (response.isSuccessful()) {
+                    simpanProfilKeServer(aName, aPhone);
+                } else {
+                    btnSubmitAll.setEnabled(true);
+                    btnSubmitAll.setText("Simpan Perubahan");
+                    Toast.makeText(UbahProfilKantin.this, "Gagal menyimpan data kantin", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-                    @Override
-                    public void onFailure(@NonNull Call<CanteenDetailResponse> call, @NonNull Throwable t) {
-                        btnSubmitAll.setEnabled(true);
-                        btnSubmitAll.setText("Simpan Perubahan");
-                        Toast.makeText(UbahProfilKantin.this, "Error koneksi kantin", Toast.LENGTH_SHORT).show();
-                    }
-                });
+            @Override
+            public void onFailure(@NonNull Call<CanteenDetailResponse> call, @NonNull Throwable t) {
+                btnSubmitAll.setEnabled(true);
+                btnSubmitAll.setText("Simpan Perubahan");
+                Toast.makeText(UbahProfilKantin.this, "Error koneksi kantin", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    @SuppressWarnings({"deprecation", "SetTextI18n"})
+    @SuppressWarnings("SetTextI18n")
     private void simpanProfilKeServer(String name, String phone) {
-        // Profile Controller menggunakan Route::post, sehingga TIDAK PERLU _method: PUT
-        RequestBody rbName    = RequestBody.create(MediaType.parse("text/plain"), name);
-        RequestBody rbPhone   = RequestBody.create(MediaType.parse("text/plain"), phone);
+        RequestBody rbName  = RequestBody.create(MediaType.parse("text/plain"), name);
+        RequestBody rbPhone = RequestBody.create(MediaType.parse("text/plain"), phone);
 
-        MultipartBody.Part partPhoto = prepareFilePart("photo_profile", fileAdmin);
+        // Hanya kirim foto jika ada file baru dipilih
+        MultipartBody.Part partPhoto = (fileAdmin != null) ? prepareFilePart("photo_profile", fileAdmin) : null;
 
-        // Memanggil endpoint milik temanmu
         apiService.updateProfile(rbName, rbPhone, partPhoto)
                 .enqueue(new Callback<ProfileAdminResponse>() {
                     @Override
@@ -358,7 +351,6 @@ public class UbahProfilKantin extends AppCompatActivity {
                 });
     }
 
-    @SuppressWarnings("deprecation")
     private MultipartBody.Part prepareFilePart(String partName, File file) {
         if (file == null) return null;
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
