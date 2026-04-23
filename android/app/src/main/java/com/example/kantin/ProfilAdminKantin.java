@@ -3,6 +3,7 @@ package com.example.kantin;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +33,7 @@ public class ProfilAdminKantin extends AppCompatActivity {
     private RelativeLayout btnEditCanteen, btnHistory;
     private AppCompatButton btnLogout;
 
+    private LinearLayout btnBantuan;
     private ApiService apiService;
     private SessionManager sessionManager;
 
@@ -64,6 +66,8 @@ public class ProfilAdminKantin extends AppCompatActivity {
         btnEditCanteen = findViewById(R.id.btnEditCanteen);
         btnHistory     = findViewById(R.id.btnHistory);
         btnLogout      = findViewById(R.id.btnLogout);
+        btnBantuan = findViewById(R.id.btnBantuan);
+
     }
 
     private void fetchProfileData() {
@@ -122,6 +126,10 @@ public class ProfilAdminKantin extends AppCompatActivity {
 
         btnEditCanteen.setOnClickListener(v -> {
             startActivity(new Intent(ProfilAdminKantin.this, UbahProfilKantin.class));
+        });
+
+        btnBantuan.setOnClickListener(v -> {
+            startActivity(new Intent(ProfilAdminKantin.this, PusatBantuan.class));
         });
 
         // ✅ FIX 4: Ganti sessionManager.logout() → sessionManager.clearSession()
