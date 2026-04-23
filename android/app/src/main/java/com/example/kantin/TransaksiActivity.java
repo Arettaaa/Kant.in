@@ -1,4 +1,4 @@
-package com.example.kantin; // Pastikan package ini sesuai
+package com.example.kantin;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
