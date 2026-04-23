@@ -128,8 +128,13 @@ public class KantinAdapter extends RecyclerView.Adapter<KantinAdapter.KantinView
             int openTotal = Integer.parseInt(openParts[0]) * 60 + Integer.parseInt(openParts[1]);
             int closeTotal = Integer.parseInt(closeParts[0]) * 60 + Integer.parseInt(closeParts[1]);
 
-            return nowTotal >= openTotal && nowTotal < closeTotal;
-
+            if (openTotal < closeTotal) {
+                // Normal: misal 08:00 - 17:00
+                return nowTotal >= openTotal && nowTotal < closeTotal;
+            } else {
+                // Melewati tengah malam: misal 23:00 - 07:00
+                return nowTotal >= openTotal || nowTotal < closeTotal;
+            }
         } catch (Exception e) {
             // Kalau parsing gagal, fallback ke is_open
             return kantin.isOpen();

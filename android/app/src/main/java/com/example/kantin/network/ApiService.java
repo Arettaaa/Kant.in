@@ -1,8 +1,10 @@
 package com.example.kantin.network;// Import untuk Request (Data yang dikirim ke Laravel)
+import com.example.kantin.model.request.ForgotPasswordRequest;
 import com.example.kantin.model.request.LoginRequest;
 import com.example.kantin.model.request.RegisterPelangganRequest;
 import com.example.kantin.model.request.RegisterAdminKantinRequest;
 import com.example.kantin.model.request.AddToCartRequest;
+import com.example.kantin.model.request.ResetPasswordRequest;
 import com.example.kantin.model.request.UpdateCartRequest;
 import com.example.kantin.model.request.CheckoutRequest;
 import com.example.kantin.model.request.UpdateStatusOrderRequest;
@@ -68,6 +70,12 @@ public interface ApiService {
     @DELETE("auth/sessions")
     Call<BaseResponse> logout();
 
+    @POST("auth/forgot-password")
+    Call<BaseResponse> forgotPassword(@Body ForgotPasswordRequest request);
+
+    @POST("auth/reset-password")
+    Call<BaseResponse> resetPassword(@Body ResetPasswordRequest request);
+
     /**
      * Register Admin Kantin
      * POST /api/auth/register
@@ -78,6 +86,7 @@ public interface ApiService {
 
     @POST("auth/register")
     Call<BaseResponse> registerAdminKantin(@Body RegisterAdminKantinRequest request);
+
 
     //    @POST("auth/register")
     //    Call<BaseResponse> registerAdminKantin(@Body RegisterAdminKantinRequest request);
