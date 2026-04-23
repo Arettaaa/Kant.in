@@ -38,17 +38,17 @@ public class ExploreMenuAdapter extends RecyclerView.Adapter<ExploreMenuAdapter.
     }
 
     public void filter(String query, String category) {
-        listMenu.clear();
+        List<MenuListResponse.MenuItem> filtered = new ArrayList<>(); // ← list baru
         for (MenuListResponse.MenuItem menu : listOriginal) {
             boolean matchSearch = menu.getName().toLowerCase().contains(query.toLowerCase());
             boolean matchCategory = category.equals("Semua") || category.equalsIgnoreCase(menu.getCategory());
             if (matchSearch && matchCategory) {
-                listMenu.add(menu);
+                filtered.add(menu);
             }
         }
+        listMenu = filtered; // ← replace sekaligus, bukan clear dulu
         notifyDataSetChanged();
     }
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -66,45 +66,22 @@ public class ExploreMenuAdapter extends RecyclerView.Adapter<ExploreMenuAdapter.
         NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
         holder.tvHarga.setText(formatRupiah.format(harga).replace(",00", ""));
 
-        // ✅ Fix URL gambar
         String imageUrl = menu.getImage();
         if (imageUrl != null && !imageUrl.startsWith("http")) {
             imageUrl = BASE_URL_STORAGE + imageUrl;
         }
         Glide.with(context).load(imageUrl).placeholder(R.drawable.makanan).into(holder.ivMenu);
 
-        // ✅ Nama kantin dinamis dari cache atau fetch API
+        // ← cukup ini, tidak ada fetch API di sini
         String canteenId = menu.getCanteenId();
-        if (canteenId != null) {
-            if (canteenNameCache.containsKey(canteenId)) {
-                holder.tvNamaKantin.setText(canteenNameCache.get(canteenId));
-            } else {
-                holder.tvNamaKantin.setText("Memuat...");
-                ApiClient.getClient().create(ApiService.class)
-                        .getCanteenDetail(canteenId)
-                        .enqueue(new retrofit2.Callback<com.example.kantin.model.response.CanteenDetailResponse>() {
-                            @Override
-                            public void onResponse(retrofit2.Call<com.example.kantin.model.response.CanteenDetailResponse> call,
-                                                   retrofit2.Response<com.example.kantin.model.response.CanteenDetailResponse> response) {
-                                if (response.isSuccessful() && response.body() != null) {
-                                    String namaKantin = response.body().getData().getName();
-                                    canteenNameCache.put(canteenId, namaKantin);
-                                    // Update UI di main thread
-                                    ((android.app.Activity) context).runOnUiThread(() ->
-                                            holder.tvNamaKantin.setText(namaKantin));
-                                }
-                            }
-                            @Override
-                            public void onFailure(retrofit2.Call<com.example.kantin.model.response.CanteenDetailResponse> call, Throwable t) {
-                                holder.tvNamaKantin.setText("Kantin");
-                            }
-                        });
-            }
+        if (canteenId != null && canteenNameCache.containsKey(canteenId)) {
+            holder.tvNamaKantin.setText(canteenNameCache.get(canteenId));
+        } else {
+            holder.tvNamaKantin.setText("Memuat...");
         }
 
         holder.itemView.setOnClickListener(v -> {
             String menuId = menu.getId();
-            Log.d("MENU_ID", "Klik menu id: " + menuId);
             if (menuId == null || menuId.isEmpty()) {
                 Toast.makeText(context, "ID menu tidak valid", Toast.LENGTH_SHORT).show();
                 return;
@@ -128,5 +105,34 @@ public class ExploreMenuAdapter extends RecyclerView.Adapter<ExploreMenuAdapter.
             tvNamaKantin = itemView.findViewById(R.id.tvNamaKantinExplore);
             tvHarga = itemView.findViewById(R.id.tvHargaExplore);
         }
+    }
+
+    public void updateData(List<MenuListResponse.MenuItem> newData) {
+        this.listOriginal = new ArrayList<>(newData);
+        this.listMenu = new ArrayList<>(newData);
+        // Prefetch semua canteen name sekaligus
+        for (MenuListResponse.MenuItem menu : newData) {
+            String canteenId = menu.getCanteenId();
+            if (canteenId != null && !canteenNameCache.containsKey(canteenId)) {
+                canteenNameCache.put(canteenId, "Memuat..."); // placeholder dulu
+                ApiClient.getClient().create(ApiService.class)
+                        .getCanteenDetail(canteenId)
+                        .enqueue(new retrofit2.Callback<com.example.kantin.model.response.CanteenDetailResponse>() {
+                            @Override
+                            public void onResponse(retrofit2.Call<com.example.kantin.model.response.CanteenDetailResponse> call,
+                                                   retrofit2.Response<com.example.kantin.model.response.CanteenDetailResponse> response) {
+                                if (response.isSuccessful() && response.body() != null) {
+                                    canteenNameCache.put(canteenId, response.body().getData().getName());
+                                    notifyDataSetChanged(); // update nama kantin di UI
+                                }
+                            }
+                            @Override
+                            public void onFailure(retrofit2.Call<com.example.kantin.model.response.CanteenDetailResponse> call, Throwable t) {
+                                canteenNameCache.put(canteenId, "Kantin");
+                            }
+                        });
+            }
+        }
+        notifyDataSetChanged();
     }
 }

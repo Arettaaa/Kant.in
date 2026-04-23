@@ -29,6 +29,8 @@ public class ExploreKantinPelangganActivity extends AppCompatActivity {
     private RecyclerView rvExploreKantin;
     private KantinAdapter adapter;
     private EditText etSearchKantin;
+    private TextView tvEmpty;
+
 
     // Filter state
     private String activeFilter = "Semua"; // default
@@ -45,6 +47,8 @@ public class ExploreKantinPelangganActivity extends AppCompatActivity {
         ImageView btnBack = findViewById(R.id.btnBackExplore);
         rvExploreKantin = findViewById(R.id.rvExploreKantin);
         etSearchKantin = findViewById(R.id.etSearchKantin);
+        tvEmpty = findViewById(R.id.tvEmpty);
+
 
         chipSemua = findViewById(R.id.chipSemua);
         chipBuka = findViewById(R.id.chipBuka);
@@ -72,6 +76,8 @@ public class ExploreKantinPelangganActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (adapter != null) {
                     adapter.filter(s.toString(), activeFilter);
+                    updateEmptyState(); // ← tambah
+
                 }
             }
         });
@@ -108,6 +114,7 @@ public class ExploreKantinPelangganActivity extends AppCompatActivity {
         // Jalankan filter
         if (adapter != null) {
             adapter.filter(etSearchKantin.getText().toString(), activeFilter);
+            updateEmptyState(); // ← tambah
         }
     }
 
@@ -131,6 +138,7 @@ public class ExploreKantinPelangganActivity extends AppCompatActivity {
                     adapter = new KantinAdapter(ExploreKantinPelangganActivity.this, list);
                     rvExploreKantin.setAdapter(adapter);
                     setFilter("Semua");
+                    updateEmptyState();
 
                     String queryDariIntent = getIntent().getStringExtra("QUERY");
                     if (queryDariIntent != null && !queryDariIntent.isEmpty()) {
@@ -146,5 +154,15 @@ public class ExploreKantinPelangganActivity extends AppCompatActivity {
                 Toast.makeText(ExploreKantinPelangganActivity.this, "Gagal memuat kantin", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void updateEmptyState() {
+        if (adapter == null || adapter.getItemCount() == 0) {
+            rvExploreKantin.setVisibility(android.view.View.GONE);
+            tvEmpty.setVisibility(android.view.View.VISIBLE);
+        } else {
+            rvExploreKantin.setVisibility(android.view.View.VISIBLE);
+            tvEmpty.setVisibility(android.view.View.GONE);
+        }
     }
 }

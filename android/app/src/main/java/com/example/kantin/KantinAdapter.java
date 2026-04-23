@@ -36,13 +36,14 @@ public class KantinAdapter extends RecyclerView.Adapter<KantinAdapter.KantinView
         listKantin.clear();
         for (CanteenListResponse.CanteenData kantin : listOriginal) {
             boolean matchSearch = kantin.getName().toLowerCase().contains(query.toLowerCase());
+            boolean isBuka = isKantinBuka(kantin); // ← pakai method baru
             boolean matchStatus;
             if (statusFilter.equals("Buka")) {
-                matchStatus = kantin.isOpen();
+                matchStatus = isBuka;
             } else if (statusFilter.equals("Tutup")) {
-                matchStatus = !kantin.isOpen();
+                matchStatus = !isBuka;
             } else {
-                matchStatus = true; // "Semua"
+                matchStatus = true;
             }
             if (matchSearch && matchStatus) {
                 listKantin.add(kantin);
@@ -72,7 +73,9 @@ public class KantinAdapter extends RecyclerView.Adapter<KantinAdapter.KantinView
             holder.tvJamOperasional.setText("-");
         }
 
-        if (kantin.isOpen()) {
+        boolean isBuka = isKantinBuka(kantin);
+
+        if (isBuka) {
             holder.tvStatusKantin.setText("Buka");
             holder.tvStatusKantin.setTextColor(Color.parseColor("#10B981"));
             holder.cvStatusKantin.setCardBackgroundColor(Color.parseColor("#D1FAE5"));
@@ -101,6 +104,36 @@ public class KantinAdapter extends RecyclerView.Adapter<KantinAdapter.KantinView
             intent.putExtra("CANTEEN_ID", kantin.getId());
             context.startActivity(intent);
         });
+    }
+
+    private boolean isKantinBuka(CanteenListResponse.CanteenData kantin) {
+        // Kalau is_open false, langsung tutup
+        if (!kantin.isOpen()) return false;
+
+        // Kalau tidak ada jam operasional, fallback ke is_open saja
+        if (kantin.getOperatingHours() == null) return true;
+
+        try {
+            String openStr = kantin.getOperatingHours().getOpen();   // contoh: "08:00"
+            String closeStr = kantin.getOperatingHours().getClose(); // contoh: "17:00"
+
+            java.util.Calendar now = java.util.Calendar.getInstance();
+            int nowHour = now.get(java.util.Calendar.HOUR_OF_DAY);
+            int nowMinute = now.get(java.util.Calendar.MINUTE);
+            int nowTotal = nowHour * 60 + nowMinute;
+
+            String[] openParts = openStr.split(":");
+            String[] closeParts = closeStr.split(":");
+
+            int openTotal = Integer.parseInt(openParts[0]) * 60 + Integer.parseInt(openParts[1]);
+            int closeTotal = Integer.parseInt(closeParts[0]) * 60 + Integer.parseInt(closeParts[1]);
+
+            return nowTotal >= openTotal && nowTotal < closeTotal;
+
+        } catch (Exception e) {
+            // Kalau parsing gagal, fallback ke is_open
+            return kantin.isOpen();
+        }
     }
 
     @Override

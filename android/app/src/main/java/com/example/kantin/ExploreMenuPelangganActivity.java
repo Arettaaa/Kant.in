@@ -31,6 +31,7 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
     private RecyclerView rvExploreMenu;
     private ExploreMenuAdapter adapter;
     private EditText etSearchMenu;
+    private TextView tvEmpty;
     private LinearLayout chipCategoryContainer;
 
     private String activeCategory = "Semua";
@@ -51,8 +52,10 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
         ImageView btnBack = findViewById(R.id.btnBackExploreMenu);
 
         rvExploreMenu.setLayoutManager(new LinearLayoutManager(this));
+        tvEmpty = findViewById(R.id.tvEmpty);
         adapter = new ExploreMenuAdapter(this, new ArrayList<>());
         rvExploreMenu.setAdapter(adapter);
+
 
         // --- 1. AMBIL DATA DARI INTENT ---
         String kategoriIntent = getIntent().getStringExtra("KATEGORI");
@@ -77,10 +80,33 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (adapter != null) adapter.filter(s.toString(), activeCategory);
+                updateEmptyState();
             }
         });
 
         btnBack.setOnClickListener(v -> onBackPressed());
+
+        LinearLayout navHome = findViewById(R.id.navHome);
+        LinearLayout navHistory = findViewById(R.id.navHistory);
+        LinearLayout navProfile = findViewById(R.id.navProfile);
+
+        navHome.setOnClickListener(v -> {
+            Intent intent = new Intent(this, BerandaPelangganActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        });
+        navHistory.setOnClickListener(v -> startActivity(new Intent(this, HistoryActivity.class)));
+        navProfile.setOnClickListener(v -> startActivity(new Intent(this, ProfilPelangganActivity.class)));
+    }
+
+    private void updateEmptyState() {
+        if (adapter.getItemCount() == 0) {
+            rvExploreMenu.setVisibility(android.view.View.GONE);
+            tvEmpty.setVisibility(android.view.View.VISIBLE);
+        } else {
+            rvExploreMenu.setVisibility(android.view.View.VISIBLE);
+            tvEmpty.setVisibility(android.view.View.GONE);
+        }
     }
 
     private void setupFixedCategoryChips() {
@@ -112,6 +138,7 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
                 activeCategory = category;
                 refreshChipStyles();
                 if (adapter != null) adapter.filter(etSearchMenu.getText().toString(), activeCategory);
+                updateEmptyState();
             });
 
             chipCategoryContainer.addView(chip);
@@ -147,9 +174,9 @@ public class ExploreMenuPelangganActivity extends AppCompatActivity {
             public void onResponse(Call<MenuListResponse> call, Response<MenuListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<MenuListResponse.MenuItem> data = response.body().getData();
-                    adapter = new ExploreMenuAdapter(ExploreMenuPelangganActivity.this, data);
-                    rvExploreMenu.setAdapter(adapter);
+                    adapter.updateData(data); // ← ganti ini
                     adapter.filter(etSearchMenu.getText().toString(), activeCategory);
+                    updateEmptyState();
                 }
             }
 

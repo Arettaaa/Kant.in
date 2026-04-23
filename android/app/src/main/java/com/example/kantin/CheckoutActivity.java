@@ -132,7 +132,7 @@ public class CheckoutActivity extends AppCompatActivity {
                 if (fileBuktiBayar != null) {
                     btnKonfirmasi.setText("Memproses...");
                     btnKonfirmasi.setEnabled(false);
-                    prosesCheckout(fileBuktiBayar);
+                    cekKantinBukaDanCheckout(fileBuktiBayar);
                 } else {
                     Toast.makeText(this, "Gagal memproses gambar", Toast.LENGTH_SHORT).show();
                 }
@@ -291,10 +291,13 @@ public class CheckoutActivity extends AppCompatActivity {
                             finish();
                         } else {
                             try {
-                                String errorMsg = response.errorBody().string();
-                                Log.e("CHECKOUT_ERROR", "Gagal Checkout: " + errorMsg);
-                            } catch (Exception e) {}
-                            Toast.makeText(CheckoutActivity.this, "Gagal Checkout! Cek Logcat.", Toast.LENGTH_SHORT).show();
+                                String errorBody = response.errorBody().string();
+                                org.json.JSONObject json = new org.json.JSONObject(errorBody);
+                                String message = json.optString("message", "Gagal Checkout!");
+                                Toast.makeText(CheckoutActivity.this, message, Toast.LENGTH_SHORT).show();
+                            } catch (Exception e) {
+                                Toast.makeText(CheckoutActivity.this, "Gagal Checkout!", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
 
@@ -305,5 +308,66 @@ public class CheckoutActivity extends AppCompatActivity {
                         Toast.makeText(CheckoutActivity.this, "Error jaringan", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void cekKantinBukaDanCheckout(File fileBuktiBayar) {
+        String canteenId = getIntent().getStringExtra("CANTEEN_ID");
+        ApiClient.getClient().create(ApiService.class).getAllCanteens()
+                .enqueue(new Callback<com.example.kantin.model.response.CanteenListResponse>() {
+                    @Override
+                    public void onResponse(Call<com.example.kantin.model.response.CanteenListResponse> call,
+                                           Response<com.example.kantin.model.response.CanteenListResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            com.example.kantin.model.response.CanteenListResponse.CanteenData targetKantin = null;
+                            for (com.example.kantin.model.response.CanteenListResponse.CanteenData kantin
+                                    : response.body().getData()) {
+                                if (kantin.getId().equals(canteenId)) {
+                                    targetKantin = kantin;
+                                    break;
+                                }
+                            }
+                            if (targetKantin == null) {
+                                Toast.makeText(CheckoutActivity.this, "Kantin tidak ditemukan!", Toast.LENGTH_SHORT).show();
+                                resetTombolKonfirmasi();
+                                return;
+                            }
+                            if (!isKantinBuka(targetKantin)) {
+                                Toast.makeText(CheckoutActivity.this, "Kantin sedang tutup, tidak bisa memesan!", Toast.LENGTH_SHORT).show();
+                                resetTombolKonfirmasi();
+                                return;
+                            }
+                            prosesCheckout(fileBuktiBayar);
+                        } else {
+                            Toast.makeText(CheckoutActivity.this, "Gagal cek status kantin!", Toast.LENGTH_SHORT).show();
+                            resetTombolKonfirmasi();
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<com.example.kantin.model.response.CanteenListResponse> call, Throwable t) {
+                        Toast.makeText(CheckoutActivity.this, "Error jaringan!", Toast.LENGTH_SHORT).show();
+                        resetTombolKonfirmasi();
+                    }
+                });
+    }
+
+    private boolean isKantinBuka(com.example.kantin.model.response.CanteenListResponse.CanteenData kantin) {
+        if (!kantin.isOpen()) return false;
+        if (kantin.getOperatingHours() == null) return true;
+        try {
+            String openStr = kantin.getOperatingHours().getOpen();
+            String closeStr = kantin.getOperatingHours().getClose();
+            java.util.Calendar now = java.util.Calendar.getInstance();
+            int nowTotal = now.get(java.util.Calendar.HOUR_OF_DAY) * 60 + now.get(java.util.Calendar.MINUTE);
+            int openTotal = Integer.parseInt(openStr.split(":")[0]) * 60 + Integer.parseInt(openStr.split(":")[1]);
+            int closeTotal = Integer.parseInt(closeStr.split(":")[0]) * 60 + Integer.parseInt(closeStr.split(":")[1]);
+            return nowTotal >= openTotal && nowTotal < closeTotal;
+        } catch (Exception e) {
+            return kantin.isOpen();
+        }
+    }
+
+    private void resetTombolKonfirmasi() {
+        btnKonfirmasi.setText("Konfirmasi Pembayaran");
+        btnKonfirmasi.setEnabled(true);
     }
 }
