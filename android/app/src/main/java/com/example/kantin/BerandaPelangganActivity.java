@@ -270,6 +270,7 @@ public class BerandaPelangganActivity extends AppCompatActivity {
                     }
                 }
             }
+
             @Override public void onFailure(Call<MenuListResponse> call, Throwable t) {
                 Log.e("API_ERROR", "Fetch Menu Populer: " + t.getMessage());
             }
