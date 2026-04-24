@@ -12,6 +12,10 @@ public class OrderModel implements Serializable {
     @SerializedName("order_code")
     private String orderCode;
 
+    @SerializedName("order_notes")
+    private String orderNotes;
+
+    public String getOrderNotes() { return orderNotes; }
     @SerializedName("customer_snapshot")
     private CustomerSnapshot customerSnapshot;
 

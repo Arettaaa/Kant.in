@@ -439,7 +439,7 @@ public class CheckoutActivity extends AppCompatActivity {
         String token = new SessionManager(this).getToken();
         ApiClient.getAuthClient(token).create(ApiService.class)
                 .checkout(canteenIdPart, deliveryMethodPart, locationNotePart, orderNotesPart,
-                        menuIdParts, paymentProofPart)
+                        menuIdParts, notesParts, paymentProofPart)
                 .enqueue(new Callback<OrderDetailResponse>() {
                     @Override
                     public void onResponse(Call<OrderDetailResponse> call,

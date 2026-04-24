@@ -370,9 +370,10 @@ public interface ApiService {
     Call<OrderDetailResponse> checkout(
             @Part("canteen_id") RequestBody canteenId,
             @Part("delivery_method") RequestBody deliveryMethod,
-            @Part("location_note") RequestBody locationNote, // bisa null
-            @Part("order_notes") RequestBody orderNotes, // bisa null
+            @Part("location_note") RequestBody locationNote,
+            @Part("order_notes") RequestBody orderNotes,
             @Part("menu_ids[]") List<RequestBody> menuIds,
+            @Part("notes[]") List<RequestBody> notes,  // ← TAMBAH INI
             @Part MultipartBody.Part paymentProof
     );
 

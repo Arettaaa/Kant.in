@@ -104,6 +104,8 @@ public class DetailPesanan extends AppCompatActivity {
     }
 
     private void populateDataToUI() {
+        android.util.Log.d("ORDER_DEBUG", new com.google.gson.Gson().toJson(currentOrder));
+
         NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 
         // Header & Customer Info

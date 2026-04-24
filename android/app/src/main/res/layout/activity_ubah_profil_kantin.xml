@@ -21,6 +21,7 @@
             android:layout_height="40dp"
             app:cardCornerRadius="20dp"
             app:cardElevation="2dp">
+
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -40,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:text="Ubah Data Kantin"
                 android:textColor="#111827"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -48,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:text="Perbarui detail warung &amp; profilmu"
                 android:textColor="#6B7280"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
         </LinearLayout>
     </RelativeLayout>
 
@@ -64,10 +65,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="24dp"
-            android:paddingBottom="32dp"
-            android:paddingTop="10dp">
+            android:paddingTop="10dp"
+            android:paddingBottom="32dp">
 
-            <!-- ====== LOGO KANTIN ====== -->
             <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -79,14 +79,15 @@
                     android:layout_height="110dp"
                     app:cardCornerRadius="55dp"
                     app:cardElevation="0dp">
+
                     <ImageView
                         android:id="@+id/ivCanteenLogo"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/user"
                         android:background="@drawable/bg_circle_outline"
-                        android:padding="9dp"/>
+                        android:padding="9dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/user" />
                 </androidx.cardview.widget.CardView>
 
                 <ImageView
@@ -108,14 +109,13 @@
                 android:textColor="#6B7280"
                 android:textSize="12sp" />
 
-            <!-- ====== IDENTITAS KANTIN ====== -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
                 android:text="IDENTITAS KANTIN"
                 android:textColor="#F97316"
-                android:textSize="11sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <EditText
@@ -123,30 +123,32 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="8dp"
-                android:enabled="false"
-                android:focusable="false"
-                android:cursorVisible="false"
-                android:longClickable="false"
                 android:background="@drawable/bg_input_field"
+                android:cursorVisible="false"
                 android:drawableStart="@drawable/home"
                 android:drawablePadding="12dp"
+                android:enabled="false"
+                android:focusable="false"
                 android:hint="Nama Kantin"
-                android:paddingHorizontal="16dp" />
+                android:longClickable="false"
+                android:paddingHorizontal="16dp"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/etCanteenLocation"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="12dp"
-                android:enabled="false"
-                android:focusable="false"
-                android:cursorVisible="false"
-                android:longClickable="false"
                 android:background="@drawable/bg_input_field"
+                android:cursorVisible="false"
                 android:drawableStart="@drawable/mappin"
                 android:drawablePadding="12dp"
+                android:enabled="false"
+                android:focusable="false"
                 android:hint="Lokasi Gedung / Alamat"
-                android:paddingHorizontal="16dp" />
+                android:longClickable="false"
+                android:paddingHorizontal="16dp"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/etCanteenDescription"
@@ -156,7 +158,8 @@
                 android:background="@drawable/bg_input_field"
                 android:gravity="top"
                 android:hint="Deskripsi singkat kantin..."
-                android:padding="16dp" />
+                android:padding="16dp"
+                android:textSize="16sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -170,38 +173,44 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1.2"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="ONGKIR (RP)"
-                        android:textSize="10sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
+
                     <EditText
                         android:id="@+id/etDeliveryFee"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
                         android:layout_marginTop="4dp"
                         android:background="@drawable/bg_input_field"
+                        android:gravity="center"
                         android:hint="2000"
                         android:inputType="number"
                         android:paddingHorizontal="12dp"
-                        android:gravity="center"
-                        android:textSize="14sp" />
+                        android:textSize="16sp" />
                 </LinearLayout>
 
-                <View android:layout_width="8dp" android:layout_height="match_parent"/>
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="match_parent" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="BUKA"
-                        android:textSize="10sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
+
                     <EditText
                         android:id="@+id/etOpenTime"
                         android:layout_width="match_parent"
@@ -209,24 +218,28 @@
                         android:layout_marginTop="4dp"
                         android:background="@drawable/bg_input_field"
                         android:focusable="false"
-                        android:hint="08:00"
                         android:gravity="center"
-                        android:textSize="14sp" />
+                        android:hint="08:00"
+                        android:textSize="16sp" />
                 </LinearLayout>
 
-                <View android:layout_width="8dp" android:layout_height="match_parent"/>
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="match_parent" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.9"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="TUTUP"
-                        android:textSize="10sp"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
+
                     <EditText
                         android:id="@+id/etCloseTime"
                         android:layout_width="match_parent"
@@ -234,9 +247,9 @@
                         android:layout_marginTop="4dp"
                         android:background="@drawable/bg_input_field"
                         android:focusable="false"
-                        android:hint="17:00"
                         android:gravity="center"
-                        android:textSize="14sp" />
+                        android:hint="17:00"
+                        android:textSize="16sp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -244,36 +257,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="24dp"
-                android:background="#F3F4F6"/>
+                android:background="#F3F4F6" />
 
-            <!-- ====== INFO PEMBAYARAN / QRIS ====== -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:text="INFO PEMBAYARAN"
                 android:textColor="#F97316"
-                android:textSize="11sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
-            <!--
-                QRIS punya 2 state, dikontrol visibility dari Java:
-
-                STATE 1 — btnUploadQrisEmpty VISIBLE, containerQrisPreview GONE
-                  Kondisi: belum ada QRIS sama sekali (qrisUrl == null dari API)
-                  Tampil  : ikon kamera + teks instruksi. Klik → buka galeri.
-
-                STATE 2 — btnUploadQrisEmpty GONE, containerQrisPreview VISIBLE
-                  Kondisi: ada QRIS (dari server ATAU preview file baru)
-                  Tampil  : gambar QRIS + label status + tombol "Ganti QRIS"
-                  Sub-state label (tvQrisLabel + tvQrisPreviewBadge):
-                    • Gambar dari server  → tvQrisLabel "QRIS saat ini" VISIBLE,
-                                            tvQrisPreviewBadge GONE
-                    • File baru dipilih  → tvQrisLabel "Preview baru" VISIBLE (#orange),
-                                            tvQrisPreviewBadge VISIBLE
-            -->
-
-            <!-- STATE 1: belum ada QRIS -->
             <LinearLayout
                 android:id="@+id/btnUploadQrisEmpty"
                 android:layout_width="match_parent"
@@ -298,20 +292,19 @@
                     android:text="Ketuk untuk upload QRIS"
                     android:textAlignment="center"
                     android:textColor="#6B7280"
-                    android:textSize="12sp" />
+                    android:textSize="14sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
+                    android:layout_marginTop="4dp"
                     android:paddingHorizontal="16dp"
                     android:text="Pastikan kotak QR pas di tengah dan tidak terpotong."
                     android:textAlignment="center"
                     android:textColor="#9CA3AF"
-                    android:textSize="11sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
 
-            <!-- STATE 2: ada QRIS (lama atau preview baru) -->
             <LinearLayout
                 android:id="@+id/containerQrisPreview"
                 android:layout_width="match_parent"
@@ -320,33 +313,30 @@
                 android:background="@drawable/bg_input_field"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:paddingVertical="20dp"
                 android:paddingHorizontal="16dp"
+                android:paddingVertical="20dp"
                 android:visibility="gone">
 
-                <!-- Label status: "QRIS saat ini" atau "Preview QRIS baru" -->
                 <TextView
                     android:id="@+id/tvQrisLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="12dp"
+                    android:background="@drawable/bg_badge_orange_light"
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="4dp"
                     android:text="QRIS saat ini"
-                    android:textColor="#FFFFFF"
-                    android:textSize="11sp"
+                    android:textColor="#F97316"
+                    android:textSize="12sp"
                     android:textStyle="bold"
-                    android:background="@drawable/bg_badge_orange_light"
                     android:visibility="gone" />
 
-                <!-- Gambar QRIS — diisi Glide dari server atau File lokal -->
                 <ImageView
                     android:id="@+id/ivQrisImage"
                     android:layout_width="200dp"
                     android:layout_height="200dp"
                     android:scaleType="fitCenter" />
 
-                <!-- Tombol ganti -->
                 <LinearLayout
                     android:id="@+id/btnGantiQris"
                     android:layout_width="wrap_content"
@@ -368,17 +358,11 @@
                         android:layout_marginStart="6dp"
                         android:text="Ganti QRIS"
                         android:textColor="#F97316"
-                        android:textSize="13sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!--
-                Banner "belum disimpan" — muncul di bawah container
-                hanya saat user sudah pilih file baru (fileQris != null)
-                dan belum menekan Simpan.
-                Setelah simpan berhasil → GONE kembali.
-            -->
             <TextView
                 android:id="@+id/tvQrisPreviewBadge"
                 android:layout_width="match_parent"
@@ -389,7 +373,7 @@
                 android:paddingVertical="7dp"
                 android:text="⚠ Preview QRIS baru (belum disimpan)"
                 android:textColor="#EA580C"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:textStyle="italic"
                 android:visibility="gone" />
 
@@ -397,15 +381,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginVertical="24dp"
-                android:background="#F3F4F6"/>
+                android:background="#F3F4F6" />
 
-            <!-- ====== PROFIL PEMILIK ====== -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="PROFIL PEMILIK"
                 android:textColor="#F97316"
-                android:textSize="11sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -418,20 +401,23 @@
                 <FrameLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
+
                     <androidx.cardview.widget.CardView
                         android:layout_width="64dp"
                         android:layout_height="64dp"
                         app:cardCornerRadius="32dp"
                         app:cardElevation="0dp">
+
                         <ImageView
                             android:id="@+id/ivAdminPhoto"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/user"
                             android:background="@drawable/bg_circle_outline"
-                            android:padding="9dp"/>
+                            android:padding="9dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/user" />
                     </androidx.cardview.widget.CardView>
+
                     <ImageView
                         android:id="@+id/btnEditAdminPhoto"
                         android:layout_width="20dp"
@@ -450,7 +436,7 @@
                     android:background="@drawable/bg_input_field"
                     android:hint="Nama Lengkap Admin"
                     android:paddingHorizontal="16dp"
-                    android:textSize="14sp" />
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <EditText
@@ -460,12 +446,13 @@
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_input_field"
                 android:drawableStart="@drawable/mail"
-                android:drawableTint="@color/orange_primary"
                 android:drawablePadding="12dp"
+                android:drawableTint="@color/orange_primary"
                 android:enabled="false"
                 android:hint="email@admin.com"
                 android:paddingHorizontal="16dp"
-                android:textColor="#9CA3AF" />
+                android:textColor="#9CA3AF"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/etAdminPhone"
@@ -477,7 +464,8 @@
                 android:drawablePadding="12dp"
                 android:hint="No. Telepon Aktif"
                 android:inputType="phone"
-                android:paddingHorizontal="16dp" />
+                android:paddingHorizontal="16dp"
+                android:textSize="16sp" />
 
         </LinearLayout>
     </ScrollView>
