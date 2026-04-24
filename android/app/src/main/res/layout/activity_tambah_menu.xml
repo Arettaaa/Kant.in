@@ -57,6 +57,7 @@
                 android:layout_height="wrap_content"
                 android:text="Foto Menu"
                 android:textColor="#111827"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -100,7 +101,7 @@
                             android:layout_marginTop="16dp"
                             android:text="Klik untuk mengunggah"
                             android:textColor="#374151"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -109,7 +110,7 @@
                             android:layout_marginTop="4dp"
                             android:text="Saran ukuran: 1:1 (Kotak)"
                             android:textColor="#9CA3AF"
-                            android:textSize="14sp" />
+                            android:textSize="12sp" />
                     </LinearLayout>
 
                     <androidx.cardview.widget.CardView
@@ -277,7 +278,7 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp">
+                        android:layout_marginTop="16dp">
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -287,6 +288,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Ketersediaan"
                                 android:textColor="#111827"
+                                android:textSize="14sp"
                                 android:textStyle="bold" />
                             <TextView
                                 android:layout_width="wrap_content"

@@ -47,23 +47,30 @@ public class MenuAdminAdapter extends RecyclerView.Adapter<MenuAdminAdapter.Menu
     public void onBindViewHolder(@NonNull MenuViewHolder holder, int position) {
         MenuItem menu = menuList.get(position);
 
-        // Nama & Harga
         holder.tvMenuName.setText(menu.getName());
         holder.tvMenuPrice.setText(formatRupiah(menu.getPriceAsDouble()));
 
+        // Rating
+        int totalReviews = menu.getTotalReviews();
+        if (totalReviews > 0) {
+            holder.tvRatingMenu.setText(String.format(Locale.getDefault(), "%.1f", menu.getAverageRating()));
+            holder.tvTotalUlasan.setText("(" + totalReviews + " ulasan)");
+        } else {
+            holder.tvRatingMenu.setText("Baru");
+            holder.tvTotalUlasan.setText("(Belum ada ulasan)");
+        }
+
         // Status label & switch
         boolean available = menu.isAvailable();
-        holder.switchAvailability.setOnCheckedChangeListener(null); // reset dulu biar tidak trigger
+        holder.switchAvailability.setOnCheckedChangeListener(null);
         holder.switchAvailability.setChecked(available);
         updateStatusLabel(holder.tvStatusLabel, available);
 
-        // Switch toggle
         holder.switchAvailability.setOnCheckedChangeListener((btn, isChecked) -> {
             updateStatusLabel(holder.tvStatusLabel, isChecked);
             listener.onToggleAvailability(menu, isChecked);
         });
 
-        // Foto menu
         if (menu.getImage() != null && !menu.getImage().isEmpty()) {
             Glide.with(context)
                     .load(menu.getImage())
@@ -75,7 +82,6 @@ public class MenuAdminAdapter extends RecyclerView.Adapter<MenuAdminAdapter.Menu
             holder.ivMenuImage.setImageResource(R.drawable.makanan);
         }
 
-        // Tombol edit
         holder.btnEditMenu.setOnClickListener(v -> listener.onEditClick(menu));
     }
 
@@ -99,17 +105,19 @@ public class MenuAdminAdapter extends RecyclerView.Adapter<MenuAdminAdapter.Menu
 
     static class MenuViewHolder extends RecyclerView.ViewHolder {
         ImageView ivMenuImage, btnEditMenu;
-        TextView tvMenuName, tvMenuPrice, tvStatusLabel;
+        TextView tvMenuName, tvMenuPrice, tvStatusLabel, tvRatingMenu, tvTotalUlasan; // tambah dua ini
         android.widget.CheckBox switchAvailability;
 
         MenuViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivMenuImage       = itemView.findViewById(R.id.ivMenuImage);
-            btnEditMenu       = itemView.findViewById(R.id.btnEditMenu);
-            tvMenuName        = itemView.findViewById(R.id.tvMenuName);
-            tvMenuPrice       = itemView.findViewById(R.id.tvMenuPrice);
-            tvStatusLabel     = itemView.findViewById(R.id.tvStatusLabel);
+            ivMenuImage        = itemView.findViewById(R.id.ivMenuImage);
+            btnEditMenu        = itemView.findViewById(R.id.btnEditMenu);
+            tvMenuName         = itemView.findViewById(R.id.tvMenuName);
+            tvMenuPrice        = itemView.findViewById(R.id.tvMenuPrice);
+            tvStatusLabel      = itemView.findViewById(R.id.tvStatusLabel);
             switchAvailability = itemView.findViewById(R.id.switchAvailability);
+            tvRatingMenu       = itemView.findViewById(R.id.tvRatingMenu);
+            tvTotalUlasan      = itemView.findViewById(R.id.tvTotalUlasan);
         }
     }
 }

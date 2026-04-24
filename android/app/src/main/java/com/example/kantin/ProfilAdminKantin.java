@@ -19,20 +19,23 @@ import com.example.kantin.network.ApiClient;
 import com.example.kantin.network.ApiService;
 import com.example.kantin.utils.SessionManager;
 
-// ✅ FIX 1: Ganti ProfileResponse → ProfileAdminResponse (sesuai ApiService)
 import com.example.kantin.model.response.ProfileAdminResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import com.example.kantin.model.response.CanteenDetailResponse;
+import com.example.kantin.model.response.MenuListResponse;
+import java.util.List;
+import java.util.Locale;
+
 public class ProfilAdminKantin extends AppCompatActivity {
 
     private ImageView ivCanteenImage, ivOwnerPhoto;
-    private TextView tvCanteenName, tvOwnerName;
+    private TextView tvCanteenName, tvOwnerName, tvCanteenRating; // ← tambah tvCanteenRating
     private RelativeLayout btnEditCanteen, btnHistory;
     private AppCompatButton btnLogout;
-
     private LinearLayout btnBantuan;
     private ApiService apiService;
     private SessionManager sessionManager;
@@ -59,15 +62,15 @@ public class ProfilAdminKantin extends AppCompatActivity {
     }
 
     private void initViews() {
-        ivCanteenImage = findViewById(R.id.ivCanteenImage);
-        ivOwnerPhoto   = findViewById(R.id.ivOwnerPhoto);
-        tvCanteenName  = findViewById(R.id.tvCanteenName);
-        tvOwnerName    = findViewById(R.id.tvOwnerName);
-        btnEditCanteen = findViewById(R.id.btnEditCanteen);
-        btnHistory     = findViewById(R.id.btnHistory);
-        btnLogout      = findViewById(R.id.btnLogout);
-        btnBantuan = findViewById(R.id.btnBantuan);
-
+        ivCanteenImage  = findViewById(R.id.ivCanteenImage);
+        ivOwnerPhoto    = findViewById(R.id.ivOwnerPhoto);
+        tvCanteenName   = findViewById(R.id.tvCanteenName);
+        tvOwnerName     = findViewById(R.id.tvOwnerName);
+        tvCanteenRating = findViewById(R.id.tvCanteenRating); // ← tambah ini
+        btnEditCanteen  = findViewById(R.id.btnEditCanteen);
+        btnHistory      = findViewById(R.id.btnHistory);
+        btnLogout       = findViewById(R.id.btnLogout);
+        btnBantuan      = findViewById(R.id.btnBantuan);
     }
 
     private void fetchProfileData() {
@@ -75,26 +78,39 @@ public class ProfilAdminKantin extends AppCompatActivity {
         String canteenName = sessionManager.getCanteenName();
         tvCanteenName.setText(canteenName != null ? canteenName : "Kantin Saya");
 
-        // ✅ FIX 2: Ganti ProfileResponse → ProfileAdminResponse
         apiService.getProfile().enqueue(new Callback<ProfileAdminResponse>() {
             @Override
             public void onResponse(Call<ProfileAdminResponse> call, Response<ProfileAdminResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-
-                    // ✅ FIX 3: Pakai ProfileAdminResponse.UserData (bukan ProfileResponse.UserData)
                     ProfileAdminResponse.AdminProfile userData = response.body().getData();
                     if (userData != null) {
-                        // Set Nama Owner dari API
                         tvOwnerName.setText(userData.getName());
-
-                        // Simpan ke session supaya bisa dipakai di halaman lain
                         sessionManager.saveUserInfo(
                                 userData.getName(),
                                 userData.getEmail(),
                                 userData.getPhone()
                         );
 
-                        // Load foto profil pakai Glide
+                        // ← TAMBAH INI UNTUK DEBUG
+                        String canteenId = userData.getCanteenId();
+                        android.util.Log.d("PROFIL_DEBUG", "canteen_id dari API: " + canteenId);
+                        android.util.Log.d("PROFIL_DEBUG", "canteen_id dari session: " + sessionManager.getCanteenId());
+                        android.util.Log.d("PROFIL_DEBUG", "nama dari API: " + userData.getName());
+
+                        if (canteenId != null && !canteenId.isEmpty()) {
+                            fetchCanteenDetail(canteenId);
+                            fetchCanteenRating(canteenId);
+                        } else {
+                            // ← Coba fallback ke session
+                            String canteenIdFromSession = sessionManager.getCanteenId();
+                            android.util.Log.d("PROFIL_DEBUG", "Pakai canteen_id dari session: " + canteenIdFromSession);
+                            if (canteenIdFromSession != null && !canteenIdFromSession.isEmpty()) {
+                                fetchCanteenDetail(canteenIdFromSession);
+                                fetchCanteenRating(canteenIdFromSession);
+                            }
+                        }
+
+                        // Load foto owner
                         String photoUrl = userData.getPhotoProfile();
                         if (photoUrl != null && !photoUrl.isEmpty()) {
                             Glide.with(ProfilAdminKantin.this)
@@ -103,6 +119,12 @@ public class ProfilAdminKantin extends AppCompatActivity {
                                     .placeholder(R.drawable.user)
                                     .error(R.drawable.user)
                                     .into(ivOwnerPhoto);
+                        }
+
+                        // ← Setelah dapat canteen_id, fetch detail kantin & rating
+                        if (canteenId != null && !canteenId.isEmpty()) {
+                            fetchCanteenDetail(canteenId);
+                            fetchCanteenRating(canteenId);
                         }
                     }
                 } else {
@@ -119,23 +141,88 @@ public class ProfilAdminKantin extends AppCompatActivity {
         });
     }
 
+    /** Fetch nama kantin + foto kantin dari API */
+    private void fetchCanteenDetail(String canteenId) {
+        apiService.getCanteenDetail(canteenId).enqueue(new Callback<CanteenDetailResponse>() {
+            @Override
+            public void onResponse(Call<CanteenDetailResponse> call, Response<CanteenDetailResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    CanteenDetailResponse.CanteenDetail detail = response.body().getData();
+                    if (detail != null) {
+                        // Set nama kantin dari API (bukan session lagi)
+                        tvCanteenName.setText(detail.getName());
+                        sessionManager.saveCanteenName(detail.getName());
+
+                        // Load foto kantin ke avatar atas
+                        String imageUrl = detail.getImage();
+                        if (imageUrl != null && !imageUrl.isEmpty()) {
+                            if (!imageUrl.startsWith("http")) {
+                                imageUrl = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/" + imageUrl;
+                            }
+                            Glide.with(ProfilAdminKantin.this)
+                                    .load(imageUrl)
+                                    .centerCrop()
+                                    .placeholder(R.drawable.logo_kantin)
+                                    .error(R.drawable.logo_kantin)
+                                    .into(ivCanteenImage);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CanteenDetailResponse> call, Throwable t) {
+                // Biarkan foto default, tidak perlu toast
+            }
+        });
+    }
+
+    /** Hitung rating rata-rata dari semua menu kantin */
+    private void fetchCanteenRating(String canteenId) {
+        ApiClient.getClient().create(ApiService.class)
+                .getCanteenMenus(canteenId)
+                .enqueue(new Callback<MenuListResponse>() {
+                    @Override
+                    public void onResponse(Call<MenuListResponse> call, Response<MenuListResponse> response) {
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().getData() != null) {
+                            List<MenuListResponse.MenuItem> menus = response.body().getData();
+                            double total = 0;
+                            int count = 0;
+                            for (MenuListResponse.MenuItem menu : menus) {
+                                if (menu.getTotalReviews() > 0) {
+                                    total += menu.getAverageRating();
+                                    count++;
+                                }
+                            }
+                            String ratingText = count > 0
+                                    ? String.format(Locale.getDefault(), "%.1f", total / count)
+                                    : "Baru";
+                            tvCanteenRating.setText(ratingText);
+                        } else {
+                            tvCanteenRating.setText("Baru");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<MenuListResponse> call, Throwable t) {
+                        tvCanteenRating.setText("Baru");
+                    }
+                });
+    }
+
     private void setupListeners() {
-        btnHistory.setOnClickListener(v -> {
-            startActivity(new Intent(ProfilAdminKantin.this, TransaksiActivity.class));
-        });
+        btnHistory.setOnClickListener(v ->
+                startActivity(new Intent(ProfilAdminKantin.this, TransaksiActivity.class)));
 
-        btnEditCanteen.setOnClickListener(v -> {
-            startActivity(new Intent(ProfilAdminKantin.this, UbahProfilKantin.class));
-        });
+        btnEditCanteen.setOnClickListener(v ->
+                startActivity(new Intent(ProfilAdminKantin.this, UbahProfilKantin.class)));
 
-        btnBantuan.setOnClickListener(v -> {
-            startActivity(new Intent(ProfilAdminKantin.this, PusatBantuan.class));
-        });
+        btnBantuan.setOnClickListener(v ->
+                startActivity(new Intent(ProfilAdminKantin.this, PusatBantuan.class)));
 
-        // ✅ FIX 4: Ganti sessionManager.logout() → sessionManager.clearSession()
         btnLogout.setOnClickListener(v -> {
             sessionManager.clearSession();
-
             Intent intent = new Intent(ProfilAdminKantin.this, LoginActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

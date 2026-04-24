@@ -53,6 +53,41 @@
                     android:src="@drawable/button_pencil" />
             </RelativeLayout>
 
+            <!-- Tambah ini setelah RelativeLayout yang berisi tvMenuName dan btnEditMenu -->
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="11dp"
+                    android:src="@android:drawable/star_on"
+                    app:tint="#F59E0B" />
+
+                <TextView
+                    android:id="@+id/tvRatingMenu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="Baru"
+                    android:textColor="#4B5563"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTotalUlasan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="(0 ulasan)"
+                    android:textColor="#9CA3AF"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -67,7 +102,7 @@
                     android:layout_weight="1"
                     android:text="Rp 0"
                     android:textColor="#F97316"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -77,13 +112,13 @@
                     android:layout_marginEnd="8dp"
                     android:text="TERSEDIA"
                     android:textColor="#00C950"
-                    android:textSize="12sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <CheckBox
                     android:id="@+id/switchAvailability"
-                    android:layout_width="56dp"
-                    android:layout_height="32dp"
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
                     android:button="@null"
                     android:background="@drawable/switch_track_final" />
             </LinearLayout>
