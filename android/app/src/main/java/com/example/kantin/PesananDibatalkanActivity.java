@@ -32,8 +32,7 @@ public class PesananDibatalkanActivity extends AppCompatActivity {
 
         // Aksi Tombol "Kembali ke Beranda"
         btnKembaliBeranda.setOnClickListener(v -> {
-            // Ganti MainActivity.class dengan nama class beranda Anda jika berbeda (misal HomeActivity.class)
-            Intent intent = new Intent(PesananDibatalkanActivity.this, MainActivity.class);
+            Intent intent = new Intent(PesananDibatalkanActivity.this, BerandaPelangganActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
