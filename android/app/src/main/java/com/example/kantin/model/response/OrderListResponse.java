@@ -119,6 +119,10 @@ public class OrderListResponse {
         public boolean needsPaymentVerification() {
             return payment != null && payment.isPendingVerification();
         }
+        // Tambah di OrderListResponse.OrderItem:
+        public String getEffectiveId() {
+            return id != null ? id : idAlias;
+        }
     }
 
     // ======================================================================
@@ -230,4 +234,5 @@ public class OrderListResponse {
         public boolean isUnpaid()  { return "unpaid".equals(status); }
         public boolean isRejected(){ return "rejected".equals(status); }
     }
+
 }

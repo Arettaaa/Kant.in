@@ -22,6 +22,7 @@ import com.example.kantin.model.response.OrderListResponse;
 import com.example.kantin.model.response.OrderDetailResponse;
 import com.example.kantin.model.response.ProfileResponse;
 import com.example.kantin.model.response.ProfileAdminResponse;
+import com.example.kantin.model.response.RatingCheckResponse;
 import com.example.kantin.model.response.TransactionListResponse;
 import com.example.kantin.model.response.DashboardResponse;
 import com.example.kantin.model.response.RegisterResponse;
@@ -34,6 +35,8 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
@@ -384,6 +387,17 @@ public interface ApiService {
 
     @POST("buyers/orders/{orderId}/completions")
     Call<BaseResponse> completeOrder(@Path("orderId") String orderId);
+
+    @FormUrlEncoded
+    @POST("buyers/orders/{orderId}/ratings")
+    Call<BaseResponse> submitRating(
+            @Path("orderId") String orderId,
+            @Field("rating") int rating
+    );
+
+    // Cek apakah order sudah pernah dirating
+    @GET("buyers/orders/{orderId}/ratings")
+    Call<RatingCheckResponse> checkRating(@Path("orderId") String orderId);
 
     /** 3. PROFIL (Pelanggan) **/
     @GET("buyers/profiles")
