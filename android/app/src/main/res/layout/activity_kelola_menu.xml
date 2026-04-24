@@ -26,17 +26,12 @@
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground">
             <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:src="@drawable/logout"
-                app:tint="#9CA3AF" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="Keluar"
-                android:textColor="#9CA3AF"
-                android:textSize="14sp" />
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@drawable/chevronleft"
+                android:background="@drawable/bg_circle_outline"
+                android:padding="8dp"/>
+
         </LinearLayout>
 
         <LinearLayout

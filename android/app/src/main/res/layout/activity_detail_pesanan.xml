@@ -25,11 +25,11 @@
 
         <ImageView
             android:id="@+id/btnBack"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_circle_outline"
             android:src="@drawable/chevronleft"
-            app:tint="#4B5563" />
+            android:padding="8dp" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -138,7 +138,7 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_marginTop="16dp"
-                        android:src="@drawable/clock"
+                        android:src="@drawable/ic_clock"
                         app:tint="#4B5563"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/divider1" />
@@ -170,7 +170,7 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_marginTop="16dp"
-                        android:src="@drawable/ic_bike"
+                        android:src="@drawable/ic_motor"
                         app:tint="#4B5563"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/icWaktu" />

@@ -105,7 +105,7 @@ class OrderController extends Controller
         }, $selectedItems);
 
         $user = $request->user();
-        $orderCode = 'KANTIN-' . date('Y') . '-' . strtoupper(Str::random(6));
+        $orderCode = 'ORD-' . date('Y') . '-' . strtoupper(Str::random(3));
         $subtotal = array_sum(array_column($selectedItems, 'subtotal'));
         $total = $subtotal + $deliveryFee;
 
