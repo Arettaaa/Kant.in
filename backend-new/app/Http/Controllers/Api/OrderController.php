@@ -16,13 +16,15 @@ class OrderController extends Controller
     public function checkout(Request $request)
     {
         $validated = $request->validate([
-            'canteen_id' => 'required|string',
-            'menu_ids' => 'required|array|min:1',
-            'menu_ids.*' => 'required|string',
+            'canteen_id'      => 'required|string',
+            'menu_ids'        => 'required|array|min:1',
+            'menu_ids.*'      => 'required|string',
+            'notes'           => 'nullable|array',      // ← TAMBAH
+            'notes.*'         => 'nullable|string',     // ← TAMBAH
             'delivery_method' => 'required|in:pickup,delivery',
-            'location_note' => 'required_if:delivery_method,delivery|nullable|string',
-            'order_notes' => 'nullable|string',
-            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+            'location_note'   => 'required_if:delivery_method,delivery|nullable|string',
+            'order_notes'     => 'nullable|string',
+            'payment_proof'   => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
         $userId = (string) $request->user()->_id;
@@ -91,16 +93,22 @@ class OrderController extends Controller
             ? ($canteen->delivery_fee_flat ?? 0)
             : 0;
 
-        $orderItems = array_map(function ($item) {
-            $menu = Menu::find($item['menu_id']);
+        $requestMenuIds = $validated['menu_ids'];
+        $requestNotes   = $request->input('notes', []); // array notes per item dari Android
+
+        $orderItems = array_map(function ($item) use ($requestMenuIds, $requestNotes) {
+            $menu  = Menu::find($item['menu_id']);
+            $index = array_search((string) $item['menu_id'], $requestMenuIds);
+            $notes = ($index !== false && isset($requestNotes[$index])) ? $requestNotes[$index] : null;
+
             return [
-                'menu_id' => $item['menu_id'],
-                'name' => $item['name'],
-                'price' => $item['price'],
-                'quantity' => $item['quantity'],
-                'notes' => $item['notes'] ?? null,
+                'menu_id'                => $item['menu_id'],
+                'name'                   => $item['name'],
+                'price'                  => $item['price'],
+                'quantity'               => $item['quantity'],
+                'notes'                  => $notes,
                 'estimated_cooking_time' => $menu->estimated_cooking_time ?? 0,
-                'subtotal' => $item['subtotal'],
+                'subtotal'               => $item['subtotal'],
             ];
         }, $selectedItems);
 
