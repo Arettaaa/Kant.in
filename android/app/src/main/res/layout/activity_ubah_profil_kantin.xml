@@ -67,6 +67,7 @@
             android:paddingBottom="32dp"
             android:paddingTop="10dp">
 
+            <!-- ====== LOGO KANTIN ====== -->
             <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -85,7 +86,7 @@
                         android:scaleType="centerCrop"
                         android:src="@drawable/user"
                         android:background="@drawable/bg_circle_outline"
-                        android:padding="8dp"/>
+                        android:padding="9dp"/>
                 </androidx.cardview.widget.CardView>
 
                 <ImageView
@@ -107,6 +108,7 @@
                 android:textColor="#6B7280"
                 android:textSize="12sp" />
 
+            <!-- ====== IDENTITAS KANTIN ====== -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -183,6 +185,7 @@
                         android:hint="2000"
                         android:inputType="number"
                         android:paddingHorizontal="12dp"
+                        android:gravity="center"
                         android:textSize="14sp" />
                 </LinearLayout>
 
@@ -237,8 +240,13 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="24dp" android:background="#F3F4F6"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="24dp"
+                android:background="#F3F4F6"/>
 
+            <!-- ====== INFO PEMBAYARAN / QRIS ====== -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -248,20 +256,38 @@
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
+            <!--
+                QRIS punya 2 state, dikontrol visibility dari Java:
+
+                STATE 1 — btnUploadQrisEmpty VISIBLE, containerQrisPreview GONE
+                  Kondisi: belum ada QRIS sama sekali (qrisUrl == null dari API)
+                  Tampil  : ikon kamera + teks instruksi. Klik → buka galeri.
+
+                STATE 2 — btnUploadQrisEmpty GONE, containerQrisPreview VISIBLE
+                  Kondisi: ada QRIS (dari server ATAU preview file baru)
+                  Tampil  : gambar QRIS + label status + tombol "Ganti QRIS"
+                  Sub-state label (tvQrisLabel + tvQrisPreviewBadge):
+                    • Gambar dari server  → tvQrisLabel "QRIS saat ini" VISIBLE,
+                                            tvQrisPreviewBadge GONE
+                    • File baru dipilih  → tvQrisLabel "Preview baru" VISIBLE (#orange),
+                                            tvQrisPreviewBadge VISIBLE
+            -->
+
+            <!-- STATE 1: belum ada QRIS -->
             <LinearLayout
-                android:id="@+id/btnUploadQris"
+                android:id="@+id/btnUploadQrisEmpty"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/bg_input_field"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:paddingVertical="32dp">
+                android:paddingVertical="32dp"
+                android:visibility="visible">
 
                 <ImageView
-                    android:id="@+id/ivQrisImage"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:src="@drawable/camera"
                     app:tint="#9CA3AF" />
 
@@ -269,14 +295,111 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Ketuk untuk upload QRIS. \nPastikan kotak QR pas di tengah dan tidak terpotong."
+                    android:text="Ketuk untuk upload QRIS"
                     android:textAlignment="center"
                     android:textColor="#6B7280"
                     android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:paddingHorizontal="16dp"
+                    android:text="Pastikan kotak QR pas di tengah dan tidak terpotong."
+                    android:textAlignment="center"
+                    android:textColor="#9CA3AF"
+                    android:textSize="11sp" />
             </LinearLayout>
 
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginVertical="24dp" android:background="#F3F4F6"/>
+            <!-- STATE 2: ada QRIS (lama atau preview baru) -->
+            <LinearLayout
+                android:id="@+id/containerQrisPreview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_input_field"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="20dp"
+                android:paddingHorizontal="16dp"
+                android:visibility="gone">
 
+                <!-- Label status: "QRIS saat ini" atau "Preview QRIS baru" -->
+                <TextView
+                    android:id="@+id/tvQrisLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp"
+                    android:text="QRIS saat ini"
+                    android:textColor="#FFFFFF"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/bg_badge_orange_light"
+                    android:visibility="gone" />
+
+                <!-- Gambar QRIS — diisi Glide dari server atau File lokal -->
+                <ImageView
+                    android:id="@+id/ivQrisImage"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:scaleType="fitCenter" />
+
+                <!-- Tombol ganti -->
+                <LinearLayout
+                    android:id="@+id/btnGantiQris"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:src="@drawable/camera"
+                        app:tint="#F97316" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:text="Ganti QRIS"
+                        android:textColor="#F97316"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!--
+                Banner "belum disimpan" — muncul di bawah container
+                hanya saat user sudah pilih file baru (fileQris != null)
+                dan belum menekan Simpan.
+                Setelah simpan berhasil → GONE kembali.
+            -->
+            <TextView
+                android:id="@+id/tvQrisPreviewBadge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:background="#FFF7ED"
+                android:gravity="center"
+                android:paddingVertical="7dp"
+                android:text="⚠ Preview QRIS baru (belum disimpan)"
+                android:textColor="#EA580C"
+                android:textSize="11sp"
+                android:textStyle="italic"
+                android:visibility="gone" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="24dp"
+                android:background="#F3F4F6"/>
+
+            <!-- ====== PROFIL PEMILIK ====== -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -307,7 +430,7 @@
                             android:scaleType="centerCrop"
                             android:src="@drawable/user"
                             android:background="@drawable/bg_circle_outline"
-                            android:padding="8dp"/>
+                            android:padding="9dp"/>
                     </androidx.cardview.widget.CardView>
                     <ImageView
                         android:id="@+id/btnEditAdminPhoto"

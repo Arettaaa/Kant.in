@@ -5,9 +5,11 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,23 +47,52 @@ public class UbahProfilKantin extends AppCompatActivity {
 
     private static final String TAG = "UbahProfilKantin";
 
-    private ImageView ivCanteenLogo, btnEditCanteenLogo, ivQrisImage;
-    private EditText etCanteenName, etCanteenLocation, etCanteenDescription, etDeliveryFee, etOpenTime, etCloseTime;
-    private LinearLayout btnUploadQris;
+    // ── Views: Logo kantin ──
+    private ImageView ivCanteenLogo, btnEditCanteenLogo;
 
+    // ── Views: Form kantin ──
+    private EditText etCanteenName, etCanteenLocation, etCanteenDescription,
+            etDeliveryFee, etOpenTime, etCloseTime;
+
+    // ── Views: QRIS — 2 state ──
+    //
+    // STATE 1 (btnUploadQrisEmpty): ditampilkan saat belum ada QRIS sama sekali.
+    //   Klik → buka galeri.
+    //
+    // STATE 2 (containerQrisPreview): ditampilkan saat ada gambar QRIS,
+    //   baik yang lama dari server maupun preview file baru yang belum disimpan.
+    //   Di dalamnya ada:
+    //     • tvQrisLabel       → badge "QRIS saat ini" atau "Preview QRIS baru"
+    //     • ivQrisImage       → gambar QRIS
+    //     • btnGantiQris      → buka galeri untuk ganti
+    //   Di luar (tapi masih satu parent LinearLayout):
+    //     • tvQrisPreviewBadge → banner orange "belum disimpan", muncul hanya
+    //                            saat fileQris != null (sebelum tombol Simpan ditekan)
+    private LinearLayout btnUploadQrisEmpty;
+    private LinearLayout containerQrisPreview;
+    private LinearLayout btnGantiQris;
+    private ImageView ivQrisImage;
+    private TextView tvQrisLabel;
+    private TextView tvQrisPreviewBadge;
+
+    // ── Views: Profil admin ──
     private ImageView ivAdminPhoto, btnEditAdminPhoto;
     private EditText etAdminName, etAdminEmail, etAdminPhone;
 
+    // ── Views: Action ──
     private AppCompatButton btnSubmitAll;
     private CardView btnBack;
 
+    // ── Dependencies ──
     private SessionManager sessionManager;
     private ApiService apiService;
 
-    private File fileLogo = null;
-    private File fileQris = null;
+    // ── State file yang dipilih user ──
+    private File fileLogo  = null;
+    private File fileQris  = null;
     private File fileAdmin = null;
 
+    // Konstanta tipe gambar untuk onActivityResult
     private static final int TYPE_LOGO  = 1;
     private static final int TYPE_QRIS  = 2;
     private static final int TYPE_ADMIN = 3;
@@ -95,10 +126,11 @@ public class UbahProfilKantin extends AppCompatActivity {
     // ==========================================================
 
     private void initViews() {
-        ivCanteenLogo        = findViewById(R.id.ivCanteenLogo);
-        btnEditCanteenLogo   = findViewById(R.id.btnEditCanteenLogo);
-        ivQrisImage          = findViewById(R.id.ivQrisImage);
-        btnUploadQris        = findViewById(R.id.btnUploadQris);
+        // Logo
+        ivCanteenLogo      = findViewById(R.id.ivCanteenLogo);
+        btnEditCanteenLogo = findViewById(R.id.btnEditCanteenLogo);
+
+        // Form kantin
         etCanteenName        = findViewById(R.id.etCanteenName);
         etCanteenLocation    = findViewById(R.id.etCanteenLocation);
         etCanteenDescription = findViewById(R.id.etCanteenDescription);
@@ -106,23 +138,108 @@ public class UbahProfilKantin extends AppCompatActivity {
         etOpenTime           = findViewById(R.id.etOpenTime);
         etCloseTime          = findViewById(R.id.etCloseTime);
 
-        ivAdminPhoto         = findViewById(R.id.ivAdminPhoto);
-        btnEditAdminPhoto    = findViewById(R.id.btnEditAdminPhoto);
-        etAdminName          = findViewById(R.id.etAdminName);
-        etAdminEmail         = findViewById(R.id.etAdminEmail);
-        etAdminPhone         = findViewById(R.id.etAdminPhone);
+        // QRIS — semua view untuk dua state
+        btnUploadQrisEmpty   = findViewById(R.id.btnUploadQrisEmpty);
+        containerQrisPreview = findViewById(R.id.containerQrisPreview);
+        btnGantiQris         = findViewById(R.id.btnGantiQris);
+        ivQrisImage          = findViewById(R.id.ivQrisImage);
+        tvQrisLabel          = findViewById(R.id.tvQrisLabel);
+        tvQrisPreviewBadge   = findViewById(R.id.tvQrisPreviewBadge);
 
-        btnSubmitAll         = findViewById(R.id.btnSubmitAll);
-        btnBack              = findViewById(R.id.btnBack);
+        // Admin
+        ivAdminPhoto      = findViewById(R.id.ivAdminPhoto);
+        btnEditAdminPhoto = findViewById(R.id.btnEditAdminPhoto);
+        etAdminName       = findViewById(R.id.etAdminName);
+        etAdminEmail      = findViewById(R.id.etAdminEmail);
+        etAdminPhone      = findViewById(R.id.etAdminPhone);
 
-        // Field yang tidak boleh diedit
+        // Action
+        btnSubmitAll = findViewById(R.id.btnSubmitAll);
+        btnBack      = findViewById(R.id.btnBack);
+
+        // Field yang tidak bisa diedit
         etCanteenName.setEnabled(false);
         etCanteenLocation.setEnabled(false);
         etAdminEmail.setEnabled(false);
     }
 
     // ==========================================================
-    // BAGIAN GET DATA (READ)
+    // HELPER QRIS STATE
+    //
+    // Semua perubahan visibility QRIS dipusatkan di sini agar
+    // tidak ada yang terlewat di berbagai tempat.
+    // ==========================================================
+
+    /**
+     * Tampilkan STATE 1: placeholder kosong (belum ada QRIS).
+     * Dipanggil saat: API tidak mengembalikan qrisUrl.
+     */
+    private void tampilQrisKosong() {
+        Log.d(TAG, "tampilQrisKosong() → STATE 1: placeholder");
+        btnUploadQrisEmpty.setVisibility(View.VISIBLE);
+        containerQrisPreview.setVisibility(View.GONE);
+        tvQrisPreviewBadge.setVisibility(View.GONE);
+    }
+
+    /**
+     * Tampilkan STATE 2 dengan gambar dari SERVER.
+     * Label: "QRIS saat ini" (badge hijau/abu), badge "belum disimpan" GONE.
+     * Dipanggil saat: API mengembalikan qrisUrl yang valid.
+     */
+    private void tampilQrisDariServer(String url) {
+        Log.d(TAG, "tampilQrisDariServer() → STATE 2 (server): url=" + url);
+        btnUploadQrisEmpty.setVisibility(View.GONE);
+        containerQrisPreview.setVisibility(View.VISIBLE);
+        tvQrisPreviewBadge.setVisibility(View.GONE);
+
+        // Label status
+        tvQrisLabel.setText("QRIS saat ini");
+        tvQrisLabel.setBackgroundResource(R.drawable.bg_badge_orange_light);
+        tvQrisLabel.setVisibility(View.VISIBLE);
+
+        Glide.with(this).load(url).into(ivQrisImage);
+    }
+
+    /**
+     * Tampilkan STATE 2 dengan gambar PREVIEW dari file lokal.
+     * Label: "Preview QRIS baru", badge "belum disimpan" VISIBLE.
+     * Dipanggil saat: user memilih file baru dari galeri.
+     */
+    private void tampilQrisPreviewBaru(File file) {
+        Log.d(TAG, "tampilQrisPreviewBaru() → STATE 2 (preview): path=" + file.getAbsolutePath());
+        btnUploadQrisEmpty.setVisibility(View.GONE);
+        containerQrisPreview.setVisibility(View.VISIBLE);
+
+        // Label berubah jadi "Preview QRIS baru" — tetap pakai drawable yang sama
+        tvQrisLabel.setText("Preview QRIS baru");
+        tvQrisLabel.setBackgroundResource(R.drawable.bg_badge_orange_light);
+        tvQrisLabel.setVisibility(View.VISIBLE);
+
+        // Banner peringatan "belum disimpan" muncul
+        tvQrisPreviewBadge.setVisibility(View.VISIBLE);
+
+        Glide.with(this).load(file).into(ivQrisImage);
+    }
+
+    /**
+     * Setelah simpan berhasil: sembunyikan badge "belum disimpan",
+     * kembalikan label ke "QRIS saat ini".
+     * Dipanggil di callback sukses updateCanteenSettings.
+     */
+    private void konfirmasiQrisTersimpan(String urlBaru) {
+        Log.d(TAG, "konfirmasiQrisTersimpan() → url=" + urlBaru);
+        tvQrisPreviewBadge.setVisibility(View.GONE);
+        tvQrisLabel.setText("QRIS saat ini");
+        tvQrisLabel.setVisibility(View.VISIBLE);
+        if (urlBaru != null) {
+            Glide.with(this).load(urlBaru).into(ivQrisImage);
+        }
+        // Reset file agar tidak dikirim ulang jika user simpan lagi
+        fileQris = null;
+    }
+
+    // ==========================================================
+    // LOAD DATA (READ)
     // ==========================================================
 
     private void loadCanteenSettings() {
@@ -146,9 +263,6 @@ public class UbahProfilKantin extends AppCompatActivity {
                         Log.d(TAG, "getCanteenSettings → SUKSES"
                                 + " | name="  + data.getName()
                                 + " | desc="  + data.getDescription()
-                                + " | fee="   + data.getDeliveryFeeFlat()
-                                + " | open="  + (data.getOperatingHours() != null ? data.getOperatingHours().getOpen()  : "null")
-                                + " | close=" + (data.getOperatingHours() != null ? data.getOperatingHours().getClose() : "null")
                                 + " | image=" + data.getImage()
                                 + " | qris="  + data.getQrisUrl());
 
@@ -161,32 +275,39 @@ public class UbahProfilKantin extends AppCompatActivity {
                             etOpenTime.setText(data.getOperatingHours().getOpen());
                             etCloseTime.setText(data.getOperatingHours().getClose());
                         }
+
                         if (data.getImage() != null) {
                             Glide.with(UbahProfilKantin.this).load(data.getImage()).into(ivCanteenLogo);
                         }
-                        if (data.getQrisUrl() != null) {
-                            ivQrisImage.clearColorFilter();
-                            Glide.with(UbahProfilKantin.this).load(data.getQrisUrl()).into(ivQrisImage);
+
+                        // ── QRIS: tentukan state awal berdasarkan data server ──
+                        if (data.getQrisUrl() != null && !data.getQrisUrl().isEmpty()) {
+                            tampilQrisDariServer(data.getQrisUrl());
+                        } else {
+                            tampilQrisKosong();
                         }
+
                     } else {
                         Log.w(TAG, "getCanteenSettings → data null di dalam body");
+                        tampilQrisKosong();
                     }
                 } else {
                     try {
                         String errBody = response.errorBody() != null ? response.errorBody().string() : "null";
                         Log.e(TAG, "getCanteenSettings → GAGAL HTTP " + response.code() + " | body: " + errBody);
                     } catch (IOException e) {
-                        Log.e(TAG, "getCanteenSettings → GAGAL HTTP " + response.code() + " | error baca errorBody: " + e.getMessage());
+                        Log.e(TAG, "getCanteenSettings → error baca errorBody: " + e.getMessage());
                     }
+                    tampilQrisKosong();
                 }
 
-                // Selalu lanjut load profil admin, apapun hasilnya
                 loadAdminProfile();
             }
 
             @Override
             public void onFailure(@NonNull Call<CanteenDetailResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "getCanteenSettings → onFailure: " + t.getMessage(), t);
+                tampilQrisKosong();
                 loadAdminProfile();
             }
         });
@@ -228,7 +349,7 @@ public class UbahProfilKantin extends AppCompatActivity {
                         String errBody = response.errorBody() != null ? response.errorBody().string() : "null";
                         Log.e(TAG, "getProfile → GAGAL HTTP " + response.code() + " | body: " + errBody);
                     } catch (IOException e) {
-                        Log.e(TAG, "getProfile → GAGAL, error baca errorBody: " + e.getMessage());
+                        Log.e(TAG, "getProfile → error baca errorBody: " + e.getMessage());
                     }
                 }
             }
@@ -241,7 +362,7 @@ public class UbahProfilKantin extends AppCompatActivity {
     }
 
     // ==========================================================
-    // BAGIAN EVENT LISTENER & IMAGE PICKER
+    // EVENT LISTENER & IMAGE PICKER
     // ==========================================================
 
     private void setupListeners() {
@@ -250,11 +371,17 @@ public class UbahProfilKantin extends AppCompatActivity {
         etOpenTime.setOnClickListener(v  -> showTimePicker(etOpenTime));
         etCloseTime.setOnClickListener(v -> showTimePicker(etCloseTime));
 
+        // Logo kantin
         btnEditCanteenLogo.setOnClickListener(v -> bukaGaleri(TYPE_LOGO));
         ivCanteenLogo.setOnClickListener(v      -> bukaGaleri(TYPE_LOGO));
-        btnUploadQris.setOnClickListener(v      -> bukaGaleri(TYPE_QRIS));
-        btnEditAdminPhoto.setOnClickListener(v  -> bukaGaleri(TYPE_ADMIN));
-        ivAdminPhoto.setOnClickListener(v       -> bukaGaleri(TYPE_ADMIN));
+
+        // QRIS — kedua state sama-sama buka galeri
+        btnUploadQrisEmpty.setOnClickListener(v -> bukaGaleri(TYPE_QRIS));
+        btnGantiQris.setOnClickListener(v       -> bukaGaleri(TYPE_QRIS));
+
+        // Foto admin
+        btnEditAdminPhoto.setOnClickListener(v -> bukaGaleri(TYPE_ADMIN));
+        ivAdminPhoto.setOnClickListener(v      -> bukaGaleri(TYPE_ADMIN));
 
         btnSubmitAll.setOnClickListener(v -> validasiDanSimpan());
     }
@@ -288,18 +415,11 @@ public class UbahProfilKantin extends AppCompatActivity {
     }
 
     // ==========================================================
-    // FIX UTAMA: onActivityResult
+    // onActivityResult — terima file dari ImagePicker
     //
-    // MASALAH LAMA: new File(uri.getPath()) tidak valid di Android 10+
-    // karena getData() mengembalikan content:// URI seperti:
-    //   content://com.android.providers.media.documents/document/image:1234
-    // Dipaksa jadi File → path "/document/image:1234" tidak ada di filesystem
-    // → exists=false, size=0 → foto tidak pernah terupload meski 200 OK.
-    //
-    // FIX: ImagePicker menyimpan path file asli ke cache dan menaruh
-    // path tersebut di Intent extras dengan key "extra_image_path".
-    // Ini kompatibel dengan semua versi ImagePicker (tidak bergantung
-    // pada Companion object yang berubah antar versi library).
+    // FIX: Pakai "extra_image_path" dari Intent extras, bukan
+    // new File(uri.getPath()) yang tidak valid di Android 10+.
+    // content:// URI tidak bisa langsung dijadikan File path.
     // ==========================================================
 
     @Override
@@ -308,11 +428,9 @@ public class UbahProfilKantin extends AppCompatActivity {
 
         if (resultCode == Activity.RESULT_OK && data != null) {
 
-            // Ambil path file dari extras — ImagePicker menulis path cache
-            // ke key ini sehingga file bisa langsung dibaca sebagai File.
             String filePath = data.getStringExtra("extra_image_path");
 
-            // Fallback jika extras tidak ada (ImagePicker versi lama)
+            // Fallback untuk ImagePicker versi lama yang tidak set extras
             if (filePath == null && data.getData() != null) {
                 filePath = data.getData().getPath();
                 Log.w(TAG, "onActivityResult → extras kosong, fallback ke URI path: " + filePath);
@@ -320,12 +438,6 @@ public class UbahProfilKantin extends AppCompatActivity {
 
             if (filePath != null) {
                 File file = new File(filePath);
-
-                // Validasi wajib:
-                // - exists() = true  → file benar-benar ada di storage device
-                // - length() > 0     → file tidak kosong atau corrupt
-                // Jika salah satu false, file tidak dikirim ke server.
-                // Cek ini yang membedakan file valid vs file "fiktif" dari URI lama.
                 boolean isValid = file.exists() && file.length() > 0;
 
                 Log.d(TAG, "onActivityResult → type=" + currentImageType
@@ -336,14 +448,11 @@ public class UbahProfilKantin extends AppCompatActivity {
 
                 if (!isValid) {
                     Log.e(TAG, "onActivityResult → FILE TIDAK VALID!"
-                            + " exists=" + file.exists()
-                            + ", size="  + file.length()
-                            + " → foto tidak akan diupload");
+                            + " exists=" + file.exists() + ", size=" + file.length());
                     Toast.makeText(this, "Gagal membaca foto, coba pilih ulang", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                // File valid, simpan ke variabel sesuai tipe
                 if (currentImageType == TYPE_LOGO) {
                     fileLogo = file;
                     Glide.with(this).load(fileLogo).into(ivCanteenLogo);
@@ -351,8 +460,8 @@ public class UbahProfilKantin extends AppCompatActivity {
 
                 } else if (currentImageType == TYPE_QRIS) {
                     fileQris = file;
-                    ivQrisImage.clearColorFilter();
-                    Glide.with(this).load(fileQris).into(ivQrisImage);
+                    // Langsung tampilkan preview + badge "belum disimpan"
+                    tampilQrisPreviewBaru(fileQris);
                     Log.d(TAG, "onActivityResult → fileQris diset | path=" + fileQris.getAbsolutePath());
 
                 } else if (currentImageType == TYPE_ADMIN) {
@@ -371,7 +480,7 @@ public class UbahProfilKantin extends AppCompatActivity {
     }
 
     // ==========================================================
-    // BAGIAN SIMPAN DATA
+    // SIMPAN DATA
     // ==========================================================
 
     @SuppressWarnings("SetTextI18n")
@@ -406,12 +515,11 @@ public class UbahProfilKantin extends AppCompatActivity {
                 + " | fee="      + feeVal
                 + " | open="     + openVal
                 + " | close="    + closeVal
-                + " | fileLogo=" + (fileLogo  != null ? fileLogo.getAbsolutePath()  + " (size=" + fileLogo.length()  + ")" : "null")
-                + " | fileQris=" + (fileQris  != null ? fileQris.getAbsolutePath()  + " (size=" + fileQris.length()  + ")" : "null"));
+                + " | fileLogo=" + (fileLogo != null ? fileLogo.getAbsolutePath() + " (size=" + fileLogo.length() + ")" : "null")
+                + " | fileQris=" + (fileQris != null ? fileQris.getAbsolutePath() + " (size=" + fileQris.length() + ")" : "null"));
 
-        // _method=PUT wajib dikirim karena endpoint Laravel didefinisikan sebagai PUT,
-        // tapi request dikirim sebagai POST agar PHP bisa membaca file multipart.
-        // PHP tidak bisa baca $request->file() dari method PUT — ini limitasi PHP core.
+        // _method=PUT: dikirim sebagai POST agar PHP bisa baca file multipart,
+        // tapi Laravel tetap routing ke Route::put('/canteens/{id}/settings').
         RequestBody method      = RequestBody.create(MediaType.parse("text/plain"), "PUT");
         RequestBody desc        = RequestBody.create(MediaType.parse("text/plain"), descVal);
         RequestBody fee         = RequestBody.create(MediaType.parse("text/plain"), feeVal);
@@ -426,7 +534,7 @@ public class UbahProfilKantin extends AppCompatActivity {
                 files.add(prepareFilePart("image", fileLogo));
                 Log.d(TAG, "simpanKantinKeServer() → image ditambahkan ke multipart (size=" + fileLogo.length() + ")");
             } else {
-                Log.e(TAG, "simpanKantinKeServer() → fileLogo TIDAK VALID, skip upload"
+                Log.e(TAG, "simpanKantinKeServer() → fileLogo TIDAK VALID, skip"
                         + " | exists=" + fileLogo.exists() + ", size=" + fileLogo.length());
             }
         }
@@ -436,7 +544,7 @@ public class UbahProfilKantin extends AppCompatActivity {
                 files.add(prepareFilePart("qris_image", fileQris));
                 Log.d(TAG, "simpanKantinKeServer() → qris_image ditambahkan ke multipart (size=" + fileQris.length() + ")");
             } else {
-                Log.e(TAG, "simpanKantinKeServer() → fileQris TIDAK VALID, skip upload"
+                Log.e(TAG, "simpanKantinKeServer() → fileQris TIDAK VALID, skip"
                         + " | exists=" + fileQris.exists() + ", size=" + fileQris.length());
             }
         }
@@ -457,15 +565,23 @@ public class UbahProfilKantin extends AppCompatActivity {
                                         + " | desc="  + updated.getDescription()
                                         + " | image=" + updated.getImage()
                                         + " | qris="  + updated.getQrisUrl());
+
+                                // QRIS berhasil disimpan → update state UI:
+                                // sembunyikan badge "belum disimpan", label kembali ke "QRIS saat ini"
+                                if (updated.getQrisUrl() != null) {
+                                    konfirmasiQrisTersimpan(updated.getQrisUrl());
+                                } else if (fileQris != null) {
+                                    // Server tidak kembalikan URL baru tapi file dikirim — reset saja badge
+                                    konfirmasiQrisTersimpan(null);
+                                }
                             }
-                            // Lanjut simpan profil admin
                             simpanProfilKeServer(aName, aPhone);
                         } else {
                             try {
                                 String errBody = response.errorBody() != null ? response.errorBody().string() : "null";
                                 Log.e(TAG, "updateCanteenSettings → GAGAL HTTP " + response.code() + " | body: " + errBody);
                             } catch (IOException e) {
-                                Log.e(TAG, "updateCanteenSettings → GAGAL, error baca errorBody: " + e.getMessage());
+                                Log.e(TAG, "updateCanteenSettings → error baca errorBody: " + e.getMessage());
                             }
                             btnSubmitAll.setEnabled(true);
                             btnSubmitAll.setText("Simpan Perubahan");
@@ -493,15 +609,14 @@ public class UbahProfilKantin extends AppCompatActivity {
         RequestBody rbName  = RequestBody.create(MediaType.parse("text/plain"), name);
         RequestBody rbPhone = RequestBody.create(MediaType.parse("text/plain"), phone);
 
-        // FIX: kirim sebagai List agar bisa kosong saat tidak ada foto baru.
-        // Retrofit tidak bisa kirim null sebagai @Part — harus List kosong.
+        // List kosong = tidak kirim foto. Retrofit tidak bisa terima null sebagai @Part.
         List<MultipartBody.Part> photoParts = new ArrayList<>();
         if (fileAdmin != null) {
             if (fileAdmin.exists() && fileAdmin.length() > 0) {
                 photoParts.add(prepareFilePart("photo_profile", fileAdmin));
                 Log.d(TAG, "simpanProfilKeServer() → photo_profile ditambahkan ke multipart (size=" + fileAdmin.length() + ")");
             } else {
-                Log.e(TAG, "simpanProfilKeServer() → fileAdmin TIDAK VALID, skip upload"
+                Log.e(TAG, "simpanProfilKeServer() → fileAdmin TIDAK VALID, skip"
                         + " | exists=" + fileAdmin.exists() + ", size=" + fileAdmin.length());
             }
         } else {
@@ -535,7 +650,7 @@ public class UbahProfilKantin extends AppCompatActivity {
                                 String errBody = response.errorBody() != null ? response.errorBody().string() : "null";
                                 Log.e(TAG, "updateProfile → GAGAL HTTP " + response.code() + " | body: " + errBody);
                             } catch (IOException e) {
-                                Log.e(TAG, "updateProfile → GAGAL, error baca errorBody: " + e.getMessage());
+                                Log.e(TAG, "updateProfile → error baca errorBody: " + e.getMessage());
                             }
                             Toast.makeText(UbahProfilKantin.this,
                                     "Settings Kantin berhasil, tapi Profil gagal diperbarui",
