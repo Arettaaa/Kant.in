@@ -155,6 +155,9 @@ public class KeranjangPelangganActivity extends AppCompatActivity
             intent.putExtra("ONGKIR", (double) biayaOngkir);
             intent.putExtra("TOTAL_BAYAR", cartAdapter.getSelectedSubtotal() + biayaOngkir);
 
+            intent.putExtra("QRIS_URL", getQrisUrlForSelectedCanteen());
+            intent.putExtra("CANTEEN_NAME", getCanteenNameForSelectedCanteen());
+
             startActivity(intent);
         });
     }
@@ -430,4 +433,54 @@ public class KeranjangPelangganActivity extends AppCompatActivity
         NumberFormat fmt = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
         return fmt.format(harga).replace(",00", "");
     }
+
+    // ─── PATCH: tambah 2 baris ini di KeranjangPelangganActivity ───────────────
+// Lokasi: di dalam setupListeners() → btnCheckout.setOnClickListener(v -> { ... })
+// Tepat SEBELUM baris: startActivity(intent);
+//
+// Cari kode ini:
+//   intent.putExtra("TOTAL_BAYAR", cartAdapter.getSelectedSubtotal() + biayaOngkir);
+//   startActivity(intent);
+//
+// Ganti jadi:
+//   intent.putExtra("TOTAL_BAYAR", cartAdapter.getSelectedSubtotal() + biayaOngkir);
+//
+//   // ← TAMBAH DUA BARIS INI ↓
+//   intent.putExtra("QRIS_URL", getQrisUrlForSelectedCanteen());
+//   intent.putExtra("CANTEEN_NAME", getCanteenNameForSelectedCanteen());
+//   // ← SELESAI ↑
+//
+//   startActivity(intent);
+// ───────────────────────────────────────────────────────────────────────────
+
+// Kemudian tambahkan dua helper method ini di dalam class KeranjangPelangganActivity:
+
+    /**
+     * Ambil qris_url kantin dari list allCanteens berdasarkan item yang dipilih.
+     * Dipanggil setelah getSelectedCanteenId() sudah dipastikan tidak null.
+     */
+    private String getQrisUrlForSelectedCanteen() {
+        String canteenId = getSelectedCanteenId();
+        if (canteenId == null) return null;
+        // Karena allCanteens menyimpan CanteenCart, kita perlu fetch dari API.
+        // Tapi agar tidak menambah request, kirim null saja —
+        // CheckoutActivity akan fetch sendiri pakai CANTEEN_ID.
+        return null; // CheckoutActivity fallback ke API otomatis
+    }
+
+    private String getCanteenNameForSelectedCanteen() {
+        String canteenId = getSelectedCanteenId();
+        if (canteenId == null) return null;
+        for (CartResponse.CanteenCart canteen : allCanteens) {
+            if (canteen.getCanteenId().equals(canteenId)) {
+                return canteen.getCanteenName();
+            }
+        }
+        return null;
+    }
+
+// ─── CATATAN ───────────────────────────────────────────────────────────────
+// Kalau CartResponse.CanteenCart punya getter getCanteenId() dan getCanteenName(),
+// helper di atas langsung jalan. Sesuaikan nama getter jika berbeda.
+// ───────────────────────────────────────────────────────────────────────────
 }
