@@ -417,19 +417,39 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        android:text="Ketuk gambar untuk melihat detail. Pastikan nominal Rp 73.000 telah masuk ke rekening Anda."
+                        android:text="Ketuk gambar untuk melihat detail. Pastikan transaksi telah berhasil masuk ke rekening Anda."
                         android:textColor="#6B7280"
                         android:textSize="12sp" />
 
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/imgBuktiTransfer"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:scaleType="centerCrop"
-                        android:background="#E5E7EB"
-                        app:cornerFamily="rounded"
-                        app:cornerSize="12dp"
-                        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/imgBuktiTransfer"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:scaleType="centerCrop"
+                            android:background="#E5E7EB"
+                            app:cornerFamily="rounded"
+                            app:cornerSize="12dp"
+                            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+                        <ImageView
+                            android:id="@+id/btnViewBukti"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="bottom|end"
+                            android:layout_margin="10dp"
+                            android:src="@drawable/eye"
+                            app:tint="@color/black"
+                            android:background="@drawable/bg_circle_white_shadow"
+                            android:padding="8dp"
+                            android:elevation="4dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                    </FrameLayout>
 
                     <LinearLayout
                         android:id="@+id/layVerifikasiCheck"

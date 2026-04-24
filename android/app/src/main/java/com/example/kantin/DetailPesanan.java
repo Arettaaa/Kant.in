@@ -1,7 +1,11 @@
-package com.example.kantin; // Sesuaikan jika kamu memindahkannya ke dalam folder ui/admin
+package com.example.kantin;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -22,6 +26,26 @@ import com.example.kantin.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.imageview.ShapeableImageView;
 
+import android.Manifest;
+import android.content.ContentValues;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.view.ViewGroup;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
+
+import java.io.OutputStream;
+import com.github.chrisbanes.photoview.PhotoView;
+
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -32,6 +56,7 @@ import retrofit2.Response;
 public class DetailPesanan extends AppCompatActivity {
 
     private ImageView btnBack, imgAvatar;
+    private ImageView btnViewBukti; // ← TAMBAHAN
     private ShapeableImageView imgBuktiTransfer;
     private TextView tvOrderCode, tvCustomerName, tvCustomerPhone, valWaktu, valMetode, valAlamat, tvTotalItemHeader;
     private TextView valSubtotal, valOngkir, valTotal;
@@ -40,7 +65,8 @@ public class DetailPesanan extends AppCompatActivity {
     private RecyclerView rvMenuPesanan;
 
     private String canteenId = "";
-    private OrderModel currentOrder; // Menyimpan data pesanan saat ini
+    private OrderModel currentOrder;
+    private String currentImageUrl = null; // ← TAMBAHAN: simpan URL gambar untuk dialog
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +82,7 @@ public class DetailPesanan extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
         imgAvatar = findViewById(R.id.imgAvatar);
         imgBuktiTransfer = findViewById(R.id.imgBuktiTransfer);
+        btnViewBukti = findViewById(R.id.btnViewBukti); // ← TAMBAHAN
 
         tvOrderCode = findViewById(R.id.tvOrderCode);
         tvCustomerName = findViewById(R.id.tvCustomerName);
@@ -81,17 +108,14 @@ public class DetailPesanan extends AppCompatActivity {
     }
 
     private void getIntentData() {
-        // ambil dari session (langsung)
         SessionManager session = new SessionManager(this);
         canteenId = session.getCanteenId();
 
-        // ambil order dari intent (ini masih perlu)
         Intent intent = getIntent();
         if (intent != null) {
             currentOrder = (OrderModel) intent.getSerializableExtra("ORDER_DATA");
         }
 
-        // debug biar yakin
         android.util.Log.d("DEBUG", "canteenId = " + canteenId);
         android.util.Log.d("DEBUG", "orderId = " + (currentOrder != null ? currentOrder.getId() : "null"));
 
@@ -108,7 +132,6 @@ public class DetailPesanan extends AppCompatActivity {
 
         NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 
-        // Header & Customer Info
         tvOrderCode.setText(currentOrder.getOrderCode() != null ? currentOrder.getOrderCode() : "#ORD-XXX");
 
         if (currentOrder.getCustomerSnapshot() != null) {
@@ -116,11 +139,9 @@ public class DetailPesanan extends AppCompatActivity {
             tvCustomerPhone.setText(currentOrder.getCustomerSnapshot().getPhone());
         }
 
-        // Waktu
         String rawDate = currentOrder.getCreatedAt();
-        valWaktu.setText(rawDate != null ? rawDate.substring(11, 16) : "Baru saja"); // Ambil jam:menit kasar
+        valWaktu.setText(rawDate != null ? rawDate.substring(11, 16) : "Baru saja");
 
-        // Delivery Info
         if (currentOrder.getDeliveryDetails() != null) {
             String method = currentOrder.getDeliveryDetails().getMethod();
             valMetode.setText(method != null && method.equals("delivery") ? "Antar Kurir" : "Ambil Sendiri");
@@ -129,42 +150,142 @@ public class DetailPesanan extends AppCompatActivity {
             valAlamat.setText(alamat != null && !alamat.isEmpty() ? alamat : "-");
         }
 
-        // Daftar Menu (RecyclerView)
         if (currentOrder.getItems() != null) {
             tvTotalItemHeader.setText(currentOrder.getItems().size() + " ITEM");
             MenuPesananAdapter adapter = new MenuPesananAdapter(currentOrder.getItems());
             rvMenuPesanan.setAdapter(adapter);
         }
 
-        // Ringkasan Pembayaran
         valSubtotal.setText(formatRupiah.format(currentOrder.getSubtotalAmount()));
         valOngkir.setText(formatRupiah.format(currentOrder.getDeliveryDetails() != null ? currentOrder.getDeliveryDetails().getFee() : 0));
         valTotal.setText(formatRupiah.format(currentOrder.getTotalAmount()));
 
         // Bukti Pembayaran
         if (currentOrder.getPayment() != null && currentOrder.getPayment().getProof() != null) {
-            // URL Base server + direktori storage Laravel
-            String imageUrl = ApiClient.BASE_URL.replace("api/", "") + "storage/" + currentOrder.getPayment().getProof();
+            currentImageUrl = ApiClient.BASE_URL.replace("api/", "") + "storage/" + currentOrder.getPayment().getProof(); // ← SIMPAN URL
 
             Glide.with(this)
-                    .load(imageUrl)
+                    .load(currentImageUrl)
                     .into(imgBuktiTransfer);
+
+            btnViewBukti.setVisibility(ImageView.VISIBLE); // ← Tampilkan tombol mata jika ada gambar
+        } else {
+            btnViewBukti.setVisibility(ImageView.GONE); // ← Sembunyikan jika tidak ada gambar
         }
     }
 
+    // ↓ TAMBAHAN: Method untuk membuka dialog preview gambar
+    private void showImagePreviewDialog(String imageUrl) {
+        Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_image_preview);
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().setLayout(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+        }
+
+        // ← Ganti ImageView jadi PhotoView
+        PhotoView imgPreview = dialog.findViewById(R.id.imgPreview);
+        ImageView btnClose = dialog.findViewById(R.id.btnCloseDialog);
+        MaterialButton btnDownload = dialog.findViewById(R.id.btnDownloadBukti);
+
+        Glide.with(this)
+                .load(imageUrl)
+                .placeholder(R.drawable.bg_circle_outline)
+                .into(imgPreview);
+
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+
+        btnDownload.setOnClickListener(v -> {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 101);
+                    Toast.makeText(this, "Izin diperlukan. Silakan coba lagi.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+            downloadImage(imageUrl);
+            dialog.dismiss();
+        });
+
+        dialog.show();
+    }
+
+    private void downloadImage(String imageUrl) {
+        Toast.makeText(this, "Menyimpan gambar...", Toast.LENGTH_SHORT).show();
+
+        Glide.with(this)
+                .asBitmap()
+                .load(imageUrl)
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap bitmap, Transition<? super Bitmap> transition) {
+                        try {
+                            String fileName = "bukti_" + currentOrder.getOrderCode() + ".jpg";
+                            OutputStream outputStream;
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                // Android 10+ — pakai MediaStore, tidak perlu permission
+                                ContentValues values = new ContentValues();
+                                values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+                                values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+                                values.put(MediaStore.Images.Media.RELATIVE_PATH,
+                                        Environment.DIRECTORY_PICTURES + "/BuktiPembayaran");
+
+                                Uri uri = getContentResolver().insert(
+                                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                                outputStream = getContentResolver().openOutputStream(uri);
+                            } else {
+                                // Android < 10 — simpan ke folder Pictures
+                                java.io.File dir = new java.io.File(
+                                        Environment.getExternalStoragePublicDirectory(
+                                                Environment.DIRECTORY_PICTURES), "BuktiPembayaran");
+                                if (!dir.exists()) dir.mkdirs();
+                                java.io.File file = new java.io.File(dir, fileName);
+                                outputStream = new java.io.FileOutputStream(file);
+                            }
+
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 95, outputStream);
+                            outputStream.close();
+
+                            Toast.makeText(DetailPesanan.this,
+                                    "Tersimpan di Galeri › BuktiPembayaran", Toast.LENGTH_LONG).show();
+
+                        } catch (Exception e) {
+                            Toast.makeText(DetailPesanan.this,
+                                    "Gagal menyimpan: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onLoadCleared(Drawable placeholder) {}
+                });
+    }
+
     private void setupListeners() {
-        // 1. Perbaikan Tombol Back (Tidak lagi memakai fungsi deprecated)
         btnBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
-        // Buka kunci tombol terima jika checkbox dicentang
         cbVerifikasi.setOnCheckedChangeListener((buttonView, isChecked) -> {
             btnVerifikasi.setEnabled(isChecked);
         });
 
-        // 2. ACTION: TOMBOL TOLAK (Hit API Laravel, lalu ke halaman Cancel)
-        btnTolak.setOnClickListener(v -> {
+        // ↓ TAMBAHAN: Listener tombol mata untuk membuka preview gambar
+        btnViewBukti.setOnClickListener(v -> {
+            if (currentImageUrl != null && !currentImageUrl.isEmpty()) {
+                showImagePreviewDialog(currentImageUrl);
+            } else {
+                Toast.makeText(this, "Gambar bukti pembayaran tidak tersedia", Toast.LENGTH_SHORT).show();
+            }
+        });
 
-            // Nonaktifkan tombol sementara biar gak diklik dobel
+        // Tombol Tolak
+        btnTolak.setOnClickListener(v -> {
             btnTolak.setEnabled(false);
 
             SessionManager session = new SessionManager(DetailPesanan.this);
@@ -174,19 +295,14 @@ public class DetailPesanan extends AppCompatActivity {
             call.enqueue(new Callback<BaseResponse>() {
                 @Override
                 public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
-                    btnTolak.setEnabled(true); // Aktifkan lagi tombolnya
+                    btnTolak.setEnabled(true);
 
                     if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                         Toast.makeText(DetailPesanan.this, "Pesanan berhasil ditolak", Toast.LENGTH_SHORT).show();
 
-                        // Pindah ke halaman CancelOrderActivity jika sukses
                         Intent intent = new Intent(DetailPesanan.this, CancelOrderActivity.class);
-                        // Kirim data pesanan agar bisa ditampilkan di halaman pembatalan
                         intent.putExtra("ORDER_DATA", currentOrder);
                         startActivity(intent);
-
-                        // Menutup halaman DetailPesanan ini agar saat user back dari CancelOrderActivity
-                        // mereka kembali ke halaman List Pesanan, bukan ke Detail yang sudah ditolak.
                         finish();
                     } else {
                         Toast.makeText(DetailPesanan.this, "Gagal menolak pesanan", Toast.LENGTH_SHORT).show();
@@ -201,38 +317,28 @@ public class DetailPesanan extends AppCompatActivity {
             });
         });
 
-        // 3. ACTION: TOMBOL VERIFIKASI & TERIMA
+        // Tombol Verifikasi
         btnVerifikasi.setOnClickListener(v -> {
             if (cbVerifikasi.isChecked()) {
-
-                // Nonaktifkan tombol sementara agar tidak diklik dua kali (double-submit)
                 btnVerifikasi.setEnabled(false);
 
                 SessionManager session = new SessionManager(DetailPesanan.this);
                 ApiService apiService = ApiClient.getAuthClient(session.getToken()).create(ApiService.class);
-                // Panggil API Verify Payment
                 Call<BaseResponse> call = apiService.verifyPayment(canteenId, currentOrder.getId());
 
                 call.enqueue(new Callback<BaseResponse>() {
                     @Override
                     public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
-                        btnVerifikasi.setEnabled(true); // Aktifkan tombol lagi
+                        btnVerifikasi.setEnabled(true);
 
                         if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                             Toast.makeText(DetailPesanan.this, "Pembayaran berhasil diverifikasi!", Toast.LENGTH_SHORT).show();
 
-                            // Pindah ke halaman Update Status Pesanan
                             Intent intent = new Intent(DetailPesanan.this, UpdateStatusPesananActivity.class);
                             intent.putExtra("ORDER_ID", currentOrder.getId());
                             intent.putExtra("CANTEEN_ID", canteenId);
-
-                            // PENTING: Bawa data pesanannya agar bisa ditampilkan di halaman update status
                             intent.putExtra("ORDER_DATA", currentOrder);
-
                             startActivity(intent);
-
-                            // Tutup halaman detail ini agar saat admin menekan back,
-                            // tidak kembali ke halaman pesanan yang sudah diterima
                             finish();
                         } else {
                             Toast.makeText(DetailPesanan.this, "Gagal memverifikasi pembayaran.", Toast.LENGTH_SHORT).show();
@@ -247,7 +353,6 @@ public class DetailPesanan extends AppCompatActivity {
                 });
 
             } else {
-                // (Opsional) Pesan jika admin klik terima tapi belum centang checkbox
                 Toast.makeText(DetailPesanan.this, "Silakan centang verifikasi pembayaran terlebih dahulu.", Toast.LENGTH_SHORT).show();
             }
         });
