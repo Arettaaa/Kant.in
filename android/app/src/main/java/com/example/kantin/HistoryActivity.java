@@ -164,8 +164,7 @@ public class HistoryActivity extends AppCompatActivity {
                             Toast.makeText(HistoryActivity.this,
                                     "Terima kasih atas penilaiannya!", Toast.LENGTH_SHORT).show();
                             // Update tombol Nilai → Sudah Dinilai tanpa reload seluruh list
-                            adapter.onRatingSubmitted(holder);
-                        } else {
+                            adapter.onRatingSubmitted(holder, rating); // pass rating yang dikirim                        } else {
                             Toast.makeText(HistoryActivity.this,
                                     "Gagal mengirim rating", Toast.LENGTH_SHORT).show();
                         }

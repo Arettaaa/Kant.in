@@ -90,20 +90,30 @@ public class ExploreMenuAdapter extends RecyclerView.Adapter<ExploreMenuAdapter.
             intent.putExtra("MENU_ID", menuId);
             context.startActivity(intent);
         });
+
+        double rating = menu.getAverageRating();
+        int totalReviews = menu.getTotalReviews();
+
+        if (totalReviews > 0) {
+            holder.tvRatingMenu.setText(String.format(Locale.getDefault(), "%.1f", rating));
+        } else {
+            holder.tvRatingMenu.setText("Baru");
+        }
     }
     @Override
     public int getItemCount() { return listMenu != null ? listMenu.size() : 0; }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivMenu;
-        TextView tvNamaMenu, tvNamaKantin, tvHarga;
+        TextView tvNamaMenu, tvNamaKantin, tvHarga, tvRatingMenu;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivMenu = itemView.findViewById(R.id.imgMenuExplore);
-            tvNamaMenu = itemView.findViewById(R.id.tvNamaMenuExplore);
+            ivMenu       = itemView.findViewById(R.id.imgMenuExplore);
+            tvNamaMenu   = itemView.findViewById(R.id.tvNamaMenuExplore);
             tvNamaKantin = itemView.findViewById(R.id.tvNamaKantinExplore);
-            tvHarga = itemView.findViewById(R.id.tvHargaExplore);
+            tvHarga      = itemView.findViewById(R.id.tvHargaExplore);
+            tvRatingMenu = itemView.findViewById(R.id.tvRatingExplore);
         }
     }
 

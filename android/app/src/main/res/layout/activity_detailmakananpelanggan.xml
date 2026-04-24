@@ -78,13 +78,21 @@
                     app:tint="#FBBF24" />
 
                 <TextView
+                    android:id="@+id/tvRatingMenu"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
-                    android:text="5.0"
                     android:textColor="#1A1A1A"
                     android:textSize="14sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvJumlahUlasan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:textColor="#9CA3AF"
+                    android:textSize="13sp" />
 
                 <TextView
                     android:layout_width="wrap_content"

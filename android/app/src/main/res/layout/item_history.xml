@@ -122,6 +122,7 @@
             android:orientation="horizontal"
             android:visibility="gone">
 
+            <!-- Tombol Nilai (tampil saat belum dinilai) -->
             <TextView
                 android:id="@+id/btnNilai"
                 android:layout_width="wrap_content"
@@ -137,6 +138,40 @@
                 app:drawableStartCompat="@drawable/star"
                 app:drawableTint="#FBBF24" />
 
+            <!-- Bintang read-only (tampil saat sudah dinilai, awalnya GONE) -->
+            <LinearLayout
+                android:id="@+id/layoutStarDisplay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:visibility="gone">
+
+                <ImageView android:id="@+id/starView1"
+                    android:layout_width="16dp" android:layout_height="16dp"
+                    android:src="@drawable/star"
+                    app:tint="#FDC700" />
+                <ImageView android:id="@+id/starView2"
+                    android:layout_width="16dp" android:layout_height="16dp"
+                    android:src="@drawable/star"
+                    android:layout_marginStart="2dp"
+                    app:tint="#FDC700" />
+                <ImageView android:id="@+id/starView3"
+                    android:layout_width="16dp" android:layout_height="16dp"
+                    android:src="@drawable/star"
+                    android:layout_marginStart="2dp"
+                    app:tint="#FDC700" />
+                <ImageView android:id="@+id/starView4"
+                    android:layout_width="16dp" android:layout_height="16dp"
+                    android:src="@drawable/star"
+                    android:layout_marginStart="2dp"
+                    app:tint="#FDC700" />
+                <ImageView android:id="@+id/starView5"
+                    android:layout_width="16dp" android:layout_height="16dp"
+                    android:src="@drawable/star"
+                    android:layout_marginStart="2dp"
+                    app:tint="#FDC700" />
+            </LinearLayout>
             <TextView
                 android:id="@+id/btnPesanLagi"
                 android:layout_width="wrap_content"

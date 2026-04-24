@@ -65,14 +65,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         if ("completed".equals(order.getStatus())) {
             holder.layoutBadgeStatus.setBackgroundResource(R.drawable.bg_badge_green_light);
             holder.imgBadgeIcon.setImageResource(R.drawable.checkcircle);
-            holder.imgBadgeIcon.setColorFilter(
-                    context.getResources().getColor(android.R.color.holo_green_dark));
+            holder.imgBadgeIcon.setColorFilter(0xFF00A63E);
             holder.tvBadgeStatus.setText("Selesai");
+            holder.tvBadgeStatus.setTextColor(0xFF00A63E);
 
             holder.layoutBtnCompleted.setVisibility(View.VISIBLE);
             holder.btnPesanLagiCancelled.setVisibility(View.GONE);
 
-            // Set tombol Nilai loading dulu, lalu cek status rating dari API
             setNilaiButtonLoading(holder);
             String orderId = order.getId() != null ? order.getId() : order.getIdAlias();
             cekStatusRating(orderId, holder, order);
@@ -104,12 +103,14 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
                     public void onResponse(Call<RatingCheckResponse> call,
                                            Response<RatingCheckResponse> response) {
                         boolean hasRated = false;
+                        int rating = 0;
                         if (response.isSuccessful() && response.body() != null
                                 && response.body().getData() != null) {
                             hasRated = response.body().getData().isHasRated();
+                            rating   = response.body().getData().getRating(); // AMBIL RATING
                         }
                         if (hasRated) {
-                            setNilaiButtonSudahDinilai(holder);
+                            setNilaiButtonSudahDinilai(holder, rating); // PASS RATING
                         } else {
                             setNilaiButtonAktif(holder, order);
                         }
@@ -117,7 +118,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
                     @Override
                     public void onFailure(Call<RatingCheckResponse> call, Throwable t) {
-                        // Kalau gagal network, tampilkan tombol aktif agar user bisa coba
                         setNilaiButtonAktif(holder, order);
                     }
                 });
@@ -131,13 +131,24 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         holder.btnNilai.setAlpha(0.5f);
     }
 
-    private void setNilaiButtonSudahDinilai(ViewHolder holder) {
-        holder.btnNilai.setText("Sudah Dinilai");
-        holder.btnNilai.setEnabled(false);
-        holder.btnNilai.setAlpha(0.5f);
-        holder.btnNilai.setOnClickListener(null);
-    }
+    private void setNilaiButtonSudahDinilai(ViewHolder holder, int rating) {
+        holder.btnNilai.setVisibility(View.GONE);
+        holder.layoutStarDisplay.setVisibility(View.VISIBLE);
 
+        ImageView[] stars = {
+                holder.starView1, holder.starView2, holder.starView3,
+                holder.starView4, holder.starView5
+        };
+        for (int i = 0; i < stars.length; i++) {
+            if (i < rating) {
+                stars[i].setImageResource(R.drawable.starfill);
+                stars[i].setColorFilter(0xFFFDC700);
+            } else {
+                stars[i].setImageResource(R.drawable.star);
+                stars[i].clearColorFilter(); // TAMBAH INI
+            }
+        }
+    }
     private void setNilaiButtonAktif(ViewHolder holder, OrderListResponse.OrderItem order) {
         holder.btnNilai.setText("Nilai");
         holder.btnNilai.setEnabled(true);
@@ -152,8 +163,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     // ── Setelah rating berhasil dikirim ───────────────────────
 
-    public void onRatingSubmitted(ViewHolder holder) {
-        setNilaiButtonSudahDinilai(holder);
+    public void onRatingSubmitted(ViewHolder holder, int rating) {
+        setNilaiButtonSudahDinilai(holder, rating);
     }
 
     // ── Pesan lagi ─────────────────────────────────────────────
@@ -202,7 +213,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         TextView tvTanggal, tvTotalBayar, tvNamaKantin, tvNamaMenu;
         TextView tvBadgeStatus, btnNilai, btnPesanLagi, btnPesanLagiCancelled;
         ImageView imgBadgeIcon;
-        LinearLayout layoutBadgeStatus, layoutBtnCompleted;
+        LinearLayout layoutBadgeStatus, layoutBtnCompleted, layoutStarDisplay;
+        ImageView starView1, starView2, starView3, starView4, starView5;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -217,6 +229,12 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             btnNilai              = itemView.findViewById(R.id.btnNilai);
             btnPesanLagi          = itemView.findViewById(R.id.btnPesanLagi);
             btnPesanLagiCancelled = itemView.findViewById(R.id.btnPesanLagiCancelled);
+            layoutStarDisplay     = itemView.findViewById(R.id.layoutStarDisplay);
+            starView1             = itemView.findViewById(R.id.starView1);
+            starView2             = itemView.findViewById(R.id.starView2);
+            starView3             = itemView.findViewById(R.id.starView3);
+            starView4             = itemView.findViewById(R.id.starView4);
+            starView5             = itemView.findViewById(R.id.starView5);
         }
     }
 }

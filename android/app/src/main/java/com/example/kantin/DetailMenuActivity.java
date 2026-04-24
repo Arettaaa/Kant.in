@@ -35,6 +35,9 @@ public class DetailMenuActivity extends AppCompatActivity {
     private boolean isCanteenOpen = true; // ← tambah ini
     private TextView tvTambahKeranjang;
 
+    private TextView tvRatingMenu, tvJumlahUlasan;
+
+
 
     private int quantity = 1;
     private double basePrice = 0;
@@ -58,6 +61,9 @@ public class DetailMenuActivity extends AppCompatActivity {
         tvEstimasiWaktu    = findViewById(R.id.tvEstimasiWaktu);
 
         tvTambahKeranjang = findViewById(R.id.tvTambahKeranjang);
+
+        tvRatingMenu   = findViewById(R.id.tvRatingMenu);
+        tvJumlahUlasan = findViewById(R.id.tvJumlahUlasan);
 
         btnBack.setOnClickListener(v -> onBackPressed());
 
@@ -191,6 +197,17 @@ public class DetailMenuActivity extends AppCompatActivity {
         tvDeskripsi.setText(menu.getDescription());
         tvHarga.setText(formatRupiah(basePrice));
         tvEstimasiWaktu.setText("Siap dalam " + menu.getEstimatedCookingTime() + " menit");
+
+        double rating = menu.getAverageRating();
+        int totalReviews = menu.getTotalReviews();
+
+        if (totalReviews > 0) {
+            tvRatingMenu.setText(String.format(Locale.getDefault(), "%.1f", rating));
+            tvJumlahUlasan.setText("(" + totalReviews + " ulasan)");
+        } else {
+            tvRatingMenu.setText("Belum dinilai");
+            tvJumlahUlasan.setText("Belum ada ulasan");
+        }
 
         String imageUrl = menu.getImage();
         if (imageUrl != null && !imageUrl.startsWith("http")) {

@@ -94,6 +94,16 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
             context.startActivity(intent);
         });
 
+        // Rating
+        double rating = menu.getAverageRating();
+        int totalReviews = menu.getTotalReviews();
+
+        if (totalReviews > 0) {
+            holder.tvRatingMenu.setText(String.format(Locale.getDefault(), "%.1f", rating));
+        } else {
+            holder.tvRatingMenu.setText("Baru");
+        }
+
         // 5. Tombol Tambah (Add to Cart)
         holder.btnAddMenu.setOnClickListener(v -> {
             if (!isCanteenOpen) {
@@ -150,16 +160,18 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
 
     public static class MenuViewHolder extends RecyclerView.ViewHolder {
         ImageView imgMenu;
-        TextView tvNamaMenu, tvDeskripsiMenu, tvHargaMenu;
+        TextView tvNamaMenu, tvDeskripsiMenu, tvHargaMenu, tvRatingMenu, tvJumlahUlasan;
         androidx.cardview.widget.CardView btnAddMenu; // ← ganti dari View ke CardView
 
         public MenuViewHolder(@NonNull View itemView) {
             super(itemView);
-            imgMenu = itemView.findViewById(R.id.imgMenu);
-            tvNamaMenu = itemView.findViewById(R.id.tvNamaMenu);
-            tvDeskripsiMenu = itemView.findViewById(R.id.tvDeskripsiMenu);
-            tvHargaMenu = itemView.findViewById(R.id.tvHargaMenu);
-            btnAddMenu = itemView.findViewById(R.id.btnAddMenu);
+            imgMenu        = itemView.findViewById(R.id.imgMenu);
+            tvNamaMenu     = itemView.findViewById(R.id.tvNamaMenu);
+            tvDeskripsiMenu= itemView.findViewById(R.id.tvDeskripsiMenu);
+            tvHargaMenu    = itemView.findViewById(R.id.tvHargaMenu);
+            btnAddMenu     = itemView.findViewById(R.id.btnAddMenu);
+            tvRatingMenu   = itemView.findViewById(R.id.tvRatingMenu);   // ← TAMBAH INI
+            tvJumlahUlasan = itemView.findViewById(R.id.tvJumlahUlasan); // ← ini juga perlu ada di XML
         }
     }
     // Di MenuAdapter.java
