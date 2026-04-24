@@ -66,6 +66,13 @@ public class MenuPopulerAdapter extends RecyclerView.Adapter<MenuPopulerAdapter.
             intent.putExtra("MENU_ID", String.valueOf(item.getId()));
             context.startActivity(intent);
         });
+
+        int totalReviews = item.getTotalReviews();
+        if (totalReviews > 0) {
+            holder.tvRating.setText(String.format(Locale.getDefault(), "%.1f", item.getAverageRating()));
+        } else {
+            holder.tvRating.setText("Baru");
+        }
     }
 
     @Override
@@ -75,13 +82,14 @@ public class MenuPopulerAdapter extends RecyclerView.Adapter<MenuPopulerAdapter.
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView img;
-        TextView tvNama, tvHarga;
+        TextView tvNama, tvHarga, tvRating; // tambah tvRating
 
         public ViewHolder(View v) {
             super(v);
-            img = v.findViewById(R.id.img_menu_populer);
-            tvNama = v.findViewById(R.id.tv_nama_menu_populer);
-            tvHarga = v.findViewById(R.id.tv_harga_menu_populer); // Pastikan ID ini ada di item_menu_populer.xml
+            img      = v.findViewById(R.id.img_menu_populer);
+            tvNama   = v.findViewById(R.id.tv_nama_menu_populer);
+            tvHarga  = v.findViewById(R.id.tv_harga_menu_populer);
+            tvRating = v.findViewById(R.id.tv_rating_menu_populer); // tambah ini
         }
     }
 }

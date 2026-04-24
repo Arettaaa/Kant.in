@@ -25,6 +25,7 @@ import com.example.kantin.utils.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -199,11 +200,53 @@ public class BerandaPelangganActivity extends AppCompatActivity {
             public void onResponse(Call<CanteenListResponse> call, Response<CanteenListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<CanteenListResponse.CanteenData> allKantin = response.body().getData();
-                    if (allKantin != null && !allKantin.isEmpty()) {
-                        List<CanteenListResponse.CanteenData> displayList = allKantin.size() > 5 ? allKantin.subList(0, 5) : allKantin;
-                        kantinAdapter = new KantinAdapter(BerandaPelangganActivity.this, displayList);
-                        rvKantin.setAdapter(kantinAdapter);
-                    }
+                    if (allKantin == null || allKantin.isEmpty()) return;
+
+                    // Fetch semua menu untuk hitung rating per kantin
+                    apiService.getAllMenus().enqueue(new Callback<MenuListResponse>() {
+                        @Override
+                        public void onResponse(Call<MenuListResponse> call, Response<MenuListResponse> response) {
+                            List<MenuListResponse.MenuItem> allMenus = (response.isSuccessful()
+                                    && response.body() != null) ? response.body().getData() : new ArrayList<>();
+
+                            // Hitung rata-rata rating per canteen_id
+                            java.util.Map<String, Double> ratingMap = new java.util.HashMap<>();
+                            java.util.Map<String, Integer> countMap = new java.util.HashMap<>();
+
+                            if (allMenus != null) {
+                                for (MenuListResponse.MenuItem menu : allMenus) {
+                                    if (menu.getTotalReviews() > 0 && menu.getCanteenId() != null) {
+                                        String cid = menu.getCanteenId();
+                                        ratingMap.put(cid, (ratingMap.getOrDefault(cid, 0.0) + menu.getAverageRating()));
+                                        countMap.put(cid, (countMap.getOrDefault(cid, 0) + 1));
+                                    }
+                                }
+                            }
+
+                            // Sort kantin by rating descending
+                            Collections.sort(allKantin, (a, b) -> {
+                                double rA = countMap.getOrDefault(a.getId(), 0) > 0
+                                        ? ratingMap.getOrDefault(a.getId(), 0.0) / countMap.get(a.getId()) : 0;
+                                double rB = countMap.getOrDefault(b.getId(), 0) > 0
+                                        ? ratingMap.getOrDefault(b.getId(), 0.0) / countMap.get(b.getId()) : 0;
+                                return Double.compare(rB, rA);
+                            });
+
+                            List<CanteenListResponse.CanteenData> displayList =
+                                    allKantin.size() > 5 ? allKantin.subList(0, 5) : allKantin;
+                            kantinAdapter = new KantinAdapter(BerandaPelangganActivity.this, displayList);
+                            rvKantin.setAdapter(kantinAdapter);
+                        }
+
+                        @Override
+                        public void onFailure(Call<MenuListResponse> call, Throwable t) {
+                            // Kalau gagal fetch menu, tampilkan kantin tanpa sorting
+                            List<CanteenListResponse.CanteenData> displayList =
+                                    allKantin.size() > 5 ? allKantin.subList(0, 5) : allKantin;
+                            kantinAdapter = new KantinAdapter(BerandaPelangganActivity.this, displayList);
+                            rvKantin.setAdapter(kantinAdapter);
+                        }
+                    });
                 }
             }
             @Override public void onFailure(Call<CanteenListResponse> call, Throwable t) {
@@ -211,29 +254,19 @@ public class BerandaPelangganActivity extends AppCompatActivity {
             }
         });
     }
-
     private void fetchMenuPopuler() {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         apiService.getAllMenus().enqueue(new Callback<MenuListResponse>() {
             @Override
             public void onResponse(Call<MenuListResponse> call, Response<MenuListResponse> response) {
-                Log.d("DEBUG_KANTIN", "Response Code: " + response.code()); // Cek status code
-
                 if (response.isSuccessful() && response.body() != null) {
                     List<MenuListResponse.MenuItem> allMenu = response.body().getData();
-
-                    Log.d("DEBUG_KANTIN", "Jumlah data menu: " + (allMenu != null ? allMenu.size() : "null"));
-
                     if (allMenu != null && !allMenu.isEmpty()) {
-                        List<MenuListResponse.MenuItem> displayList = allMenu.size() > 3 ? allMenu.subList(0, 3) : allMenu;
-                        menuPopulerAdapter = new MenuPopulerAdapter(BerandaPelangganActivity.this, displayList);
+                        // Sort by total_reviews descending
+                        Collections.sort(allMenu, (a, b) -> b.getTotalReviews() - a.getTotalReviews());
+                        List<MenuListResponse.MenuItem> populer = allMenu.subList(0, Math.min(3, allMenu.size()));
+                        menuPopulerAdapter = new MenuPopulerAdapter(BerandaPelangganActivity.this, populer);
                         rvMenuPopuler.setAdapter(menuPopulerAdapter);
-
-                        // Tambahkan ini untuk memastikan UI refresh
-                        menuPopulerAdapter.notifyDataSetChanged();
-                        Log.d("DEBUG_KANTIN", "Adapter berhasil dipasang!");
-                    } else {
-                        Log.d("DEBUG_KANTIN", "Data menu kosong dari server");
                     }
                 }
             }

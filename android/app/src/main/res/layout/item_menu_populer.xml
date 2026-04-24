@@ -23,8 +23,17 @@
                 android:scaleType="centerCrop" />
 
             <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="8dp" android:background="@drawable/bg_input_rounded" android:gravity="center_vertical" android:paddingHorizontal="6dp" android:paddingVertical="4dp">
-                <ImageView android:layout_width="12dp" android:layout_height="12dp" android:src="@android:drawable/star_on" app:tint="#F97316"/>
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="4dp" android:text="4.8" android:textColor="#1A1A1A" android:textSize="10sp" android:textStyle="bold"/>
+                <ImageView android:layout_width="12dp" android:layout_height="12dp"
+                    android:src="@android:drawable/star_on" app:tint="#F97316"/>
+                <TextView
+                    android:id="@+id/tv_rating_menu_populer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="0.0"
+                    android:textColor="#1A1A1A"
+                    android:textSize="10sp"
+                    android:textStyle="bold"/>
             </LinearLayout>
         </RelativeLayout>
 

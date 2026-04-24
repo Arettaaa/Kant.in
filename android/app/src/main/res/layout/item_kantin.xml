@@ -44,6 +44,7 @@
                     android:src="@android:drawable/star_on"
                     app:tint="#F97316"/>
                 <TextView
+                    android:id="@+id/tv_rating_kantin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="2dp"
