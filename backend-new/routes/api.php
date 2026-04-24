@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\RatingController; 
 
 /*
 |--------------------------------------------------------------------------
@@ -60,8 +61,11 @@ Route::middleware(['auth:sanctum', 'role:pembeli'])->prefix('buyers')->group(fun
 
     // Profile
     Route::get('/profiles', [ProfileController::class, 'show']);
-    Route::post('/profiles', [ProfileController::class, 'update']);});
+    Route::post('/profiles', [ProfileController::class, 'update']);
 
+    Route::post('/orders/{orderId}/ratings', [RatingController::class, 'store']);
+    Route::get('/orders/{orderId}/ratings', [RatingController::class, 'check']);
+});
 /*
 |--------------------------------------------------------------------------
 | Admin Kantin Routes
