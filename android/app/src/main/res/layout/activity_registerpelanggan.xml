@@ -195,7 +195,7 @@
                     android:layout_weight="1"
                     android:background="@null"
                     android:fontFamily="@font/inter_regular"
-                    android:hint="mahasiswa@kampus.ac.id"
+                    android:hint="contoh@gmail.com"
                     android:inputType="textEmailAddress"
                     android:singleLine="true"
                     android:textColor="#1A1A1A"
@@ -291,7 +291,7 @@
                     android:alpha="0.5"
                     android:clickable="true"
                     android:focusable="true"
-                    android:src="@drawable/eye" />
+                    android:src="@drawable/eye_close" />
             </LinearLayout>
 
             <LinearLayout

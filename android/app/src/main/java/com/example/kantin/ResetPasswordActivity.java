@@ -116,12 +116,12 @@ public class ResetPasswordActivity extends AppCompatActivity {
         if (editText.getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
             // Jika sedang tertutup -> Buka password
             editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-            eyeIcon.setImageResource(R.drawable.eye_close); // Pastikan Anda punya gambar eye_close.xml atau .png
+            eyeIcon.setImageResource(R.drawable.eye); // Pastikan Anda punya gambar eye_close.xml atau .png
             eyeIcon.setAlpha(1.0f); // Bikin ikon sedikit lebih terang saat diklik (opsional)
         } else {
             // Jika sedang terbuka -> Tutup password
             editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            eyeIcon.setImageResource(R.drawable.eye);
+            eyeIcon.setImageResource(R.drawable.eye_close);
             eyeIcon.setAlpha(0.5f); // Kembalikan transparansi
         }
 

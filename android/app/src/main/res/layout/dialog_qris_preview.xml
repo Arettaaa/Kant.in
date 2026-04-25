@@ -16,7 +16,6 @@
         android:background="@drawable/bg_circle_outline"
         android:padding="8dp"
         android:src="@drawable/close"
-        app:tint="#FFFFFF"
         android:clickable="true"
         android:focusable="true" />
 
