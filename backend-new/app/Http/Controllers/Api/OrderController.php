@@ -123,6 +123,7 @@ class OrderController extends Controller
                 'user_id' => (string) $user->_id,
                 'name' => $user->name,
                 'phone' => $user->phone,
+                'photo_profile' => $user->photo_profile ?? null,
             ],
             'canteen_id' => $validated['canteen_id'],
             'items' => $orderItems,
