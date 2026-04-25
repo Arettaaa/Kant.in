@@ -71,16 +71,11 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
             tvStatusBadge.setTextColor(Color.parseColor("#F44336"));
             tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_red_light);
 
-            // ✅ .mutate() agar tint tidak bocor ke drawable lain yang di-cache
+            // ✅ Pakai warna asli drawable 'close' — tidak perlu tint
             Drawable iconClose = ContextCompat.getDrawable(this, R.drawable.close);
-            if (iconClose != null) {
-                iconClose = DrawableCompat.wrap(iconClose).mutate();
-                DrawableCompat.setTint(iconClose, Color.parseColor("#F44336"));
-                tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(iconClose, null, null, null);
-            } else {
-                tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-            }
+            tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(iconClose, null, null, null);
 
+            // Harga dicoret
             tvTotalPembayaranUtama.setPaintFlags(
                     tvTotalPembayaranUtama.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
             tvTotalPembayaranUtama.setTextColor(Color.parseColor("#9E9E9E"));
@@ -93,7 +88,7 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
             tvStatusBadge.setTextColor(Color.parseColor("#28A745"));
             tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_green_light);
 
-            // ✅ .mutate() agar tint tidak bocor ke drawable lain yang di-cache
+            // ic_check tetap pakai mutate+tint karena warnanya perlu di-set
             Drawable iconCheck = ContextCompat.getDrawable(this, R.drawable.ic_check);
             if (iconCheck != null) {
                 iconCheck = DrawableCompat.wrap(iconCheck).mutate();
@@ -104,7 +99,7 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
             }
         }
 
-        // ── Format tanggal ────────────────────────────────────────
+        // ── Format tanggal (WIB, 24 jam) ─────────────────────────
         if (createdAt != null && !createdAt.isEmpty()) {
             try {
                 SimpleDateFormat sdfIn = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault());
@@ -118,7 +113,7 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
             }
         }
 
-        // ── List menu ──────────────────────────────────────────────
+        // ── List menu ─────────────────────────────────────────────
         ArrayList<String>  itemNames     = intent.getStringArrayListExtra("item_names");
         ArrayList<String>  itemPrices    = intent.getStringArrayListExtra("item_prices");
         ArrayList<Integer> itemQtys      = intent.getIntegerArrayListExtra("item_qtys");
