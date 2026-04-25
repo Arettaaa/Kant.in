@@ -114,7 +114,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
         // --- Klik item → buka detail transaksi ---
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(v.getContext(), DetailTransaksiActivity.class);
+            Intent intent = new Intent(v.getContext(), DetaiTransaksiActivity.class);
             intent.putExtra("order_id", order.getId());
             v.getContext().startActivity(intent);
         });
