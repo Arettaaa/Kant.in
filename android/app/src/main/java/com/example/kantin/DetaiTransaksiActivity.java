@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -28,8 +29,7 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detai_transaksi);
 
-        // Ambil data dari Intent
-        Intent intent    = getIntent();
+        Intent intent        = getIntent();
         String orderCode     = intent.getStringExtra("order_code");
         String customerName  = intent.getStringExtra("customer_name");
         String status        = intent.getStringExtra("status");
@@ -39,7 +39,6 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
         double deliveryFee   = intent.getDoubleExtra("delivery_fee", 0);
         String paymentMethod = intent.getStringExtra("payment_method");
 
-        // Init views
         TextView tvHeaderOrderId        = findViewById(R.id.tvHeaderOrderId);
         TextView tvTotalPembayaranUtama = findViewById(R.id.tvTotalPembayaranUtama);
         TextView tvTanggalWaktu         = findViewById(R.id.tvTanggalWaktu);
@@ -48,7 +47,7 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
         TextView tvSubtotal             = findViewById(R.id.tvSubtotal);
         TextView tvBiayaAplikasi        = findViewById(R.id.tvBiayaAplikasi);
         TextView tvTotalAkhir           = findViewById(R.id.tvTotalAkhir);
-        TextView tvStatusBadge          = findViewById(R.id.tvStatusBadge); // ← badge status
+        TextView tvStatusBadge          = findViewById(R.id.tvStatusBadge);
         LinearLayout containerMenuList  = findViewById(R.id.containerMenuList);
         ImageView btnBack               = findViewById(R.id.btnBack);
 
@@ -56,7 +55,6 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
 
         NumberFormat rupiah = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 
-        // ── Isi data ──────────────────────────────────────────────
         tvHeaderOrderId.setText(orderCode);
         tvIdPesanan.setText(orderCode);
         tvNamaPelanggan.setText(customerName);
@@ -69,23 +67,20 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
         boolean isCancelled = "cancelled".equalsIgnoreCase(status);
 
         if (isCancelled) {
-            // Teks & warna merah
             tvStatusBadge.setText("Dibatalkan");
             tvStatusBadge.setTextColor(Color.parseColor("#F44336"));
-
-            // Background badge merah
             tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_red_light);
 
-            // Icon silang (X) — gunakan ic_close jika ada, fallback ke tanpa icon
+            // ✅ .mutate() agar tint tidak bocor ke drawable lain yang di-cache
             Drawable iconClose = ContextCompat.getDrawable(this, R.drawable.close);
             if (iconClose != null) {
-                iconClose.setTint(Color.parseColor("#F44336"));
+                iconClose = DrawableCompat.wrap(iconClose).mutate();
+                DrawableCompat.setTint(iconClose, Color.parseColor("#F44336"));
                 tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(iconClose, null, null, null);
             } else {
                 tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
             }
 
-            // Total harga dicoret karena dibatalkan
             tvTotalPembayaranUtama.setPaintFlags(
                     tvTotalPembayaranUtama.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
             tvTotalPembayaranUtama.setTextColor(Color.parseColor("#9E9E9E"));
@@ -94,15 +89,18 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
             tvTotalAkhir.setTextColor(Color.parseColor("#9E9E9E"));
 
         } else {
-            // Selesai (completed) — tampilan default sesuai XML
             tvStatusBadge.setText("Selesai");
             tvStatusBadge.setTextColor(Color.parseColor("#28A745"));
             tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_green_light);
 
+            // ✅ .mutate() agar tint tidak bocor ke drawable lain yang di-cache
             Drawable iconCheck = ContextCompat.getDrawable(this, R.drawable.ic_check);
             if (iconCheck != null) {
-                iconCheck.setTint(Color.parseColor("#28A745"));
+                iconCheck = DrawableCompat.wrap(iconCheck).mutate();
+                DrawableCompat.setTint(iconCheck, Color.parseColor("#28A745"));
                 tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(iconCheck, null, null, null);
+            } else {
+                tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
             }
         }
 
@@ -111,10 +109,8 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
             try {
                 SimpleDateFormat sdfIn = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault());
                 sdfIn.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-                SimpleDateFormat sdfOut = new SimpleDateFormat("dd MMM yyyy\nhh:mm a", Locale.getDefault());
+                SimpleDateFormat sdfOut = new SimpleDateFormat("dd MMM yyyy\nHH:mm", Locale.getDefault());
                 sdfOut.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
-
                 Date date = sdfIn.parse(createdAt);
                 tvTanggalWaktu.setText(date != null ? sdfOut.format(date) : createdAt);
             } catch (ParseException e) {
@@ -122,7 +118,7 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
             }
         }
 
-        // ── List menu — inflate per item ──────────────────────────
+        // ── List menu ──────────────────────────────────────────────
         ArrayList<String>  itemNames     = intent.getStringArrayListExtra("item_names");
         ArrayList<String>  itemPrices    = intent.getStringArrayListExtra("item_prices");
         ArrayList<Integer> itemQtys      = intent.getIntegerArrayListExtra("item_qtys");
@@ -142,7 +138,7 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
                 TextView tvNote = row.findViewById(R.id.tvMenuNote);
                 String note = (itemNotes != null && i < itemNotes.size()) ? itemNotes.get(i) : "";
                 if (note != null && !note.isEmpty()) {
-                    tvNote.setText("📝 " + note);
+                    tvNote.setText(note);
                     tvNote.setVisibility(View.VISIBLE);
                 } else {
                     tvNote.setVisibility(View.GONE);
