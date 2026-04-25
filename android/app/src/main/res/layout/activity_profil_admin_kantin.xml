@@ -347,20 +347,25 @@
                     android:src="@drawable/chevronright" />
             </LinearLayout>
 
-            <androidx.appcompat.widget.AppCompatButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogout"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="32dp"
                 android:background="@drawable/bg_badge_red_light"
-                android:drawableStart="@drawable/logout"
-                android:paddingStart="24dp"
-                android:text="Log Out Akun"
+                android:text="Keluar"
                 android:textAllCaps="false"
                 android:textColor="#EF4444"
                 android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                app:backgroundTint="@null"
+                app:icon="@drawable/logout"
+                app:iconTint="#EF4444"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:rippleColor="#FFEBEB"
+                app:strokeWidth="0dp" />
 
         </LinearLayout>
     </ScrollView>
