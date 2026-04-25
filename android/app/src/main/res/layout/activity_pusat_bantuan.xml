@@ -68,6 +68,7 @@
             android:letterSpacing="0.1"
             android:layout_marginBottom="16dp"/>
 
+        <!-- Artikel 1 -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -111,20 +112,30 @@
                         app:tint="#9E9E9E" />
                 </LinearLayout>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F0F0F0"
+                    android:visibility="gone"
+                    android:id="@+id/divider_article_1"/>
+
                 <TextView
                     android:id="@+id/content_article_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
+                    android:paddingTop="12dp"
                     android:paddingBottom="16dp"
                     android:text="Buka 'Dashboard Admin Kantin' pada tab 'Pesanan Masuk'. Anda bisa melihat rincian pesanan dari pelanggan, lalu tekan tombol hijau 'Terima Pesanan' untuk mulai memprosesnya, atau 'Tolak' jika pesanan tidak dapat dipenuhi."
                     android:textColor="#616161"
                     android:textSize="13sp"
+                    android:lineSpacingMultiplier="1.6"
                     android:visibility="gone" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Artikel 2 -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -146,6 +157,7 @@
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:padding="16dp">
@@ -173,14 +185,17 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
+                    android:paddingTop="12dp"
                     android:paddingBottom="16dp"
                     android:text="Masuk ke halaman 'Detail Pesanan', lalu gulir ke area 'Bukti Pembayaran'. Anda dapat meninjau foto bukti transfer yang diunggah pelanggan, mencentang konfirmasi verifikasi, dan memilih tombol 'Verifikasi &amp; Terima' untuk melanjutkan pesanan."
                     android:textColor="#616161"
                     android:textSize="13sp"
+                    android:lineSpacingMultiplier="1.6"
                     android:visibility="gone" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Artikel 3 -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -202,6 +217,7 @@
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:padding="16dp">
@@ -229,14 +245,17 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
+                    android:paddingTop="12dp"
                     android:paddingBottom="16dp"
                     android:text="Pada daftar pesanan yang sedang 'Diproses', masuk ke halaman 'Perbarui Status Pesanan'. Pilih status interaktif 'Dimasak' saat makanan mulai disiapkan, dan pilih 'Siap' ketika pesanan sudah bisa diambil atau diantar kepada pelanggan."
                     android:textColor="#616161"
                     android:textSize="13sp"
+                    android:lineSpacingMultiplier="1.6"
                     android:visibility="gone" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Artikel 4 -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -258,6 +277,7 @@
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:padding="16dp">
@@ -285,14 +305,17 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
+                    android:paddingTop="12dp"
                     android:paddingBottom="16dp"
                     android:text="Buka halaman 'Kelola Menu', cari item yang dimaksud, lalu tekan toggle switch 'Ketersediaan' untuk mengubah status menu secara instan dari 'TERSEDIA' menjadi 'HABIS'."
                     android:textColor="#616161"
                     android:textSize="13sp"
+                    android:lineSpacingMultiplier="1.6"
                     android:visibility="gone" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Artikel 5 -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -314,6 +337,7 @@
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackground"
                     android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:padding="16dp">
@@ -341,14 +365,17 @@
                     android:layout_height="wrap_content"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
+                    android:paddingTop="12dp"
                     android:paddingBottom="16dp"
                     android:text="Bisa. Buka halaman 'Daftar Transaksi', lalu tekan ikon unduh di pojok kanan atas. Anda dapat memilih format dokumen (PDF Dokumen atau CSV Excel), menentukan rentang tanggal laporan, lalu menekan 'Unduh PDF' untuk menyimpannya ke perangkat."
                     android:textColor="#616161"
                     android:textSize="13sp"
+                    android:lineSpacingMultiplier="1.6"
                     android:visibility="gone" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Card Hubungi Manajer Akun -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
