@@ -23,12 +23,13 @@ class TransactionController extends Controller
         }
 
         $orders = Order::where('canteen_id', $canteenId)
-            ->whereIn('status', ['completed'])
+            ->whereIn('status', ['completed', 'cancelled'])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $totalRevenue = $orders->sum('total_amount');
-        $totalOrders = $orders->count();
+        // Hanya hitung revenue dari transaksi yang selesai (bukan cancelled)
+        $totalRevenue = $orders->where('status', 'completed')->sum('total_amount');
+        $totalOrders  = $orders->where('status', 'completed')->count();
 
         return response()->json([
             'success' => true,
