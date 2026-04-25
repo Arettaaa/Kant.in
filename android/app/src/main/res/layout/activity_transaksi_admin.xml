@@ -22,8 +22,9 @@
                 android:id="@+id/btnBack"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_back" />
+                android:background="@drawable/bg_circle_outline"
+                android:src="@drawable/chevronleft"
+                android:padding="8dp"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"

@@ -60,7 +60,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/logo_kantin" />
+                        android:src="@drawable/logo_kantin"/>
                 </androidx.cardview.widget.CardView>
 
                 <ImageView
@@ -88,34 +88,7 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_badge_gray_light"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="4dp">
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:src="@drawable/chefhat" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:text="Food Stall"
-                        android:textColor="#4B5563"
-                        android:textSize="12sp" />
-                </LinearLayout>
 
-                <!-- Dot separator -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="8dp"
-                    android:text="•"
-                    android:textColor="#9CA3AF"
-                    android:textSize="12sp" />
 
                 <!-- Rating -->
                 <ImageView

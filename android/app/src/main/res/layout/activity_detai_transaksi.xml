@@ -25,8 +25,9 @@
                 android:layout_height="40dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:padding="10dp"
-                android:src="@drawable/ic_back"
+                android:padding="8dp"
+                android:src="@drawable/chevronleft"
+                android:background="@drawable/bg_circle_outline"
                 android:contentDescription="@null" />
 
             <LinearLayout
