@@ -223,29 +223,36 @@ public class BerandaPelangganActivity extends AppCompatActivity {
                                 }
                             }
 
-                            // Sort kantin by rating descending
-                            Collections.sort(allKantin, (a, b) -> {
-                                double rA = countMap.getOrDefault(a.getId(), 0) > 0
-                                        ? ratingMap.get(a.getId()) / countMap.get(a.getId()) : -1;
-                                double rB = countMap.getOrDefault(b.getId(), 0) > 0
-                                        ? ratingMap.get(b.getId()) / countMap.get(b.getId()) : -1;
+                            // Filter: hanya kantin yang sudah punya rating
+                            List<CanteenListResponse.CanteenData> kantinDenganRating = new ArrayList<>();
+                            List<CanteenListResponse.CanteenData> kantinBaru = new ArrayList<>();
 
-                                // Kantin buka diprioritaskan dulu
-                                if (a.isOpen() != b.isOpen()) return a.isOpen() ? -1 : 1;
-
-                                // Kalau sama-sama punya rating, sort by rating
+                            for (CanteenListResponse.CanteenData k : allKantin) {
+                                if (countMap.getOrDefault(k.getId(), 0) > 0) {
+                                    kantinDenganRating.add(k);
+                                } else {
+                                    kantinBaru.add(k);
+                                }
+                            }
+                            Collections.sort(kantinDenganRating, (a, b) -> {
+                                double rA = ratingMap.get(a.getId()) / countMap.get(a.getId());
+                                double rB = ratingMap.get(b.getId()) / countMap.get(b.getId());
                                 return Double.compare(rB, rA);
                             });
 
+                            List<CanteenListResponse.CanteenData> sortedKantin = new ArrayList<>();
+                            sortedKantin.addAll(kantinDenganRating);
+                            sortedKantin.addAll(kantinBaru);
+
                             List<CanteenListResponse.CanteenData> displayList =
-                                    allKantin.size() > 5 ? allKantin.subList(0, 5) : allKantin;
+                                    kantinDenganRating.subList(0, Math.min(5, kantinDenganRating.size()));
+
                             kantinAdapter = new KantinAdapter(BerandaPelangganActivity.this, displayList);
                             rvKantin.setAdapter(kantinAdapter);
                         }
 
                         @Override
                         public void onFailure(Call<MenuListResponse> call, Throwable t) {
-                            // Kalau gagal fetch menu, tampilkan kantin tanpa sorting
                             List<CanteenListResponse.CanteenData> displayList =
                                     allKantin.size() > 5 ? allKantin.subList(0, 5) : allKantin;
                             kantinAdapter = new KantinAdapter(BerandaPelangganActivity.this, displayList);
@@ -267,8 +274,17 @@ public class BerandaPelangganActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     List<MenuListResponse.MenuItem> allMenu = response.body().getData();
                     if (allMenu != null && !allMenu.isEmpty()) {
-                        // Sort by total_reviews descending
-                        Collections.sort(allMenu, (a, b) -> b.getTotalReviews() - a.getTotalReviews());
+                        // Sort gabungan rating × review
+                        Collections.sort(allMenu, (a, b) -> {
+                            if (a.getTotalReviews() == 0 && b.getTotalReviews() == 0) return 0;
+                            if (a.getTotalReviews() == 0) return 1;
+                            if (b.getTotalReviews() == 0) return -1;
+
+                            double scoreA = a.getAverageRating() * Math.log1p(a.getTotalReviews());
+                            double scoreB = b.getAverageRating() * Math.log1p(b.getTotalReviews());
+                            return Double.compare(scoreB, scoreA);
+                        });
+
                         List<MenuListResponse.MenuItem> populer = allMenu.subList(0, Math.min(3, allMenu.size()));
                         menuPopulerAdapter = new MenuPopulerAdapter(BerandaPelangganActivity.this, populer);
                         rvMenuPopuler.setAdapter(menuPopulerAdapter);
