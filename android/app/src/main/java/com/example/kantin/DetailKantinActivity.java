@@ -22,6 +22,7 @@ import com.example.kantin.network.ApiService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -184,10 +185,22 @@ public class DetailKantinActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<MenuListResponse> call, Response<MenuListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // Simpan data ke originalMenuList agar bisa difilter nanti
                     originalMenuList = response.body().getData();
                     menuAdapter = new MenuAdapter(DetailKantinActivity.this, originalMenuList, canteenIsOpen);
                     rvMenu.setAdapter(menuAdapter);
+
+                    double total = 0;
+                    int count = 0;
+                    for (MenuListResponse.MenuItem menu : originalMenuList) {
+                        if (menu.getTotalReviews() > 0) {
+                            total += menu.getAverageRating();
+                            count++;
+                        }
+                    }
+                    String ratingText = count > 0
+                            ? String.format(Locale.getDefault(), "%.1f", total / count)
+                            : "Baru";
+                    tvRatingWarung.setText(ratingText);
                 }
             }
 
@@ -198,6 +211,5 @@ public class DetailKantinActivity extends AppCompatActivity {
             }
         });
     }
-
 
 }
