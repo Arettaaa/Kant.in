@@ -152,7 +152,6 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
         return listMenu != null ? listMenu.size() : 0;
     }
 
-    // --- TAMBAHAN BARU: Method untuk memfilter isi RecyclerView ---
     public void filterList(List<MenuListResponse.MenuItem> filteredList) {
         this.listMenu = filteredList;
         notifyDataSetChanged(); // Refresh tampilan adapter dengan data baru
@@ -160,21 +159,19 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
 
     public static class MenuViewHolder extends RecyclerView.ViewHolder {
         ImageView imgMenu;
-        TextView tvNamaMenu, tvDeskripsiMenu, tvHargaMenu, tvRatingMenu, tvJumlahUlasan;
-        androidx.cardview.widget.CardView btnAddMenu; // ← ganti dari View ke CardView
+        TextView tvNamaMenu, tvDeskripsiMenu, tvHargaMenu, tvRatingMenu;
+        androidx.cardview.widget.CardView btnAddMenu;
 
         public MenuViewHolder(@NonNull View itemView) {
             super(itemView);
-            imgMenu        = itemView.findViewById(R.id.imgMenu);
-            tvNamaMenu     = itemView.findViewById(R.id.tvNamaMenu);
-            tvDeskripsiMenu= itemView.findViewById(R.id.tvDeskripsiMenu);
-            tvHargaMenu    = itemView.findViewById(R.id.tvHargaMenu);
-            btnAddMenu     = itemView.findViewById(R.id.btnAddMenu);
-            tvRatingMenu   = itemView.findViewById(R.id.tvRatingMenu);   // ← TAMBAH INI
-            tvJumlahUlasan = itemView.findViewById(R.id.tvJumlahUlasan); // ← ini juga perlu ada di XML
+            imgMenu         = itemView.findViewById(R.id.imgMenu);
+            tvNamaMenu      = itemView.findViewById(R.id.tvNamaMenu);
+            tvDeskripsiMenu = itemView.findViewById(R.id.tvDeskripsiMenu);
+            tvHargaMenu     = itemView.findViewById(R.id.tvHargaMenu);
+            btnAddMenu      = itemView.findViewById(R.id.btnAddMenu);
+            tvRatingMenu    = itemView.findViewById(R.id.tvRatingMenu);
         }
     }
-    // Di MenuAdapter.java
     public void setCanteenOpen(boolean isOpen) {
         this.isCanteenOpen = isOpen;
         notifyDataSetChanged();

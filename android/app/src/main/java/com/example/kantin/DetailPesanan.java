@@ -140,7 +140,23 @@ public class DetailPesanan extends AppCompatActivity {
         }
 
         String rawDate = currentOrder.getCreatedAt();
-        valWaktu.setText(rawDate != null ? rawDate.substring(11, 16) : "Baru saja");
+        if (rawDate != null) {
+            try {
+                java.text.SimpleDateFormat inputFormat = new java.text.SimpleDateFormat(
+                        "yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault());
+                inputFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
+                java.util.Date date = inputFormat.parse(rawDate);
+
+                java.text.SimpleDateFormat outputFormat = new java.text.SimpleDateFormat(
+                        "HH:mm 'WIB'", new Locale("id", "ID"));
+                outputFormat.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Jakarta"));
+                valWaktu.setText(outputFormat.format(date));
+            } catch (Exception e) {
+                valWaktu.setText(rawDate.substring(11, 16));
+            }
+        } else {
+            valWaktu.setText("Baru saja");
+        }
 
         if (currentOrder.getDeliveryDetails() != null) {
             String method = currentOrder.getDeliveryDetails().getMethod();

@@ -32,6 +32,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     private Context context;
     private List<OrderListResponse.OrderItem> orderList;
 
+    // Tambah field di atas class
+    private final java.util.Map<String, Integer> ratingCache = new java.util.HashMap<>();
+
     public HistoryAdapter(Context context, List<OrderListResponse.OrderItem> orderList) {
         this.context   = context;
         this.orderList = orderList;
@@ -72,7 +75,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             holder.layoutBtnCompleted.setVisibility(View.VISIBLE);
             holder.btnPesanLagiCancelled.setVisibility(View.GONE);
 
-            setNilaiButtonLoading(holder);
+            // Reset state dulu sebelum fetch API
+            holder.btnNilai.setVisibility(View.VISIBLE);
+            holder.btnNilai.setText("...");
+            holder.btnNilai.setEnabled(false);
+            holder.btnNilai.setAlpha(0.5f);
+            holder.layoutStarDisplay.setVisibility(View.GONE);
+
             String orderId = order.getId() != null ? order.getId() : order.getIdAlias();
             cekStatusRating(orderId, holder, order);
             holder.btnPesanLagi.setOnClickListener(v -> pesanLagi(order));
@@ -95,7 +104,19 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     private void cekStatusRating(String orderId, ViewHolder holder,
                                  OrderListResponse.OrderItem order) {
+        // Cek cache dulu
+        if (ratingCache.containsKey(orderId)) {
+            int cachedRating = ratingCache.get(orderId);
+            if (cachedRating > 0) {
+                setNilaiButtonSudahDinilai(holder, cachedRating);
+            } else {
+                setNilaiButtonAktif(holder, order);
+            }
+            return; // tidak perlu fetch API
+        }
+
         String token = new SessionManager(context).getToken();
+        android.util.Log.d("RATING_CHECK", "Cek rating untuk orderId: " + orderId);
         ApiClient.getAuthClient(token).create(ApiService.class)
                 .checkRating(orderId)
                 .enqueue(new Callback<RatingCheckResponse>() {
@@ -107,10 +128,15 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
                         if (response.isSuccessful() && response.body() != null
                                 && response.body().getData() != null) {
                             hasRated = response.body().getData().isHasRated();
-                            rating   = response.body().getData().getRating(); // AMBIL RATING
+                            rating   = response.body().getData().getRating();
+                            android.util.Log.d("RATING_CHECK", "orderId: " + orderId
+                                    + " | hasRated: " + hasRated + " | rating: " + rating);
                         }
+                        // Simpan ke cache
+                        ratingCache.put(orderId, hasRated ? rating : 0);
+
                         if (hasRated) {
-                            setNilaiButtonSudahDinilai(holder, rating); // PASS RATING
+                            setNilaiButtonSudahDinilai(holder, rating);
                         } else {
                             setNilaiButtonAktif(holder, order);
                         }
@@ -122,8 +148,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
                     }
                 });
     }
-
-    // ── State tombol Nilai ─────────────────────────────────────
 
     private void setNilaiButtonLoading(ViewHolder holder) {
         holder.btnNilai.setText("...");

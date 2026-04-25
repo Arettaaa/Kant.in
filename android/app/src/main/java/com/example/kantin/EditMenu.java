@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -40,19 +41,18 @@ import retrofit2.Response;
 public class EditMenu extends AppCompatActivity implements HapusMenuDialog.OnHapusMenuListener {
 
     // UI Components
-    private CardView btnBack, btnChangeFoto, btnSave;
-    private ImageView ivMenuPreview, btnDelete;
+    private ImageButton btnBack;
+    private ImageView btnDelete, ivMenuPreview;
+    private CardView btnChangeFoto, btnSave;
     private EditText etName, etPrice, etCookingTime, etDescription;
     private Spinner spinnerCategory;
     private android.widget.CheckBox switchIsAvailable;
-
     // Data & Network
     private String menuId;
     private Uri selectedImageUri = null;
     private ApiService apiService;
     private SessionManager sessionManager;
 
-    // Image Picker Launcher
     private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {

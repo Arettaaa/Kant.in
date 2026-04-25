@@ -28,7 +28,8 @@ public class KantinAdapter extends RecyclerView.Adapter<KantinAdapter.KantinView
 
     private Context context;
     private List<CanteenListResponse.CanteenData> listKantin;
-    private List<CanteenListResponse.CanteenData> listOriginal; // data asli
+    private List<CanteenListResponse.CanteenData> listOriginal;
+    private final java.util.Map<String, String> ratingCache = new java.util.HashMap<>();
 
     public KantinAdapter(Context context, List<CanteenListResponse.CanteenData> listKantin) {
         this.context = context;
@@ -173,12 +174,19 @@ public class KantinAdapter extends RecyclerView.Adapter<KantinAdapter.KantinView
     }
 
     private void fetchRatingKantin(String canteenId, KantinViewHolder holder) {
+        // Cek cache dulu
+        if (ratingCache.containsKey(canteenId)) {
+            holder.tvRatingWarung.setText(ratingCache.get(canteenId));
+            return;
+        }
+
         ApiClient.getClient().create(ApiService.class)
                 .getCanteenMenus(canteenId)
                 .enqueue(new retrofit2.Callback<MenuListResponse>() {
                     @Override
                     public void onResponse(retrofit2.Call<MenuListResponse> call,
                                            retrofit2.Response<MenuListResponse> response) {
+                        String ratingText = "Baru";
                         if (response.isSuccessful() && response.body() != null
                                 && response.body().getData() != null) {
                             List<MenuListResponse.MenuItem> menus = response.body().getData();
@@ -190,17 +198,18 @@ public class KantinAdapter extends RecyclerView.Adapter<KantinAdapter.KantinView
                                     count++;
                                 }
                             }
-                            String ratingText = count > 0
-                                    ? String.format(Locale.getDefault(), "%.1f", total / count)
-                                    : "Baru";
-                            holder.tvRatingWarung.setText(ratingText);
-                        } else {
-                            holder.tvRatingWarung.setText("Baru");
+                            if (count > 0) {
+                                ratingText = String.format(Locale.getDefault(), "%.1f", total / count);
+                            }
                         }
+                        // Simpan ke cache
+                        ratingCache.put(canteenId, ratingText);
+                        holder.tvRatingWarung.setText(ratingText);
                     }
 
                     @Override
                     public void onFailure(retrofit2.Call<MenuListResponse> call, Throwable t) {
+                        ratingCache.put(canteenId, "Baru");
                         holder.tvRatingWarung.setText("Baru");
                     }
                 });

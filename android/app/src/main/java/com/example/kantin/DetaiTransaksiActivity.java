@@ -71,14 +71,12 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
             tvStatusBadge.setTextColor(Color.parseColor("#F44336"));
             tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_red_light);
 
-            // ✅ .mutate() agar tint tidak bocor ke drawable lain yang di-cache
             Drawable iconClose = ContextCompat.getDrawable(this, R.drawable.close);
             if (iconClose != null) {
-                iconClose = DrawableCompat.wrap(iconClose).mutate();
-                DrawableCompat.setTint(iconClose, Color.parseColor("#F44336"));
+                iconClose = iconClose.mutate();
+                iconClose.setColorFilter(Color.parseColor("#F44336"),
+                        android.graphics.PorterDuff.Mode.SRC_IN);
                 tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(iconClose, null, null, null);
-            } else {
-                tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
             }
 
             tvTotalPembayaranUtama.setPaintFlags(
@@ -93,14 +91,12 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
             tvStatusBadge.setTextColor(Color.parseColor("#28A745"));
             tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_green_light);
 
-            // ✅ .mutate() agar tint tidak bocor ke drawable lain yang di-cache
             Drawable iconCheck = ContextCompat.getDrawable(this, R.drawable.ic_check);
             if (iconCheck != null) {
-                iconCheck = DrawableCompat.wrap(iconCheck).mutate();
-                DrawableCompat.setTint(iconCheck, Color.parseColor("#28A745"));
+                iconCheck = iconCheck.mutate();
+                iconCheck.setColorFilter(Color.parseColor("#28A745"),
+                        android.graphics.PorterDuff.Mode.SRC_IN);
                 tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(iconCheck, null, null, null);
-            } else {
-                tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
             }
         }
 
