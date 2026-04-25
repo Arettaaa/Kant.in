@@ -401,7 +401,7 @@ public class CheckoutActivity extends AppCompatActivity {
             return;
         }
 
-        String locationNoteText = etAlamat.getText().toString().trim();
+        String locationNoteText = "";
         if ("delivery".equals(deliveryMethod)) {
             locationNoteText = etAlamat.getText().toString().trim();
             if (locationNoteText.isEmpty()) {
