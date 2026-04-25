@@ -226,9 +226,14 @@ public class BerandaPelangganActivity extends AppCompatActivity {
                             // Sort kantin by rating descending
                             Collections.sort(allKantin, (a, b) -> {
                                 double rA = countMap.getOrDefault(a.getId(), 0) > 0
-                                        ? ratingMap.getOrDefault(a.getId(), 0.0) / countMap.get(a.getId()) : 0;
+                                        ? ratingMap.get(a.getId()) / countMap.get(a.getId()) : -1;
                                 double rB = countMap.getOrDefault(b.getId(), 0) > 0
-                                        ? ratingMap.getOrDefault(b.getId(), 0.0) / countMap.get(b.getId()) : 0;
+                                        ? ratingMap.get(b.getId()) / countMap.get(b.getId()) : -1;
+
+                                // Kantin buka diprioritaskan dulu
+                                if (a.isOpen() != b.isOpen()) return a.isOpen() ? -1 : 1;
+
+                                // Kalau sama-sama punya rating, sort by rating
                                 return Double.compare(rB, rA);
                             });
 
