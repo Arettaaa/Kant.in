@@ -17,22 +17,15 @@ import com.example.kantin.model.TransactionOrder;
 import com.google.android.material.card.MaterialCardView;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.ViewHolder> {
 
     private List<TransactionOrder> orders;
-    private final Context context;
 
-    public TransactionAdapter(Context context, List<TransactionOrder> orders) {
-        this.context = context;
-        this.orders = orders;
-    }
-
-    // Overload constructor tanpa context (backward-compat jika diperlukan)
     public TransactionAdapter(List<TransactionOrder> orders) {
-        this.context = null;
         this.orders = orders;
     }
 
@@ -57,65 +50,99 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         // --- Nama Pelanggan ---
         holder.tvNamaPelanggan.setText(order.getCustomerName());
 
-        // --- Kode Order + Jumlah Item (satu baris gabungan) ---
+        // --- Kode Order + Jumlah Item ---
         int itemCount = order.getItemCount();
         String detailText = order.getOrderCode() + "  •  " + itemCount + " item";
         holder.tvDetailPesanan.setText(detailText);
 
-        // Sembunyikan tvJumlahItem karena sudah digabung di atas
         if (holder.tvJumlahItem != null) {
             holder.tvJumlahItem.setVisibility(View.GONE);
         }
 
         // --- Total Harga ---
         NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
-        String formattedPrice = nf.format(order.getTotalAmount());
-        holder.tvTotalHarga.setText(formattedPrice);
+        holder.tvTotalHarga.setText(nf.format(order.getTotalAmount()));
 
         // --- STATUS & WARNA ---
         if (isCancelled) {
-            // Label status
             holder.tvStatus.setText("DIBATALKAN");
-            holder.tvStatus.setTextColor(Color.parseColor("#F44336")); // Merah
+            holder.tvStatus.setTextColor(Color.parseColor("#F44336"));
 
-            // Harga dicoret (strikethrough)
             holder.tvTotalHarga.setPaintFlags(
-                    holder.tvTotalHarga.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
-            );
-            holder.tvTotalHarga.setTextColor(Color.parseColor("#9E9E9E")); // Abu-abu
+                    holder.tvTotalHarga.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            holder.tvTotalHarga.setTextColor(Color.parseColor("#9E9E9E"));
 
-            // Card border merah
-            holder.cardView.setStrokeColor(Color.parseColor("#FFCDD2")); // Merah muda
-            holder.cardView.setCardBackgroundColor(Color.parseColor("#FFF8F8")); // Background merah sangat muda
+            holder.cardView.setStrokeColor(Color.parseColor("#FFCDD2"));
+            holder.cardView.setCardBackgroundColor(Color.parseColor("#FFF8F8"));
 
-            // Icon merah
-            holder.ivIcon.setBackgroundResource(R.drawable.bg_circle_lightred); // Buat drawable ini (lihat catatan)
-            holder.ivIcon.setImageResource(R.drawable.receipt_red);             // Atau gunakan receipt_green dengan tint
+            holder.ivIcon.setBackgroundResource(R.drawable.bg_circle_lightred);
+            holder.ivIcon.setImageResource(R.drawable.receipt_red);
 
         } else {
-            // STATUS SELESAI (completed)
+            // completed
             holder.tvStatus.setText("SELESAI");
-            holder.tvStatus.setTextColor(Color.parseColor("#00C853")); // Hijau
+            holder.tvStatus.setTextColor(Color.parseColor("#00C853"));
 
-            // Pastikan harga tidak dicoret
             holder.tvTotalHarga.setPaintFlags(
-                    holder.tvTotalHarga.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG
-            );
+                    holder.tvTotalHarga.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
             holder.tvTotalHarga.setTextColor(Color.parseColor("#1A1A1A"));
 
-            // Card normal
             holder.cardView.setStrokeColor(Color.parseColor("#EEEEEE"));
             holder.cardView.setCardBackgroundColor(Color.WHITE);
 
-            // Icon hijau
             holder.ivIcon.setBackgroundResource(R.drawable.bg_circle_lightgreen);
             holder.ivIcon.setImageResource(R.drawable.receipt_green);
         }
 
-        // --- Klik item → buka detail transaksi ---
+        // --- Klik item → kirim semua data yang dibutuhkan DetaiTransaksiActivity ---
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), DetaiTransaksiActivity.class);
-            intent.putExtra("order_id", order.getId());
+
+            // Data utama
+            intent.putExtra("order_code",      order.getOrderCode());
+            intent.putExtra("customer_name",   order.getCustomerName());
+            intent.putExtra("status",          order.getStatus());
+            intent.putExtra("created_at",      order.getCreatedAt());
+            intent.putExtra("total_amount",    order.getTotalAmount());
+            intent.putExtra("subtotal_amount", order.getSubtotalAmount());
+
+            // Delivery fee
+            double deliveryFee = 0;
+            if (order.getDeliveryDetails() != null) {
+                deliveryFee = order.getDeliveryDetails().fee;
+            }
+            intent.putExtra("delivery_fee", deliveryFee);
+
+            // Payment method
+            String paymentMethod = "";
+            if (order.getPayment() != null && order.getPayment().method != null) {
+                paymentMethod = order.getPayment().method;
+            }
+            intent.putExtra("payment_method", paymentMethod);
+
+            // List item menu
+            ArrayList<String>  itemNames     = new ArrayList<>();
+            ArrayList<String>  itemPrices    = new ArrayList<>();
+            ArrayList<Integer> itemQtys      = new ArrayList<>();
+            ArrayList<String>  itemNotes     = new ArrayList<>();
+            ArrayList<String>  itemSubtotals = new ArrayList<>();
+
+            if (order.getItems() != null) {
+                for (TransactionOrder.OrderItem item : order.getItems()) {
+                    itemNames.add(item.name != null ? item.name : "");
+                    itemPrices.add(String.valueOf(item.price));
+                    itemQtys.add(item.quantity);
+                    itemNotes.add(item.notes != null ? item.notes : "");
+                    itemSubtotals.add(String.valueOf(item.subtotal));
+                }
+            }
+
+            intent.putStringArrayListExtra("item_names",     itemNames);
+            intent.putStringArrayListExtra("item_prices",    itemPrices);
+            intent.putIntegerArrayListExtra("item_qtys",     itemQtys);
+            intent.putStringArrayListExtra("item_notes",     itemNotes);
+            intent.putStringArrayListExtra("item_subtotals", itemSubtotals);
+
             v.getContext().startActivity(intent);
         });
     }
@@ -132,7 +159,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            cardView        = (MaterialCardView) itemView; // Root view adalah MaterialCardView
+            cardView        = (MaterialCardView) itemView;
             ivIcon          = itemView.findViewById(R.id.ivIcon);
             tvNamaPelanggan = itemView.findViewById(R.id.tvNamaPelanggan);
             tvDetailPesanan = itemView.findViewById(R.id.tvDetailPesanan);
