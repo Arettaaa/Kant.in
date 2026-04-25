@@ -16,11 +16,12 @@ public class OrderModel implements Serializable {
     private String orderNotes;
 
     public String getOrderNotes() { return orderNotes; }
+
     @SerializedName("customer_snapshot")
     private CustomerSnapshot customerSnapshot;
 
     @SerializedName("items")
-    private List<OrderItem> items; // Menggunakan OrderItem yang sudah kita buat sebelumnya
+    private List<OrderItem> items;
 
     @SerializedName("delivery_details")
     private DeliveryDetails deliveryDetails;
@@ -41,54 +42,64 @@ public class OrderModel implements Serializable {
     private String createdAt;
 
     // --- GETTER ---
-    public String getId() { return id; }
-    public String getOrderCode() { return orderCode; }
+    public String getId()                         { return id; }
+    public String getOrderCode()                  { return orderCode; }
     public CustomerSnapshot getCustomerSnapshot() { return customerSnapshot; }
-    public List<OrderItem> getItems() { return items; }
-    public DeliveryDetails getDeliveryDetails() { return deliveryDetails; }
-    public Payment getPayment() { return payment; }
-    public int getSubtotalAmount() { return subtotalAmount; }
-    public int getTotalAmount() { return totalAmount; }
-    public String getStatus() { return status; }
-    public String getCreatedAt() { return createdAt; }
+    public List<OrderItem> getItems()             { return items; }
+    public DeliveryDetails getDeliveryDetails()   { return deliveryDetails; }
+    public Payment getPayment()                   { return payment; }
+    public int getSubtotalAmount()                { return subtotalAmount; }
+    public int getTotalAmount()                   { return totalAmount; }
+    public String getStatus()                     { return status; }
+    public String getCreatedAt()                  { return createdAt; }
 
     // ==========================================
-    // NESTED CLASSES (Sesuai struktur JSON Laravel)
+    // NESTED CLASSES
     // ==========================================
 
     public static class CustomerSnapshot implements Serializable {
         @SerializedName("name")
         private String name;
+
         @SerializedName("phone")
         private String phone;
 
-        public String getName() { return name; }
-        public String getPhone() { return phone; }
+        // ✅ TAMBAHAN — foto profil pelanggan
+        @SerializedName("photo_profile")
+        private String photoProfile;
+
+        public String getName()         { return name; }
+        public String getPhone()        { return phone; }
+        public String getPhotoProfile() { return photoProfile; } // ✅ getter baru
     }
 
     public static class DeliveryDetails implements Serializable {
         @SerializedName("method")
-        private String method; // "delivery" atau "pickup"
+        private String method;
+
         @SerializedName("fee")
         private int fee;
+
         @SerializedName("location_note")
         private String locationNote;
 
-        public String getMethod() { return method; }
-        public int getFee() { return fee; }
+        public String getMethod()       { return method; }
+        public int getFee()             { return fee; }
         public String getLocationNote() { return locationNote; }
     }
 
     public static class Payment implements Serializable {
         @SerializedName("method")
         private String method;
+
         @SerializedName("status")
         private String status;
+
         @SerializedName("proof")
-        private String proof; // Nama file foto struk
+        private String proof;
 
         public String getMethod() { return method; }
         public String getStatus() { return status; }
-        public String getProof() { return proof; }
+        public String getProof()  { return proof; }
     }
 }

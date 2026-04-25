@@ -8,13 +8,16 @@ import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.kantin.model.OrderModel; // Import Model
-import com.example.kantin.model.OrderItem;  // Import OrderItem
+import com.bumptech.glide.Glide;
+import com.example.kantin.model.OrderModel;
+import com.example.kantin.model.OrderItem;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -22,10 +25,11 @@ import java.util.Locale;
 
 public class OrderMasukAdapter extends RecyclerView.Adapter<OrderMasukAdapter.ViewHolder> {
 
-    private final Context context;
-    private final List<OrderModel> orderList; // Gunakan OrderModel
+    private static final String BASE_URL_STORAGE = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/";
 
-    // Constructor
+    private final Context context;
+    private final List<OrderModel> orderList;
+
     public OrderMasukAdapter(Context context, List<OrderModel> orderList) {
         this.context = context;
         this.orderList = orderList;
@@ -41,29 +45,51 @@ public class OrderMasukAdapter extends RecyclerView.Adapter<OrderMasukAdapter.Vi
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        OrderModel order = orderList.get(position); // Gunakan OrderModel
+        OrderModel order = orderList.get(position);
+        if (order == null) return;
 
-        if (order == null) return; // Mencegah crash
-
-        // 1. Set Header Info
+        // 1. Nama pelanggan (nama depan saja)
         if (order.getCustomerSnapshot() != null) {
             String fullName = order.getCustomerSnapshot().getName();
             String firstName = (fullName != null && fullName.contains(" "))
                     ? fullName.split(" ")[0] : fullName;
-            holder.tvCustomerName.setText(firstName);
+            holder.tvCustomerName.setText(firstName != null ? firstName : "Pelanggan");
+
+            // ✅ FOTO PROFIL — load dari customer_snapshot.photo_profile
+            if (holder.ivCustomerPhoto != null) {
+                String photoPath = order.getCustomerSnapshot().getPhotoProfile();
+                if (photoPath != null && !photoPath.isEmpty()) {
+                    String fullUrl = photoPath.startsWith("http")
+                            ? photoPath
+                            : BASE_URL_STORAGE + photoPath;
+                    Glide.with(context)
+                            .load(fullUrl)
+                            .circleCrop()
+                            .placeholder(R.drawable.avatar)
+                            .error(R.drawable.avatar)
+                            .into(holder.ivCustomerPhoto);
+                } else {
+                    // Tidak ada foto → tampilkan avatar default
+                    holder.ivCustomerPhoto.setImageResource(R.drawable.avatar);
+                }
+            }
         } else {
             holder.tvCustomerName.setText("Pelanggan");
+            if (holder.ivCustomerPhoto != null) {
+                holder.ivCustomerPhoto.setImageResource(R.drawable.avatar);
+            }
         }
 
+        // 2. Order code & waktu
         holder.tvOrderId.setText(order.getOrderCode());
-        holder.tvTotal.setText(formatRupiah(order.getTotalAmount()));
-
-        // 2. Set Waktu (Otomatis konversi ke WIB)
         if (holder.tvTime != null) {
             holder.tvTime.setText(formatWaktuWIB(order.getCreatedAt()));
         }
 
-        // 3. Set Delivery Badge
+        // 3. Total
+        holder.tvTotal.setText(formatRupiah(order.getTotalAmount()));
+
+        // 4. Badge delivery
         if (order.getDeliveryDetails() != null && "pickup".equals(order.getDeliveryDetails().getMethod())) {
             holder.tvDeliveryType.setText("Ambil Sendiri");
             holder.tvDeliveryType.setTextColor(Color.parseColor("#9C27B0"));
@@ -74,47 +100,34 @@ public class OrderMasukAdapter extends RecyclerView.Adapter<OrderMasukAdapter.Vi
             holder.tvDeliveryType.setBackgroundResource(R.drawable.bg_order_label_blue);
         }
 
-        // 4. Logic Maksimal 2 Menu List
+        // 5. Menu list (maks 2 item)
         holder.llMenuContainer.removeAllViews();
-        List<OrderItem> items = order.getItems(); // Gunakan OrderItem
-
+        List<OrderItem> items = order.getItems();
         if (items != null) {
             int maxItemsToShow = Math.min(items.size(), 2);
-
             for (int i = 0; i < maxItemsToShow; i++) {
                 OrderItem item = items.get(i);
-                View rowView = LayoutInflater.from(context).inflate(R.layout.item_menu_row, holder.llMenuContainer, false);
-
-                TextView tvQty = rowView.findViewById(R.id.tv_qty);
-                TextView tvMenuName = rowView.findViewById(R.id.tv_menu_name);
-
-                tvQty.setText(item.getQuantity() + "x");
-                tvMenuName.setText(item.getName());
-
+                View rowView = LayoutInflater.from(context)
+                        .inflate(R.layout.item_menu_row, holder.llMenuContainer, false);
+                ((TextView) rowView.findViewById(R.id.tv_qty)).setText(item.getQuantity() + "x");
+                ((TextView) rowView.findViewById(R.id.tv_menu_name)).setText(item.getName());
                 holder.llMenuContainer.addView(rowView);
             }
 
-            // 5. Logic "+ X item lainnya"
             if (items.size() > 2) {
-                int remaining = items.size() - 2;
-                holder.tvMoreItems.setText("+ " + remaining + " item lainnya");
+                holder.tvMoreItems.setText("+ " + (items.size() - 2) + " item lainnya");
                 holder.tvMoreItems.setVisibility(View.VISIBLE);
             } else {
                 holder.tvMoreItems.setVisibility(View.GONE);
             }
         }
 
-        // 6. Aksi Klik Card (Lempar ke DetailPesanan)
+        // 6. Klik card → detail pesanan
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, DetailPesanan.class); // Nama Activity Detail
-
-            // Ambil Canteen ID yang tersimpan di SharedPreferences
+            Intent intent = new Intent(context, DetailPesanan.class);
             SharedPreferences prefs = context.getSharedPreferences("KantinApp", Context.MODE_PRIVATE);
-            String canteenId = prefs.getString("CANTEEN_ID", "");
-
-            intent.putExtra("CANTEEN_ID", canteenId);
-            intent.putExtra("ORDER_DATA", order); // Mengirim seluruh data OrderModel
-
+            intent.putExtra("CANTEEN_ID", prefs.getString("CANTEEN_ID", ""));
+            intent.putExtra("ORDER_DATA", order);
             context.startActivity(intent);
         });
     }
@@ -125,47 +138,40 @@ public class OrderMasukAdapter extends RecyclerView.Adapter<OrderMasukAdapter.Vi
     }
 
     private String formatRupiah(int number) {
-        Locale localeID = new Locale("in", "ID");
-        NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(localeID);
+        NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
         return formatRupiah.format(number).replace("Rp", "Rp ");
     }
 
-    // Fungsi Ajaib Konversi UTC ke WIB (Jam:Menit)
     private String formatWaktuWIB(String createdAt) {
         if (createdAt == null || createdAt.isEmpty()) return "-";
         try {
-            // Bersihkan format (Misal "2026-04-21T01:20:39.980000Z" jadi "2026-04-21 01:20:39")
             String cleanDate = createdAt.split("\\.")[0].replace("T", " ");
-
-            // Beritahu Android kalau waktu aslinya adalah UTC
-            java.text.SimpleDateFormat inputFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault());
+            java.text.SimpleDateFormat inputFormat = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
             inputFormat.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
             java.util.Date date = inputFormat.parse(cleanDate);
-
-            // Ubah ke WIB (Asia/Jakarta) dengan format HH:mm (24 Jam)
-            java.text.SimpleDateFormat outputFormat = new java.text.SimpleDateFormat("HH:mm", new java.util.Locale("id", "ID"));
+            java.text.SimpleDateFormat outputFormat = new java.text.SimpleDateFormat("HH:mm", new Locale("id", "ID"));
             outputFormat.setTimeZone(java.util.TimeZone.getTimeZone("Asia/Jakarta"));
-
             return outputFormat.format(date);
         } catch (Exception e) {
-            // Kalau gagal, kembali ke cara potong string biasa
             return createdAt.length() >= 16 ? createdAt.substring(11, 16) : "-";
         }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        ImageView ivCustomerPhoto;   // ✅ foto profil
         TextView tvCustomerName, tvTime, tvOrderId, tvDeliveryType, tvMoreItems, tvTotal;
         LinearLayout llMenuContainer;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvCustomerName = itemView.findViewById(R.id.tv_customer_name);
-            tvTime = itemView.findViewById(R.id.tv_order_time);
-            tvOrderId = itemView.findViewById(R.id.tv_order_id);
-            tvDeliveryType = itemView.findViewById(R.id.tv_delivery_type);
+            ivCustomerPhoto = itemView.findViewById(R.id.iv_customer_profile); // sesuaikan ID dengan XML
+            tvCustomerName  = itemView.findViewById(R.id.tv_customer_name);
+            tvTime          = itemView.findViewById(R.id.tv_order_time);
+            tvOrderId       = itemView.findViewById(R.id.tv_order_id);
+            tvDeliveryType  = itemView.findViewById(R.id.tv_delivery_type);
             llMenuContainer = itemView.findViewById(R.id.ll_menu_container);
-            tvMoreItems = itemView.findViewById(R.id.tv_more_items);
-            tvTotal = itemView.findViewById(R.id.tv_total_price);
+            tvMoreItems     = itemView.findViewById(R.id.tv_more_items);
+            tvTotal         = itemView.findViewById(R.id.tv_total_price);
         }
     }
 }
