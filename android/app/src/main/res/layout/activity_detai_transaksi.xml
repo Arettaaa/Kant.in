@@ -70,6 +70,7 @@
                 android:padding="20dp">
 
                 <TextView
+                    android:id="@+id/tvStatusBadge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_badge_green_light"

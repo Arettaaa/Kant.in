@@ -1,6 +1,8 @@
 package com.example.kantin;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +11,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,7 +29,7 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detai_transaksi);
 
         // Ambil data dari Intent
-        Intent intent = getIntent();
+        Intent intent    = getIntent();
         String orderCode     = intent.getStringExtra("order_code");
         String customerName  = intent.getStringExtra("customer_name");
         String status        = intent.getStringExtra("status");
@@ -34,6 +38,7 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
         double subtotal      = intent.getDoubleExtra("subtotal_amount", 0);
         double deliveryFee   = intent.getDoubleExtra("delivery_fee", 0);
         String paymentMethod = intent.getStringExtra("payment_method");
+
         // Init views
         TextView tvHeaderOrderId        = findViewById(R.id.tvHeaderOrderId);
         TextView tvTotalPembayaranUtama = findViewById(R.id.tvTotalPembayaranUtama);
@@ -43,13 +48,15 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
         TextView tvSubtotal             = findViewById(R.id.tvSubtotal);
         TextView tvBiayaAplikasi        = findViewById(R.id.tvBiayaAplikasi);
         TextView tvTotalAkhir           = findViewById(R.id.tvTotalAkhir);
+        TextView tvStatusBadge          = findViewById(R.id.tvStatusBadge); // ← badge status
         LinearLayout containerMenuList  = findViewById(R.id.containerMenuList);
         ImageView btnBack               = findViewById(R.id.btnBack);
+
         btnBack.setOnClickListener(v -> finish());
 
         NumberFormat rupiah = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 
-        // Isi data
+        // ── Isi data ──────────────────────────────────────────────
         tvHeaderOrderId.setText(orderCode);
         tvIdPesanan.setText(orderCode);
         tvNamaPelanggan.setText(customerName);
@@ -58,37 +65,84 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
         tvBiayaAplikasi.setText(rupiah.format(deliveryFee));
         tvTotalAkhir.setText(rupiah.format(totalAmount));
 
-        // Format tanggal
-        try {
-            SimpleDateFormat sdfIn  = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault());
-            sdfIn.setTimeZone(TimeZone.getTimeZone("UTC")); // parse sebagai UTC dulu
+        // ── Status Badge ──────────────────────────────────────────
+        boolean isCancelled = "cancelled".equalsIgnoreCase(status);
 
-            SimpleDateFormat sdfOut = new SimpleDateFormat("dd MMM yyyy\nhh:mm a", Locale.getDefault());
-            sdfOut.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta")); // output dalam WIB
-            Date date = sdfIn.parse(createdAt);
-            tvTanggalWaktu.setText(date != null ? sdfOut.format(date) : createdAt);
-        } catch (ParseException e) {
-            tvTanggalWaktu.setText(createdAt);
+        if (isCancelled) {
+            // Teks & warna merah
+            tvStatusBadge.setText("Dibatalkan");
+            tvStatusBadge.setTextColor(Color.parseColor("#F44336"));
+
+            // Background badge merah
+            tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_red_light);
+
+            // Icon silang (X) — gunakan ic_close jika ada, fallback ke tanpa icon
+            Drawable iconClose = ContextCompat.getDrawable(this, R.drawable.ic_close);
+            if (iconClose != null) {
+                iconClose.setTint(Color.parseColor("#F44336"));
+                tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(iconClose, null, null, null);
+            } else {
+                tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+            }
+
+            // Total harga dicoret karena dibatalkan
+            tvTotalPembayaranUtama.setPaintFlags(
+                    tvTotalPembayaranUtama.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+            tvTotalPembayaranUtama.setTextColor(Color.parseColor("#9E9E9E"));
+            tvTotalAkhir.setPaintFlags(
+                    tvTotalAkhir.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+            tvTotalAkhir.setTextColor(Color.parseColor("#9E9E9E"));
+
+        } else {
+            // Selesai (completed) — tampilan default sesuai XML
+            tvStatusBadge.setText("Selesai");
+            tvStatusBadge.setTextColor(Color.parseColor("#28A745"));
+            tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_green_light);
+
+            Drawable iconCheck = ContextCompat.getDrawable(this, R.drawable.ic_check);
+            if (iconCheck != null) {
+                iconCheck.setTint(Color.parseColor("#28A745"));
+                tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(iconCheck, null, null, null);
+            }
         }
 
-        // List menu — inflate per item
-        ArrayList<String> itemNames    = intent.getStringArrayListExtra("item_names");
-        ArrayList<String> itemPrices   = intent.getStringArrayListExtra("item_prices");
-        ArrayList<Integer> itemQtys    = intent.getIntegerArrayListExtra("item_qtys");
-        ArrayList<String> itemNotes = intent.getStringArrayListExtra("item_notes");
-        ArrayList<String> itemSubtotals = intent.getStringArrayListExtra("item_subtotals");
+        // ── Format tanggal ────────────────────────────────────────
+        if (createdAt != null && !createdAt.isEmpty()) {
+            try {
+                SimpleDateFormat sdfIn = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault());
+                sdfIn.setTimeZone(TimeZone.getTimeZone("UTC"));
 
+                SimpleDateFormat sdfOut = new SimpleDateFormat("dd MMM yyyy\nhh:mm a", Locale.getDefault());
+                sdfOut.setTimeZone(TimeZone.getTimeZone("Asia/Jakarta"));
+
+                Date date = sdfIn.parse(createdAt);
+                tvTanggalWaktu.setText(date != null ? sdfOut.format(date) : createdAt);
+            } catch (ParseException e) {
+                tvTanggalWaktu.setText(createdAt);
+            }
+        }
+
+        // ── List menu — inflate per item ──────────────────────────
+        ArrayList<String>  itemNames     = intent.getStringArrayListExtra("item_names");
+        ArrayList<String>  itemPrices    = intent.getStringArrayListExtra("item_prices");
+        ArrayList<Integer> itemQtys      = intent.getIntegerArrayListExtra("item_qtys");
+        ArrayList<String>  itemNotes     = intent.getStringArrayListExtra("item_notes");
+        ArrayList<String>  itemSubtotals = intent.getStringArrayListExtra("item_subtotals");
 
         if (itemNames != null) {
             for (int i = 0; i < itemNames.size(); i++) {
-                View row = LayoutInflater.from(this).inflate(R.layout.item_menu_detail_with_note, containerMenuList, false);                ((TextView) row.findViewById(R.id.tvMenuNama)).setText(itemNames.get(i));
-                ((TextView) row.findViewById(R.id.tvMenuQty)).setText(itemQtys.get(i) + "x");
-                ((TextView) row.findViewById(R.id.tvMenuHarga)).setText(rupiah.format(Double.parseDouble(itemPrices.get(i))));
+                View row = LayoutInflater.from(this)
+                        .inflate(R.layout.item_menu_detail_with_note, containerMenuList, false);
 
-                // Handle note
+                ((TextView) row.findViewById(R.id.tvMenuNama)).setText(itemNames.get(i));
+                ((TextView) row.findViewById(R.id.tvMenuQty)).setText(itemQtys.get(i) + "x");
+                ((TextView) row.findViewById(R.id.tvMenuHarga)).setText(
+                        rupiah.format(Double.parseDouble(itemPrices.get(i))));
+
                 TextView tvNote = row.findViewById(R.id.tvMenuNote);
-                if (itemNotes != null && itemNotes.get(i) != null && !itemNotes.get(i).isEmpty()) {
-                    tvNote.setText("📝 " + itemNotes.get(i));
+                String note = (itemNotes != null && i < itemNotes.size()) ? itemNotes.get(i) : "";
+                if (note != null && !note.isEmpty()) {
+                    tvNote.setText("📝 " + note);
                     tvNote.setVisibility(View.VISIBLE);
                 } else {
                     tvNote.setVisibility(View.GONE);
