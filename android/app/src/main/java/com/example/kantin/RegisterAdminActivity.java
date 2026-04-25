@@ -103,11 +103,11 @@ public class RegisterAdminActivity extends AppCompatActivity {
     private void togglePassword() {
         if (isPasswordVisible) {
             etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            ivTogglePassword.setImageResource(R.drawable.eye_close); // Pastikan drawable ini ada
+            ivTogglePassword.setImageResource(R.drawable.eye); // Pastikan drawable ini ada
             isPasswordVisible = false;
         } else {
             etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-            ivTogglePassword.setImageResource(R.drawable.eye);
+            ivTogglePassword.setImageResource(R.drawable.eye_close);
             isPasswordVisible = true;
         }
         etPassword.setSelection(etPassword.getText().length());

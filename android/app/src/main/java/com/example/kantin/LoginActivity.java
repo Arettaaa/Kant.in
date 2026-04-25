@@ -80,11 +80,11 @@ public class LoginActivity extends AppCompatActivity {
     private void togglePassword() {
         if (isPasswordVisible) {
             etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            ivTogglePassword.setImageResource(R.drawable.eye);
+            ivTogglePassword.setImageResource(R.drawable.eye_close);
             isPasswordVisible = false;
         } else {
             etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-            ivTogglePassword.setImageResource(R.drawable.eye_close);
+            ivTogglePassword.setImageResource(R.drawable.eye);
             isPasswordVisible = true;
         }
         etPassword.setSelection(etPassword.getText().length());

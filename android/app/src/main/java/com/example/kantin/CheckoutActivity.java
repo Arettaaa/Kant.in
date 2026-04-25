@@ -401,14 +401,11 @@ public class CheckoutActivity extends AppCompatActivity {
             return;
         }
 
-        String locationNoteText = "";
-        if ("delivery".equals(deliveryMethod)) {
-            locationNoteText = etAlamat.getText().toString().trim();
-            if (locationNoteText.isEmpty()) {
-                Toast.makeText(this, "Alamat pengiriman wajib diisi!", Toast.LENGTH_SHORT).show();
-                resetTombolKonfirmasi();
-                return;
-            }
+        String locationNoteText = etAlamat.getText().toString().trim();
+        if (locationNoteText.isEmpty()) {
+            Toast.makeText(this, "Alamat pengiriman wajib diisi!", Toast.LENGTH_SHORT).show();
+            resetTombolKonfirmasi();
+            return;
         }
 
         RequestBody canteenIdPart      = RequestBody.create(okhttp3.MultipartBody.FORM, canteenId);
