@@ -77,7 +77,7 @@ public class DetaiTransaksiActivity extends AppCompatActivity {
             tvStatusBadge.setBackgroundResource(R.drawable.bg_badge_red_light);
 
             // Icon silang (X) — gunakan ic_close jika ada, fallback ke tanpa icon
-            Drawable iconClose = ContextCompat.getDrawable(this, R.drawable.ic_close);
+            Drawable iconClose = ContextCompat.getDrawable(this, R.drawable.close);
             if (iconClose != null) {
                 iconClose.setTint(Color.parseColor("#F44336"));
                 tvStatusBadge.setCompoundDrawablesWithIntrinsicBounds(iconClose, null, null, null);

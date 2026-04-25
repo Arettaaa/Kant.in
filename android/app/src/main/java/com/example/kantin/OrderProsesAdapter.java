@@ -193,7 +193,7 @@ public class OrderProsesAdapter extends RecyclerView.Adapter<OrderProsesAdapter.
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivCustomerProfile = itemView.findViewById(R.id.iv_customer_profile_proses); 
+            ivCustomerProfile = itemView.findViewById(R.id.iv_customer_profile_proses);
             tvCustomerName    = itemView.findViewById(R.id.tvCustomerNameProses);
             tvTime            = itemView.findViewById(R.id.tvOrderTimeProses);
             tvOrderId         = itemView.findViewById(R.id.tvOrderIdProses);
