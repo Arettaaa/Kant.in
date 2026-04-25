@@ -53,7 +53,7 @@
                 android:layout_height="88dp"
                 android:background="@drawable/bg_circle_orange_outline"
                 android:padding="24dp"
-                android:src="@drawable/clock"
+                android:src="@drawable/ic_clock"
                 app:tint="#F97316" />
 
             <TextView

@@ -130,7 +130,7 @@
                     android:layout_height="36dp"
                     android:background="@drawable/bg_circle_gray_outline"
                     android:padding="8dp"
-                    android:src="@drawable/clock"
+                    android:src="@drawable/ic_clock"
                     app:tint="#9CA3AF" />
                 <TextView
                     android:id="@+id/tvMenunggu"
