@@ -167,6 +167,30 @@
     .modal-card {
         animation: modalIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideOut {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        to {
+            opacity: 0;
+            transform: translateX(40px);
+        }
+    }
 </style>
 @endpush
 
@@ -326,6 +350,18 @@
                         </div>
 
                     </div>
+
+                    @if($status === 'ready')
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <button onclick="konfirmasiPesanan('{{ $order['_id'] ?? $order['id'] ?? '' }}')"
+                            data-order-btn="{{ $order['_id'] ?? '' }}"
+                            class="action-btn w-full py-3 rounded-2xl text-sm font-bold text-white flex items-center justify-center gap-2"
+                            style="background:linear-gradient(135deg,#FF6900,#ea580c);">
+                            <i class="fa-solid fa-check text-sm"></i>
+                            Pesanan Diterima
+                        </button>
+                    </div>
+                    @endif
                 </div>
                 @empty
                 <div class="col-span-2 flex flex-col items-center justify-center py-20 gap-3">
@@ -542,6 +578,28 @@ function setRating(val) {
     });
 }
 
+function konfirmasiPesanan(orderId) {
+    if (!confirm('Konfirmasi bahwa pesanan sudah kamu terima?')) return;
+
+    fetch(`/pesanan/${orderId}/complete`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success !== false) {
+            // Reload halaman supaya card pindah ke tab Riwayat
+            window.location.reload();
+        } else {
+            alert(data.message ?? 'Gagal mengkonfirmasi pesanan.');
+        }
+    })
+    .catch(() => alert('Terjadi kesalahan.'));
+}
+
 // Hover effect
 document.querySelectorAll('.star-rating .star').forEach((star, idx) => {
     star.addEventListener('mouseenter', () => {
@@ -606,5 +664,53 @@ function submitRating() {
 document.getElementById('ratingModal').addEventListener('click', function(e) {
     if (e.target === this) closeRating();
 });
+
+function showToast(message, type = 'success') {
+    const existing = document.getElementById('toastNotif');
+    if (existing) existing.remove();
+
+    const colors = type === 'success'
+        ? 'background: linear-gradient(135deg, #22c55e, #16a34a);'
+        : 'background: linear-gradient(135deg, #ef4444, #dc2626);';
+
+    const icon = type === 'success' ? 'fa-check' : 'fa-xmark';
+
+    const toast = document.createElement('div');
+    toast.id = 'toastNotif';
+    toast.style.cssText = `
+        position: fixed; top: 24px; right: 24px; z-index: 9999;
+        display: flex; align-items: center; gap: 12px;
+        padding: 14px 20px; border-radius: 16px; color: white;
+        font-size: 14px; font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s ease; ${colors}
+    `;
+    toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease forwards';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function konfirmasiPesanan(orderId) {
+    fetch(`/pesanan/${orderId}/complete`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success !== false) {
+            showToast('Pesanan berhasil dikonfirmasi!', 'success');
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            showToast(data.message ?? 'Gagal mengkonfirmasi pesanan.', 'error');
+        }
+    })
+    .catch(() => showToast('Terjadi kesalahan.', 'error'));
+}
 </script>
 @endpush

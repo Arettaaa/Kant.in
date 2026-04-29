@@ -265,7 +265,7 @@
             tabK.style.cssText = 'background-color:#FF6900; color:#fff;';
             tabP.style.cssText = 'background-color:#F3F4F6; color:#6B7280;';
             nkf.style.display = 'block';
-            linkLogin.href = '/admin/login'; 
+            linkLogin.href = '/login'; 
         }
     }
 

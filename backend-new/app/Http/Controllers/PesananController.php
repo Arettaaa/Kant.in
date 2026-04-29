@@ -74,4 +74,18 @@ class PesananController extends Controller
 
         return view('pelanggan.pesanan', compact('orders'));
     }
+
+    public function complete(Request $request, $orderId)
+    {
+        $response = Http::withToken($this->token($request))
+            ->timeout(15)
+            ->post($this->apiUrl("/buyers/orders/{$orderId}/completions")); // ← ini
+
+        $data = $response->json();
+
+        return response()->json([
+            'success' => $response->successful() && ($data['success'] ?? true) !== false,
+            'message' => $data['message'] ?? 'Berhasil dikonfirmasi.',
+        ]);
+    }
 }

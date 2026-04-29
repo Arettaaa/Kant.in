@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Canteen;
 use Illuminate\Http\Request;
 
 class TransactionController extends Controller
@@ -71,83 +72,127 @@ class TransactionController extends Controller
     // GET /transactions (admin global - semua kantin)
     public function globalTransactions(Request $request)
     {
-        $canteens = \App\Models\Canteen::where('is_active', true)->get();
+        $periode = $request->query('periode', 'bulan');
+        $query = Order::where('status', 'completed');
 
-        $result = [];
-        $grandTotalRevenue = 0;
-        $grandTotalOrders = 0;
-
-        foreach ($canteens as $canteen) {
-            $orders = Order::where('canteen_id', (string) $canteen->_id)
-                ->where('status', 'completed')
-                ->get();
-
-            $totalRevenue = $orders->sum('total_amount');
-            $totalOrders = $orders->count();
-
-            $grandTotalRevenue += $totalRevenue;
-            $grandTotalOrders += $totalOrders;
-
-            $result[] = [
-                'canteen_id' => (string) $canteen->_id,
-                'canteen_name' => $canteen->name,
-                'canteen_image' => $canteen->image ? asset('storage/' . $canteen->image) : null,
-                'total_orders' => $totalOrders,
-                'total_revenue' => $totalRevenue,
-            ];
+        // Filter Waktu
+        if ($periode == 'hari') {
+            $query->whereDate('created_at', today());
+        } elseif ($periode == 'minggu') {
+            $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
+        } else {
+            $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
         }
+
+        $orders = $query->get();
+        $canteens = Canteen::where('is_active', true)->get();
+
+        $result = $canteens->map(function($c) use ($orders) {
+            $cOrders = $orders->where('canteen_id', (string)$c->_id);
+            return [
+                'canteen_id'    => (string)$c->_id,
+                'canteen_name'  => $c->name,
+                'canteen_image' => $c->image ? asset('storage/' . $c->image) : null,
+                'total_orders'  => $cOrders->count(),
+                'total_revenue' => $cOrders->sum('total_amount'),
+            ];
+        });
 
         return response()->json([
             'success' => true,
             'data' => [
-                'grand_total_revenue' => $grandTotalRevenue,
-                'grand_total_orders' => $grandTotalOrders,
-                'canteens' => $result,
+                'grand_total_revenue' => $result->sum('total_revenue'),
+                'grand_total_orders'  => $result->sum('total_orders'),
+                'canteens'            => $result,
             ],
         ]);
     }
 
     // GET /dashboard (admin global - semua kantin)
-    public function globalDashboard(Request $request)
+   public function globalDashboard(Request $request)
     {
-        $totalActiveCanteens = \App\Models\Canteen::where('is_active', true)->count();
-        $canteens = \App\Models\Canteen::where('is_active', true)->get();
+        // ✅ FIX: Ganti constant dengan string 'completed' langsung
+        $statusCompleted = 'completed';
 
-        $grandTotalRevenue = 0;
-        $grandTotalOrders = 0;
-        $canteenPerformance = [];
+        // Bulan ini
+        $startOfMonth = now()->startOfMonth();
+        $endOfMonth   = now()->endOfMonth();
 
-        foreach ($canteens as $canteen) {
-            $completedOrders = Order::where('canteen_id', (string) $canteen->_id)
-                ->where('status', 'completed')
-                ->get();
+        // Bulan lalu
+        $startOfLastMonth = now()->subMonth()->startOfMonth();
+        $endOfLastMonth   = now()->subMonth()->endOfMonth();
 
-            $totalRevenue = $completedOrders->sum('total_amount');
-            $totalOrders = $completedOrders->count();
+        // Pendapatan bulan ini
+        $totalPendapatan = Order::where('status', $statusCompleted)
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->sum('total_amount');
 
-            $grandTotalRevenue += $totalRevenue;
-            $grandTotalOrders += $totalOrders;
+        // Total pesanan bulan ini
+        $totalPesanan = Order::where('status', $statusCompleted)
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->count();
 
-            $canteenPerformance[] = [
-                'canteen_id' => (string) $canteen->_id,
-                'canteen_name' => $canteen->name,
-                'canteen_image' => $canteen->image ? asset('storage/' . $canteen->image) : null,
-                'total_orders' => $totalOrders,
-                'total_revenue' => $totalRevenue,
-            ];
+        // Pendapatan bulan lalu
+        $pendapatanBulanLalu = Order::where('status', $statusCompleted)
+            ->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])
+            ->sum('total_amount');
+
+        // Hitung persentase
+        $persentase = 0;
+        $trend = 'flat';
+
+        if ($pendapatanBulanLalu > 0) {
+            $persentase = (($totalPendapatan - $pendapatanBulanLalu) / $pendapatanBulanLalu) * 100;
+        } elseif ($totalPendapatan > 0) {
+            $persentase = 100;
         }
 
-        // Sort by total_orders descending
-        usort($canteenPerformance, fn($a, $b) => $b['total_orders'] - $a['total_orders']);
+        if ($persentase > 0) {
+            $trend = 'up';
+        } elseif ($persentase < 0) {
+            $trend = 'down';
+        }
+
+        // Statistik kantin
+        $kantinAktif   = Canteen::where('is_active', true)->where('status', 'active')->count();
+        $kantinPending = Canteen::where('status', 'pending')->count();
+
+        // Top kantin
+        $topKantin = Order::where('status', $statusCompleted)
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->get()
+            ->groupBy('canteen_id')
+            ->map(function ($orders) {
+                return [
+                    'total' => $orders->count(),
+                    'canteen_id' => $orders->first()->canteen_id,
+                ];
+            })
+            ->sortByDesc('total')
+            ->take(5)
+            ->values();
+
+        $chartLabels = [];
+        $chartData   = [];
+
+        foreach ($topKantin as $item) {
+            $canteen = Canteen::find($item['canteen_id']);
+            $chartLabels[] = $canteen ? $canteen->name : 'Unknown';
+            $chartData[]   = $item['total'];
+        }
 
         return response()->json([
             'success' => true,
             'data' => [
-                'total_revenue' => $grandTotalRevenue,
-                'total_orders' => $grandTotalOrders,
-                'total_active_canteens' => $totalActiveCanteens,
-                'canteen_performance' => $canteenPerformance,
-            ],
+                'totalPendapatan'   => $totalPendapatan,
+                'totalPesanan'      => $totalPesanan,
+                'kantinAktif'       => $kantinAktif,
+                'kantinPending'     => $kantinPending,
+                'chartLabels'       => $chartLabels,
+                'chartData'         => $chartData,
+                'revenuePercentage' => round(abs($persentase), 1),
+                'revenueTrend'      => $trend
+            ]
         ]);
     }
 }

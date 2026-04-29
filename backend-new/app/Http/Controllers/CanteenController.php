@@ -2,112 +2,71 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Canteen;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Session;
+// ✅ TAMBAHKAN BARIS INI BIAR NGGAK ERROR LAGI:
+use App\Models\User; 
 
 class CanteenController extends Controller
 {
-    // TAMPILAN UTAMA: List Kantin
+    private function apiUrl(string $path): string
+    {
+        $base = env('API_INTERNAL_URL', config('app.url'));
+        return rtrim($base, '/') . '/api' . $path;
+    }
+
     public function index()
     {
-        // Ambil semua kantin KECUALI yang statusnya 'pending'
-        $canteens = Canteen::with('admin')
-            ->where('status', '!=', 'pending')
-            ->latest()
-            ->get();
+        $token = Session::get('api_token');
 
-        // Data Statistik
-        $totalKantin = $canteens->count(); // Total dari data yang ditarik (bukan pending)
-        $kantinAktif = $canteens->where('status', 'active')->count(); // Total yang aktif saja
+        // 1. Ambil data kantin dari API
+        $response = Http::timeout(15)
+            ->withToken($token)
+            ->get($this->apiUrl('/canteens'));
 
-        return view('admin_global.kantin', compact('canteens', 'totalKantin', 'kantinAktif'));
+        if ($response->successful()) {
+            $rawCanteens = $response->json('data') ?? [];
+
+            // 2. Kita gabungkan data dari API dengan data User (Pemilik) dari Database Lokal
+            $canteens = collect($rawCanteens)->map(function($kantin) {
+                // Ambil ID Kantin (support format MongoDB _id atau ID biasa)
+                $idKantin = $kantin['_id'] ?? $kantin['id'] ?? null;
+                
+                // Cari user yang punya canteen_id tersebut dan rolenya admin_kantin
+                $pemilik = User::where('canteen_id', (string)$idKantin)
+                               ->where('role', 'admin_kantin')
+                               ->first();
+                
+                // Masukkan nama pemilik ke dalam array kantin
+                $kantin['admin_kantin_name'] = $pemilik ? $pemilik->name : 'Belum ada pemilik';
+                return $kantin;
+            });
+
+            // Filter supaya yang statusnya 'pending' nggak muncul di halaman ini
+            $canteens = $canteens->filter(fn($c) => ($c['status'] ?? '') !== 'pending');
+
+            $totalKantin = $canteens->count();
+            $kantinAktif = $canteens->where('status', 'active')->count();
+
+            return view('admin_global.kantin', compact('canteens', 'totalKantin', 'kantinAktif'));
+        }
+
+        return redirect()->route('admin.global.dasbor')->withErrors('Gagal menyambung ke server API.');
     }
 
-    // PROSES: Simpan Kantin Baru (Dari Modal Tambah)
+    // Fungsi store, update, destroy tetap arahkan ke API...
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'admin_name' => 'required|string',
-            'admin_email' => 'required|email|unique:users,email',
-            'admin_password' => 'required|min:6',
-            'location' => 'required|string',
-            'image' => 'nullable|image|max:2048',
-        ]);
-
-        // 1. Upload Gambar jika ada
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('canteens', 'public');
-        }
-
-        // 2. Buat Kantin (Gunakan data default seperti di API kamu)
-        $canteen = Canteen::create([
-            'name' => $request->name,
-            'location' => $request->location,
-            'image' => $imagePath,
-            'delivery_fee_flat' => 5000, // Contoh default
-            'operating_hours' => ['open' => '08:00', 'close' => '17:00'],
-            'status' => 'active',
-            'is_active' => true,
-            'is_open' => true,
-        ]);
-
-        // 3. Buat User Admin Kantin (Relasi)
-        User::create([
-            'name' => $request->admin_name,
-            'email' => $request->admin_email,
-            'password' => Hash::make($request->admin_password),
-            'role' => 'admin_kantin',
-            'canteen_id' => $canteen->id,
-            'status' => 'active',
-        ]);
-
-        return redirect()->back()->with('success', 'Kantin dan Admin berhasil didaftarkan!');
+        $token = Session::get('api_token');
+        $response = Http::withToken($token)->post($this->apiUrl('/canteens'), $request->all());
+        return redirect()->back()->with('success', 'Kantin berhasil ditambahkan!');
     }
 
-    // PROSES: Update Kantin
-    public function update(Request $request, $id)
-    {
-        $canteen = Canteen::findOrFail($id);
-
-        $data = $request->validate([
-            'name' => 'required|string',
-            'location' => 'required|string',
-            // Validasi 'status' dihapus karena form edit tidak mengirimkan data status
-        ]);
-
-        if ($request->hasFile('image')) {
-            if ($canteen->image) Storage::disk('public')->delete($canteen->image);
-            $data['image'] = $request->file('image')->store('canteens', 'public');
-        }
-
-        $canteen->update($data);
-
-        return redirect()->back()->with('success', 'Data kantin berhasil diperbarui!');
-    }
-
-    // PROSES: Hapus Kantin
     public function destroy($id)
     {
-        $canteen = Canteen::findOrFail($id);
-
-        // 1. Hapus foto agar tidak nyampah di storage
-        if ($canteen->image) {
-            Storage::disk('public')->delete($canteen->image);
-        }
-
-        // 2. Hapus akun User (Admin/Pemilik Kantin) yang terikat dengan kantin ini
-        // Kita cari user yang 'canteen_id'-nya sama dengan ID kantin yang mau dihapus
-        User::where('canteen_id', $id)->delete();
-
-        // 3. Hapus data kantinnya
-        $canteen->delete();
-
-        return redirect()->back()->with('success', 'Kantin beserta akun pemiliknya berhasil dihapus.');
+        $token = Session::get('api_token');
+        $response = Http::withToken($token)->delete($this->apiUrl("/canteens/{$id}"));
+        return redirect()->back()->with('success', 'Kantin berhasil dihapus!');
     }
 }

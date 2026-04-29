@@ -17,6 +17,19 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.session' => \App\Http\Middleware\CheckSession::class,    // ← tambah ini saja
             'admin.kantin'  => \App\Http\Middleware\CheckAdminKantin::class, // tambah baru
         ]);
+
+        $middleware->redirectGuestsTo(function (\Illuminate\Http\Request $request) {
+        // Admin Global → /admin/login
+        if ($request->is('admin/global/*')) {
+            return '/admin/login';
+        }
+        // Admin Kantin → /admin/login
+        if ($request->is('admin/*')) {
+            return '/admin/login';
+        }
+        // Pelanggan → /login
+        return '/login';
+    });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

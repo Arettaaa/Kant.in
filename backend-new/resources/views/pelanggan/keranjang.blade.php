@@ -345,7 +345,7 @@
             </div>
             <p class="text-base font-extrabold text-gray-700">Keranjang kosong</p>
             <p class="text-sm text-gray-400 font-medium text-center">Tambahkan makanan dari halaman kantin</p>
-            <a href="/beranda" class="mt-2 px-6 py-2.5 rounded-2xl text-sm font-bold text-white"
+            <a href="/jelajah?tab=makanan" class="mt-2 px-6 py-2.5 rounded-2xl text-sm font-bold text-white"
                 style="background-color:#FF6900;">
                 Cari Makanan
             </a>

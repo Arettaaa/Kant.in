@@ -16,6 +16,8 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\PesananController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ForgotPasswordController;
+
 
 
 
@@ -36,18 +38,20 @@ Route::post('/register', [AuthController::class, 'processRegister'])->name('regi
 // Logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Lupa kata sandi (Tetap di folder auth)
-Route::get('/lupa-sandi',            fn() => view('auth.lupa-sandi'));
-Route::get('/lupa-sandi/verifikasi', fn() => view('auth.verifikasi-otp'));
-Route::get('/lupa-sandi/reset',      fn() => view('auth.reset-sandi'));
 
+Route::get('/lupa-sandi',        [ForgotPasswordController::class, 'index']);
+Route::post('/lupa-sandi',       [ForgotPasswordController::class, 'checkEmail']);
+Route::get('/lupa-sandi/reset',  [ForgotPasswordController::class, 'resetForm']);
+Route::post('/lupa-sandi/reset', [ForgotPasswordController::class, 'resetPassword']);
+
+Route::get('/lupa-sandi/verifikasi', fn() => view('auth.verifikasi-otp'));
 /*
 |--------------------------------------------------------------------------
 | Admin Auth Routes
 |--------------------------------------------------------------------------
 */
-Route::get('/admin/register', fn() => view('admin.register'))->name('admin.register');
-Route::get('/admin/login',    fn() => view('admin.login'))->name('admin.login');
+Route::get('/admin/register', fn() => view('auth.register'))->name('admin.register');
+Route::get('/admin/login', fn() => view('auth.login'))->name('admin.login');
 
 
 /*
@@ -55,7 +59,7 @@ Route::get('/admin/login',    fn() => view('admin.login'))->name('admin.login');
 | Admin Global Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth'])->prefix('admin/global')->name('admin.global.')->group(function () {
+Route::middleware(['check.session'])->prefix('admin/global')->name('admin.global.')->group(function () {
 
     // Dasbor
     Route::get('/dasbor', [DashboardController::class, 'index'])->name('dasbor');
@@ -66,9 +70,8 @@ Route::middleware(['auth'])->prefix('admin/global')->name('admin.global.')->grou
 
     // Transaksi & Notifikasi
     Route::get('/transaksi', [TransactionController::class, 'index'])->name('transaksi');
+    Route::get('/transaksi/ekspor', [TransactionController::class, 'export'])->name('transaksi.export');
     Route::get('/notifikasi', [NotificationController::class, 'index'])->name('notifikasi');
-    // Ubah 'review-pendaftaran' jadi 'rev-pendaftaran'
-    Route::get('/notifikasi/review', fn() => view('admin_global.rev-pendaftaran'))->name('rev-pendaftaran');
 
 
     // Profil & Keamanan
@@ -79,16 +82,15 @@ Route::middleware(['auth'])->prefix('admin/global')->name('admin.global.')->grou
     Route::post('/kantin-mitra', [CanteenController::class, 'store'])->name('kantin.store');
     Route::put('/kantin-mitra/{id}', [CanteenController::class, 'update'])->name('kantin.update');
     Route::delete('/kantin-mitra/{id}', [CanteenController::class, 'destroy'])->name('kantin.destroy');
-    
-    Route::get('/pengaturan', [DashboardController::class, 'pengaturan'])->name('pengaturan');
 
+    Route::get('/pengaturan', [DashboardController::class, 'pengaturan'])->name('pengaturan');
 });
 /*
 |--------------------------------------------------------------------------
 | Admin Kantin Routes
 |--------------------------------------------------------------------------
 */
-Route::middleware(['admin.kantin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['check.session', 'admin.kantin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Pesanan
     Route::get('/pesanan', [App\Http\Controllers\AdminKantin\OrderController::class, 'index'])->name('pesanan');
@@ -143,12 +145,13 @@ Route::get('/keranjang/ongkir/{canteenId}', [CartController::class, 'getOngkir']
 Route::post('/rating/{orderId}', [RatingController::class, 'store'])->name('pelanggan.rating.store');
 Route::get('/rating/{orderId}/check', [RatingController::class, 'check'])->name('pelanggan.rating.check');
 
- Route::post('/pembayaran/session',  [CheckoutController::class, 'saveSession']);
-Route::get('/pembayaran',           [CheckoutController::class, 'index']);
-Route::post('/pembayaran',          [CheckoutController::class, 'store']);
+Route::post('/pembayaran/session',  [CheckoutController::class, 'saveSession']);
+Route::get('/pembayaran', [CheckoutController::class, 'index']);
+Route::post('/pembayaran', [CheckoutController::class, 'store']);
 Route::post('/pembayaran/batalkan', [CheckoutController::class, 'cancel']);
 Route::get('/jelajah', [JelajahController::class, 'index'])->name('pelanggan.jelajah');
 Route::get('/pesanan', [PesananController::class, 'index'])->name('pelanggan.pesanan');
+Route::post('/pesanan/{orderId}/complete', [PesananController::class, 'complete']);
 Route::get('/profil', [ProfilController::class, 'index'])->name('pelanggan.profil');
 Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('pelanggan.edit-profil');
 Route::get('/profil/data-diri', [ProfilController::class, 'dataDiri'])->name('pelanggan.data-diri');

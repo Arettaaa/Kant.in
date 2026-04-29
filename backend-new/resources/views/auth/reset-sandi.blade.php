@@ -17,14 +17,22 @@
         transition: all 0.2s ease;
         letter-spacing: 0.04em;
     }
+
     .input-field:focus {
         border-color: #FF6900;
-        box-shadow: 0 0 0 3px rgba(255,105,0,0.12);
+        box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.12);
         background-color: #fff;
     }
-    .input-field::placeholder { letter-spacing: normal; color: #d1d5db; }
 
-    .input-wrap { position: relative; }
+    .input-field::placeholder {
+        letter-spacing: normal;
+        color: #d1d5db;
+    }
+
+    .input-wrap {
+        position: relative;
+    }
+
     .toggle-eye {
         position: absolute;
         right: 14px;
@@ -34,7 +42,10 @@
         cursor: pointer;
         transition: color 0.15s ease;
     }
-    .toggle-eye:hover { color: #FF6900; }
+
+    .toggle-eye:hover {
+        color: #FF6900;
+    }
 
     .strength-seg {
         height: 4px;
@@ -43,50 +54,93 @@
         background-color: #e5e7eb;
     }
 
-    .submit-btn { transition: all 0.2s ease; }
+    .submit-btn {
+        transition: all 0.2s ease;
+    }
+
     .submit-btn:hover {
         filter: brightness(1.08);
         transform: translateY(-1px);
-        box-shadow: 0 8px 24px rgba(255,105,0,0.3);
+        box-shadow: 0 8px 24px rgba(255, 105, 0, 0.3);
     }
-    .submit-btn:active { transform: translateY(0); }
+
+    .submit-btn:active {
+        transform: translateY(0);
+    }
 
     /* Modal */
     @keyframes modalIn {
-        from { opacity:0; transform:scale(0.88) translateY(12px); }
-        to   { opacity:1; transform:scale(1) translateY(0); }
+        from {
+            opacity: 0;
+            transform: scale(0.88) translateY(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
     }
+
     @keyframes checkPop {
-        0%   { transform:scale(0); opacity:0; }
-        60%  { transform:scale(1.2); }
-        100% { transform:scale(1); opacity:1; }
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        60% {
+            transform: scale(1.2);
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
     }
+
     @keyframes fadeUp {
-        from { opacity:0; transform:translateY(8px); }
-        to   { opacity:1; transform:translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-    .modal-card  { animation: modalIn  0.28s cubic-bezier(0.34,1.56,0.64,1); }
-    .check-anim  { animation: checkPop 0.4s  cubic-bezier(0.34,1.56,0.64,1) 0.1s both; }
-    .fade-up-1   { animation: fadeUp   0.3s  ease 0.3s both; }
-    .fade-up-2   { animation: fadeUp   0.3s  ease 0.45s both; }
+
+    .modal-card {
+        animation: modalIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .check-anim {
+        animation: checkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+    }
+
+    .fade-up-1 {
+        animation: fadeUp 0.3s ease 0.3s both;
+    }
+
+    .fade-up-2 {
+        animation: fadeUp 0.3s ease 0.45s both;
+    }
 </style>
 @endpush
 
 @section('content')
 
 {{-- ======================== MODAL BERHASIL ======================== --}}
-<div id="successModal"
-     class="fixed inset-0 z-50 hidden items-center justify-center"
-     style="background:rgba(0,0,0,0.45); backdrop-filter:blur(6px);">
+<div id="successModal" class="fixed inset-0 z-50 hidden items-center justify-center"
+    style="background:rgba(0,0,0,0.45); backdrop-filter:blur(6px);">
     <div class="modal-card bg-white rounded-3xl shadow-2xl w-[380px] mx-4 overflow-hidden">
         <div class="h-2 w-full" style="background:linear-gradient(90deg,#22c55e,#16a34a);"></div>
         <div class="px-8 pt-8 pb-8 flex flex-col items-center gap-4">
 
             {{-- Check icon --}}
             <div class="check-anim w-18 h-18 w-[72px] h-[72px] rounded-full flex items-center justify-center shadow-lg"
-                 style="background:linear-gradient(135deg,#22c55e,#16a34a);">
+                style="background:linear-gradient(135deg,#22c55e,#16a34a);">
                 <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                 </svg>
             </div>
 
@@ -98,7 +152,8 @@
             </div>
 
             {{-- Info box --}}
-            <div class="fade-up-1 w-full flex items-center gap-3 px-4 py-3 rounded-2xl" style="background-color:#F0FDF4;">
+            <div class="fade-up-1 w-full flex items-center gap-3 px-4 py-3 rounded-2xl"
+                style="background-color:#F0FDF4;">
                 <i class="fa-solid fa-shield-halved text-green-500 text-sm flex-shrink-0"></i>
                 <p class="text-xs text-green-700 font-semibold">Akun kamu sudah aman dengan kata sandi baru</p>
             </div>
@@ -106,8 +161,8 @@
             {{-- CTA --}}
             <div class="fade-up-2 w-full flex flex-col gap-2.5 mt-1">
                 <a href="/login"
-                   class="w-full py-3.5 rounded-2xl text-white font-extrabold text-sm text-center shadow-md"
-                   style="background:linear-gradient(135deg,#FF6900,#ea580c);">
+                    class="w-full py-3.5 rounded-2xl text-white font-extrabold text-sm text-center shadow-md"
+                    style="background:linear-gradient(135deg,#FF6900,#ea580c);">
                     Login Sekarang
                 </a>
             </div>
@@ -120,9 +175,10 @@
 
     {{-- LEFT --}}
     <div class="hidden md:flex md:w-1/2 relative min-h-screen">
-        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80"
-             alt="Food" class="absolute inset-0 w-full h-full object-cover">
-        <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(249,115,22,0.82) 0%,rgba(194,65,12,0.90) 100%);"></div>
+        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80" alt="Food"
+            class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0"
+            style="background:linear-gradient(135deg,rgba(249,115,22,0.82) 0%,rgba(194,65,12,0.90) 100%);"></div>
         <div class="relative z-10 flex flex-col justify-end p-12 pb-20 text-white">
             <h2 class="text-4xl font-extrabold leading-tight mb-4">Buat kata sandi<br>yang kuat ya!</h2>
             <p class="text-base leading-relaxed max-w-sm" style="color:rgba(255,237,213,0.92);">
@@ -136,19 +192,22 @@
 
         {{-- Logo --}}
         <div class="flex flex-col items-center pt-10 pb-8 px-10 rounded-b-3xl" style="background-color:#FFF7ED;">
-            <div class="w-14 h-14 rounded-[16px] flex items-center justify-center mb-3 shadow-sm" style="background-color:#FF6900;">
+            <div class="w-14 h-14 rounded-[16px] flex items-center justify-center mb-3 shadow-sm"
+                style="background-color:#FF6900;">
                 <i class="fa-solid fa-utensils text-2xl text-white"></i>
             </div>
-            <h1 class="text-xl font-extrabold text-gray-900 tracking-tight">Kant<span style="color:#FF6900;">.in</span></h1>
+            <h1 class="text-xl font-extrabold text-gray-900 tracking-tight">Kant<span style="color:#FF6900;">.in</span>
+            </h1>
         </div>
 
         {{-- Content --}}
         <div class="flex-1 flex flex-col px-10 pt-8 pb-10">
 
             {{-- Back --}}
-            <a href="/lupa-sandi/verifikasi" class="flex items-center gap-2 text-sm font-semibold text-gray-400 hover:text-gray-600 transition-all mb-6 w-fit">
+            <a href="/lupa-sandi"
+                class="flex items-center gap-2 text-sm font-semibold text-gray-400 hover:text-gray-600 transition-all mb-6 w-fit">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
                 </svg>
                 Kembali
             </a>
@@ -167,7 +226,7 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Kata Sandi Baru</label>
                     <div class="input-wrap">
                         <input type="password" id="newPass" class="input-field" placeholder="••••••••"
-                               oninput="checkStrength(this.value)">
+                            oninput="checkStrength(this.value)">
                         <i class="fa-regular fa-eye toggle-eye" onclick="togglePass('newPass', this)"></i>
                     </div>
                     {{-- Strength bar --}}
@@ -181,7 +240,7 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Konfirmasi Kata Sandi</label>
                     <div class="input-wrap">
                         <input type="password" id="confirmPass" class="input-field" placeholder="••••••••"
-                               oninput="checkMatch()">
+                            oninput="checkMatch()">
                         <i class="fa-regular fa-eye toggle-eye" onclick="togglePass('confirmPass', this)"></i>
                     </div>
                     <p id="matchLabel" class="text-xs mt-1 font-medium hidden"></p>
@@ -210,10 +269,9 @@
 
             {{-- Submit --}}
             <button onclick="handleReset()"
-                    class="submit-btn mt-6 w-full py-3.5 text-white font-bold text-sm rounded-xl shadow-md flex items-center justify-center gap-2"
-                    style="background-color:#FF6900;"
-                    onmouseover="this.style.backgroundColor='#e55f00'"
-                    onmouseout="this.style.backgroundColor='#FF6900'">
+                class="submit-btn mt-6 w-full py-3.5 text-white font-bold text-sm rounded-xl shadow-md flex items-center justify-center gap-2"
+                style="background-color:#FF6900;" onmouseover="this.style.backgroundColor='#e55f00'"
+                onmouseout="this.style.backgroundColor='#FF6900'">
                 <i class="fa-solid fa-key text-sm"></i>
                 Simpan Kata Sandi Baru
             </button>
@@ -293,20 +351,47 @@
     }
 
     // Submit
-    function handleReset() {
-        const nw   = document.getElementById('newPass').value;
-        const conf = document.getElementById('confirmPass').value;
+   function handleReset() {
+    const nw   = document.getElementById('newPass').value;
+    const conf = document.getElementById('confirmPass').value;
 
-        if (!nw || !conf) { alert('Semua field wajib diisi!'); return; }
-        if (nw.length < 8) { alert('Kata sandi minimal 8 karakter!'); return; }
-        if (nw !== conf)   { alert('Konfirmasi kata sandi tidak cocok!'); return; }
+    if (!nw || !conf) { alert('Semua field wajib diisi!'); return; }
+    if (nw.length < 8) { alert('Kata sandi minimal 8 karakter!'); return; }
+    if (nw !== conf)   { alert('Konfirmasi kata sandi tidak cocok!'); return; }
 
-        // Tampilkan modal berhasil
-        const modal = document.getElementById('successModal');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-    }
+    const btn = document.querySelector('button[onclick="handleReset()"]');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
 
+    fetch('/lupa-sandi/reset', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({
+            password: nw,
+            password_confirmation: conf,
+        }),
+    })
+    .then(r => r.json().then(data => ({ ok: r.ok, data })))
+    .then(({ ok, data }) => {
+        if (ok) {
+            const modal = document.getElementById('successModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        } else {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-key text-sm"></i> Simpan Kata Sandi Baru';
+            alert(data.message ?? 'Gagal menyimpan password.');
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-key text-sm"></i> Simpan Kata Sandi Baru';
+        alert('Terjadi kesalahan.');
+    });
+}
     // Backdrop klik tutup modal
     document.getElementById('successModal').addEventListener('click', function(e) {
         if (e.target === this) {
