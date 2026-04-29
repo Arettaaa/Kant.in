@@ -33,7 +33,7 @@ class OrderController extends Controller
     // GET /admin/pesanan
     public function index(Request $request)
     {
-        $status   = $request->get('status', 'pending');
+        $status   = $request->input('status', 'pending');
         $canteenId = $this->canteenId();
 
         $response = Http::withToken($this->token())
