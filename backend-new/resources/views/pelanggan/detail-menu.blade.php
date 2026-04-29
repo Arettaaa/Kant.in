@@ -114,14 +114,19 @@
             <div class="flex items-center gap-3 text-sm text-gray-500 font-semibold -mt-3">
                 <span class="flex items-center gap-1.5">
                     <i class="fa-solid fa-star text-amber-400 text-base"></i>
-                    <span class="font-extrabold text-gray-800">5.0</span>
-                    <span class="text-gray-400">(dummy)</span>
+                    <span class="font-extrabold text-gray-800">
+                        {{ !empty($menu['average_rating']) ? number_format($menu['average_rating'], 1) : 'Belum ada
+                        rating' }}
+                    </span>
+                    @if(!empty($menu['total_reviews']))
+                    <span class="text-gray-400">({{ $menu['total_reviews'] }} ulasan)</span>
+                    @endif
                 </span>
                 @if(!empty($menu['estimated_cooking_time']))
                 <span class="text-gray-300">•</span>
                 <span class="flex items-center gap-1.5">
                     <i class="fa-regular fa-clock text-gray-400"></i>
-                    {{ $menu['estimated_cooking_time'] }} mnt waktu siapkan
+                    {{ $menu['estimated_cooking_time'] }} menit waktu siapkan
                 </span>
                 @endif
             </div>

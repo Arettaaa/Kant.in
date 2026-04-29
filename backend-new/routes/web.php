@@ -13,6 +13,12 @@ use App\Http\Controllers\JelajahController;
 use App\Http\Controllers\DetailMenuController;
 use App\Http\Controllers\DetailKantinController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\RatingController;
+use App\Http\Controllers\PesananController;
+use App\Http\Controllers\CheckoutController;
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -122,9 +128,15 @@ Route::delete('/keranjang/items/{menuId}', [CartController::class, 'removeItem']
 Route::delete('/keranjang', [CartController::class, 'clearSelected'])->name('pelanggan.keranjang.clear');
 Route::get('/keranjang/ongkir/{canteenId}', [CartController::class, 'getOngkir'])->name('pelanggan.keranjang.ongkir');
 
-Route::get('/pembayaran',               fn() => view('pelanggan.pembayaran'))->name('pelanggan.pembayaran');
+Route::post('/rating/{orderId}', [RatingController::class, 'store'])->name('pelanggan.rating.store');
+Route::get('/rating/{orderId}/check', [RatingController::class, 'check'])->name('pelanggan.rating.check');
+
+ Route::post('/pembayaran/session',  [CheckoutController::class, 'saveSession']);
+Route::get('/pembayaran',           [CheckoutController::class, 'index']);
+Route::post('/pembayaran',          [CheckoutController::class, 'store']);
+Route::post('/pembayaran/batalkan', [CheckoutController::class, 'cancel']);
 Route::get('/jelajah', [JelajahController::class, 'index'])->name('pelanggan.jelajah');
-Route::get('/pesanan',                  fn() => view('pelanggan.pesanan'))->name('pelanggan.pesanan');
+Route::get('/pesanan', [PesananController::class, 'index'])->name('pelanggan.pesanan');
 Route::get('/profil', [ProfilController::class, 'index'])->name('pelanggan.profil');
 Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('pelanggan.edit-profil');
 Route::get('/profil/data-diri', [ProfilController::class, 'dataDiri'])->name('pelanggan.data-diri');

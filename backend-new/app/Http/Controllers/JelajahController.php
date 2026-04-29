@@ -66,6 +66,38 @@ class JelajahController extends Controller
             }
 
             $canteens = array_values($canteens);
+
+            // Versi paralel (lebih cepat)
+            $canteenIds = array_column($canteens, '_id');
+
+            $responses = Http::pool(
+                fn($pool) =>
+                array_map(
+                    fn($id) => $pool->as($id)->timeout(10)->get($this->apiUrl('/canteens/' . $id . '/menus')),
+                    $canteenIds
+                )
+            );
+
+            $canteens = array_map(function ($kantin) use ($responses) {
+                $res = $responses[$kantin['_id']] ?? null;
+                $avgRating = null;
+
+                if ($res && $res->successful()) {
+                    $menus = $res->json('data') ?? [];
+                    $total = 0;
+                    $count = 0;
+                    foreach ($menus as $menu) {
+                        if (($menu['total_reviews'] ?? 0) > 0) {
+                            $total += $menu['average_rating'] ?? 0;
+                            $count++;
+                        }
+                    }
+                    if ($count > 0) $avgRating = round($total / $count, 1);
+                }
+
+                $kantin['computed_rating'] = $avgRating;
+                return $kantin;
+            }, $canteens);
         }
 
         return view('pelanggan.jelajah', compact('menus', 'canteens', 'tab', 'category', 'search', 'searchKantin', 'statusFilter'));

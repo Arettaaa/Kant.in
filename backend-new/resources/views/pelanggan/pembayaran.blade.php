@@ -5,57 +5,178 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-    .upload-area { transition: all 0.2s ease; cursor: pointer; }
-    .upload-area:hover { border-color: #FF6900; background-color: #FFFAF7; }
-    .upload-area.has-file { border-color: #22c55e; background-color: #F0FDF4; }
+    .upload-area {
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
 
-    .konfirmasi-btn { transition: all 0.2s ease; }
-    .konfirmasi-btn:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(255,105,0,0.35); }
-    .konfirmasi-btn:active { transform: translateY(0); }
+    .upload-area:hover {
+        border-color: #FF6900;
+        background-color: #FFFAF7;
+    }
+
+    .upload-area.has-file {
+        border-color: #22c55e;
+        background-color: #F0FDF4;
+    }
+
+    .konfirmasi-btn {
+        transition: all 0.2s ease;
+    }
+
+    .konfirmasi-btn:hover:not(:disabled) {
+        filter: brightness(1.08);
+        transform: translateY(-1px);
+        box-shadow: 0 8px 24px rgba(255, 105, 0, 0.35);
+    }
+
+    .konfirmasi-btn:active:not(:disabled) {
+        transform: translateY(0);
+    }
+
+    .konfirmasi-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background: linear-gradient(135deg, #d1d5db, #9ca3af) !important;
+    }
 
     @keyframes modalIn {
-        from { opacity: 0; transform: scale(0.88) translateY(12px); }
-        to   { opacity: 1; transform: scale(1) translateY(0); }
+        from {
+            opacity: 0;
+            transform: scale(0.88) translateY(12px);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
     }
+
     @keyframes checkPop {
-        0%   { transform: scale(0); opacity: 0; }
-        60%  { transform: scale(1.2); opacity: 1; }
-        100% { transform: scale(1); opacity: 1; }
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        60% {
+            transform: scale(1.2);
+            opacity: 1;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
     }
+
     @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(8px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
+
     @keyframes pulse-icon {
-        0%, 100% { transform: scale(1); }
-        50%       { transform: scale(1.08); }
-    }
-    .modal-card  { animation: modalIn 0.28s cubic-bezier(0.34,1.56,0.64,1); }
-    .check-anim  { animation: checkPop 0.4s cubic-bezier(0.34,1.56,0.64,1) 0.15s both; }
-    .fade-up     { animation: fadeUp 0.3s ease 0.35s both; }
-    .fade-up-2   { animation: fadeUp 0.3s ease 0.45s both; }
-    .fade-up-3   { animation: fadeUp 0.3s ease 0.55s both; }
-    .pulse-anim  { animation: pulse-icon 1.8s ease-in-out infinite; }
 
-    .qr-wrap { position: relative; display: inline-block; }
-    .qr-wrap::before {
-        content: ''; position: absolute; inset: -6px;
-        border-radius: 18px; border: 2px solid rgba(255,105,0,0.2);
-        animation: pulse-ring 2s ease-in-out infinite;
-    }
-    @keyframes pulse-ring {
-        0%, 100% { opacity: 0.3; transform: scale(1); }
-        50%       { opacity: 0.7; transform: scale(1.03); }
-    }
-    .timer-bar { animation: countdown 300s linear forwards; }
-    @keyframes countdown { from { width: 100%; } to { width: 0%; } }
+        0%,
+        100% {
+            transform: scale(1);
+        }
 
-    /* Cancel countdown */
+        50% {
+            transform: scale(1.08);
+        }
+    }
+
+    .modal-card {
+        animation: modalIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .check-anim {
+        animation: checkPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+    }
+
+    .fade-up {
+        animation: fadeUp 0.3s ease 0.35s both;
+    }
+
+    .fade-up-2 {
+        animation: fadeUp 0.3s ease 0.45s both;
+    }
+
+    .fade-up-3 {
+        animation: fadeUp 0.3s ease 0.55s both;
+    }
+
+    .pulse-anim {
+        animation: pulse-icon 1.8s ease-in-out infinite;
+    }
+
+    .qr-wrap {
+        position: relative;
+        display: inline-block;
+    }
+
     @keyframes cancelCountdown {
-        from { width: 100%; }
-        to   { width: 0%; }
+        from {
+            width: 100%;
+        }
+
+        to {
+            width: 0%;
+        }
     }
-    .cancel-bar { animation: cancelCountdown 30s linear forwards; }
+
+    .cancel-bar {
+        animation: cancelCountdown 30s linear forwards;
+    }
+
+    .item-note-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: #FFF3E8;
+        color: #FF6900;
+        border-radius: 8px;
+        padding: 2px 7px;
+        font-size: 10px;
+        font-weight: 700;
+        margin-top: 3px;
+    }
+
+    .loading-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .loading-overlay.show {
+        display: flex;
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .spin {
+        animation: spin 0.8s linear infinite;
+    }
 </style>
 @endpush
 
@@ -63,147 +184,173 @@
 
 <div class="flex w-full h-screen bg-[#F9FAFB] overflow-hidden">
 
-    {{-- SIDEBAR --}}
-    <aside class="w-[240px] h-screen bg-white flex flex-col py-8 px-6 shadow-sm flex-shrink-0 z-20 border-r border-gray-100">
-        <div class="flex items-center gap-3 mb-8 px-2">
-            <div class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg" style="background-color:#FF6900;">
+   {{-- ======================== SIDEBAR ======================== --}}
+    <aside
+        class="w-[240px] h-screen bg-white flex flex-col py-8 px-6 shadow-sm flex-shrink-0 z-20 border-r border-gray-100">
+
+        {{-- Logo --}}
+        <div class="flex items-center gap-3 mb-10 px-2">
+            <div class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg"
+                style="background-color:#FF6900;">
                 <i class="fa-solid fa-fire text-lg text-white"></i>
             </div>
             <span class="text-xl font-extrabold text-gray-900 tracking-tight">Kant.in</span>
         </div>
-        <p class="text-[10px] font-black text-gray-300 tracking-widest uppercase px-2 mb-3">Menu Pelanggan</p>
-        <nav class="flex flex-col gap-1.5 flex-1">
-            <a href="/beranda" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+
+        {{-- Nav --}}
+        <nav class="flex flex-col gap-2 flex-1">
+            <a href="/beranda"
+                class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold transition-all"
+                style="background-color:#FFF3E8; color:#FF6900;">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
                 Beranda
             </a>
-            <a href="/jelajah" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+
+            <a href="/jelajah"
+                class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
                 Jelajah
             </a>
-            <a href="/pesanan" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+
+            <a href="/pesanan"
+                class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
                 Pesanan
             </a>
-            <a href="/profil" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
-                Tersimpan
+
+            <a href="/profil"
+                class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Profil
             </a>
         </nav>
-        <a href="/login" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all mt-auto">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+
+        {{-- Logout / Login Dinamis --}}
+        @auth
+        {{-- Jika sudah login, tampilkan tombol Keluar --}}
+        <form action="{{ route('logout') }}" method="POST" class="mt-auto">
+            @csrf
+            <button type="submit"
+                class="flex items-center w-full gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Keluar
+            </button>
+        </form>
+        @else
+        {{-- Jika belum login, tampilkan tombol Masuk --}}
+        <a href="/login"
+            class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-orange-500 hover:bg-orange-50 transition-all mt-auto">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
             Keluar
         </a>
+        @endauth
     </aside>
-
     {{-- MAIN --}}
     <main class="flex-1 flex h-screen overflow-y-auto bg-[#F9FAFB]">
         <div class="flex flex-1 gap-6 px-8 py-8 max-w-5xl w-full mx-auto">
 
-            {{-- LEFT --}}
+            {{-- ===== LEFT COLUMN ===== --}}
             <div class="flex-1 flex flex-col gap-5">
+
+                {{-- Header --}}
                 <div class="flex items-center gap-4">
-                    <a href="/keranjang" class="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all flex-shrink-0 shadow-sm">
-                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                    <a href="/keranjang"
+                        class="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-all flex-shrink-0 shadow-sm">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M15 19l-7-7 7-7" />
+                        </svg>
                     </a>
                     <div>
                         <h1 class="text-xl font-extrabold text-gray-900 leading-tight">Selesaikan Pembayaran</h1>
-                        <p class="text-sm text-gray-400 font-medium mt-0.5">Satu langkah lagi untuk menikmati hidanganmu.</p>
+                        <p class="text-sm text-gray-400 font-medium mt-0.5">Satu langkah lagi untuk menikmati
+                            hidanganmu.</p>
                     </div>
                 </div>
 
-                {{-- QR CARD --}}
+                {{-- ===== QR CARD ===== --}}
                 <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col items-center gap-5">
+
                     <div class="flex items-center gap-3 self-start w-full">
-                        <span class="text-xs font-black px-3 py-1.5 rounded-full border-2 border-blue-200 text-blue-500 tracking-widest">QRIS</span>
+                        <span
+                            class="text-xs font-black px-3 py-1.5 rounded-full border-2 border-blue-200 text-blue-500 tracking-widest">QRIS</span>
                         <span class="text-base font-extrabold text-gray-800">Pindai untuk Membayar</span>
                     </div>
+
                     <p class="text-sm text-gray-400 font-medium text-center leading-relaxed -mt-2">
-                        Buka aplikasi m-banking atau e-wallet (GoPay, OVO, Dana) Anda<br>dan pindai kode QR di bawah ini.
+                        Buka aplikasi m-banking atau e-wallet (GoPay, OVO, Dana)<br>
+                        dan pindai kode QR di bawah ini.
                     </p>
+
+                    {{-- QR Image --}}
                     <div class="qr-wrap">
-                        <div class="w-52 h-52 rounded-2xl overflow-hidden border-4 border-white shadow-lg bg-white flex items-center justify-center p-3">
-                            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                                <rect x="10" y="10" width="60" height="60" rx="6" fill="none" stroke="#111" stroke-width="8"/>
-                                <rect x="22" y="22" width="36" height="36" rx="3" fill="#111"/>
-                                <rect x="130" y="10" width="60" height="60" rx="6" fill="none" stroke="#111" stroke-width="8"/>
-                                <rect x="142" y="22" width="36" height="36" rx="3" fill="#111"/>
-                                <rect x="10" y="130" width="60" height="60" rx="6" fill="none" stroke="#111" stroke-width="8"/>
-                                <rect x="22" y="142" width="36" height="36" rx="3" fill="#111"/>
-                                <rect x="82" y="10" width="8" height="8" fill="#111"/><rect x="92" y="10" width="8" height="8" fill="#111"/>
-                                <rect x="82" y="20" width="8" height="8" fill="#111"/><rect x="102" y="20" width="8" height="8" fill="#111"/>
-                                <rect x="112" y="10" width="8" height="8" fill="#111"/><rect x="102" y="10" width="8" height="8" fill="#111"/>
-                                <rect x="82" y="30" width="8" height="8" fill="#111"/><rect x="92" y="30" width="8" height="8" fill="#111"/>
-                                <rect x="112" y="30" width="8" height="8" fill="#111"/>
-                                <rect x="82" y="40" width="8" height="8" fill="#111"/><rect x="102" y="40" width="8" height="8" fill="#111"/>
-                                <rect x="92" y="50" width="8" height="8" fill="#111"/><rect x="112" y="50" width="8" height="8" fill="#111"/>
-                                <rect x="82" y="60" width="8" height="8" fill="#111"/><rect x="102" y="60" width="8" height="8" fill="#111"/>
-                                <rect x="10" y="82" width="8" height="8" fill="#111"/><rect x="20" y="82" width="8" height="8" fill="#111"/>
-                                <rect x="40" y="82" width="8" height="8" fill="#111"/><rect x="60" y="82" width="8" height="8" fill="#111"/>
-                                <rect x="10" y="92" width="8" height="8" fill="#111"/><rect x="30" y="92" width="8" height="8" fill="#111"/>
-                                <rect x="50" y="92" width="8" height="8" fill="#111"/>
-                                <rect x="10" y="102" width="8" height="8" fill="#111"/><rect x="20" y="102" width="8" height="8" fill="#111"/>
-                                <rect x="40" y="102" width="8" height="8" fill="#111"/><rect x="60" y="102" width="8" height="8" fill="#111"/>
-                                <rect x="10" y="112" width="8" height="8" fill="#111"/><rect x="30" y="112" width="8" height="8" fill="#111"/>
-                                <rect x="82" y="82" width="8" height="8" fill="#111"/><rect x="92" y="82" width="8" height="8" fill="#111"/>
-                                <rect x="112" y="82" width="8" height="8" fill="#111"/>
-                                <rect x="82" y="92" width="8" height="8" fill="#111"/><rect x="102" y="92" width="8" height="8" fill="#111"/>
-                                <rect x="92" y="102" width="8" height="8" fill="#111"/><rect x="112" y="102" width="8" height="8" fill="#111"/>
-                                <rect x="82" y="112" width="8" height="8" fill="#111"/><rect x="102" y="112" width="8" height="8" fill="#111"/>
-                                <rect x="130" y="82" width="8" height="8" fill="#111"/><rect x="150" y="82" width="8" height="8" fill="#111"/>
-                                <rect x="140" y="82" width="8" height="8" fill="#111"/><rect x="170" y="82" width="8" height="8" fill="#111"/>
-                                <rect x="130" y="92" width="8" height="8" fill="#111"/><rect x="160" y="92" width="8" height="8" fill="#111"/>
-                                <rect x="140" y="102" width="8" height="8" fill="#111"/><rect x="150" y="102" width="8" height="8" fill="#111"/>
-                                <rect x="170" y="102" width="8" height="8" fill="#111"/>
-                                <rect x="130" y="112" width="8" height="8" fill="#111"/><rect x="150" y="112" width="8" height="8" fill="#111"/>
-                                <rect x="82" y="130" width="8" height="8" fill="#111"/><rect x="102" y="130" width="8" height="8" fill="#111"/>
-                                <rect x="112" y="130" width="8" height="8" fill="#111"/>
-                                <rect x="82" y="140" width="8" height="8" fill="#111"/><rect x="92" y="140" width="8" height="8" fill="#111"/>
-                                <rect x="82" y="150" width="8" height="8" fill="#111"/><rect x="102" y="150" width="8" height="8" fill="#111"/>
-                                <rect x="112" y="150" width="8" height="8" fill="#111"/>
-                                <rect x="82" y="160" width="8" height="8" fill="#111"/><rect x="92" y="160" width="8" height="8" fill="#111"/>
-                                <rect x="130" y="130" width="8" height="8" fill="#111"/><rect x="150" y="130" width="8" height="8" fill="#111"/>
-                                <rect x="170" y="130" width="8" height="8" fill="#111"/>
-                                <rect x="140" y="140" width="8" height="8" fill="#111"/><rect x="160" y="140" width="8" height="8" fill="#111"/>
-                                <rect x="130" y="150" width="8" height="8" fill="#111"/><rect x="150" y="150" width="8" height="8" fill="#111"/>
-                                <rect x="140" y="160" width="8" height="8" fill="#111"/><rect x="170" y="160" width="8" height="8" fill="#111"/>
-                                <rect x="130" y="170" width="8" height="8" fill="#111"/><rect x="160" y="170" width="8" height="8" fill="#111"/>
-                                <rect x="82" y="170" width="8" height="8" fill="#111"/><rect x="102" y="170" width="8" height="8" fill="#111"/>
-                                <rect x="92" y="180" width="8" height="8" fill="#111"/><rect x="112" y="180" width="8" height="8" fill="#111"/>
-                                <rect x="86" y="86" width="28" height="28" rx="4" fill="white" opacity="0.9"/>
-                                <text x="100" y="105" text-anchor="middle" font-size="16" font-weight="bold" fill="#FF6900">⚡</text>
-                            </svg>
+                        <div
+                            class="w-52 h-52 rounded-2xl overflow-hidden border-4 border-white shadow-lg bg-white flex items-center justify-center p-2">
+                            @if(!empty($canteen['qris_image']))
+                            <img src="{{ $canteen['qris_image'] }}" alt="QRIS {{ $canteen['name'] ?? 'Kantin' }}"
+                                class="w-full h-full object-contain rounded-xl">
+                            @else
+                            {{-- Placeholder QR kalau belum ada --}}
+                            <div
+                                class="w-full h-full flex flex-col items-center justify-center gap-2 bg-gray-50 rounded-xl">
+                                <i class="fa-solid fa-qrcode text-4xl text-gray-300"></i>
+                                <p class="text-[10px] font-bold text-gray-300 text-center leading-tight">QRIS
+                                    belum<br>diatur</p>
+                            </div>
+                            @endif
                         </div>
-                    </div>
-                    <div class="w-full max-w-xs">
-                        <div class="flex items-center justify-between text-xs text-gray-400 font-semibold mb-1.5">
-                            <span>Kode berlaku selama</span>
-                            <span id="timerDisplay" class="font-extrabold text-gray-600">05:00</span>
-                        </div>
-                        <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                            <div id="timerBar" class="h-full rounded-full timer-bar" style="background:linear-gradient(90deg,#FF6900,#ea580c);"></div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-gray-200 bg-gray-50 text-sm text-gray-500 font-semibold">
+                    </div>                   
+
+                    {{-- Nama Kantin --}}
+                    <div
+                        class="flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-gray-200 bg-gray-50 text-sm text-gray-500 font-semibold">
                         <i class="fa-solid fa-store text-gray-400 text-xs"></i>
-                        Kantin Utama Kant.in
+                        {{ $canteen['name'] ?? 'Kantin' }}
                     </div>
+
                 </div>
 
-                {{-- UPLOAD --}}
+                {{-- ===== UPLOAD BUKTI ===== --}}
                 <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
-                    <h2 class="text-base font-extrabold text-gray-900 mb-4">Unggah Bukti Pembayaran</h2>
-                    <label for="fileInput" class="upload-area block border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center">
-                        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="handleFile(this)">
+                    <h2 class="text-base font-extrabold text-gray-900 mb-1">Unggah Bukti Pembayaran</h2>
+                    <p class="text-xs text-gray-400 font-medium mb-4">Foto struk atau screenshot konfirmasi QRIS kamu
+                    </p>
+
+                    <label for="fileInput"
+                        class="upload-area block border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center">
+                        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png" class="hidden"
+                            onchange="handleFile(this)">
+
                         <div id="uploadDefault" class="flex flex-col items-center gap-3">
-                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center" style="background-color:#FFF3E8;">
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center"
+                                style="background-color:#FFF3E8;">
                                 <i class="fa-solid fa-cloud-arrow-up text-xl" style="color:#FF6900;"></i>
                             </div>
                             <div>
-                                <p class="text-sm font-extrabold text-gray-700">Ketuk untuk mengunggah bukti transfer</p>
-                                <p class="text-xs text-gray-400 mt-1">Format: JPG, PNG, atau PDF (Maks. 5MB)</p>
+                                <p class="text-sm font-extrabold text-gray-700">Ketuk untuk mengunggah bukti transfer
+                                </p>
+                                <p class="text-xs text-gray-400 mt-1">Format: JPG atau PNG (Maks. 5MB)</p>
                             </div>
                         </div>
+
                         <div id="uploadDone" class="hidden flex-col items-center gap-2">
                             <div class="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center">
                                 <i class="fa-solid fa-circle-check text-xl text-green-500"></i>
@@ -213,85 +360,196 @@
                         </div>
                     </label>
                 </div>
+
             </div>
 
-            {{-- RIGHT --}}
-            <div class="w-[280px] flex-shrink-0 flex flex-col gap-4">
-                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col items-center gap-5">
-                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center" style="background-color:#FFF3E8;">
-                        <i class="fa-solid fa-receipt text-2xl" style="color:#FF6900;"></i>
-                    </div>
-                    <div class="w-full">
-                        <h2 class="text-base font-extrabold text-gray-900 text-center mb-1">Ringkasan Pembayaran</h2>
-                        <p class="text-xs text-gray-400 font-semibold text-center">ID Pesanan: <span class="font-black text-gray-600">#KNTN-894201</span></p>
-                    </div>
-                    <div class="w-full h-px bg-gray-100"></div>
-                    <div class="w-full flex flex-col gap-3 text-sm">
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-400 font-semibold">Subtotal (3 Item)</span>
-                            <span class="font-extrabold text-gray-800">Rp 43.000</span>
+            {{-- ===== RIGHT COLUMN ===== --}}
+            <div class="w-[285px] flex-shrink-0 flex flex-col gap-4">
+
+                {{-- Ringkasan Pembayaran --}}
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col gap-4">
+
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="w-14 h-14 rounded-2xl flex items-center justify-center"
+                            style="background-color:#FFF3E8;">
+                            <i class="fa-solid fa-receipt text-xl" style="color:#FF6900;"></i>
                         </div>
+                        <div class="text-center">
+                            <h2 class="text-base font-extrabold text-gray-900">Ringkasan Pesanan</h2>
+                            <p class="text-xs text-gray-400 font-semibold mt-0.5">
+                                {{ $canteen['name'] ?? 'Kantin' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="h-px bg-gray-100"></div>
+
+                    {{-- Daftar Item --}}
+                    <div class="flex flex-col gap-2.5">
+                        @foreach($selectedItems as $item)
+                        @php
+                        $imgUrl = $item['image'] ?? null;
+                        if ($imgUrl && !str_starts_with($imgUrl, 'http')) {
+                        $imgUrl = asset('storage/' . $imgUrl);
+                        }
+                        @endphp
+                        <div class="flex items-start gap-2.5">
+                            <div class="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+                                @if($imgUrl)
+                                <img src="{{ $imgUrl }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover">
+                                @else
+                                <div class="w-full h-full flex items-center justify-center bg-orange-50">
+                                    <i class="fa-solid fa-utensils text-orange-200 text-xs"></i>
+                                </div>
+                                @endif
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start justify-between gap-1">
+                                    <p class="text-xs font-extrabold text-gray-800 leading-snug truncate max-w-[120px]">
+                                        {{ $item['name'] }}
+                                    </p>
+                                    <span class="text-xs font-bold text-gray-600 flex-shrink-0">
+                                        Rp {{ number_format(($item['price'] ?? 0) * ($item['quantity'] ?? 1), 0, ',',
+                                        '.') }}
+                                    </span>
+                                </div>
+                                <p class="text-[11px] text-gray-400 font-medium">x{{ $item['quantity'] }}</p>
+                                @if(!empty($item['notes']))
+                                <span class="item-note-badge">
+                                    <i class="fa-regular fa-note-sticky text-[9px]"></i>
+                                    {{ $item['notes'] }}
+                                </span>
+                                @endif
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+
+                    <div class="h-px bg-gray-100"></div>
+
+                    {{-- Kalkulasi --}}
+                    <div class="flex flex-col gap-2.5 text-sm">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-400 font-semibold">Subtotal ({{ count($selectedItems) }} item)</span>
+                            <span class="font-bold text-gray-700">
+                                Rp {{ number_format($checkout['subtotal'], 0, ',', '.') }}
+                            </span>
+                        </div>
+
+                        @if($checkout['metode'] === 'kurir')
                         <div class="flex items-center justify-between">
                             <span class="text-gray-400 font-semibold">Ongkos Kirim</span>
-                            <span class="font-extrabold text-gray-800">Rp 5.000</span>
+                            <span class="font-bold text-gray-700">
+                                @if($checkout['ongkir'] > 0)
+                                Rp {{ number_format($checkout['ongkir'], 0, ',', '.') }}
+                                @else
+                                Gratis
+                                @endif
+                            </span>
                         </div>
+                        @endif
+
                         <div class="h-px bg-gray-100"></div>
+
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-extrabold text-gray-900">Total Akhir</span>
-                            <span class="text-xl font-extrabold" style="color:#FF6900;">Rp 48.000</span>
+                            <span class="text-xl font-extrabold" style="color:#FF6900;">
+                                Rp {{ number_format($checkout['total'], 0, ',', '.') }}
+                            </span>
                         </div>
                     </div>
+
                 </div>
 
-                {{-- Alamat --}}
+                {{-- Metode & Alamat --}}
                 <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-5 flex flex-col gap-3">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-location-dot text-sm" style="color:#FF6900;"></i>
-                        <p class="text-sm font-extrabold text-gray-800">Alamat Pengiriman</p>
+
+                    {{-- Metode --}}
+                    <div class="flex items-center gap-2.5">
+                        @if($checkout['metode'] === 'kurir')
+                        <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                            style="background-color:#FFF3E8;">
+                            <i class="fa-solid fa-person-biking text-xs" style="color:#FF6900;"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-extrabold text-gray-800">Kurir Antar</p>
+                            <p class="text-[11px] text-gray-400 font-medium">Diantar ke lokasimu</p>
+                        </div>
+                        @else
+                        <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                            style="background-color:#FFF3E8;">
+                            <i class="fa-solid fa-bag-shopping text-xs" style="color:#FF6900;"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-extrabold text-gray-800">Ambil Sendiri</p>
+                            <p class="text-[11px] text-gray-400 font-medium">Siap dalam 10–15 menit</p>
+                        </div>
+                        @endif
                     </div>
-                    <div class="flex items-start gap-2.5 px-3 py-3 rounded-2xl bg-gray-50 border border-gray-100">
-                        <div class="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style="background-color:#FFF3E8;">
+
+                    @if($checkout['metode'] === 'kurir' && !empty($checkout['alamat']))
+                    <div class="h-px bg-gray-100"></div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <i class="fa-solid fa-location-dot text-xs" style="color:#FF6900;"></i>
+                        <p class="text-xs font-extrabold text-gray-800">Alamat Pengiriman</p>
+                    </div>
+                    <div class="flex items-start gap-2.5 px-3 py-2.5 rounded-2xl bg-gray-50 border border-gray-100">
+                        <div class="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
+                            style="background-color:#FFF3E8;">
                             <i class="fa-solid fa-building text-[10px]" style="color:#FF6900;"></i>
                         </div>
                         <div class="flex-1">
-                            <p class="text-xs font-bold text-gray-700 leading-snug">Gedung CA SV IPB, CA B01 lt.2, Kampus IPB Cilibende</p>
+                            <p class="text-xs font-bold text-gray-700 leading-snug">{{ $checkout['alamat'] }}</p>
                         </div>
                         <i class="fa-solid fa-circle-check text-green-400 text-xs mt-0.5 flex-shrink-0"></i>
                     </div>
-                    <div class="flex items-center gap-1.5 px-1">
-                        <i class="fa-solid fa-person-biking text-xs" style="color:#FF6900;"></i>
-                        <p class="text-xs text-gray-400 font-medium">Estimasi tiba <span class="font-bold text-gray-600">10–15 menit</span></p>
-                    </div>
+                    @endif
+
                 </div>
 
-                <button onclick="showMenungguModal()"
-                        class="konfirmasi-btn w-full py-4 rounded-2xl text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-2"
-                        style="background: linear-gradient(135deg, #FF6900, #ea580c);">
-                    Konfirmasi Pembayaran
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                {{-- Tombol Konfirmasi --}}
+                <button id="konfirmasiBtn" onclick="submitPembayaran()"
+                    class="konfirmasi-btn w-full py-4 rounded-2xl text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-2"
+                    style="background: linear-gradient(135deg, #d1d5db, #9ca3af);" disabled>
+                    <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
+                    Unggah Bukti Dulu
                 </button>
 
+                {{-- Info --}}
                 <div class="flex items-start gap-2.5 px-4 py-3 rounded-2xl bg-amber-50 border border-amber-100">
                     <i class="fa-solid fa-circle-info text-amber-400 text-sm mt-0.5 flex-shrink-0"></i>
                     <p class="text-xs text-amber-700 font-medium leading-relaxed">
-                        Pembayaran akan diverifikasi otomatis. Pesanan diproses setelah konfirmasi berhasil.
+                        Pembayaran akan diverifikasi oleh admin kantin. Pesanan diproses setelah konfirmasi berhasil.
                     </p>
                 </div>
+
             </div>
         </div>
     </main>
 </div>
 
+{{-- ===== LOADING OVERLAY ===== --}}
+<div id="loadingOverlay" class="loading-overlay">
+    <div class="bg-white rounded-3xl px-10 py-8 flex flex-col items-center gap-4 shadow-2xl">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background-color:#FFF3E8;">
+            <i class="fa-solid fa-spinner spin text-2xl" style="color:#FF6900;"></i>
+        </div>
+        <p class="text-sm font-extrabold text-gray-700">Mengirim pesanan...</p>
+        <p class="text-xs text-gray-400 font-medium">Mohon tunggu sebentar</p>
+    </div>
+</div>
+
 {{-- ===== MODAL 1: MENUNGGU VALIDASI ADMIN ===== --}}
-<div id="menungguModal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background:rgba(0,0,0,0.4); backdrop-filter:blur(6px);">
+<div id="menungguModal" class="fixed inset-0 z-50 hidden items-center justify-center"
+    style="background:rgba(0,0,0,0.4); backdrop-filter:blur(6px);">
     <div class="modal-card bg-white rounded-3xl shadow-2xl w-[380px] mx-4 overflow-hidden">
         <div class="px-8 pt-8 pb-8 flex flex-col items-center gap-5">
 
-            {{-- Icon --}}
-            <div class="pulse-anim w-20 h-20 rounded-[22px] flex items-center justify-center" style="background-color:#FFF3E8;">
-                <div class="relative">
-                    <i class="fa-solid fa-shield-halved text-3xl" style="color:#FF6900; opacity:0.3;"></i>
-                    <i class="fa-regular fa-clock text-xl absolute inset-0 flex items-center justify-center" style="color:#FF6900; left:6px; top:6px;"></i>
+            <div class="pulse-anim w-20 h-20 rounded-[22px] flex items-center justify-center"
+                style="background-color:#FFF3E8;">
+                <div class="relative w-full h-full flex items-center justify-center">
+                    <i class="fa-solid fa-shield-halved text-4xl" style="color:#FF6900; opacity:0.25;"></i>
+                    <i class="fa-regular fa-clock text-xl absolute" style="color:#FF6900;"></i>
                 </div>
             </div>
 
@@ -304,6 +562,13 @@
                 </p>
             </div>
 
+            {{-- ID Pesanan --}}
+            <div
+                class="w-full px-4 py-3 rounded-2xl bg-gray-50 border border-gray-100 flex items-center justify-between">
+                <span class="text-xs font-bold text-gray-400">ID Pesanan</span>
+                <span id="modalOrderId" class="text-xs font-black text-gray-700 tracking-wide">#—</span>
+            </div>
+
             {{-- Countdown batalkan --}}
             <div class="w-full rounded-2xl p-4 text-center" style="background-color:#FEF2F2;">
                 <p class="text-xs font-black text-red-500 tracking-widest uppercase mb-2">Batas Waktu Pembatalan</p>
@@ -313,10 +578,9 @@
                 </div>
             </div>
 
-            {{-- Batalkan button --}}
             <button onclick="showBatalkanConfirm()"
-                    class="w-full py-3.5 rounded-2xl border-2 flex items-center justify-center gap-2 text-sm font-extrabold transition-all hover:bg-red-50"
-                    style="border-color:#ef4444; color:#ef4444;">
+                class="w-full py-3.5 rounded-2xl border-2 flex items-center justify-center gap-2 text-sm font-extrabold transition-all hover:bg-red-50"
+                style="border-color:#ef4444; color:#ef4444;">
                 <i class="fa-regular fa-circle-xmark text-base"></i>
                 Batalkan Pesanan
             </button>
@@ -326,7 +590,8 @@
 </div>
 
 {{-- ===== MODAL 2: KONFIRMASI BATALKAN ===== --}}
-<div id="batalkanConfirmModal" class="fixed inset-0 z-[60] hidden items-center justify-center" style="background:rgba(0,0,0,0.5); backdrop-filter:blur(6px);">
+<div id="batalkanConfirmModal" class="fixed inset-0 z-[60] hidden items-center justify-center"
+    style="background:rgba(0,0,0,0.5); backdrop-filter:blur(6px);">
     <div class="modal-card bg-white rounded-3xl shadow-2xl w-[380px] mx-4 overflow-hidden">
         <div class="px-8 pt-8 pb-8 flex flex-col items-center gap-4">
 
@@ -337,19 +602,19 @@
             <div class="text-center">
                 <h2 class="text-lg font-extrabold text-gray-900 mb-1">Batalkan Pesanan?</h2>
                 <p class="text-sm text-gray-400 font-medium leading-relaxed">
-                    Apakah Anda yakin ingin membatalkan pesanan ini?
+                    Apakah Anda yakin ingin membatalkan pesanan ini?<br>
                     Aksi ini tidak dapat dibatalkan kembali.
                 </p>
             </div>
 
             <div class="flex gap-3 w-full mt-1">
                 <button onclick="closeBatalkanConfirm()"
-                        class="flex-1 py-3.5 rounded-2xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all">
+                    class="flex-1 py-3.5 rounded-2xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all">
                     Kembali
                 </button>
-                <button onclick="showBatalkanDone()"
-                        class="flex-1 py-3.5 rounded-2xl text-white text-sm font-extrabold transition-all hover:brightness-110"
-                        style="background-color:#ef4444;">
+                <button onclick="doBatalkan()" id="batalkanBtn"
+                    class="flex-1 py-3.5 rounded-2xl text-white text-sm font-extrabold transition-all hover:brightness-110"
+                    style="background-color:#ef4444;">
                     Ya, Batalkan
                 </button>
             </div>
@@ -358,15 +623,15 @@
 </div>
 
 {{-- ===== MODAL 3: PESANAN DIBATALKAN ===== --}}
-<div id="batalkanDoneModal" class="fixed inset-0 z-[70] hidden items-center justify-center" style="background:rgba(0,0,0,0.5); backdrop-filter:blur(6px);">
+<div id="batalkanDoneModal" class="fixed inset-0 z-[70] hidden items-center justify-center"
+    style="background:rgba(0,0,0,0.5); backdrop-filter:blur(6px);">
     <div class="modal-card bg-white rounded-3xl shadow-2xl w-[380px] mx-4 overflow-hidden">
         <div class="h-2 w-full" style="background:linear-gradient(90deg,#ef4444,#dc2626);"></div>
         <div class="px-8 pt-8 pb-8 flex flex-col items-center gap-4">
-
-            <div class="w-16 h-16 rounded-full flex items-center justify-center shadow-lg" style="background:linear-gradient(135deg,#ef4444,#dc2626);">
+            <div class="w-16 h-16 rounded-full flex items-center justify-center shadow-lg"
+                style="background:linear-gradient(135deg,#ef4444,#dc2626);">
                 <i class="fa-solid fa-xmark text-white text-2xl"></i>
             </div>
-
             <div class="text-center">
                 <h2 class="text-lg font-extrabold text-gray-900 mb-1">Pesanan Dibatalkan</h2>
                 <p class="text-sm text-gray-400 font-medium leading-relaxed">
@@ -374,15 +639,14 @@
                     Anda dapat melihatnya di riwayat pesanan.
                 </p>
             </div>
-
             <div class="flex flex-col gap-2.5 w-full mt-1">
                 <a href="/pesanan"
-                   class="w-full py-3.5 rounded-2xl text-white font-extrabold text-sm text-center shadow-md"
-                   style="background:linear-gradient(135deg,#FF6900,#ea580c);">
+                    class="w-full py-3.5 rounded-2xl text-white font-extrabold text-sm text-center shadow-md"
+                    style="background:linear-gradient(135deg,#FF6900,#ea580c);">
                     Lihat Riwayat Pesanan
                 </a>
                 <a href="/beranda"
-                   class="w-full py-3.5 rounded-2xl border-2 border-gray-200 text-gray-600 font-bold text-sm text-center hover:bg-gray-50 transition-all">
+                    class="w-full py-3.5 rounded-2xl border-2 border-gray-200 text-gray-600 font-bold text-sm text-center hover:bg-gray-50 transition-all">
                     Kembali ke Beranda
                 </a>
             </div>
@@ -390,33 +654,32 @@
     </div>
 </div>
 
-{{-- ===== MODAL 4: WAKTU HABIS - SEDANG DIPROSES ===== --}}
-<div id="diproseModal" class="fixed inset-0 z-[70] hidden items-center justify-center" style="background:rgba(0,0,0,0.5); backdrop-filter:blur(6px);">
+{{-- ===== MODAL 4: WAKTU HABIS / DIPROSES ===== --}}
+<div id="diproseModal" class="fixed inset-0 z-[70] hidden items-center justify-center"
+    style="background:rgba(0,0,0,0.5); backdrop-filter:blur(6px);">
     <div class="modal-card bg-white rounded-3xl shadow-2xl w-[380px] mx-4 overflow-hidden">
         <div class="h-2 w-full" style="background:linear-gradient(90deg,#FF6900,#ea580c);"></div>
         <div class="px-8 pt-8 pb-8 flex flex-col items-center gap-4">
-
-            <div class="pulse-anim w-16 h-16 rounded-2xl flex items-center justify-center" style="background-color:#FFF3E8;">
+            <div class="pulse-anim w-16 h-16 rounded-2xl flex items-center justify-center"
+                style="background-color:#FFF3E8;">
                 <i class="fa-solid fa-clock-rotate-left text-2xl" style="color:#FF6900;"></i>
             </div>
-
             <div class="text-center">
-                <h2 class="text-lg font-extrabold text-gray-900 mb-1">Menunggu Validasi Admin</h2>
+                <h2 class="text-lg font-extrabold text-gray-900 mb-1">Sedang Diverifikasi</h2>
                 <p class="text-sm text-gray-400 font-medium leading-relaxed">
-                    Bukti pembayaran Anda berhasil diunggah.<br>
-                    Kami sedang memverifikasi pembayaran Anda,<br>
-                    mohon tunggu sebentar.
+                    Pembayaran Anda sedang diverifikasi oleh admin kantin.<br>
+                    Batas pembatalan telah habis.
                 </p>
             </div>
-
             <div class="flex flex-col gap-2.5 w-full mt-1">
-                <button class="w-full py-3.5 rounded-2xl text-white font-extrabold text-sm text-center shadow-md cursor-default opacity-90"
-                        style="background:linear-gradient(135deg,#FF6900,#ea580c);">
+                <button
+                    class="w-full py-3.5 rounded-2xl text-white font-extrabold text-sm text-center shadow-md cursor-default"
+                    style="background:linear-gradient(135deg,#FF6900,#ea580c);">
                     <i class="fa-solid fa-spinner fa-spin mr-2"></i>
                     Sedang Diproses Admin
                 </button>
                 <a href="/pesanan"
-                   class="w-full py-3.5 rounded-2xl border-2 border-gray-200 text-gray-600 font-bold text-sm text-center hover:bg-gray-50 transition-all">
+                    class="w-full py-3.5 rounded-2xl border-2 border-gray-200 text-gray-600 font-bold text-sm text-center hover:bg-gray-50 transition-all">
                     Lihat Pesanan Saya
                 </a>
             </div>
@@ -428,48 +691,85 @@
 
 @push('scripts')
 <script>
-    // ---- QR Timer ----
-    let qrSeconds = 300;
-    const timerDisplay = document.getElementById('timerDisplay');
-    const qrInterval = setInterval(() => {
-        qrSeconds--;
-        if (qrSeconds <= 0) { clearInterval(qrInterval); timerDisplay.textContent = '00:00'; return; }
-        const m = String(Math.floor(qrSeconds / 60)).padStart(2, '0');
-        const s = String(qrSeconds % 60).padStart(2, '0');
-        timerDisplay.textContent = `${m}:${s}`;
-        if (qrSeconds <= 60) timerDisplay.style.color = '#ef4444';
-    }, 1000);
+    // ── State ─────────────────────────────────────────────
+    let uploadedFile   = null;
+    let currentOrderId = null;
+    let cancelSeconds  = 30;
+    let cancelInterval = null;
 
-    // ---- File upload ----
+    // ── File Upload ───────────────────────────────────────
     function handleFile(input) {
         if (!input.files.length) return;
         const file = input.files[0];
-        if (file.size > 5 * 1024 * 1024) { alert('File terlalu besar. Maksimal 5MB.'); input.value = ''; return; }
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File terlalu besar. Maksimal 5MB.');
+            input.value = '';
+            return;
+        }
+
+        uploadedFile = file;
+
         input.closest('label').classList.add('has-file');
         document.getElementById('uploadDefault').classList.add('hidden');
+
         const done = document.getElementById('uploadDone');
         done.classList.remove('hidden');
         done.classList.add('flex');
         document.getElementById('fileName').textContent = file.name;
+
+        // Aktifkan tombol konfirmasi
+        const btn = document.getElementById('konfirmasiBtn');
+        btn.disabled = false;
+        btn.style.background = 'linear-gradient(135deg, #FF6900, #ea580c)';
+        btn.innerHTML = `<i class="fa-solid fa-paper-plane text-sm"></i> Konfirmasi Pembayaran`;
     }
 
-    // ---- Cancel countdown (30 detik) ----
-    let cancelSeconds = 30;
-    let cancelInterval = null;
+    // ── Submit Pembayaran ─────────────────────────────────
+    function submitPembayaran() {
+        if (!uploadedFile) return;
 
+        // Tampilkan loading
+        document.getElementById('loadingOverlay').classList.add('show');
+
+        const formData = new FormData();
+        formData.append('payment_proof', uploadedFile);
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+
+        fetch('/pembayaran', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('loadingOverlay').classList.remove('show');
+
+            if (data.success) {
+                currentOrderId = data.order_id;
+                showMenungguModal();
+            } else {
+                alert(data.message || 'Gagal membuat pesanan. Silakan coba lagi.');
+            }
+        })
+        .catch(() => {
+            document.getElementById('loadingOverlay').classList.remove('show');
+            alert('Terjadi kesalahan jaringan. Silakan coba lagi.');
+        });
+    }
+
+    // ── Cancel Countdown ──────────────────────────────────
     function startCancelCountdown() {
         cancelSeconds = 30;
         updateCancelDisplay();
+
         cancelInterval = setInterval(() => {
             cancelSeconds--;
             updateCancelDisplay();
+
             if (cancelSeconds <= 0) {
                 clearInterval(cancelInterval);
-                // Waktu habis → tutup menunggu modal, tampilkan diproses modal
-                document.getElementById('menungguModal').classList.add('hidden');
-                document.getElementById('menungguModal').classList.remove('flex');
-                document.getElementById('diproseModal').classList.remove('hidden');
-                document.getElementById('diproseModal').classList.add('flex');
+                closeModal('menungguModal');
+                showModal('diproseModal');
             }
         }, 1000);
     }
@@ -480,43 +780,86 @@
         document.getElementById('cancelCountdown').textContent = `${m}:${s}`;
     }
 
-    // ---- Modal controls ----
+    // ── Modal Helpers ─────────────────────────────────────
+    function showModal(id) {
+        document.getElementById(id).classList.remove('hidden');
+        document.getElementById(id).classList.add('flex');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+        document.getElementById(id).classList.remove('flex');
+    }
+
     function showMenungguModal() {
-        document.getElementById('menungguModal').classList.remove('hidden');
-        document.getElementById('menungguModal').classList.add('flex');
+        // Set order ID di modal
+        if (currentOrderId) {
+            document.getElementById('modalOrderId').textContent = '#' + currentOrderId.slice(-6).toUpperCase();
+        }
+
+        // Reset cancel bar animation
+        const bar = document.getElementById('cancelBar');
+        bar.style.animation = 'none';
+        bar.offsetHeight; // reflow
+        bar.style.animation = '';
+
+        showModal('menungguModal');
         startCancelCountdown();
     }
 
     function showBatalkanConfirm() {
-        clearInterval(cancelInterval); // hentikan countdown
-        document.getElementById('batalkanConfirmModal').classList.remove('hidden');
-        document.getElementById('batalkanConfirmModal').classList.add('flex');
+        clearInterval(cancelInterval);
+        showModal('batalkanConfirmModal');
     }
 
     function closeBatalkanConfirm() {
-        document.getElementById('batalkanConfirmModal').classList.add('hidden');
-        document.getElementById('batalkanConfirmModal').classList.remove('flex');
-        // Lanjutkan countdown
+        closeModal('batalkanConfirmModal');
+
+        // Lanjut countdown
         cancelInterval = setInterval(() => {
             cancelSeconds--;
             updateCancelDisplay();
             if (cancelSeconds <= 0) {
                 clearInterval(cancelInterval);
-                document.getElementById('menungguModal').classList.add('hidden');
-                document.getElementById('menungguModal').classList.remove('flex');
-                document.getElementById('diproseModal').classList.remove('hidden');
-                document.getElementById('diproseModal').classList.add('flex');
+                closeModal('menungguModal');
+                showModal('diproseModal');
             }
         }, 1000);
     }
 
-    function showBatalkanDone() {
-        document.getElementById('batalkanConfirmModal').classList.add('hidden');
-        document.getElementById('batalkanConfirmModal').classList.remove('flex');
-        document.getElementById('menungguModal').classList.add('hidden');
-        document.getElementById('menungguModal').classList.remove('flex');
-        document.getElementById('batalkanDoneModal').classList.remove('hidden');
-        document.getElementById('batalkanDoneModal').classList.add('flex');
+    function doBatalkan() {
+        if (!currentOrderId) {
+            // Kalau order ID belum ada, langsung tutup saja
+            closeModal('batalkanConfirmModal');
+            closeModal('menungguModal');
+            showModal('batalkanDoneModal');
+            return;
+        }
+
+        const btn = document.getElementById('batalkanBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Membatalkan...';
+
+        fetch('/pembayaran/batalkan', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+            body: JSON.stringify({ order_id: currentOrderId }),
+        })
+        .then(r => r.json())
+        .then(() => {
+            closeModal('batalkanConfirmModal');
+            closeModal('menungguModal');
+            showModal('batalkanDoneModal');
+        })
+        .catch(() => {
+            // Tetap tampilkan dibatalkan meski request gagal
+            closeModal('batalkanConfirmModal');
+            closeModal('menungguModal');
+            showModal('batalkanDoneModal');
+        });
     }
 </script>
 @endpush

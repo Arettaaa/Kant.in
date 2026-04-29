@@ -182,6 +182,20 @@
         z-index: 9;
     }
 
+    .notes-input {
+        transition: all 0.2s ease;
+    }
+
+    .notes-input:focus {
+        border-color: #FF6900;
+        box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.08);
+        background-color: #fff;
+    }
+
+    .notes-wrapper {
+        transition: all 0.25s ease;
+    }
+
     .select-all-label {
         font-size: 13px;
         font-weight: 600;
@@ -266,40 +280,57 @@
                 $imgUrl = asset('storage/' . $imgUrl);
                 }
                 @endphp
-                <div class="cart-item unselected bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-3"
+                <div class="cart-item unselected bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col gap-2"
                     data-id="{{ $item['menu_id'] }}" data-price="{{ $item['price'] }}"
                     data-canteen-id="{{ $canteen['canteen_id'] }}">
-                    <input type="checkbox" class="custom-cb item-cb" id="cb-{{ $item['menu_id'] }}"
-                        data-id="{{ $item['menu_id'] }}" data-canteen-id="{{ $canteen['canteen_id'] }}"
-                        onchange="onItemCheck(this)">
-                    <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
-                        @if($imgUrl)
-                        <img src="{{ $imgUrl }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover">
-                        @else
-                        <div class="w-full h-full flex items-center justify-center bg-orange-50">
-                            <i class="fa-solid fa-utensils text-orange-200 text-xl"></i>
+
+                    {{-- Baris utama --}}
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" class="custom-cb item-cb" id="cb-{{ $item['menu_id'] }}"
+                            data-id="{{ $item['menu_id'] }}" data-canteen-id="{{ $canteen['canteen_id'] }}"
+                            onchange="onItemCheck(this)">
+                        <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+                            @if($imgUrl)
+                            <img src="{{ $imgUrl }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover">
+                            @else
+                            <div class="w-full h-full flex items-center justify-center bg-orange-50">
+                                <i class="fa-solid fa-utensils text-orange-200 text-xl"></i>
+                            </div>
+                            @endif
                         </div>
-                        @endif
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-extrabold text-gray-900">{{ $item['name'] }}</p>
+                            <p class="text-xs text-gray-400 font-medium mt-0.5">{{ $canteen['canteen_name'] }}</p>
+                            <p class="text-sm font-extrabold mt-1" style="color:#FF6900;">
+                                Rp {{ number_format($item['price'], 0, ',', '.') }}
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <button type="button" onclick="changeQty('{{ $item['menu_id'] }}', -1)"
+                                class="qty-btn w-7 h-7 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400">
+                                <i class="fa-solid fa-minus text-[10px]"></i>
+                            </button>
+                            <span id="qty-{{ $item['menu_id'] }}"
+                                class="text-sm font-extrabold text-gray-800 w-5 text-center">{{ $item['quantity']
+                                }}</span>
+                            <button type="button" onclick="changeQty('{{ $item['menu_id'] }}', 1)"
+                                class="qty-btn w-7 h-7 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400">
+                                <i class="fa-solid fa-plus text-[10px]"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-extrabold text-gray-900">{{ $item['name'] }}</p>
-                        <p class="text-xs text-gray-400 font-medium mt-0.5">{{ $canteen['canteen_name'] }}</p>
-                        <p class="text-sm font-extrabold mt-1" style="color:#FF6900;">
-                            Rp {{ number_format($item['price'], 0, ',', '.') }}
-                        </p>
+
+                    {{-- Notes input — muncul saat item dicentang --}}
+                    <div class="notes-wrapper hidden" id="notes-wrapper-{{ $item['menu_id'] }}">
+                        <div class="flex items-center gap-2 pl-1">
+                            <i class="fa-regular fa-note-sticky text-[11px] text-gray-300 flex-shrink-0"></i>
+                            <input type="text" id="notes-{{ $item['menu_id'] }}"
+                                placeholder="Catatan untuk menu ini... (opsional)"
+                                class="notes-input flex-1 px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-100 text-xs text-gray-600 outline-none"
+                                maxlength="100">
+                        </div>
                     </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        <button type="button" onclick="changeQty('{{ $item['menu_id'] }}', -1)"
-                            class="qty-btn w-7 h-7 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400">
-                            <i class="fa-solid fa-minus text-[10px]"></i>
-                        </button>
-                        <span id="qty-{{ $item['menu_id'] }}"
-                            class="text-sm font-extrabold text-gray-800 w-5 text-center">{{ $item['quantity'] }}</span>
-                        <button type="button" onclick="changeQty('{{ $item['menu_id'] }}', 1)"
-                            class="qty-btn w-7 h-7 rounded-full border-2 border-gray-200 flex items-center justify-center text-gray-400">
-                            <i class="fa-solid fa-plus text-[10px]"></i>
-                        </button>
-                    </div>
+
                 </div>
                 @endforeach
             </div>
@@ -630,11 +661,16 @@ function updateItemVisual(cb) {
     const card = document.querySelector(`.cart-item[data-id="${cb.dataset.id}"]`);
     if (!card) return;
 
-    cb.checked
-        ? card.classList.remove('unselected')
-        : card.classList.add('unselected');
-}
+    const notesWrapper = document.getElementById(`notes-wrapper-${cb.dataset.id}`);
 
+    if (cb.checked) {
+        card.classList.remove('unselected');
+        notesWrapper?.classList.remove('hidden');
+    } else {
+        card.classList.add('unselected');
+        notesWrapper?.classList.add('hidden');
+    }
+}
 // ── SYNC CHECKBOX ─────────────────────────────────────────
 function syncCanteenCheckbox(canteenId) {
     const itemCbs = document.querySelectorAll(`.item-cb[data-canteen-id="${canteenId}"]`);
@@ -820,12 +856,45 @@ function updateSummary() {
     }
 }
 
-// ── CHECKOUT ──────────────────────────────────────────────
 function handleCheckout() {
     const selectedCanteenId = getSelectedCanteenId();
     if (!selectedCanteenId) return;
 
-    window.location.href = '/pembayaran';
+    const checked = document.querySelectorAll('.item-cb:checked');
+    const menuIds = [];
+    const notes   = [];
+
+    checked.forEach(cb => {
+        const id = cb.dataset.id;
+        menuIds.push(id);
+        const notesInput = document.getElementById(`notes-${id}`);
+        notes.push(notesInput?.value?.trim() || '');
+    });
+
+    const alamat = document.getElementById('displayAlamat')?.textContent?.trim() || '';
+
+    // Kirim ke Laravel session dulu
+    fetch('/pembayaran/session', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({
+            canteen_id: selectedCanteenId,
+            menu_ids:   menuIds,
+            notes:      notes,
+            metode:     metode,
+            alamat:     metode === 'kurir' ? alamat : null,
+            subtotal:   parseInt(document.getElementById('summarySubtotal').textContent.replace(/\D/g, '')),
+            ongkir:     metode === 'kurir' ? parseInt(ongkirAmount) || 0 : 0,
+            total:      parseInt(document.getElementById('summaryTotal').textContent.replace(/\D/g, '')),
+        }),
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) window.location.href = '/pembayaran';
+    });
 }
 
 // ── EMPTY ─────────────────────────────────────────────────

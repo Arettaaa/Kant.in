@@ -175,26 +175,23 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
+                    @if($cartCount > 0)
                     <span
                         class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px] font-black text-white flex items-center justify-center"
-                        style="background-color:#FF6900;">2</span>
+                        style="background-color:#FF6900;">{{ $cartCount > 9 ? '9+' : $cartCount }}</span>
+                    @endif
                 </a>
 
                 {{-- Avatar --}}
                 <a href="/profil"
                     class="w-10 h-10 rounded-full overflow-hidden border-2 border-orange-100 bg-orange-50 flex-shrink-0 cursor-pointer"
                     style="display:block; width:40px; height:40px;">
-                    @if($foto)
-                    <img src="{{ $foto }}"
-                        style="width:40px; height:40px; object-fit:cover; border-radius:50%; display:block;">
-                    @else
                     <div class="w-full h-full flex items-center justify-center">
                         <svg class="w-5 h-5 text-orange-300" fill="currentColor" viewBox="0 0 24 24">
                             <path
                                 d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
                         </svg>
                     </div>
-                    @endif
                 </a>
             </div>
         </div>
@@ -209,11 +206,19 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <input type="text" placeholder="Mau makan apa hari ini?"
-                    class="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-gray-200 bg-white text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200"
-                    style="focus:ring-color:#FF6900;"
+                <input id="searchBeranda" type="text" placeholder="Mau makan apa hari ini?"
+                    onkeydown="if(event.key==='Enter') handleSearchBeranda()"
                     onfocus="this.style.boxShadow='0 0 0 3px rgba(255,105,0,0.15)'; this.style.borderColor='#FF6900';"
-                    onblur="this.style.boxShadow=''; this.style.borderColor='#e5e7eb';">
+                    onblur="this.style.boxShadow=''; this.style.borderColor='#e5e7eb';"
+                    class="w-full pl-11 pr-12 py-3.5 rounded-2xl border border-gray-200 bg-white text-sm text-gray-700 placeholder-gray-400 focus:outline-none transition-all duration-200">
+                <button onclick="handleSearchBeranda()"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl flex items-center justify-center transition-all"
+                    style="background-color:#FF6900;">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </button>
             </div>
 
             {{-- KATEGORI --}}
@@ -222,186 +227,139 @@
                 <div class="grid grid-cols-4 gap-3">
 
                     {{-- Semua --}}
-                    <button onclick="setCategory(this, 'semua')"
-                        class="category-card active flex flex-col items-center gap-2 py-5 px-3 rounded-2xl border border-transparent"
-                        data-cat="semua">
+                    <a href="{{ route('pelanggan.jelajah', ['tab' => 'makanan', 'category' => 'Semua']) }}"
+                        class="category-card active flex flex-col items-center gap-2 py-5 px-3 rounded-2xl border border-transparent">
                         <div class="cat-icon-wrap w-11 h-11 rounded-2xl flex items-center justify-center"
                             style="background-color:rgba(255,255,255,0.25);">
                             <i class="fa-solid fa-border-all text-lg text-white"></i>
                         </div>
                         <span class="cat-label text-[13px] font-bold text-white">Semua</span>
-                    </button>
+                    </a>
 
                     {{-- Makanan --}}
-                    <button onclick="setCategory(this, 'makanan')"
-                        class="category-card flex flex-col items-center gap-2 py-5 px-3 rounded-2xl bg-white border border-gray-100"
-                        data-cat="makanan">
+                    <a href="{{ route('pelanggan.jelajah', ['tab' => 'makanan', 'category' => 'makanan']) }}"
+                        class="category-card flex flex-col items-center gap-2 py-5 px-3 rounded-2xl bg-white border border-gray-100">
                         <div class="cat-icon-wrap w-11 h-11 rounded-2xl flex items-center justify-center bg-orange-50">
                             <i class="fa-solid fa-utensils text-lg" style="color:#FF6900;"></i>
                         </div>
                         <span class="cat-label text-[13px] font-bold text-gray-500">Makanan</span>
-                    </button>
+                    </a>
 
                     {{-- Minuman --}}
-                    <button onclick="setCategory(this, 'minuman')"
-                        class="category-card flex flex-col items-center gap-2 py-5 px-3 rounded-2xl bg-white border border-gray-100"
-                        data-cat="minuman">
+                    <a href="{{ route('pelanggan.jelajah', ['tab' => 'makanan', 'category' => 'minuman']) }}"
+                        class="category-card flex flex-col items-center gap-2 py-5 px-3 rounded-2xl bg-white border border-gray-100">
                         <div class="cat-icon-wrap w-11 h-11 rounded-2xl flex items-center justify-center bg-orange-50">
                             <i class="fa-solid fa-mug-hot text-lg" style="color:#FF6900;"></i>
                         </div>
                         <span class="cat-label text-[13px] font-bold text-gray-500">Minuman</span>
-                    </button>
+                    </a>
 
                     {{-- Camilan --}}
-                    <button onclick="setCategory(this, 'camilan')"
-                        class="category-card flex flex-col items-center gap-2 py-5 px-3 rounded-2xl bg-white border border-gray-100"
-                        data-cat="camilan">
+                    <a href="{{ route('pelanggan.jelajah', ['tab' => 'makanan', 'category' => 'camilan']) }}"
+                        class="category-card flex flex-col items-center gap-2 py-5 px-3 rounded-2xl bg-white border border-gray-100">
                         <div class="cat-icon-wrap w-11 h-11 rounded-2xl flex items-center justify-center bg-orange-50">
                             <i class="fa-solid fa-cookie-bite text-lg" style="color:#FF6900;"></i>
                         </div>
                         <span class="cat-label text-[13px] font-bold text-gray-500">Camilan</span>
-                    </button>
+                    </a>
 
                 </div>
             </section>
 
             {{-- MAKANAN SEDANG TREN --}}
             <section>
-                <h2 class="text-lg font-extrabold text-gray-900 mb-4">Makanan Sedang Tren</h2>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-extrabold text-gray-900">Menu Populer</h2>
+                    <a href="{{ route('pelanggan.jelajah', ['tab' => 'makanan']) }}"
+                        class="text-sm font-bold hover:underline" style="color:#FF6900;">
+                        Lihat Semua &rsaquo;
+                    </a>
+                </div>
 
-                    {{-- Card 1 --}}
-                    <a href="/menu/nasi-goreng-spesial"
-                        class="food-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                        <div class="relative h-44 overflow-hidden bg-gray-100">
-                            <img src="https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&q=80"
-                                alt="Nasi Goreng Spesial" class="food-img w-full h-full object-cover">
+                {{-- Scroll horizontal --}}
+                <div class="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+                    @forelse($menuPopuler as $menu)
+                    <a href="/menu/{{ $menu['_id'] }}"
+                        class="food-card flex-shrink-0 bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-all"
+                        style="width: calc(50% - 8px);">
+                        <div class="relative h-40 overflow-hidden bg-gray-100">
+                            @if(!empty($menu['image']))
+                            <img src="{{ $menu['image'] }}" alt="{{ $menu['name'] }}"
+                                class="food-img w-full h-full object-cover">
+                            @else
+                            <div class="w-full h-full flex items-center justify-center bg-orange-50">
+                                <i class="fa-solid fa-utensils text-4xl text-orange-200"></i>
+                            </div>
+                            @endif
                             <div
-                                class="absolute top-3 left-3 flex items-center gap-1 bg-amber-400 text-white text-[11px] font-black px-2 py-1 rounded-xl shadow">
-                                <i class="fa-solid fa-star text-[10px]"></i> 4.8
+                                class="absolute top-2 left-2 flex items-center gap-1 bg-amber-400 text-white text-[10px] font-black px-2 py-0.5 rounded-xl shadow">
+                                <i class="fa-solid fa-star text-[9px]"></i>
+                                {{ ($menu['total_reviews'] ?? 0) > 0 ? number_format($menu['average_rating'], 1) :
+                                'Baru' }}
                             </div>
                         </div>
-                        <div class="p-4">
-                            <p class="text-sm font-bold text-gray-800 mb-1">Nasi Goreng Spesial</p>
-                            <p class="text-base font-extrabold" style="color:#FF6900;">Rp 25.000</p>
+                        <div class="p-3">
+                            <p class="text-sm font-bold text-gray-800 mb-0.5 truncate">{{ $menu['name'] }}</p>
+                            <p class="text-[11px] text-gray-400 mb-1 truncate">{{ $menu['canteen_name'] ?? '-' }}</p>
+                            <p class="text-sm font-extrabold" style="color:#FF6900;">
+                                Rp {{ number_format($menu['price'], 0, ',', '.') }}
+                            </p>
                         </div>
                     </a>
-
-                    {{-- Card 2 --}}
-                    <a href="/menu/mie-goreng-ayam"
-                        class="food-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                        <div class="relative h-44 overflow-hidden bg-gray-100">
-                            <img src="https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&q=80"
-                                alt="Mie Goreng Ayam" class="food-img w-full h-full object-cover">
-                            <div
-                                class="absolute top-3 left-3 flex items-center gap-1 bg-amber-400 text-white text-[11px] font-black px-2 py-1 rounded-xl shadow">
-                                <i class="fa-solid fa-star text-[10px]"></i> 4.6
-                            </div>
-                        </div>
-                        <div class="p-4">
-                            <p class="text-sm font-bold text-gray-800 mb-1">Mie Siram Spesial</p>
-                            <p class="text-base font-extrabold" style="color:#FF6900;">Rp 22.000</p>
-                        </div>
-                    </a>
-
+                    @empty
+                    <p class="text-sm text-gray-400 py-4">Belum ada menu populer</p>
+                    @endforelse
                 </div>
             </section>
-
             {{-- KANTIN POPULER --}}
             <section class="pb-8">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-extrabold text-gray-900">Kantin Populer</h2>
-                    <a href="/jelajah" class="text-sm font-bold hover:underline" style="color:#FF6900;">
-                        Lihat Semua Kantin &rsaquo;
+                    <h2 class="text-lg font-extrabold text-gray-900">Kantin Rekomendasi</h2>
+                    <a href="{{ route('pelanggan.jelajah', ['tab' => 'kantin']) }}"
+                        class="text-sm font-bold hover:underline" style="color:#FF6900;">
+                        Lihat Semua &rsaquo;
                     </a>
                 </div>
-
                 <div class="grid grid-cols-2 gap-4">
-
-                    {{-- Warung Bu Ani --}}
-                    <a href="/kantin/warung-bu-ani"
+                    @forelse($kantinRekomendasi as $kantin)
+                    <a href="/kantin/{{ $kantin['_id'] }}"
                         class="kantin-card bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
                         <div class="relative flex-shrink-0">
-                            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200&q=80"
-                                alt="Warung Bu Ani" class="w-16 h-16 rounded-2xl object-cover">
+                            @if(!empty($kantin['image']))
+                            <img src="{{ $kantin['image'] }}" alt="{{ $kantin['name'] }}"
+                                class="w-16 h-16 rounded-2xl object-cover">
+                            @else
+                            <div class="w-16 h-16 rounded-2xl bg-orange-50 flex items-center justify-center">
+                                <i class="fa-solid fa-store text-2xl text-orange-200"></i>
+                            </div>
+                            @endif
+                            @if($kantin['computed_rating'] !== null)
                             <div
                                 class="absolute -bottom-1 -right-1 flex items-center gap-0.5 bg-amber-400 text-white text-[10px] font-black px-1.5 py-0.5 rounded-lg shadow">
-                                <i class="fa-solid fa-star text-[9px]"></i> 4.8
+                                <i class="fa-solid fa-star text-[9px]"></i> {{ $kantin['computed_rating'] }}
                             </div>
+                            @endif
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-extrabold text-gray-900 truncate">Warung Bu Ani</p>
-                            <p class="text-xs text-gray-400 font-medium mb-2">Indonesian • Nasi</p>
+                            <p class="text-sm font-extrabold text-gray-900 truncate">{{ $kantin['name'] }}</p>
+                            <p class="text-xs text-gray-400 font-medium mb-2 truncate">{{ $kantin['location'] ?? '-' }}
+                            </p>
+                            @if($kantin['is_open'] ?? false)
                             <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-xl"
                                 style="background-color:#FFF3E8; color:#FF6900;">
                                 <i class="fa-regular fa-clock text-[10px]"></i> Buka
                             </span>
-                        </div>
-                    </a>
-
-                    {{-- Noodle Ninja --}}
-                    <a href="/kantin/noodle-ninja"
-                        class="kantin-card bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
-                        <div class="relative flex-shrink-0">
-                            <img src="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=200&q=80"
-                                alt="Noodle Ninja" class="w-16 h-16 rounded-2xl object-cover">
-                            <div
-                                class="absolute -bottom-1 -right-1 flex items-center gap-0.5 bg-amber-400 text-white text-[10px] font-black px-1.5 py-0.5 rounded-lg shadow">
-                                <i class="fa-solid fa-star text-[9px]"></i> 4.6
-                            </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-extrabold text-gray-900 truncate">Noodle Ninja</p>
-                            <p class="text-xs text-gray-400 font-medium mb-2">Japanese • Mie</p>
-                            <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-xl"
-                                style="background-color:#FFF3E8; color:#FF6900;">
-                                <i class="fa-regular fa-clock text-[10px]"></i> Buka
-                            </span>
-                        </div>
-                    </a>
-
-                    {{-- Fresh Sip --}}
-                    <a href="/kantin/fresh-sip"
-                        class="kantin-card bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
-                        <div class="relative flex-shrink-0">
-                            <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=200&q=80"
-                                alt="Fresh Sip" class="w-16 h-16 rounded-2xl object-cover">
-                            <div
-                                class="absolute -bottom-1 -right-1 flex items-center gap-0.5 bg-amber-400 text-white text-[10px] font-black px-1.5 py-0.5 rounded-lg shadow">
-                                <i class="fa-solid fa-star text-[9px]"></i> 4.9
-                            </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-extrabold text-gray-900 truncate">Fresh Sip</p>
-                            <p class="text-xs text-gray-400 font-medium mb-2">Minuman • Dessert</p>
+                            @else
                             <span
                                 class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-xl bg-gray-100 text-gray-400">
                                 <i class="fa-regular fa-clock text-[10px]"></i> Tutup
                             </span>
+                            @endif
                         </div>
                     </a>
-
-                    {{-- Asian Bowl House --}}
-                    <a href="/kantin/asian-bowl-house"
-                        class="kantin-card bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
-                        <div class="relative flex-shrink-0">
-                            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&q=80"
-                                alt="Asian Bowl House" class="w-16 h-16 rounded-2xl object-cover">
-                            <div
-                                class="absolute -bottom-1 -right-1 flex items-center gap-0.5 bg-amber-400 text-white text-[10px] font-black px-1.5 py-0.5 rounded-lg shadow">
-                                <i class="fa-solid fa-star text-[9px]"></i> 4.5
-                            </div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-extrabold text-gray-900 truncate">Asian Bowl House</p>
-                            <p class="text-xs text-gray-400 font-medium mb-2">Asian • Nasi</p>
-                            <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-xl"
-                                style="background-color:#FFF3E8; color:#FF6900;">
-                                <i class="fa-regular fa-clock text-[10px]"></i> Buka
-                            </span>
-                        </div>
-                    </a>
-
+                    @empty
+                    <div class="col-span-2 py-8 text-center text-gray-400 text-sm">Belum ada kantin</div>
+                    @endforelse
                 </div>
             </section>
 
@@ -413,26 +371,41 @@
 
 @push('scripts')
 <script>
-    function setCategory(el, cat) {
-        // Reset all
-        document.querySelectorAll('.category-card').forEach(btn => {
-            btn.classList.remove('active');
-            btn.classList.add('bg-white', 'border-gray-100');
-            btn.querySelector('.cat-icon-wrap').style.backgroundColor = '#FFF7ED';
-            btn.querySelector('.cat-icon-wrap').style.color = '#FF6900';
-            const icon = btn.querySelector('.cat-icon-wrap i');
-            if (icon) { icon.classList.remove('text-white'); icon.style.color = '#FF6900'; }
-            btn.querySelector('.cat-label').style.color = '#6B7280';
-        });
+    // Data untuk smart search (dari controller)
+    const allMenuNames    = @json($allMenuNames);
+    const allCanteenNames = @json($allCanteenNames);
 
-        // Set active
-        el.classList.add('active');
-        el.classList.remove('bg-white', 'border-gray-100');
-        const wrap = el.querySelector('.cat-icon-wrap');
-        wrap.style.backgroundColor = 'rgba(255,255,255,0.25)';
-        const icon = wrap.querySelector('i');
-        if (icon) { icon.classList.add('text-white'); icon.style.color = 'white'; }
-        el.querySelector('.cat-label').style.color = 'white';
+    function handleSearchBeranda() {
+        const query = document.getElementById('searchBeranda').value.trim();
+        if (!query) return;
+
+        const q = query.toLowerCase();
+        const adaMenu    = allMenuNames.some(n    => n && n.toLowerCase().includes(q));
+        const adaKantin  = allCanteenNames.some(n => n && n.toLowerCase().includes(q));
+
+        let url;
+        if (adaMenu && adaKantin) {
+            url = `{{ route('pelanggan.jelajah') }}?tab=makanan&search=${encodeURIComponent(query)}`;
+        } else if (adaMenu) {
+            url = `{{ route('pelanggan.jelajah') }}?tab=makanan&category=Semua&search=${encodeURIComponent(query)}`;
+        } else if (adaKantin) {
+            url = `{{ route('pelanggan.jelajah') }}?tab=kantin&search=${encodeURIComponent(query)}`;
+        } else {
+            url = `{{ route('pelanggan.jelajah') }}?tab=makanan&search=${encodeURIComponent(query)}`;
+        }
+
+        window.location.href = url;
     }
+
+    const carousel = document.getElementById('menuCarousel');
+function scrollCarousel(dir) {
+    carousel.scrollBy({ left: dir * (176 + 16) * 2, behavior: 'smooth' });
+}
+carousel.addEventListener('scroll', () => {
+    document.getElementById('btnCarouselPrev').disabled = carousel.scrollLeft < 10;
+    document.getElementById('btnCarouselNext').disabled =
+        carousel.scrollLeft + carousel.clientWidth >= carousel.scrollWidth - 10;
+});
+document.getElementById('btnCarouselPrev').disabled = true;
 </script>
 @endpush
