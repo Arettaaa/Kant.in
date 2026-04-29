@@ -13,15 +13,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'role' => \App\Http\Middleware\RoleMiddleware::class,
-        ]);
-    })
-    ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->alias([
             'role'          => \App\Http\Middleware\RoleMiddleware::class,  // ← jangan diubah
             'check.session' => \App\Http\Middleware\CheckSession::class,    // ← tambah ini saja
+            'admin.kantin'  => \App\Http\Middleware\CheckAdminKantin::class, // tambah baru
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
+
+    
