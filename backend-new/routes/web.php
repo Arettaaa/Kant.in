@@ -97,34 +97,34 @@ Route::middleware(['check.session'])->prefix('admin/global')->name('admin.global
 Route::middleware(['check.session', 'admin.kantin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Pesanan
-    Route::get('/pesanan',                  [AdminPesananController::class, 'index'])->name('pesanan');
-    Route::get('/pesanan/{id}',             [AdminPesananController::class, 'show'])->name('pesanan.show');
-    Route::get('/pesanan/{id}/rincian',     [AdminPesananController::class, 'rincian'])->name('pesanan.rincian');
-    Route::post('/pesanan/{id}/verify',     [AdminPesananController::class, 'verifyPayment'])->name('pesanan.verify');
-    Route::post('/pesanan/{id}/reject',     [AdminPesananController::class, 'rejectPayment'])->name('pesanan.reject');
-    Route::put('/pesanan/{id}/status',      [AdminPesananController::class, 'updateStatus'])->name('pesanan.status');
-    Route::post('/pesanan/{id}/cancel',     [AdminPesananController::class, 'cancel'])->name('pesanan.cancel');
-    Route::post('/kantin/toggle-open',      [AdminPesananController::class, 'toggleOpen'])->name('kantin.toggleOpen');
+    Route::get('/pesanan', [AdminPesananController::class, 'index'])->name('pesanan');
+    Route::get('/pesanan/{id}', [AdminPesananController::class, 'show'])->name('pesanan.show');
+    Route::get('/pesanan/{id}/rincian', [AdminPesananController::class, 'rincian'])->name('pesanan.rincian');
+    Route::post('/pesanan/{id}/verify', [AdminPesananController::class, 'verifyPayment'])->name('pesanan.verify');
+    Route::post('/pesanan/{id}/reject', [AdminPesananController::class, 'rejectPayment'])->name('pesanan.reject');
+    Route::put('/pesanan/{id}/status', [AdminPesananController::class, 'updateStatus'])->name('pesanan.status');
+    Route::post('/pesanan/{id}/cancel', [AdminPesananController::class, 'cancel'])->name('pesanan.cancel');
+    Route::post('/kantin/toggle-open', [AdminPesananController::class, 'toggleOpen'])->name('kantin.toggleOpen');
 
     // Riwayat Transaksi
-    Route::get('/riwayat',                  [AdminTransactionController::class, 'index'])->name('riwayat');
-    Route::get('/riwayat/{id}',             [AdminTransactionController::class, 'detail'])->name('riwayat.detail');
-    Route::get('/riwayat/chart-data',       [AdminTransactionController::class, 'chartData'])->name('riwayat.chart');
-    Route::get('/riwayat/export',           [AdminTransactionController::class, 'export'])->name('riwayat.export');
+    Route::get('/riwayat', [AdminTransactionController::class, 'index'])->name('riwayat');
+    Route::get('/riwayat/{id}', [AdminTransactionController::class, 'detail'])->name('riwayat.detail');
+    Route::get('/riwayat/chart-data', [AdminTransactionController::class, 'chartData'])->name('riwayat.chart');
+    Route::get('/riwayat/export', [AdminTransactionController::class, 'export'])->name('riwayat.export');
 
     // Menu
-    Route::get('/menu',                     [AdminMenuController::class, 'index'])->name('menu');
-    Route::get('/menu/tambah',              [AdminMenuController::class, 'create'])->name('menu.tambah');
-    Route::post('/menu',                    [AdminMenuController::class, 'store'])->name('menu.store');
-    Route::get('/menu/{id}/edit',           [AdminMenuController::class, 'edit'])->name('menu.edit');
-    Route::put('/menu/{id}',                [AdminMenuController::class, 'update'])->name('menu.update');
-    Route::delete('/menu/{id}',             [AdminMenuController::class, 'destroy'])->name('menu.delete');
-    Route::put('/menu/{id}/availability',   [AdminMenuController::class, 'updateAvailability'])->name('menu.availability');
+    Route::get('/menu', [AdminMenuController::class, 'index'])->name('menu');
+    Route::get('/menu/tambah', [AdminMenuController::class, 'create'])->name('menu.tambah');
+    Route::post('/menu', [AdminMenuController::class, 'store'])->name('menu.store');
+    Route::get('/menu/{id}/edit', [AdminMenuController::class, 'edit'])->name('menu.edit');
+    Route::put('/menu/{id}', [AdminMenuController::class, 'update'])->name('menu.update');
+    Route::delete('/menu/{id}', [AdminMenuController::class, 'destroy'])->name('menu.delete');
+    Route::put('/menu/{id}/availability', [AdminMenuController::class, 'updateAvailability'])->name('menu.availability');
 
     // Profil
-    Route::get('/profil',                   [AdminProfilController::class, 'index'])->name('profil');
-    Route::put('/profil',                   [AdminProfilController::class, 'update'])->name('profil.update');
-    Route::get('/pusat-bantuan',            [AdminProfilController::class, 'bantuan'])->name('support');
+    Route::get('/profil', [AdminProfilController::class, 'index'])->name('profil');
+    Route::put('/profil', [AdminProfilController::class, 'update'])->name('profil.update');
+    Route::get('/pusat-bantuan', [AdminProfilController::class, 'bantuan'])->name('support');
 });
 /*
 |--------------------------------------------------------------------------

@@ -159,7 +159,7 @@ class PesananController extends Controller
     }
 
     /**
-     * Detail satu pesanan — untuk modal atau halaman detail.
+     * Halaman ringkasan pesanan (show).
      */
     public function show($orderId)
     {
@@ -173,6 +173,49 @@ class PesananController extends Controller
             abort(404, 'Pesanan tidak ditemukan.');
         }
 
-        return view('admin-kantin.pesanan.show', compact('order'));
+        return view('admin.pesanan-show', compact('order'));
+    }
+
+    /**
+     * Halaman rincian pesanan — tampil detail lengkap termasuk bukti bayar.
+     * Di sini admin bisa verifikasi atau tolak pembayaran.
+     */
+    public function rincian($orderId)
+    {
+        $canteenId = (string) auth()->user()->canteen_id;
+
+        $order = Order::where('_id', $orderId)
+            ->where('canteen_id', $canteenId)
+            ->first();
+
+        if (!$order) {
+            abort(404, 'Pesanan tidak ditemukan.');
+        }
+
+        return view('admin.pesanan-rincian', compact('order'));
+    }
+
+    /**
+     * Batalkan pesanan oleh admin kantin.
+     */
+    public function cancel($orderId)
+    {
+        $canteenId = (string) auth()->user()->canteen_id;
+
+        $order = Order::where('_id', $orderId)
+            ->where('canteen_id', $canteenId)
+            ->first();
+
+        if (!$order) {
+            return back()->with('error', 'Pesanan tidak ditemukan.');
+        }
+
+        if (!in_array($order->status, [Order::STATUS_PENDING, 'processing'])) {
+            return back()->with('error', 'Pesanan tidak dapat dibatalkan pada status ini.');
+        }
+
+        $order->update(['status' => Order::STATUS_CANCELLED]);
+
+        return back()->with('success', 'Pesanan berhasil dibatalkan.');
     }
 }
