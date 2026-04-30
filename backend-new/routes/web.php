@@ -17,6 +17,10 @@ use App\Http\Controllers\RatingController;
 use App\Http\Controllers\PesananController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\AdminKantin\PesananController as AdminPesananController;
+use App\Http\Controllers\AdminKantin\MenuController as AdminMenuController;
+use App\Http\Controllers\AdminKantin\TransactionController as AdminTransactionController;
+use App\Http\Controllers\AdminKantin\ProfilController as AdminProfilController;
 
 
 
@@ -39,9 +43,9 @@ Route::post('/register', [AuthController::class, 'processRegister'])->name('regi
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
-Route::get('/lupa-sandi',        [ForgotPasswordController::class, 'index']);
-Route::post('/lupa-sandi',       [ForgotPasswordController::class, 'checkEmail']);
-Route::get('/lupa-sandi/reset',  [ForgotPasswordController::class, 'resetForm']);
+Route::get('/lupa-sandi', [ForgotPasswordController::class, 'index']);
+Route::post('/lupa-sandi', [ForgotPasswordController::class, 'checkEmail']);
+Route::get('/lupa-sandi/reset', [ForgotPasswordController::class, 'resetForm']);
 Route::post('/lupa-sandi/reset', [ForgotPasswordController::class, 'resetPassword']);
 
 Route::get('/lupa-sandi/verifikasi', fn() => view('auth.verifikasi-otp'));
@@ -98,38 +102,35 @@ Route::middleware(['check.session'])->prefix('admin/global')->name('admin.global
 Route::middleware(['check.session', 'admin.kantin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Pesanan
-    Route::get('/pesanan', [App\Http\Controllers\AdminKantin\OrderController::class, 'index'])->name('pesanan');
-    Route::get('/pesanan/{id}', [App\Http\Controllers\AdminKantin\OrderController::class, 'show'])->name('pesanan.show');
-    Route::get('/pesanan/{id}/rincian', [App\Http\Controllers\AdminKantin\OrderController::class, 'rincian'])->name('pesanan.rincian');
-    Route::post('/pesanan/{id}/verify', [App\Http\Controllers\AdminKantin\OrderController::class, 'verify'])->name('pesanan.verify');
-    Route::post('/pesanan/{id}/reject', [App\Http\Controllers\AdminKantin\OrderController::class, 'reject'])->name('pesanan.reject');
-    Route::put('/pesanan/{id}/status', [App\Http\Controllers\AdminKantin\OrderController::class, 'updateStatus'])->name('pesanan.status');
-    Route::post('/pesanan/{id}/cancel', [App\Http\Controllers\AdminKantin\OrderController::class, 'cancel'])->name('pesanan.cancel');
+    Route::get('/pesanan', [AdminPesananController::class, 'index'])->name('pesanan');
+    Route::get('/pesanan/{id}', [AdminPesananController::class, 'show'])->name('pesanan.show');
+    Route::get('/pesanan/{id}/rincian', [AdminPesananController::class, 'rincian'])->name('pesanan.rincian');
+    Route::post('/pesanan/{id}/verify', [AdminPesananController::class, 'verifyPayment'])->name('pesanan.verify');
+    Route::post('/pesanan/{id}/reject', [AdminPesananController::class, 'rejectPayment'])->name('pesanan.reject');
+    Route::put('/pesanan/{id}/status', [AdminPesananController::class, 'updateStatus'])->name('pesanan.status');
+    Route::post('/pesanan/{id}/cancel', [AdminPesananController::class, 'cancel'])->name('pesanan.cancel');
+    Route::post('/kantin/toggle-open', [AdminPesananController::class, 'toggleOpen'])->name('kantin.toggleOpen');
 
-    // Riwayat
-    Route::get('/riwayat', [App\Http\Controllers\AdminKantin\OrderController::class, 'history'])->name('riwayat');
-    Route::get('/riwayat/{id}', [App\Http\Controllers\AdminKantin\OrderController::class, 'historyDetail'])->name('riwayat.detail');
+    // Riwayat Transaksi
+    Route::get('/riwayat', [AdminTransactionController::class, 'index'])->name('riwayat');
+    Route::get('/riwayat/{id}', [AdminTransactionController::class, 'detail'])->name('riwayat.detail');
+    Route::get('/riwayat/chart-data', [AdminTransactionController::class, 'chartData'])->name('riwayat.chart');
+    Route::get('/riwayat/export', [AdminTransactionController::class, 'export'])->name('riwayat.export');
 
     // Menu
-    Route::get('/menu', [App\Http\Controllers\AdminKantin\MenuController::class, 'index'])->name('menu');
-    Route::get('/menu/tambah', [App\Http\Controllers\AdminKantin\MenuController::class, 'create'])->name('menu.tambah');
-    Route::post('/menu', [App\Http\Controllers\AdminKantin\MenuController::class, 'store'])->name('menu.store');
-    Route::get('/menu/{id}/edit', [App\Http\Controllers\AdminKantin\MenuController::class, 'edit'])->name('menu.edit');
-    Route::put('/menu/{id}', [App\Http\Controllers\AdminKantin\MenuController::class, 'update'])->name('menu.update');
-    Route::delete('/menu/{id}', [App\Http\Controllers\AdminKantin\MenuController::class, 'destroy'])->name('menu.delete');
-    Route::put('/menu/{id}/availability', [App\Http\Controllers\AdminKantin\MenuController::class, 'toggleAvailability'])->name('menu.availability');
+    Route::get('/menu', [AdminMenuController::class, 'index'])->name('menu');
+    Route::get('/menu/tambah', [AdminMenuController::class, 'create'])->name('menu.tambah');
+    Route::post('/menu', [AdminMenuController::class, 'store'])->name('menu.store');
+    Route::get('/menu/{id}/edit', [AdminMenuController::class, 'edit'])->name('menu.edit');
+    Route::put('/menu/{id}', [AdminMenuController::class, 'update'])->name('menu.update');
+    Route::delete('/menu/{id}', [AdminMenuController::class, 'destroy'])->name('menu.delete');
+    Route::put('/menu/{id}/availability', [AdminMenuController::class, 'updateAvailability'])->name('menu.availability');
 
-    // Profil & Settings
-    Route::get('/profil', [App\Http\Controllers\AdminKantin\ProfileController::class, 'show'])->name('profil');
-    Route::get('/profil/edit', [App\Http\Controllers\AdminKantin\ProfileController::class, 'edit'])->name('profil.edit');
-    Route::post('/profil', [App\Http\Controllers\AdminKantin\ProfileController::class, 'update'])->name('profil.update');
-    Route::get('/profil/jam-operasional', [App\Http\Controllers\AdminKantin\ProfileController::class, 'settings'])->name('profil.jam');
-    Route::post('/profil/settings', [App\Http\Controllers\AdminKantin\ProfileController::class, 'updateSettings'])->name('profil.settings');
-
-    // Support
-    Route::get('/pusat-bantuan', fn() => view('admin.support'))->name('support');
+    // Profil
+    Route::get('/profil', [AdminProfilController::class, 'index'])->name('profil');
+    Route::put('/profil', [AdminProfilController::class, 'update'])->name('profil.update');
+    Route::get('/pusat-bantuan', [AdminProfilController::class, 'bantuan'])->name('support');
 });
-
 /*
 |--------------------------------------------------------------------------
 | Pelanggan Routes
@@ -150,7 +151,7 @@ Route::get('/keranjang/ongkir/{canteenId}', [CartController::class, 'getOngkir']
 Route::post('/rating/{orderId}', [RatingController::class, 'store'])->name('pelanggan.rating.store');
 Route::get('/rating/{orderId}/check', [RatingController::class, 'check'])->name('pelanggan.rating.check');
 
-Route::post('/pembayaran/session',  [CheckoutController::class, 'saveSession']);
+Route::post('/pembayaran/session', [CheckoutController::class, 'saveSession']);
 Route::get('/pembayaran', [CheckoutController::class, 'index']);
 Route::post('/pembayaran', [CheckoutController::class, 'store']);
 Route::post('/pembayaran/batalkan', [CheckoutController::class, 'cancel']);

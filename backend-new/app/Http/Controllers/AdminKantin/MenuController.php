@@ -3,175 +3,198 @@
 namespace App\Http\Controllers\AdminKantin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Menu;
+use App\Models\Canteen;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
-    private function apiUrl(string $path): string
+    /**
+     * Daftar semua menu milik kantin ini.
+     */
+    public function index()
     {
-        $base = env('API_INTERNAL_URL', config('app.url'));
-        return rtrim($base, '/') . '/api' . $path;
+        $canteenId = (string) auth()->user()->canteen_id;
+
+        $menus = Menu::where('canteen_id', $canteenId)
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get()
+            ->map(fn($menu) => $this->formatMenu($menu));
+
+        // Ambil kategori unik untuk filter di view
+        $categories = $menus->pluck('category')->unique()->sort()->values();
+
+        return view('admin-kantin.menu.index', compact('menus', 'categories'));
     }
 
-    private function token(): string
-    {
-        return Session::get('api_token', '');
-    }
-
-    private function canteenId(): string
-    {
-        return Session::get('user', [])['canteen_id'] ?? '';
-    }
-
-    // GET /admin/menu
-    public function index(Request $request)
-    {
-        $canteenId = $this->canteenId();
-
-        $response = Http::withToken($this->token())
-            ->get($this->apiUrl("/canteens/{$canteenId}/menus"), [
-                'search'   => $request->search,
-                'category' => $request->category,
-            ]);
-
-        $menus = $response->successful() ? ($response->json()['data'] ?? []) : [];
-
-        return view('admin.kelola-menu', compact('menus'));
-    }
-
-    // GET /admin/menu/tambah
+    /**
+     * Halaman form tambah menu baru.
+     */
     public function create()
     {
-        return view('admin.tambah-menu');
+        return view('admin-kantin.menu.create');
     }
 
-    // POST /admin/menu
+    /**
+     * Simpan menu baru ke database.
+     */
     public function store(Request $request)
     {
-        $canteenId = $this->canteenId();
+        $canteenId = (string) auth()->user()->canteen_id;
 
-        $request->validate([
-            'name'                   => 'required|string',
+        $validated = $request->validate([
+            'name'                   => 'required|string|max:255',
             'description'            => 'nullable|string',
             'price'                  => 'required|integer|min:0',
-            'category'               => 'required|string',
-            'estimated_cooking_time' => 'nullable|integer|min:1',
+            'category'               => 'required|string|max:100',
             'image'                  => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'estimated_cooking_time' => 'nullable|integer|min:1',
         ]);
-
-        $http = Http::withToken($this->token())->asMultipart();
 
         if ($request->hasFile('image')) {
-            $http = $http->attach(
-                'image',
-                file_get_contents($request->file('image')->getRealPath()),
-                $request->file('image')->getClientOriginalName()
-            );
+            $validated['image'] = $request->file('image')->store('menus', 'public');
         }
 
-        $response = $http->post($this->apiUrl("/canteens/{$canteenId}/menus"), [
-            'name'                   => $request->name,
-            'description'            => $request->description,
-            'price'                  => $request->price,
-            'category'               => $request->category,
-            'estimated_cooking_time' => $request->estimated_cooking_time,
+        $validated['canteen_id']   = $canteenId;
+        $validated['is_available'] = true;
+
+        Menu::create($validated);
+
+        return redirect()
+            ->route('admin-kantin.menu.index')
+            ->with('success', 'Menu berhasil ditambahkan.');
+    }
+
+    /**
+     * Halaman form edit menu.
+     */
+    public function edit($menuId)
+    {
+        $canteenId = (string) auth()->user()->canteen_id;
+
+        $menu = Menu::where('_id', $menuId)
+            ->where('canteen_id', $canteenId)
+            ->first();
+
+        if (!$menu) {
+            abort(404, 'Menu tidak ditemukan.');
+        }
+
+        return view('admin-kantin.menu.edit', [
+            'menu' => $this->formatMenu($menu),
         ]);
-
-        if ($response->successful()) {
-            return redirect()->route('admin.menu')->with('success', 'Menu berhasil ditambahkan.');
-        }
-
-        return back()->with('error', $response->json()['message'] ?? 'Gagal menambahkan menu.')->withInput();
     }
 
-    // GET /admin/menu/{id}/edit
-    public function edit($id)
+    /**
+     * Simpan perubahan menu.
+     */
+    public function update(Request $request, $menuId)
     {
-        $canteenId = $this->canteenId();
+        $canteenId = (string) auth()->user()->canteen_id;
 
-        $response = Http::withToken($this->token())
-            ->get($this->apiUrl("/menus/{$id}"));
+        $menu = Menu::where('_id', $menuId)
+            ->where('canteen_id', $canteenId)
+            ->first();
 
-        if (!$response->successful()) {
-            return redirect()->route('admin.menu')->with('error', 'Menu tidak ditemukan.');
+        if (!$menu) {
+            abort(404, 'Menu tidak ditemukan.');
         }
 
-        $menu = $response->json()['data'];
-
-        return view('admin.edit-menu', compact('menu'));
-    }
-
-    // PUT /admin/menu/{id}
-    public function update(Request $request, $id)
-    {
-        $canteenId = $this->canteenId();
-
-        $request->validate([
-            'name'                   => 'sometimes|string',
+        $validated = $request->validate([
+            'name'                   => 'sometimes|string|max:255',
             'description'            => 'nullable|string',
             'price'                  => 'sometimes|integer|min:0',
-            'category'               => 'sometimes|string',
-            'estimated_cooking_time' => 'nullable|integer|min:1',
+            'category'               => 'sometimes|string|max:100',
             'image'                  => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'estimated_cooking_time' => 'nullable|integer|min:1',
         ]);
-
-        $http = Http::withToken($this->token())->asMultipart();
 
         if ($request->hasFile('image')) {
-            $http = $http->attach(
-                'image',
-                file_get_contents($request->file('image')->getRealPath()),
-                $request->file('image')->getClientOriginalName()
-            );
+            if ($menu->image) {
+                Storage::disk('public')->delete($menu->image);
+            }
+            $validated['image'] = $request->file('image')->store('menus', 'public');
         }
 
-        $response = $http->post($this->apiUrl("/canteens/{$canteenId}/menus/{$id}"), [
-            'name'                   => $request->name,
-            'description'            => $request->description,
-            'price'                  => $request->price,
-            'category'               => $request->category,
-            'estimated_cooking_time' => $request->estimated_cooking_time,
-            '_method'                => 'PUT',
+        $menu->update($validated);
+
+        return redirect()
+            ->route('admin-kantin.menu.index')
+            ->with('success', 'Menu berhasil diperbarui.');
+    }
+
+    /**
+     * Hapus menu.
+     */
+    public function destroy($menuId)
+    {
+        $canteenId = (string) auth()->user()->canteen_id;
+
+        $menu = Menu::where('_id', $menuId)
+            ->where('canteen_id', $canteenId)
+            ->first();
+
+        if (!$menu) {
+            abort(404, 'Menu tidak ditemukan.');
+        }
+
+        if ($menu->image) {
+            Storage::disk('public')->delete($menu->image);
+        }
+
+        $menu->delete();
+
+        return redirect()
+            ->route('admin-kantin.menu.index')
+            ->with('success', 'Menu berhasil dihapus.');
+    }
+
+    /**
+     * Toggle ketersediaan menu (tersedia / tidak tersedia).
+     * Dipanggil via AJAX — toggle switch di halaman daftar menu.
+     */
+    public function updateAvailability(Request $request, $menuId)
+    {
+        $request->validate([
+            'is_available' => 'required|in:0,1,true,false',
         ]);
 
-        if ($response->successful()) {
-            return redirect()->route('admin.menu')->with('success', 'Menu berhasil diperbarui.');
+        $canteenId = (string) auth()->user()->canteen_id;
+
+        $menu = Menu::where('_id', $menuId)
+            ->where('canteen_id', $canteenId)
+            ->first();
+
+        if (!$menu) {
+            return response()->json(['success' => false, 'message' => 'Menu tidak ditemukan.'], 404);
         }
 
-        return back()->with('error', $response->json()['message'] ?? 'Gagal memperbarui menu.')->withInput();
+        $isAvailable = filter_var($request->is_available, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)
+            ?? (bool)(int) $request->is_available;
+
+        Menu::where('_id', $menuId)->update(['is_available' => $isAvailable]);
+
+        return response()->json([
+            'success'      => true,
+            'message'      => $isAvailable ? 'Menu tersedia.' : 'Menu tidak tersedia.',
+            'is_available' => $isAvailable,
+        ]);
     }
 
-    // DELETE /admin/menu/{id}
-    public function destroy($id)
+    /**
+     * Format menu untuk dikirim ke view (URL gambar lengkap, ID string).
+     */
+    private function formatMenu($menu): array
     {
-        $canteenId = $this->canteenId();
+        $data        = $menu->toArray();
+        $data['_id'] = (string) $menu->_id;
 
-        $response = Http::withToken($this->token())
-            ->delete($this->apiUrl("/canteens/{$canteenId}/menus/{$id}"));
-
-        if ($response->successful()) {
-            return redirect()->route('admin.menu')->with('success', 'Menu berhasil dihapus.');
+        if (!empty($data['image'])) {
+            $data['image'] = asset('storage/' . $data['image']);
         }
 
-        return back()->with('error', $response->json()['message'] ?? 'Gagal menghapus menu.');
-    }
-
-    // PUT /admin/menu/{id}/availability
-    public function toggleAvailability(Request $request, $id)
-    {
-        $canteenId = $this->canteenId();
-
-        $response = Http::withToken($this->token())
-            ->put($this->apiUrl("/canteens/{$canteenId}/menus/{$id}/availabilities"), [
-                'is_available' => $request->is_available,
-            ]);
-
-        if ($response->successful()) {
-            return back()->with('success', 'Status menu berhasil diperbarui.');
-        }
-
-        return back()->with('error', $response->json()['message'] ?? 'Gagal memperbarui status menu.');
+        return $data;
     }
 }
