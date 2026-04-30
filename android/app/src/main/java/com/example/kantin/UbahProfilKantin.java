@@ -81,7 +81,7 @@ public class UbahProfilKantin extends AppCompatActivity {
 
     // ── Views: Action ──
     private AppCompatButton btnSubmitAll;
-    private CardView btnBack;
+    private android.widget.ImageButton btnBack;
 
     // ── Dependencies ──
     private SessionManager sessionManager;

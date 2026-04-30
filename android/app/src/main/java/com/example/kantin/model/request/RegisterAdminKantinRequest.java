@@ -33,27 +33,42 @@ public class RegisterAdminKantinRequest {
     @SerializedName("phone")
     private String phone;
 
-    /** Harus "admin_kantin" — sesuai validasi server */
     @SerializedName("role")
     private String role = "admin_kantin";
 
-    /** Wajib diisi jika role = admin_kantin */
     @SerializedName("canteen_name")
     private String canteenName;
 
+    @SerializedName("canteen_location")      // ← tambah
+    private String canteenLocation;
+
+    @SerializedName("canteen_description")   // ← tambah
+    private String canteenDescription;
+
+    @SerializedName("canteen_phone")         // ← tambah
+    private String canteenPhone;
+
     public RegisterAdminKantinRequest(String name, String email, String password,
-                                      String phone, String canteenName) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.phone = phone;
-        this.canteenName = canteenName;
+                                      String phone, String canteenName,
+                                      String canteenLocation, String canteenDescription,
+                                      String canteenPhone) {
+        this.name               = name;
+        this.email              = email;
+        this.password           = password;
+        this.phone              = phone;
+        this.canteenName        = canteenName;
+        this.canteenLocation    = canteenLocation;
+        this.canteenDescription = canteenDescription;
+        this.canteenPhone       = canteenPhone;
     }
 
-    public String getName()        { return name; }
-    public String getEmail()       { return email; }
-    public String getPassword()    { return password; }
-    public String getPhone()       { return phone; }
-    public String getRole()        { return role; }
-    public String getCanteenName() { return canteenName; }
+    public String getName()               { return name; }
+    public String getEmail()              { return email; }
+    public String getPassword()           { return password; }
+    public String getPhone()              { return phone; }
+    public String getRole()               { return role; }
+    public String getCanteenName()        { return canteenName; }
+    public String getCanteenLocation()    { return canteenLocation; }
+    public String getCanteenDescription() { return canteenDescription; }
+    public String getCanteenPhone()       { return canteenPhone; }
 }

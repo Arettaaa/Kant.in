@@ -31,6 +31,7 @@ import retrofit2.Response;
 public class RegisterAdminActivity extends AppCompatActivity {
 
     private EditText etNamaLengkap, etEmail, etPassword, etPhone, etNamaKantin;
+    private EditText etLokasiKantin, etDeskripsiKantin, etTelpKantin;
     private ImageView ivTogglePassword;
     private MaterialButton btnRegister;
     private TextView tabPelanggan, tvLogin, tvStrengthLabel;
@@ -88,6 +89,9 @@ public class RegisterAdminActivity extends AppCompatActivity {
         etPhone         = findViewById(R.id.etPhone);
         etNamaKantin    = findViewById(R.id.etNamaKantin);
         ivTogglePassword = findViewById(R.id.ivTogglePassword);
+        etLokasiKantin   = findViewById(R.id.etLokasiKantin);
+        etDeskripsiKantin = findViewById(R.id.etDeskripsiKantin);
+        etTelpKantin     = findViewById(R.id.etTelpKantin);
         btnRegister     = findViewById(R.id.btnRegister);
         tabPelanggan    = findViewById(R.id.tabPelanggan);
         tvLogin         = findViewById(R.id.tvLogin);
@@ -169,6 +173,10 @@ public class RegisterAdminActivity extends AppCompatActivity {
         String password = etPassword.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
         String namaKantin = etNamaKantin.getText().toString().trim();
+        String lokasiKantin    = etLokasiKantin.getText().toString().trim();
+        String deskripsiKantin = etDeskripsiKantin.getText().toString().trim();
+        String telpKantin      = etTelpKantin.getText().toString().trim();
+
 
         if (nama.isEmpty()) {
             etNamaLengkap.setError("Nama tidak boleh kosong");
@@ -191,16 +199,21 @@ public class RegisterAdminActivity extends AppCompatActivity {
             return;
         }
 
-        prosesRegisterAdmin(nama, email, password, phone, namaKantin);
+        prosesRegisterAdmin(nama, email, password, phone, namaKantin, lokasiKantin, deskripsiKantin, telpKantin);
     }
 
-    private void prosesRegisterAdmin(String nama, String email, String password, String phone, String namaKantin) {
+    private void prosesRegisterAdmin(String nama, String email, String password, String phone,
+                                     String namaKantin, String lokasiKantin,
+                                     String deskripsiKantin, String telpKantin) {
         btnRegister.setEnabled(false);
         btnRegister.setText("Memproses...");
 
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        RegisterAdminKantinRequest request = new RegisterAdminKantinRequest(nama, email, password, phone, namaKantin);
-
+        RegisterAdminKantinRequest request = new RegisterAdminKantinRequest(
+                nama, email, password, phone,
+                namaKantin, lokasiKantin, deskripsiKantin, telpKantin
+        );
+        
         apiService.registerAdminKantin(request).enqueue(new Callback<BaseResponse>() {
             @Override
             public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
