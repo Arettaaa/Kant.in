@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Session;
-// ✅ TAMBAHKAN BARIS INI BIAR NGGAK ERROR LAGI:
-use App\Models\User; 
 
 class CanteenController extends Controller
 {
@@ -16,57 +14,99 @@ class CanteenController extends Controller
         return rtrim($base, '/') . '/api' . $path;
     }
 
+    private function token(): string
+    {
+        return Session::get('api_token', '');
+    }
+
     public function index()
     {
-        $token = Session::get('api_token');
-
-        // 1. Ambil data kantin dari API
         $response = Http::timeout(15)
-            ->withToken($token)
+            ->withToken($this->token())
             ->get($this->apiUrl('/canteens'));
 
-        if ($response->successful()) {
-            $rawCanteens = $response->json('data') ?? [];
-
-            // 2. Kita gabungkan data dari API dengan data User (Pemilik) dari Database Lokal
-            $canteens = collect($rawCanteens)->map(function($kantin) {
-                // Ambil ID Kantin (support format MongoDB _id atau ID biasa)
-                $idKantin = $kantin['_id'] ?? $kantin['id'] ?? null;
-                
-                // Cari user yang punya canteen_id tersebut dan rolenya admin_kantin
-                $pemilik = User::where('canteen_id', (string)$idKantin)
-                               ->where('role', 'admin_kantin')
-                               ->first();
-                
-                // Masukkan nama pemilik ke dalam array kantin
-                $kantin['admin_kantin_name'] = $pemilik ? $pemilik->name : 'Belum ada pemilik';
-                return $kantin;
-            });
-
-            // Filter supaya yang statusnya 'pending' nggak muncul di halaman ini
-            $canteens = $canteens->filter(fn($c) => ($c['status'] ?? '') !== 'pending');
-
-            $totalKantin = $canteens->count();
-            $kantinAktif = $canteens->where('status', 'active')->count();
-
-            return view('admin_global.kantin', compact('canteens', 'totalKantin', 'kantinAktif'));
+        if (!$response->successful()) {
+            return redirect()->route('admin.global.dasbor')
+                ->withErrors('Gagal menyambung ke server API.');
         }
 
-        return redirect()->route('admin.global.dasbor')->withErrors('Gagal menyambung ke server API.');
+        $canteens    = collect($response->json('data') ?? []);
+        $totalKantin = $canteens->count();
+        $kantinAktif = $canteens->where('status', 'active')->count();
+
+        return view('admin_global.kantin', compact('canteens', 'totalKantin', 'kantinAktif'));
     }
 
-    // Fungsi store, update, destroy tetap arahkan ke API...
     public function store(Request $request)
     {
-        $token = Session::get('api_token');
-        $response = Http::withToken($token)->post($this->apiUrl('/canteens'), $request->all());
-        return redirect()->back()->with('success', 'Kantin berhasil ditambahkan!');
+        $http = Http::withToken($this->token());
+
+        // Handle file upload dengan multipart
+        if ($request->hasFile('image')) {
+            $http = $http->attach(
+                'image',
+                file_get_contents($request->file('image')->getRealPath()),
+                $request->file('image')->getClientOriginalName()
+            );
+        }
+
+        $response = $http->post($this->apiUrl('/canteens'), [
+            'name'                  => $request->name,
+            'location'              => $request->location,
+            'description'           => $request->description,
+            'phone'                 => $request->phone,
+            'delivery_fee_flat'     => $request->delivery_fee_flat,
+            'operating_hours'       => $request->operating_hours,
+            'operating_hours[open]' => $request->input('operating_hours.open'),
+            'operating_hours[close]' => $request->input('operating_hours.close'),
+            'admin_name'            => $request->admin_name,
+            'admin_email'           => $request->admin_email,
+            'admin_password'        => $request->admin_password,
+            'admin_phone'           => $request->admin_phone,
+        ]);
+
+        if ($response->successful()) {
+            return redirect()->back()->with('success', 'Kantin berhasil ditambahkan!');
+        }
+
+        $errors = $response->json('errors') ?? [];
+        return redirect()->back()->withErrors($errors)->withInput();
     }
 
+    public function update(Request $request, $id)
+    {
+        $token = $this->token();
+
+        $payload = [
+            'name'              => $request->name,
+            'location'          => $request->location,
+            'phone'             => $request->phone,
+            'admin_phone'       => $request->admin_phone,
+            'status'            => $request->status,
+            'delivery_fee_flat' => $request->delivery_fee_flat !== null ? (int) $request->delivery_fee_flat : null,
+            'operating_hours'   => $request->operating_hours, // ✅ tambah ini
+        ];
+
+        $payload = array_filter($payload, fn($v) => !is_null($v) && $v !== '');
+
+        $response = Http::withToken($token)
+            ->put($this->apiUrl("/canteens/{$id}"), $payload);
+
+        if ($response->successful()) {
+            return redirect()->back()->with('success', 'Kantin berhasil diperbarui!');
+        }
+
+        return redirect()->back()->withErrors(['msg' => 'Gagal memperbarui kantin. ' . $response->body()]);
+    }
     public function destroy($id)
     {
-        $token = Session::get('api_token');
-        $response = Http::withToken($token)->delete($this->apiUrl("/canteens/{$id}"));
-        return redirect()->back()->with('success', 'Kantin berhasil dihapus!');
+        $response = Http::withToken($this->token())
+            ->delete($this->apiUrl("/canteens/{$id}"));
+
+        if ($response->successful()) {
+            return redirect()->back()->with('success', 'Kantin berhasil dihapus!');
+        }
+
+        return redirect()->back()->withErrors(['msg' => 'Gagal menghapus kantin.']);
     }
 }

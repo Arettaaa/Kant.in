@@ -11,153 +11,125 @@ use Illuminate\Support\Facades\Storage;
 
 class CanteenController extends Controller
 {
-    // PUBLIC: GET /canteens
     public function index()
     {
         $canteens = Canteen::where('is_active', true)
-            ->where('status', 'active') // tambahkan ini
+            ->where('status', 'active')
             ->get()
             ->map(fn($canteen) => $this->formatCanteen($canteen));
 
-        return response()->json([
-            'success' => true,
-            'data' => $canteens,
-        ]);
+        return response()->json(['success' => true, 'data' => $canteens]);
     }
 
-    // PUBLIC: GET /canteens/{id}
     public function show($id)
     {
         $canteen = Canteen::find($id);
-
         if (!$canteen) {
             return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan.'], 404);
         }
-
-        return response()->json([
-            'success' => true,
-            'data' => $this->formatCanteen($canteen),
-        ]);
+        return response()->json(['success' => true, 'data' => $this->formatCanteen($canteen)]);
     }
 
-    // ADMIN GLOBAL: POST /canteens
     public function store(Request $request)
     {
         $validated = $request->validate([
-            // Data kantin
-            'name' => 'required|string',
-            'description' => 'nullable|string',
-            'location' => 'required|string',
-            'phone' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'delivery_fee_flat' => 'required|integer|min:0',
-            'operating_hours' => 'required|array',
-            'operating_hours.open' => 'required|string',
-            'operating_hours.close' => 'required|string',
-            'qris_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            // Data admin kantin
-            'admin_name' => 'required|string',
-            'admin_email' => 'required|email|unique:users,email',
-            'admin_password' => 'required|min:6',
-            'admin_phone' => 'nullable|string',
+            'name'                  => 'required|string',
+            'location'              => 'required|string',
+            'description'           => 'nullable|string',
+            'phone'                 => 'nullable|string',
+            'image'                 => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'delivery_fee_flat'     => 'nullable|integer|min:0',
+            'operating_hours'       => 'nullable|array',
+            'operating_hours.open'  => 'nullable|string',
+            'operating_hours.close' => 'nullable|string',
+            'admin_name'            => 'required|string',
+            'admin_email'           => 'required|email|unique:users,email',
+            'admin_password'        => 'required|min:6',
+            'admin_phone'           => 'nullable|string',
         ]);
 
         if ($request->hasFile('image')) {
             $validated['image'] = $request->file('image')->store('canteens', 'public');
         }
 
-        if ($request->hasFile('qris_image')) {
-            $validated['qris_image'] = $request->file('qris_image')->store('qris', 'public');
-        }
-
-        // Buat kantin
         $canteen = Canteen::create([
-            'name' => $validated['name'],
-            'description' => $validated['description'] ?? null,
-            'location' => $validated['location'],
-            'phone' => $validated['phone'] ?? null,
-            'image' => $validated['image'] ?? null,
-            'qris_image' => $validated['qris_image'] ?? null,
-            'delivery_fee_flat' => $validated['delivery_fee_flat'],
-            'operating_hours' => $validated['operating_hours'],
-            'is_active' => true,
-            'is_open' => true,
-            'status' => 'active',
+            'name'              => $validated['name'],
+            'description'       => $validated['description'] ?? null,
+            'location'          => $validated['location'],
+            'phone'             => $validated['phone'] ?? null,
+            'image'             => $validated['image'] ?? null,
+            'qris_image'        => null,
+            'delivery_fee_flat' => $validated['delivery_fee_flat'] ?? 0,
+            'operating_hours'   => $validated['operating_hours'] ?? ['open' => '07:00', 'close' => '17:00'],
+            'is_active'         => true,
+            'is_open'           => true,
+            'status'            => 'active',
         ]);
 
-        // Buat akun admin kantin
         $admin = User::create([
-            'name' => $validated['admin_name'],
-            'email' => $validated['admin_email'],
-            'password' => Hash::make($validated['admin_password']),
-            'phone' => $validated['admin_phone'] ?? null,
-            'role' => 'admin_kantin',
+            'name'       => $validated['admin_name'],
+            'email'      => $validated['admin_email'],
+            'password'   => Hash::make($validated['admin_password']),
+            'phone'      => $validated['admin_phone'] ?? null,
+            'role'       => 'admin_kantin',
             'canteen_id' => (string) $canteen->_id,
-            'status' => 'active',
+            'status'     => 'active',
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Kantin dan akun admin berhasil dibuat.',
-            'data' => [
+            'data'    => [
                 'canteen' => $this->formatCanteen($canteen),
-                'admin' => [
-                    'id' => (string) $admin->_id,
-                    'name' => $admin->name,
+                'admin'   => [
+                    'id'    => (string) $admin->_id,
+                    'name'  => $admin->name,
                     'email' => $admin->email,
                 ],
             ],
         ], 201);
     }
 
-    // ADMIN GLOBAL: PUT /canteens/{id}
-    public function update(Request $request, $id)
-    {
-        $canteen = Canteen::find($id);
+    // public function update(Request $request, $id)
+    // {
+    //     $canteen = Canteen::find($id);
+    //     if (!$canteen) {
+    //         return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan.'], 404);
+    //     }
 
-        if (!$canteen) {
-            return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan.'], 404);
-        }
+    //     $validated = $request->validate([
+    //         'name'                  => 'sometimes|string',
+    //         'description'           => 'nullable|string',
+    //         'location'              => 'sometimes|string',
+    //         'phone'                 => 'nullable|string',
+    //         'image'                 => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+    //         'delivery_fee_flat'     => 'sometimes|integer|min:0',
+    //         'operating_hours'       => 'sometimes|array',
+    //         'operating_hours.open'  => 'sometimes|string',
+    //         'operating_hours.close' => 'sometimes|string',
+    //         'is_active'             => 'sometimes|boolean',
+    //         'status'                => 'sometimes|in:active,inactive',
+    //     ]);
 
-        $validated = $request->validate([
-            'name' => 'sometimes|string',
-            'description' => 'nullable|string',
-            'location' => 'sometimes|string',
-            'phone' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'delivery_fee_flat' => 'sometimes|integer|min:0',
-            'operating_hours' => 'sometimes|array',
-            'operating_hours.open' => 'sometimes|string',
-            'operating_hours.close' => 'sometimes|string',
-            'is_active' => 'sometimes|boolean',
-            'qris_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
+    //     if ($request->hasFile('image')) {
+    //         if ($canteen->image) Storage::disk('public')->delete($canteen->image);
+    //         $validated['image'] = $request->file('image')->store('canteens', 'public');
+    //     }
 
-        if ($request->hasFile('image')) {
-            // Hapus foto lama
-            if ($canteen->image) {
-                Storage::disk('public')->delete($canteen->image);
-            }
-            $validated['image'] = $request->file('image')->store('canteens', 'public');
-        }
+    //     // sync is_active dengan status
+    //     if (isset($validated['status'])) {
+    //         $validated['is_active'] = $validated['status'] === 'active';
+    //     }
 
-        if ($request->hasFile('qris_image')) {
-            if ($canteen->qris_image) {
-                Storage::disk('public')->delete($canteen->qris_image);
-            }
-            $validated['qris_image'] = $request->file('qris_image')->store('qris', 'public');
-        }
+    //     $canteen->update($validated);
 
-        $canteen->update($validated);
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Kantin berhasil diperbarui.',
+    //         'data'    => $this->formatCanteen($canteen->fresh()),
+    //     ]);
+    // }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Kantin berhasil diperbarui.',
-            'data' => $this->formatCanteen($canteen),
-        ]);
-    }
-
-    // ADMIN GLOBAL: DELETE /canteens/{id}
     public function destroy($id)
     {
         $canteen = Canteen::find($id);
@@ -166,35 +138,131 @@ class CanteenController extends Controller
             return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan.'], 404);
         }
 
-        // Hapus foto jika ada
+        // ✅ Hapus foto kantin
         if ($canteen->image) {
             Storage::disk('public')->delete($canteen->image);
+        }
+        if ($canteen->qris_image) {
+            Storage::disk('public')->delete($canteen->qris_image);
+        }
+
+        // ✅ Hapus semua user admin kantin yang terkait
+        $admins = User::where('canteen_id', (string) $id)->get();
+        foreach ($admins as $admin) {
+            if ($admin->photo_profile) {
+                Storage::disk('public')->delete($admin->photo_profile);
+            }
+            $admin->delete();
         }
 
         $canteen->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Kantin berhasil dihapus.',
+            'message' => 'Kantin dan akun admin berhasil dihapus.',
         ]);
     }
 
-    // Helper: format image URL
+    // ✅ Sekarang include admin_name — aman untuk mobile (hanya nambah field)
+    // private function formatCanteen($canteen)
+    // {
+    //     $data        = $canteen->toArray();
+    //     $data['_id'] = (string) $canteen->_id;
+
+    //     if (!empty($data['image'])) {
+    //         $data['image'] = asset('storage/' . $data['image']);
+    //     }
+    //     if (!empty($data['qris_image'])) {
+    //         $data['qris_image'] = asset('storage/' . $data['qris_image']);
+    //     }
+
+    //     // Ambil nama admin kantin
+    //     $admin                    = User::where('canteen_id', (string) $canteen->_id)
+    //                                     ->where('role', 'admin_kantin')
+    //                                     ->first();
+    //     $data['admin_name']       = $admin?->name ?? 'Belum ada pemilik';
+    //     $data['admin_email']      = $admin?->email ?? null;
+
+    //     return $data;
+    // }
+
     private function formatCanteen($canteen)
     {
-        $data = $canteen->toArray();
-        $data['_id'] = (string) $canteen->_id; // ← tambah ini
+        $data        = $canteen->toArray();
+        $data['_id'] = (string) $canteen->_id;
+
         if (!empty($data['image'])) {
             $data['image'] = asset('storage/' . $data['image']);
         }
         if (!empty($data['qris_image'])) {
             $data['qris_image'] = asset('storage/' . $data['qris_image']);
         }
+
+        // ✅ Ambil data admin kantin sekalian
+        $admin = User::where('canteen_id', (string) $canteen->_id)
+            ->where('role', 'admin_kantin')
+            ->first();
+
+        $data['admin_name']  = $admin?->name  ?? 'Belum ada pemilik';
+        $data['admin_email'] = $admin?->email ?? null;
+        $data['admin_phone'] = $admin?->phone ?? null; // ✅ phone pemilik
+        $data['admin_id']    = $admin ? (string) $admin->_id : null;
+
+        // ✅ Pastikan delivery_fee_flat selalu integer
+        $data['delivery_fee_flat'] = (int) ($data['delivery_fee_flat'] ?? 0);
+
         return $data;
     }
 
-    // ADMIN GLOBAL: POST /canteens/{id}/admins
-    // ADMIN GLOBAL: POST /canteens/{id}/admins
+    public function update(Request $request, $id)
+    {
+        $canteen = Canteen::find($id);
+        if (!$canteen) {
+            return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan.'], 404);
+        }
+
+        $validated = $request->validate([
+            'name'                  => 'sometimes|string',
+            'description'           => 'nullable|string',
+            'location'              => 'sometimes|string',
+            'phone'                 => 'nullable|string',   // phone kantin
+            'admin_phone'           => 'nullable|string',   // phone pemilik
+            'image'                 => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'delivery_fee_flat'     => 'sometimes|integer|min:0',
+            'operating_hours'       => 'sometimes|array',
+            'operating_hours.open'  => 'sometimes|string',
+            'operating_hours.close' => 'sometimes|string',
+            'is_active'             => 'sometimes|boolean',
+            'status'                => 'sometimes|in:active,inactive',
+        ]);
+
+        if ($request->hasFile('image')) {
+            if ($canteen->image) Storage::disk('public')->delete($canteen->image);
+            $validated['image'] = $request->file('image')->store('canteens', 'public');
+        }
+
+        // Sync is_active dengan status
+        if (isset($validated['status'])) {
+            $validated['is_active'] = $validated['status'] === 'active';
+        }
+
+        // ✅ Update phone pemilik di tabel users
+        if (array_key_exists('admin_phone', $validated)) {
+            User::where('canteen_id', (string) $id)
+                ->where('role', 'admin_kantin')
+                ->update(['phone' => $validated['admin_phone']]);
+            unset($validated['admin_phone']); // jangan ikut update ke canteen
+        }
+
+        $canteen->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kantin berhasil diperbarui.',
+            'data'    => $this->formatCanteen($canteen->fresh()),
+        ]);
+    }
+
     public function assignAdmin(Request $request, $id)
     {
         $canteen = Canteen::find($id);
@@ -203,47 +271,44 @@ class CanteenController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users,email',
+            'name'     => 'required|string',
+            'email'    => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'phone' => 'nullable|string',
+            'phone'    => 'nullable|string',
         ]);
 
         $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'phone' => $validated['phone'] ?? null,
-            'role' => 'admin_kantin',
+            'name'       => $validated['name'],
+            'email'      => $validated['email'],
+            'password'   => Hash::make($validated['password']),
+            'phone'      => $validated['phone'] ?? null,
+            'role'       => 'admin_kantin',
             'canteen_id' => (string) $id,
-            'status' => 'active',
+            'status'     => 'active',
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Admin kantin berhasil dibuat dan di-assign ke kantin.',
-            'data' => [
-                'canteen_id' => $id,
+            'message' => 'Admin kantin berhasil dibuat.',
+            'data'    => [
+                'canteen_id'   => $id,
                 'canteen_name' => $canteen->name,
-                'user_id' => (string) $user->_id,
-                'user_name' => $user->name,
-                'email' => $user->email,
-            ]
+                'user_id'      => (string) $user->_id,
+                'user_name'    => $user->name,
+                'email'        => $user->email,
+            ],
         ], 201);
     }
 
-    // ADMIN GLOBAL: GET /registrations
     public function registrations()
     {
-        $canteens = Canteen::where('status', 'pending')->get();
+        $canteens = Canteen::where('status', 'pending')
+            ->get()
+            ->map(fn($c) => $this->formatCanteen($c));
 
-        return response()->json([
-            'success' => true,
-            'data' => $canteens,
-        ]);
+        return response()->json(['success' => true, 'data' => $canteens]);
     }
 
-    // ADMIN GLOBAL: POST /registrations/{id}/approve
     public function approveRegistration($id)
     {
         $canteen = Canteen::find($id);
@@ -252,17 +317,11 @@ class CanteenController extends Controller
         }
 
         $canteen->update(['status' => 'active', 'is_active' => true]);
-
-        // Aktifkan user admin kantin
         User::where('canteen_id', (string) $id)->update(['status' => 'active']);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Registrasi kantin berhasil disetujui.',
-        ]);
+        return response()->json(['success' => true, 'message' => 'Registrasi kantin berhasil disetujui.']);
     }
 
-    // ADMIN GLOBAL: POST /registrations/{id}/reject
     public function rejectRegistration(Request $request, $id)
     {
         $canteen = Canteen::find($id);
@@ -270,59 +329,42 @@ class CanteenController extends Controller
             return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan.'], 404);
         }
 
-        $request->validate([
-            'reason' => 'nullable|string',
-        ]);
-
+        $request->validate(['reason' => 'nullable|string']);
         $canteen->update(['status' => 'rejected']);
-
-        // Nonaktifkan user admin kantin
         User::where('canteen_id', (string) $id)->update(['status' => 'rejected']);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Registrasi kantin ditolak.',
-        ]);
+        return response()->json(['success' => true, 'message' => 'Registrasi kantin ditolak.']);
     }
 
-    // ADMIN KANTIN: PUT /canteens/{id}/availability
     public function toggleOpen(Request $request, $id)
     {
-        $user = $request->user();
+        $user    = $request->user();
         $canteen = Canteen::find($id);
 
         if (!$canteen) {
             return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan.'], 404);
         }
 
-        // Pastikan admin kantin hanya bisa toggle kantinnya sendiri
         if ($user->role === 'admin_kantin' && (string) $user->canteen_id !== (string) $id) {
             return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
         }
 
-        $request->validate([
-            'is_open' => 'required|in:0,1,true,false',
-        ]);
-
-        $isOpen = filter_var($request->is_open, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-        if (is_null($isOpen)) {
-            $isOpen = (bool) (int) $request->is_open;
-        }
+        $request->validate(['is_open' => 'required|in:0,1,true,false']);
+        $isOpen = filter_var($request->is_open, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)
+            ?? (bool)(int) $request->is_open;
 
         Canteen::where('_id', $id)->update(['is_open' => $isOpen]);
-        $canteen = Canteen::find($id);
 
         return response()->json([
             'success' => true,
             'message' => $isOpen ? 'Kantin sekarang buka.' : 'Kantin sekarang tutup.',
-            'data' => $this->formatCanteen($canteen),
+            'data'    => $this->formatCanteen(Canteen::find($id)),
         ]);
     }
 
-    // ADMIN KANTIN: GET /canteens/{id}/settings
     public function showSettings(Request $request, $id)
     {
-        $user = $request->user();
+        $user    = $request->user();
         $canteen = Canteen::find($id);
 
         if (!$canteen) {
@@ -333,49 +375,40 @@ class CanteenController extends Controller
             return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => $this->formatCanteen($canteen),
-        ]);
+        return response()->json(['success' => true, 'data' => $this->formatCanteen($canteen)]);
     }
 
-    // ADMIN KANTIN: PUT /canteens/{id}/settings
     public function updateSettings(Request $request, $id)
     {
-        $user = $request->user();
+        $user    = $request->user();
         $canteen = Canteen::find($id);
 
         if (!$canteen) {
             return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan.'], 404);
         }
 
-        // Pastikan admin kantin hanya bisa update kantinnya sendiri
         if ((string) $user->canteen_id !== (string) $id) {
             return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
         }
 
         $validated = $request->validate([
-            'description' => 'nullable|string',
-            'phone' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'qris_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'delivery_fee_flat' => 'sometimes|integer|min:0',
-            'operating_hours' => 'sometimes|array',
-            'operating_hours.open' => 'sometimes|string',
+            'description'           => 'nullable|string',
+            'phone'                 => 'nullable|string',
+            'image'                 => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'qris_image'            => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'delivery_fee_flat'     => 'sometimes|integer|min:0',
+            'operating_hours'       => 'sometimes|array',
+            'operating_hours.open'  => 'sometimes|string',
             'operating_hours.close' => 'sometimes|string',
         ]);
 
         if ($request->hasFile('image')) {
-            if ($canteen->image) {
-                Storage::disk('public')->delete($canteen->image);
-            }
+            if ($canteen->image) Storage::disk('public')->delete($canteen->image);
             $validated['image'] = $request->file('image')->store('canteens', 'public');
         }
 
         if ($request->hasFile('qris_image')) {
-            if ($canteen->qris_image) {
-                Storage::disk('public')->delete($canteen->qris_image);
-            }
+            if ($canteen->qris_image) Storage::disk('public')->delete($canteen->qris_image);
             $validated['qris_image'] = $request->file('qris_image')->store('qris', 'public');
         }
 
@@ -384,7 +417,7 @@ class CanteenController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Pengaturan kantin berhasil diperbarui.',
-            'data' => $this->formatCanteen($canteen->fresh()),
+            'data'    => $this->formatCanteen($canteen->fresh()),
         ]);
     }
 }
