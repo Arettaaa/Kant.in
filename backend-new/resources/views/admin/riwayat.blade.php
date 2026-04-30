@@ -145,15 +145,6 @@
             </div>
         </div>
 
-        {{-- AREA KANAN RINGKASAN --}}
-        <div class="w-[340px] h-full bg-white flex flex-col p-9 shadow-[-10px_0_30px_rgba(0,0,0,0.015)] z-10 border-l border-gray-100 flex-shrink-0 text-start">
-            <h3 class="text-lg font-black text-gray-900 mb-8">Ringkasan Hari Ini</h3>
-            <div class="space-y-6 flex-1 text-start">
-                <div class="bg-[#FFF8F3] p-8 rounded-[32px] border border-orange-100 relative overflow-hidden text-start"><p class="text-[10px] font-black text-[#FF6900] uppercase tracking-widest mb-2 relative z-10 text-start">Pendapatan Total</p><h2 class="text-2xl font-black text-gray-900 relative z-10 text-start">Rp 290.000</h2><i class="fa-solid fa-wallet absolute -right-4 -bottom-4 text-7xl text-orange-500/5 rotate-12"></i></div>
-                <div class="bg-gray-50 p-8 rounded-[32px] border border-gray-100 relative overflow-hidden text-start"><p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 relative z-10 text-start">Total Pesanan</p><h2 class="text-2xl font-black text-gray-900 relative z-10 text-start">4 <span class="text-xs text-gray-400 font-bold ml-1">selesai</span></h2><i class="fa-solid fa-box-archive absolute -right-4 -bottom-4 text-7xl text-gray-900/5 rotate-12"></i></div>
-            </div>
-            <button onclick="toggleModal('exportModal')" class="w-full py-4 bg-[#1A1A1A] text-white rounded-2xl font-black text-sm flex items-center justify-center gap-3 shadow-xl hover:bg-black transition-all mt-auto text-start"><i class="fa-solid fa-download text-start"></i> Export Laporan</button>
-        </div>
     </main>
 </div>
 
