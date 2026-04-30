@@ -4,6 +4,7 @@ namespace App\Http\Controllers\AdminKantin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Canteen;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -11,18 +12,27 @@ use Illuminate\Support\Facades\Storage;
 class ProfilController extends Controller
 {
     /**
-     * Halaman profil — tampil data admin dan data kantin sekaligus.
+     * Ambil user object dari session.
+     */
+    private function getUser(): User
+    {
+        $sessionUser = session('user');
+        return User::find($sessionUser['_id'] ?? $sessionUser['id']);
+    }
+
+    /**
+     * Halaman profil — tampil data admin dan kantin sekaligus.
      */
     public function index()
     {
-        $user    = auth()->user();
-        $canteen = Canteen::find((string) $user->canteen_id);
+        $user    = $this->getUser();
+        $canteen = Canteen::find((string) ($user->canteen_id ?? session('user')['canteen_id']));
 
         return view('admin.profil', compact('user', 'canteen'));
     }
 
     /**
-     * Update profil admin dan kantin sekaligus dalam satu form submit.
+     * Update profil admin + kantin dalam satu form submit.
      */
     public function update(Request $request)
     {
@@ -37,7 +47,7 @@ class ProfilController extends Controller
             // Data kantin
             'description'           => 'nullable|string',
             'location'              => 'nullable|string|max:255',
-            'canteen_phone'         => 'nullable|string|max:20',  // beda field agar tidak bentrok dengan phone admin
+            'canteen_phone'         => 'nullable|string|max:20',
             'delivery_fee_flat'     => 'nullable|integer|min:0',
             'operating_hours'       => 'nullable|array',
             'operating_hours.open'  => 'nullable|string',
@@ -49,12 +59,11 @@ class ProfilController extends Controller
         // ---------------------------------------------------------------
         // UPDATE DATA ADMIN
         // ---------------------------------------------------------------
-        $user = auth()->user();
+        $user = $this->getUser();
 
         if ($request->filled('name'))  $user->name  = $request->name;
         if ($request->filled('phone')) $user->phone = $request->phone;
 
-        // Ganti password hanya jika diisi
         if ($request->filled('password')) {
             if (!$request->filled('old_password') || !Hash::check($request->old_password, $user->password)) {
                 return back()->withErrors(['old_password' => 'Password lama salah.'])->withInput();
@@ -62,15 +71,18 @@ class ProfilController extends Controller
             $user->password = Hash::make($request->password);
         }
 
-        // Upload foto profil admin
         if ($request->hasFile('photo_profile')) {
-            if ($user->photo_profile) {
-                Storage::disk('public')->delete($user->photo_profile);
-            }
+            if ($user->photo_profile) Storage::disk('public')->delete($user->photo_profile);
             $user->photo_profile = $request->file('photo_profile')->store('profiles', 'public');
         }
 
         $user->save();
+
+        // Sync session agar data terbaru langsung tercermin
+        $sessionUser           = session('user');
+        $sessionUser['name']   = $user->name;
+        $sessionUser['phone']  = $user->phone;
+        session(['user' => $sessionUser]);
 
         // ---------------------------------------------------------------
         // UPDATE DATA KANTIN
@@ -86,13 +98,11 @@ class ProfilController extends Controller
                 'operating_hours'   => $request->operating_hours,
             ], fn($v) => !is_null($v));
 
-            // Upload foto kantin
             if ($request->hasFile('image')) {
                 if ($canteen->image) Storage::disk('public')->delete($canteen->image);
                 $canteenData['image'] = $request->file('image')->store('canteens', 'public');
             }
 
-            // Upload foto QRIS
             if ($request->hasFile('qris_image')) {
                 if ($canteen->qris_image) Storage::disk('public')->delete($canteen->qris_image);
                 $canteenData['qris_image'] = $request->file('qris_image')->store('qris', 'public');
@@ -107,7 +117,7 @@ class ProfilController extends Controller
     }
 
     /**
-     * Halaman pusat bantuan — statis, tidak butuh query DB.
+     * Halaman pusat bantuan — statis.
      */
     public function bantuan()
     {

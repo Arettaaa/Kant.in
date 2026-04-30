@@ -18,15 +18,22 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class TransactionController extends Controller
 {
     /**
+     * Ambil canteen_id dari session (bukan auth()->user()).
+     */
+    private function getCanteenId(): string
+    {
+        return (string) session('user')['canteen_id'];
+    }
+
+    /**
      * Halaman riwayat transaksi.
      * Chart.js di view akan hit endpoint chartData() via AJAX.
      */
     public function index()
     {
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
         $canteen   = Canteen::find($canteenId);
 
-        // Transaksi selesai dan dibatalkan untuk tabel riwayat
         $orders = Order::where('canteen_id', $canteenId)
             ->whereIn('status', ['completed', 'cancelled'])
             ->orderBy('created_at', 'desc')
@@ -35,7 +42,7 @@ class TransactionController extends Controller
         $totalRevenue = $orders->where('status', 'completed')->sum('total_amount');
         $totalOrders  = $orders->where('status', 'completed')->count();
 
-        return view('admin-kantin.transaksi.index', compact(
+        return view('admin.riwayat', compact(
             'canteen',
             'orders',
             'totalRevenue',
@@ -44,10 +51,28 @@ class TransactionController extends Controller
     }
 
     /**
-     * API endpoint untuk Chart.js — data grafik pendapatan per hari (30 hari terakhir).
-     * Dipanggil via AJAX dari view, sesuai syarat dosen (grafik harus hit API).
+     * Detail satu transaksi.
+     */
+    public function detail($orderId)
+    {
+        $canteenId = $this->getCanteenId();
+
+        $order = Order::where('_id', $orderId)
+            ->where('canteen_id', $canteenId)
+            ->first();
+
+        if (!$order) {
+            abort(404, 'Transaksi tidak ditemukan.');
+        }
+
+        return view('admin.riwayat-detail', compact('order'));
+    }
+
+    /**
+     * API endpoint untuk Chart.js — data grafik pendapatan per hari.
+     * Dipanggil via AJAX dari view (sesuai syarat dosen: grafik harus hit API).
      *
-     * GET /admin-kantin/transaksi/chart-data?periode=30
+     * GET /admin/riwayat/chart-data?periode=30
      */
     public function chartData(Request $request)
     {
@@ -55,7 +80,7 @@ class TransactionController extends Controller
             'periode' => 'nullable|integer|in:7,30,90',
         ]);
 
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
         $periode   = (int) $request->input('periode', 30);
 
         $startDate = now()->subDays($periode - 1)->startOfDay();
@@ -66,19 +91,18 @@ class TransactionController extends Controller
             ->whereBetween('created_at', [$startDate, $endDate])
             ->get(['total_amount', 'created_at']);
 
-        // Group by tanggal, sum revenue per hari
+        // Group by tanggal
         $grouped = $orders->groupBy(fn($o) =>
             Carbon::parse($o->created_at)->timezone('Asia/Jakarta')->format('Y-m-d')
         );
 
-        // Buat array lengkap semua hari dalam periode (termasuk hari 0 transaksi)
-        $labels  = [];
-        $data    = [];
+        $labels = [];
+        $data   = [];
 
         for ($i = $periode - 1; $i >= 0; $i--) {
-            $date      = now()->subDays($i)->timezone('Asia/Jakarta')->format('Y-m-d');
-            $labels[]  = Carbon::parse($date)->translatedFormat('d M');
-            $data[]    = $grouped->has($date)
+            $date     = now()->subDays($i)->timezone('Asia/Jakarta')->format('Y-m-d');
+            $labels[] = Carbon::parse($date)->translatedFormat('d M');
+            $data[]   = $grouped->has($date)
                 ? (int) $grouped[$date]->sum('total_amount')
                 : 0;
         }
@@ -95,10 +119,8 @@ class TransactionController extends Controller
     }
 
     /**
-     * Export laporan penjualan — PDF atau Excel.
-     * Reuse logic dari Api\ReportController.
-     *
-     * GET /admin-kantin/transaksi/export?format=pdf&start_date=2024-01-01&end_date=2024-01-31
+     * Export laporan PDF / Excel.
+     * GET /admin/riwayat/export?format=pdf&start_date=2024-01-01&end_date=2024-01-31
      */
     public function export(Request $request)
     {
@@ -108,9 +130,8 @@ class TransactionController extends Controller
             'end_date'   => 'required|date|after_or_equal:start_date',
         ]);
 
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
         $canteen   = Canteen::findOrFail($canteenId);
-
         $startDate = Carbon::parse($request->start_date)->startOfDay();
         $endDate   = Carbon::parse($request->end_date)->endOfDay();
 
@@ -137,10 +158,8 @@ class TransactionController extends Controller
         $sheet       = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Laporan Penjualan');
 
-        // Header laporan
         $this->writeReportHeader($sheet, $canteen, $startDate, $endDate);
 
-        // Header tabel
         $tableHeaderRow = 7;
         $columns        = ['A', 'B', 'C', 'D', 'E', 'F'];
         $headers        = ['No.', 'ID Pesanan', 'Tanggal & Waktu', 'Nama Pelanggan', 'Metode Pembayaran', 'Total Harga (Rp)'];
@@ -157,7 +176,6 @@ class TransactionController extends Controller
         ]);
         $sheet->getRowDimension($tableHeaderRow)->setRowHeight(22);
 
-        // Baris data
         $currentRow  = $tableHeaderRow + 1;
         $totalAmount = 0;
         $no          = 1;
@@ -182,7 +200,6 @@ class TransactionController extends Controller
             $sheet->getStyle("A{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle("E{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle("F{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-
             $sheet->getStyle("A{$currentRow}:F{$currentRow}")->applyFromArray([
                 'font'    => ['name' => 'Arial', 'size' => 10],
                 'fill'    => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => $bgColor]],
@@ -194,7 +211,6 @@ class TransactionController extends Controller
             $no++;
         }
 
-        // Baris kosong jika tidak ada data
         if ($orders->isEmpty()) {
             $sheet->mergeCells("A{$currentRow}:F{$currentRow}");
             $sheet->getCell("A{$currentRow}")->setValue('Tidak ada data transaksi pada periode ini.');
@@ -202,12 +218,10 @@ class TransactionController extends Controller
             $currentRow++;
         }
 
-        // Baris total
         $totalRow = $currentRow + 1;
         $sheet->mergeCells("A{$totalRow}:E{$totalRow}");
         $sheet->getCell("A{$totalRow}")->setValue('TOTAL PENDAPATAN');
         $sheet->getCell("F{$totalRow}")->setValue($totalAmount);
-
         $sheet->getStyle("F{$totalRow}")->getNumberFormat()->setFormatCode('"Rp "#,##0');
         $sheet->getStyle("F{$totalRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
         $sheet->getStyle("A{$totalRow}:F{$totalRow}")->applyFromArray([
@@ -218,7 +232,6 @@ class TransactionController extends Controller
         ]);
         $sheet->getRowDimension($totalRow)->setRowHeight(22);
 
-        // Footer
         $footerRow = $totalRow + 2;
         $sheet->mergeCells("A{$footerRow}:F{$footerRow}");
         $sheet->getCell("A{$footerRow}")->setValue(
@@ -226,7 +239,6 @@ class TransactionController extends Controller
         );
         $sheet->getStyle("A{$footerRow}")->getFont()->setItalic(true)->setSize(9)->setName('Arial')->getColor()->setARGB('FF666666');
 
-        // Auto width
         foreach (['B', 'C', 'D', 'E', 'F'] as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
@@ -252,8 +264,6 @@ class TransactionController extends Controller
 
     protected function exportPdf($orders, $canteen, $startDate, $endDate)
     {
-        $fileName = 'Laporan_Kantin_' . Carbon::now()->format('Ymd_His') . '.pdf';
-
         $pdf = Pdf::loadView('exports.transactions_pdf', [
             'orders'    => $orders,
             'canteen'   => $canteen,
@@ -261,11 +271,11 @@ class TransactionController extends Controller
             'endDate'   => $endDate,
         ])->setPaper('a4', 'landscape');
 
-        return $pdf->download($fileName);
+        return $pdf->download('Laporan_Kantin_' . Carbon::now()->format('Ymd_His') . '.pdf');
     }
 
     // =========================================================================
-    //  HELPER
+    //  HELPERS
     // =========================================================================
 
     protected function writeReportHeader($sheet, $canteen, $startDate, $endDate): void

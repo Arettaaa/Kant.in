@@ -10,29 +10,34 @@ use Illuminate\Http\Request;
 class PesananController extends Controller
 {
     /**
-     * Halaman utama pesanan — tampil pesanan masuk (pending) & diproses (processing).
-     * Sekaligus berfungsi sebagai dashboard utama admin kantin.
+     * Ambil canteen_id dari session user (bukan auth()->user()).
+     */
+    private function getCanteenId(): string
+    {
+        return (string) session('user')['canteen_id'];
+    }
+
+    /**
+     * Halaman utama pesanan — tampil pesanan masuk & diproses.
      */
     public function index()
     {
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
         $canteen   = Canteen::find($canteenId);
 
         if (!$canteen) {
             abort(404, 'Kantin tidak ditemukan.');
         }
 
-        // Pesanan masuk: pending_verification & processing
         $pesananMasuk = Order::where('canteen_id', $canteenId)
-            ->whereIn('status', [Order::STATUS_PENDING, 'processing'])
+            ->whereIn('status', [Order::STATUS_PENDING, 'processing', 'ready'])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Pisahkan berdasarkan status untuk tampilan terpisah di view
         $menungguVerifikasi = $pesananMasuk->where('status', Order::STATUS_PENDING)->values();
-        $sedangDiproses     = $pesananMasuk->where('status', 'processing')->values();
+        $sedangDiproses     = $pesananMasuk->whereIn('status', ['processing', 'ready'])->values();
 
-        return view('admin-kantin.pesanan.index', compact(
+        return view('admin.pesanan', compact(
             'canteen',
             'menungguVerifikasi',
             'sedangDiproses',
@@ -40,7 +45,7 @@ class PesananController extends Controller
     }
 
     /**
-     * Update status pesanan: processing → ready → completed → cancelled.
+     * Update status pesanan.
      */
     public function updateStatus(Request $request, $orderId)
     {
@@ -48,7 +53,7 @@ class PesananController extends Controller
             'status' => 'required|in:processing,ready,completed,cancelled',
         ]);
 
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
 
         $order = Order::where('_id', $orderId)
             ->where('canteen_id', $canteenId)
@@ -64,12 +69,11 @@ class PesananController extends Controller
     }
 
     /**
-     * Verifikasi bukti pembayaran — ubah status payment menjadi paid
-     * dan status order menjadi processing.
+     * Verifikasi pembayaran → status jadi processing.
      */
     public function verifyPayment($orderId)
     {
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
 
         $order = Order::where('_id', $orderId)
             ->where('canteen_id', $canteenId)
@@ -83,9 +87,9 @@ class PesananController extends Controller
             return back()->with('error', 'Pembayaran sudah diverifikasi sebelumnya.');
         }
 
-        $payment             = $order->payment;
-        $payment['status']   = 'paid';
-        $payment['paid_at']  = now()->toDateTimeString();
+        $payment            = $order->payment;
+        $payment['status']  = 'paid';
+        $payment['paid_at'] = now()->toDateTimeString();
 
         $order->update([
             'payment' => $payment,
@@ -96,7 +100,7 @@ class PesananController extends Controller
     }
 
     /**
-     * Tolak bukti pembayaran — batalkan pesanan.
+     * Tolak pembayaran → batalkan pesanan.
      */
     public function rejectPayment(Request $request, $orderId)
     {
@@ -104,7 +108,7 @@ class PesananController extends Controller
             'reason' => 'nullable|string|max:255',
         ]);
 
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
 
         $order = Order::where('_id', $orderId)
             ->where('canteen_id', $canteenId)
@@ -130,8 +134,7 @@ class PesananController extends Controller
     }
 
     /**
-     * Toggle buka / tutup kantin.
-     * Dipanggil via AJAX dari halaman pesanan (toggle switch di dashboard).
+     * Toggle buka/tutup kantin — AJAX, return JSON.
      */
     public function toggleOpen(Request $request)
     {
@@ -139,7 +142,7 @@ class PesananController extends Controller
             'is_open' => 'required|in:0,1,true,false',
         ]);
 
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
         $canteen   = Canteen::find($canteenId);
 
         if (!$canteen) {
@@ -159,30 +162,11 @@ class PesananController extends Controller
     }
 
     /**
-     * Halaman ringkasan pesanan (show).
-     */
-    public function show($orderId)
-    {
-        $canteenId = (string) auth()->user()->canteen_id;
-
-        $order = Order::where('_id', $orderId)
-            ->where('canteen_id', $canteenId)
-            ->first();
-
-        if (!$order) {
-            abort(404, 'Pesanan tidak ditemukan.');
-        }
-
-        return view('admin.pesanan-show', compact('order'));
-    }
-
-    /**
-     * Halaman rincian pesanan — tampil detail lengkap termasuk bukti bayar.
-     * Di sini admin bisa verifikasi atau tolak pembayaran.
+     * Halaman rincian pesanan lengkap — verifikasi / tolak pembayaran di sini.
      */
     public function rincian($orderId)
     {
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
 
         $order = Order::where('_id', $orderId)
             ->where('canteen_id', $canteenId)
@@ -196,11 +180,11 @@ class PesananController extends Controller
     }
 
     /**
-     * Batalkan pesanan oleh admin kantin.
+     * Batalkan pesanan.
      */
     public function cancel($orderId)
     {
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
 
         $order = Order::where('_id', $orderId)
             ->where('canteen_id', $canteenId)

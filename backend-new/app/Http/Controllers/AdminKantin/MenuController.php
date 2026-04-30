@@ -10,12 +10,17 @@ use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
+    private function getCanteenId(): string
+    {
+        return (string) session('user')['canteen_id'];
+    }
+
     /**
      * Daftar semua menu milik kantin ini.
      */
     public function index()
     {
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
 
         $menus = Menu::where('canteen_id', $canteenId)
             ->orderBy('category')
@@ -23,10 +28,9 @@ class MenuController extends Controller
             ->get()
             ->map(fn($menu) => $this->formatMenu($menu));
 
-        // Ambil kategori unik untuk filter di view
         $categories = $menus->pluck('category')->unique()->sort()->values();
 
-        return view('admin-kantin.menu.index', compact('menus', 'categories'));
+        return view('admin.menu', compact('menus', 'categories'));
     }
 
     /**
@@ -34,15 +38,15 @@ class MenuController extends Controller
      */
     public function create()
     {
-        return view('admin-kantin.menu.create');
+        return view('admin.menu-tambah');
     }
 
     /**
-     * Simpan menu baru ke database.
+     * Simpan menu baru.
      */
     public function store(Request $request)
     {
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
 
         $validated = $request->validate([
             'name'                   => 'required|string|max:255',
@@ -62,9 +66,7 @@ class MenuController extends Controller
 
         Menu::create($validated);
 
-        return redirect()
-            ->route('admin-kantin.menu.index')
-            ->with('success', 'Menu berhasil ditambahkan.');
+        return redirect()->route('admin.menu')->with('success', 'Menu berhasil ditambahkan.');
     }
 
     /**
@@ -72,7 +74,7 @@ class MenuController extends Controller
      */
     public function edit($menuId)
     {
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
 
         $menu = Menu::where('_id', $menuId)
             ->where('canteen_id', $canteenId)
@@ -82,9 +84,7 @@ class MenuController extends Controller
             abort(404, 'Menu tidak ditemukan.');
         }
 
-        return view('admin-kantin.menu.edit', [
-            'menu' => $this->formatMenu($menu),
-        ]);
+        return view('admin.menu-edit', ['menu' => $this->formatMenu($menu)]);
     }
 
     /**
@@ -92,7 +92,7 @@ class MenuController extends Controller
      */
     public function update(Request $request, $menuId)
     {
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
 
         $menu = Menu::where('_id', $menuId)
             ->where('canteen_id', $canteenId)
@@ -112,17 +112,13 @@ class MenuController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            if ($menu->image) {
-                Storage::disk('public')->delete($menu->image);
-            }
+            if ($menu->image) Storage::disk('public')->delete($menu->image);
             $validated['image'] = $request->file('image')->store('menus', 'public');
         }
 
         $menu->update($validated);
 
-        return redirect()
-            ->route('admin-kantin.menu.index')
-            ->with('success', 'Menu berhasil diperbarui.');
+        return redirect()->route('admin.menu')->with('success', 'Menu berhasil diperbarui.');
     }
 
     /**
@@ -130,7 +126,7 @@ class MenuController extends Controller
      */
     public function destroy($menuId)
     {
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
 
         $menu = Menu::where('_id', $menuId)
             ->where('canteen_id', $canteenId)
@@ -140,28 +136,22 @@ class MenuController extends Controller
             abort(404, 'Menu tidak ditemukan.');
         }
 
-        if ($menu->image) {
-            Storage::disk('public')->delete($menu->image);
-        }
-
+        if ($menu->image) Storage::disk('public')->delete($menu->image);
         $menu->delete();
 
-        return redirect()
-            ->route('admin-kantin.menu.index')
-            ->with('success', 'Menu berhasil dihapus.');
+        return redirect()->route('admin.menu')->with('success', 'Menu berhasil dihapus.');
     }
 
     /**
-     * Toggle ketersediaan menu (tersedia / tidak tersedia).
-     * Dipanggil via AJAX — toggle switch di halaman daftar menu.
+     * Toggle ketersediaan menu — AJAX, return JSON.
      */
-    public function updateAvailability(Request $request, $menuId)
+    public function toggleAvailability(Request $request, $menuId)
     {
         $request->validate([
             'is_available' => 'required|in:0,1,true,false',
         ]);
 
-        $canteenId = (string) auth()->user()->canteen_id;
+        $canteenId = $this->getCanteenId();
 
         $menu = Menu::where('_id', $menuId)
             ->where('canteen_id', $canteenId)
@@ -183,9 +173,6 @@ class MenuController extends Controller
         ]);
     }
 
-    /**
-     * Format menu untuk dikirim ke view (URL gambar lengkap, ID string).
-     */
     private function formatMenu($menu): array
     {
         $data        = $menu->toArray();
