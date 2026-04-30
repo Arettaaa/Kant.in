@@ -33,17 +33,37 @@ class OrderController extends Controller
     // GET /admin/pesanan
     public function index(Request $request)
     {
-        $status   = $request->input('status', 'pending');
         $canteenId = $this->canteenId();
 
-        $response = Http::withToken($this->token())
-            ->get($this->apiUrl("/canteens/{$canteenId}/orders"), [
-                'status' => $status,
-            ]);
+        // Ambil pending orders
+        $pendingResponse = Http::withToken($this->token())
+            ->get($this->apiUrl("/canteens/{$canteenId}/orders"), ['status' => 'pending']);
 
-        $orders = $response->successful() ? ($response->json()['data'] ?? []) : [];
+        // Ambil processing + ready orders
+        $processingResponse = Http::withToken($this->token())
+            ->get($this->apiUrl("/canteens/{$canteenId}/orders"), ['status' => 'processing']);
 
-        return view('admin.pesanan', compact('orders', 'status'));
+        $readyResponse = Http::withToken($this->token())
+            ->get($this->apiUrl("/canteens/{$canteenId}/orders"), ['status' => 'ready']);
+
+        // Ambil data kantin
+        $canteenResponse = Http::withToken($this->token())
+            ->get($this->apiUrl("/canteens/{$canteenId}/settings"));
+
+        $pendingOrders = $pendingResponse->successful() ? ($pendingResponse->json()['data'] ?? []) : [];
+        $processingOrders = array_merge(
+            $processingResponse->successful() ? ($processingResponse->json()['data'] ?? []) : [],
+            $readyResponse->successful() ? ($readyResponse->json()['data'] ?? []) : []
+        );
+        $canteen = $canteenResponse->successful() ? ($canteenResponse->json()['data'] ?? []) : [];
+
+        return view('admin.pesanan', [
+            'pendingOrders' => $pendingOrders,
+            'processingOrders' => $processingOrders,
+            'pendingCount' => count($pendingOrders),
+            'processingCount' => count($processingOrders),
+            'canteen' => $canteen,
+        ]);
     }
 
     // GET /admin/pesanan/{id}/rincian
@@ -57,7 +77,7 @@ class OrderController extends Controller
             ]);
 
         $orders = $response->json()['data'] ?? [];
-        $order  = collect($orders)->firstWhere('id', $id);
+        $order = collect($orders)->firstWhere('id', $id);
 
         if (!$order) {
             return redirect()->route('admin.pesanan')->with('error', 'Pesanan tidak ditemukan.');
@@ -158,7 +178,7 @@ class OrderController extends Controller
             ]);
 
         $orders = $response->json()['data'] ?? [];
-        $order  = collect($orders)->firstWhere('id', $id);
+        $order = collect($orders)->firstWhere('id', $id);
 
         if (!$order) {
             return redirect()->route('admin.riwayat')->with('error', 'Pesanan tidak ditemukan.');
