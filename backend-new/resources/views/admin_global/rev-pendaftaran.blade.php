@@ -136,7 +136,10 @@
                 <div>
                     <h4 class="text-base font-black text-gray-900">Permohonan Registrasi Baru</h4>
                     <p class="text-sm text-gray-400 font-bold">
-                        Diajukan {{ \Carbon\Carbon::parse($canteen['created_at'])->translatedFormat('d F Y, H:i') }} WIB
+                        Diajukan
+                        {{
+                        \Carbon\Carbon::parse($canteen['created_at'])->setTimezone('Asia/Jakarta')->translatedFormat('d
+                        F Y, H:i') }} WIB
                     </p>
                 </div>
             </div>

@@ -26,6 +26,8 @@ class NotificationController extends Controller
             ->get($this->apiUrl('/registrations'));
 
         $registrations = $response->json('data') ?? [];
+        Session::put('pending_count', count($registrations));
+
         return view('admin_global.notifikasi', compact('registrations'));
     }
     public function approve(string $id)
@@ -35,10 +37,12 @@ class NotificationController extends Controller
             ->post($this->apiUrl("/registrations/{$id}/approve"));
 
         if (!$response->successful()) {
-            return back()->withErrors(['error' => $response->json('message') ?? 'Gagal menyetujui.']);
+            return redirect()->route('admin.global.notifikasi')
+                ->withErrors(['error' => $response->json('message') ?? 'Gagal menyetujui.']);
         }
 
-        return back()->with('success', 'Kantin berhasil disetujui.');
+        return redirect()->route('admin.global.notifikasi')
+            ->with('success', 'Kantin berhasil disetujui dan diaktifkan!');
     }
 
     public function reject(Request $request, string $id)
@@ -50,25 +54,27 @@ class NotificationController extends Controller
             ]);
 
         if (!$response->successful()) {
-            return back()->withErrors(['error' => $response->json('message') ?? 'Gagal menolak.']);
+            return redirect()->route('admin.global.notifikasi')
+                ->withErrors(['error' => $response->json('message') ?? 'Gagal menolak.']);
         }
 
-        return back()->with('success', 'Kantin berhasil ditolak.');
+        return redirect()->route('admin.global.notifikasi')
+            ->with('success', 'Pendaftaran kantin berhasil ditolak.');
     }
 
     public function review(string $id)
-{
-    $response = Http::timeout(15)
-        ->withToken($this->apiToken())
-        ->get($this->apiUrl("/canteens/{$id}"));
+    {
+        $response = Http::timeout(15)
+            ->withToken($this->apiToken())
+            ->get($this->apiUrl("/canteens/{$id}"));
 
-    if (!$response->successful()) {
-        return redirect()->route('admin.global.notifikasi')
-            ->withErrors('Kantin tidak ditemukan.');
+        if (!$response->successful()) {
+            return redirect()->route('admin.global.notifikasi')
+                ->withErrors('Kantin tidak ditemukan.');
+        }
+
+        $canteen = $response->json('data');
+
+        return view('admin_global.rev-pendaftaran', compact('canteen'));
     }
-
-    $canteen = $response->json('data');
-
-    return view('admin_global.rev-pendaftaran', compact('canteen'));
-}
 }

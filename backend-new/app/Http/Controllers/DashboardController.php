@@ -25,6 +25,8 @@ class DashboardController extends Controller
 
         if ($response->successful()) {
             $data = $response->json('data');
+        
+        Session::put('pending_count', $data['kantinPending'] ?? 0);
 
             return view('admin_global.dasbor', [
                 'totalPendapatan'   => $data['totalPendapatan'] ?? 0,
