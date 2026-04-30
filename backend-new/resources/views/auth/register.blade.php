@@ -120,8 +120,7 @@
                                 style="background-color:#FAFAFA;">
                             <button type="button" onclick="togglePassword('passwordRegister','eyeIcon')"
                                 class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
-                                <i id="eyeIcon" class="fa-regular fa-eye"></i>
-                            </button>
+                                <i id="eyeIcon" class="fa-regular fa-eye-slash"></i> </button>
                         </div>
 
                         {{-- Bar Indikator Kekuatan --}}
@@ -336,16 +335,12 @@
     }
 
     function togglePassword(inputId, iconId) {
-        const input = document.getElementById(inputId);
-        const icon  = document.getElementById(iconId);
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.classList.replace('fa-eye', 'fa-eye-slash');
-        } else {
-            input.type = 'password';
-            icon.classList.replace('fa-eye-slash', 'fa-eye');
-        }
-    }
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    icon.className = isHidden ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
+}
 
     // Aku hapus fungsi duplikatnya ya, cukup pakai satu saja
     function checkStrength(val) {

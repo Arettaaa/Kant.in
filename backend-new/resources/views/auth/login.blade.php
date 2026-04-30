@@ -55,10 +55,17 @@
         {{-- Ganti bagian Form Section kamu dengan ini --}}
         <div class="flex-1 flex flex-col px-10 pt-7 pb-10" style="background-color:#FFFFFF;">
 
-            {{-- Tampilkan Error dari Controller --}}
-            @if ($errors->has('message'))
+            {{-- Tampilkan Error dari Controller maupun Validasi Form --}}
+            @if ($errors->any())
             <div class="mb-4 p-3 rounded-xl bg-red-50 border-l-4 border-red-500 text-red-600 text-sm font-medium">
-                <i class="fa-solid fa-circle-exclamation mr-2"></i> {{ $errors->first('message') }}
+                <i class="fa-solid fa-circle-exclamation mr-2"></i> {{ $errors->first() }}
+            </div>
+            @endif
+
+            {{-- Pesan Sukses (Misal: Setelah Register) --}}
+            @if (session('success'))
+            <div class="mb-4 p-3 rounded-xl bg-green-50 border-l-4 border-green-500 text-green-600 text-sm font-medium">
+                <i class="fa-solid fa-circle-check mr-2"></i> {{ session('success') }}
             </div>
             @endif
 
@@ -92,8 +99,7 @@
                                 style="background-color:#FAFAFA;">
                             <button type="button" onclick="togglePassword('passwordLogin','eyeLogin')"
                                 class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600">
-                                <i id="eyeLogin" class="fa-regular fa-eye"></i>
-                            </button>
+                                <i id="eyeLogin" class="fa-regular fa-eye-slash"></i> </button>
                         </div>
                         <div class="flex justify-end mt-1.5">
                             <a href="/lupa-sandi" class="text-xs font-semibold hover:underline"
@@ -149,16 +155,12 @@
         };
     });
 
-    function togglePassword(inputId, eyeId) {
-        const input = document.getElementById(inputId);
-        const eye = document.getElementById(eyeId);
-        if (input.type === 'password') {
-            input.type = 'text';
-            eye.classList.replace('fa-eye', 'fa-eye-slash');
-        } else {
-            input.type = 'password';
-            eye.classList.replace('fa-eye-slash', 'fa-eye');
-        }
-    }
+  function togglePassword(inputId, eyeId) {
+    const input = document.getElementById(inputId);
+    const eye = document.getElementById(eyeId);
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    eye.className = isHidden ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
+}
 </script>
 @endpush

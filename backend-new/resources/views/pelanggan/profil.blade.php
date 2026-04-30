@@ -21,43 +21,7 @@
 <div class="flex w-full h-screen bg-[#F9FAFB] overflow-hidden text-start">
 
     {{-- SIDEBAR MANUAL --}}
-    <aside
-        class="w-[240px] h-screen bg-white flex flex-col py-8 px-6 shadow-sm flex-shrink-0 z-20 border-r border-gray-100">
-        <div class="flex items-center gap-3 mb-10 px-2">
-            <div class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg"
-                style="background-color:#FF6900;">
-                <i class="fa-solid fa-fire text-lg text-white"></i>
-            </div>
-            <span class="text-xl font-extrabold text-gray-900 tracking-tight">Kant.in</span>
-        </div>
-
-        <nav class="flex flex-col gap-2 flex-1">
-            <a href="/beranda"
-                class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                <i class="fa-solid fa-house w-5 text-center"></i> Beranda
-            </a>
-            <a href="/jelajah"
-                class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                <i class="fa-solid fa-magnifying-glass w-5 text-center"></i> Jelajah
-            </a>
-            <a href="/pesanan"
-                class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                <i class="fa-solid fa-clipboard-list w-5 text-center"></i> Pesanan
-            </a>
-            <a href="/profil" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold transition-all"
-                style="background-color:#FFF3E8;color:#FF6900;">
-                <i class="fa-solid fa-user w-5 text-center"></i> Profil
-            </a>
-        </nav>
-
-        <form action="{{ route('logout') }}" method="POST" class="mt-auto border-t border-gray-50 pt-6">
-            @csrf
-            <button type="submit"
-                class="flex items-center w-full gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">
-                <i class="fa-solid fa-right-from-bracket w-5 text-center"></i> Keluar
-            </button>
-        </form>
-    </aside>
+    @include('pelanggan.partials.sidebar', ['currentPath' => 'profil'])
 
     {{-- MAIN CONTENT --}}
     <main class="flex-1 flex flex-col h-screen overflow-hidden bg-[#F9FAFB] text-start relative">

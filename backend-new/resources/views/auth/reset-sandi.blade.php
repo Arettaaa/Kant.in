@@ -227,7 +227,7 @@
                     <div class="input-wrap">
                         <input type="password" id="newPass" class="input-field" placeholder="••••••••"
                             oninput="checkStrength(this.value)">
-                        <i class="fa-regular fa-eye toggle-eye" onclick="togglePass('newPass', this)"></i>
+                        <i class="fa-regular fa-eye-slash toggle-eye" onclick="togglePass('newPass', this)"></i>
                     </div>
                     {{-- Strength bar --}}
                     <div class="flex gap-1.5 mt-2" id="strengthBar">
@@ -240,8 +240,8 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Konfirmasi Kata Sandi</label>
                     <div class="input-wrap">
                         <input type="password" id="confirmPass" class="input-field" placeholder="••••••••"
-                            oninput="checkMatch()">
-                        <i class="fa-regular fa-eye toggle-eye" onclick="togglePass('confirmPass', this)"></i>
+                            oninput="checkMatch()" style="letter-spacing: normal;">
+                        <i class="fa-regular fa-eye-slash toggle-eye" onclick="togglePass('confirmPass', this)"></i>
                     </div>
                     <p id="matchLabel" class="text-xs mt-1 font-medium hidden"></p>
                 </div>
@@ -284,15 +284,15 @@
 
 @push('scripts')
 <script>
-    // Toggle show/hide password
     function togglePass(id, icon) {
-        const input = document.getElementById(id);
-        const isPass = input.type === 'password';
-        input.type = isPass ? 'text' : 'password';
-        icon.className = isPass
-            ? 'fa-regular fa-eye-slash toggle-eye'
-            : 'fa-regular fa-eye toggle-eye';
-    }
+    const input = document.getElementById(id);
+    const isPass = input.type === 'password';
+    input.type = isPass ? 'text' : 'password';
+    input.style.letterSpacing = isPass ? 'normal' : '0.2em';
+    icon.className = isPass
+        ? 'fa-regular fa-eye toggle-eye'
+        : 'fa-regular fa-eye-slash toggle-eye';
+}
 
     // Strength checker
     function checkStrength(val) {

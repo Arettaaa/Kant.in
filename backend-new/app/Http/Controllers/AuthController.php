@@ -38,25 +38,18 @@ class AuthController extends Controller
             'password.regex' => 'Kata sandi harus mengandung huruf besar, huruf kecil, dan angka.',
         ]);
 
-        $response = Http::timeout(15)->post($this->apiUrl('/auth/register'), [
-            'name'                 => $request->name,
-            'email'                => $request->email,
-            'password'             => $request->password,
-            'phone'                => $request->phone,
-            'role'                 => $role,
-            'canteen_name'         => $request->canteen_name,
-            'canteen_location'     => $request->canteen_location,    // ← tambah
-            'canteen_description'  => $request->canteen_description, // ← tambah
-            'canteen_phone'        => $request->canteen_phone,       // ← tambah
-        ]);
+        // Panggil langsung tanpa HTTP
+        $apiController = new \App\Http\Controllers\Api\AuthController();
+        $apiResponse = $apiController->register($request);
 
-        $data = $response->json();
+        $data = json_decode($apiResponse->getContent(), true);
+        $status = $apiResponse->getStatusCode();
 
-        if (!$response->successful()) {
+        if ($status >= 400) {
             $errors = $data['errors'] ?? ['message' => [$data['message'] ?? 'Terjadi kesalahan.']];
 
             if ($request->wantsJson() || $request->ajax()) {
-                return response()->json(['errors' => $errors], $response->status());
+                return response()->json(['errors' => $errors], $status);
             }
 
             return back()->withErrors($errors)->withInput();
@@ -75,7 +68,6 @@ class AuthController extends Controller
 
         return redirect('/login')->with('success', $msg);
     }
-
     public function processLogin(Request $request)
     {
         $request->validate([
@@ -83,14 +75,14 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $response = Http::timeout(15)->post($this->apiUrl('/auth/sessions'), [
-            'email'    => $request->email,
-            'password' => $request->password,
-        ]);
+        // Panggil langsung tanpa HTTP
+        $apiController = new \App\Http\Controllers\Api\AuthController();
+        $apiResponse = $apiController->login($request);
 
-        $data = $response->json();
+        $data = json_decode($apiResponse->getContent(), true);
+        $status = $apiResponse->getStatusCode();
 
-        if (!$response->successful()) {
+        if ($status !== 200) {
             $message = $data['message'] ?? 'Email atau kata sandi salah.';
             return back()->withErrors(['message' => $message])->withInput();
         }

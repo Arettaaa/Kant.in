@@ -45,7 +45,7 @@
 @section('content')
 <div class="flex w-full h-screen bg-[#F9FAFB] overflow-hidden text-start font-sans">
 
-   {{-- ======================== SIDEBAR ======================== --}}
+    {{-- ======================== SIDEBAR ======================== --}}
     @include('admin_global.partials.sidebar')
 
     {{-- ======================== MAIN ======================== --}}
@@ -181,13 +181,9 @@
 function toggleEye(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon  = document.getElementById(iconId);
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.replace('fa-eye-slash', 'fa-eye');
-    } else {
-        input.type = 'password';
-        icon.classList.replace('fa-eye', 'fa-eye-slash');
-    }
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    icon.className = isHidden ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
 }
 
 // Password strength checker

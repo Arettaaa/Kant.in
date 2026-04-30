@@ -17,36 +17,44 @@ class BerandaController extends Controller
     public function index(Request $request)
     {
         $user = Session::get('user');
-
         $namaDepan = 'Sobat Kantin';
         if ($user && !empty($user['name'])) {
             $namaDepan = explode(' ', trim($user['name']))[0];
         }
 
-        $cartCount = 0;
         $token = $request->session()->get('api_token', '');
+
+        // Jalankan semua request sequential, BUKAN pool
+        // (pool deadlock di php artisan serve karena single-threaded)
+        try {
+            $menusResponse   = Http::timeout(10)->get($this->apiUrl('/menus'));
+            $canteensResponse = Http::timeout(10)->get($this->apiUrl('/canteens'));
+
+            $allMenus    = $menusResponse->successful()   ? ($menusResponse->json('data')   ?? []) : [];
+            $allCanteens = $canteensResponse->successful() ? ($canteensResponse->json('data') ?? []) : [];
+        } catch (\Exception $e) {
+            $allMenus    = [];
+            $allCanteens = [];
+        }
+
+        $cartCount = 0;
         if ($token) {
-            $cartResponse = Http::withToken($token)->timeout(15)->get($this->apiUrl('/buyers/carts'));
-            if ($cartResponse->successful()) {
-                $cart = $cartResponse->json('data');
-                if ($cart && !empty($cart['canteens'])) {
-                    foreach ($cart['canteens'] as $canteen) {
-                        foreach ($canteen['items'] as $item) {
-                            $cartCount += $item['quantity'];
+            try {
+                $cartResponse = Http::withToken($token)->timeout(10)->get($this->apiUrl('/buyers/carts'));
+                if ($cartResponse->successful()) {
+                    $cart = $cartResponse->json('data');
+                    if ($cart && !empty($cart['canteens'])) {
+                        foreach ($cart['canteens'] as $canteen) {
+                            foreach ($canteen['items'] as $item) {
+                                $cartCount += $item['quantity'];
+                            }
                         }
                     }
                 }
+            } catch (\Exception $e) {
+                $cartCount = 0;
             }
         }
-
-        // Fetch semua menu & kantin secara paralel (efisien)
-        $responses = Http::pool(fn($pool) => [
-            $pool->as('menus')->timeout(15)->get($this->apiUrl('/menus')),
-            $pool->as('canteens')->timeout(15)->get($this->apiUrl('/canteens')),
-        ]);
-
-        $allMenus   = $responses['menus']->successful()   ? ($responses['menus']->json('data')   ?? []) : [];
-        $allCanteens = $responses['canteens']->successful() ? ($responses['canteens']->json('data') ?? []) : [];
 
         // ---- MENU POPULER ----
         // Sort: rating × log(1 + total_reviews), ambil 4 teratas
