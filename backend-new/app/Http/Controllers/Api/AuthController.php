@@ -25,20 +25,25 @@ class AuthController extends Controller
 
         // Tambah validasi canteen_name jika admin_kantin
         if ($role === 'admin_kantin') {
-            $rules['canteen_name'] = 'required|string';
+            $rules['canteen_name']        = 'required|string';
+            $rules['canteen_location']    = 'nullable|string';    // ← tambah
+            $rules['canteen_description'] = 'nullable|string';    // ← tambah
+            $rules['canteen_phone']       = 'nullable|string';    // ← tambah
         }
 
         $request->validate($rules);
 
-        // Kalau admin_kantin, buat canteen dulu dengan status pending
         $canteenId = null;
         if ($role === 'admin_kantin') {
             $canteen = Canteen::create([
-                'name' => $request->canteen_name,
-                'is_active' => false,
-                'status' => 'pending',
+                'name'              => $request->canteen_name,
+                'location'          => $request->canteen_location ?? null,    // ← tambah
+                'description'       => $request->canteen_description ?? null, // ← tambah
+                'phone'             => $request->canteen_phone ?? null,       // ← tambah
+                'is_active'         => false,
+                'status'            => 'pending',
                 'delivery_fee_flat' => 0,
-                'operating_hours' => ['open' => '08:00', 'close' => '17:00'],
+                'operating_hours'   => ['open' => '08:00', 'close' => '17:00'],
             ]);
             $canteenId = (string) $canteen->_id;
         }

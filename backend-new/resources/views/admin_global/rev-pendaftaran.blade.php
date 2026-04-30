@@ -6,10 +6,18 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
     /* Menghilangkan scrollbar tapi tetap bisa scroll */
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
 
-    body { background-color: #F9FAFB; }
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    body {
+        background-color: #F9FAFB;
+    }
 
     /* Layout Full Width */
     .full-container {
@@ -27,7 +35,7 @@
         margin-bottom: 24px;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
-    
+
     .label-title {
         font-size: 10px;
         font-weight: 900;
@@ -71,144 +79,154 @@
 
 @section('content')
 <div class="full-container hide-scrollbar overflow-y-auto">
-    
+
     {{-- Header: Menempel di ujung ke ujung --}}
-    <header class="w-full bg-white border-b border-gray-100 px-10 py-6 flex justify-between items-center sticky top-0 z-50">
+    <header
+        class="w-full bg-white border-b border-gray-100 px-10 py-6 flex justify-between items-center sticky top-0 z-50">
+
+        {{-- Kiri: Tombol Kembali & Badge --}}
         <div class="flex items-center gap-6">
-            <a href="{{ route('admin.global.notifikasi') }}" 
-               class="w-11 h-11 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-[#FF6900] transition-all">
+            <a href="{{ route('admin.global.notifikasi') }}"
+                class="flex items-center gap-2 text-gray-400 hover:text-[#FF6900] font-bold text-sm transition-colors duration-200">
                 <i class="fa-solid fa-arrow-left"></i>
+                <span>Kembali</span>
             </a>
-            <h1 class="text-2xl font-black text-gray-900 tracking-tight">Review Pendaftaran Kantin</h1>
+
+            <div class="h-6 w-px bg-gray-200"></div> {{-- Garis pemisah --}}
+
+            <div class="badge-pending">Menunggu Persetujuan</div>
         </div>
+
+        {{-- Kanan: Aksi (Tolak / Setujui) --}}
         <div class="flex items-center gap-4">
-            <div class="badge-pending mr-4">Menunggu Persetujuan</div>
-            <button class="px-8 py-3.5 bg-white border border-gray-200 text-red-500 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-red-50 transition-all">Tolak</button>
-            <button class="px-8 py-3.5 bg-[#FF6900] text-white font-black text-xs uppercase tracking-widest rounded-2xl hover:brightness-110 shadow-lg shadow-orange-100 transition-all">Setujui & Aktifkan</button>
+            <form action="{{ route('admin.global.notifikasi.reject', $canteen['_id']) }}" method="POST">
+                @csrf
+                <button type="submit"
+                    class="px-8 py-3.5 bg-white border border-gray-200 text-red-500 font-black text-xs uppercase tracking-widest rounded-2xl hover:bg-red-50 transition-all">
+                    Tolak
+                </button>
+            </form>
+
+            <form action="{{ route('admin.global.notifikasi.approve', $canteen['_id']) }}" method="POST">
+                @csrf
+                <button type="submit"
+                    class="px-8 py-3.5 bg-[#FF6900] text-white font-black text-xs uppercase tracking-widest rounded-2xl hover:brightness-110 shadow-lg shadow-orange-100 transition-all">
+                    Setujui & Aktifkan
+                </button>
+            </form>
         </div>
     </header>
 
-    {{-- Layout Grid 2 Kolom: Biar Kanan Nggak Kosong --}}
-    <div class="grid grid-cols-12 gap-8 p-10">
-        
-        {{-- KOLOM KIRI: DATA PENDAFTAR (5/12 bagian) --}}
-        <div class="col-span-12 lg:col-span-5 space-y-6">
-            
-            <div class="bg-[#FFF8F4] border border-[#FFE0CC] p-6 rounded-[28px] flex items-center gap-5 text-start">
+    {{-- Cek apakah ada dokumen --}}
+    @php
+    $hasDocument = !empty($canteen['document_path']);
+    @endphp
+
+    {{-- Layout Pintar: Grid 2 Kolom kalau ada dokumen, Centered kalau tidak ada dokumen --}}
+    <div class="{{ $hasDocument ? 'grid grid-cols-12 gap-8' : 'max-w-4xl mx-auto w-full' }} p-10">
+
+        {{-- KOLOM KIRI: DATA PENDAFTAR --}}
+        <div class="{{ $hasDocument ? 'col-span-12 lg:col-span-5' : 'w-full' }} space-y-6">
+
+            {{-- Banner atas --}}
+            <div class="bg-[#FFF8F4] border border-[#FFE0CC] p-6 rounded-[28px] flex items-center gap-5">
                 <div class="w-14 h-14 rounded-2xl bg-orange-100 flex items-center justify-center text-[#FF6900]">
                     <i class="fa-solid fa-file-signature text-2xl"></i>
                 </div>
                 <div>
                     <h4 class="text-base font-black text-gray-900">Permohonan Registrasi Baru</h4>
-                    <p class="text-sm text-gray-400 font-bold">Diajukan pada 24 Oktober 2023, 10:30 WIB</p>
+                    <p class="text-sm text-gray-400 font-bold">
+                        Diajukan {{ \Carbon\Carbon::parse($canteen['created_at'])->translatedFormat('d F Y, H:i') }} WIB
+                    </p>
                 </div>
             </div>
 
             {{-- Detail Kantin --}}
-            <div class="review-card text-start">
-                <div class="flex items-center gap-3 mb-8">
-                    <i class="fa-solid fa-store text-[#FF6900] text-sm"></i>
+            <div class="review-card">
+                <div class="flex items-center gap-3 mb-6">
+                    <i class="fa-solid fa-store text-[#FF6900]"></i>
                     <h3 class="text-base font-black text-gray-900">Detail Kantin</h3>
                 </div>
-                <div class="space-y-6">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <p class="label-title">Nama Kantin</p>
-                            <p class="data-value">Warung Bu Ani</p>
-                        </div>
-                        <div>
-                            <p class="label-title">Kategori</p>
-                            <p class="data-value">Indonesian Food</p>
-                        </div>
-                    </div>
+                <div class="space-y-5">
                     <div>
-                        <p class="label-title">Deskripsi Kantin</p>
-                        <div class="bg-[#F9FAFB] p-5 rounded-2xl border border-gray-50 text-gray-500 font-bold text-sm leading-relaxed">
-                            Menyajikan aneka masakan rumahan khas Nusantara dengan resep turun temurun yang sehat dan bergizi.
+                        <p class="label-title">Nama Kantin</p>
+                        <p class="data-value">{{ $canteen['name'] }}</p>
+                    </div>
+                    @if(!empty($canteen['location']))
+                    <div>
+                        <p class="label-title">Lokasi</p>
+                        <p class="data-value">{{ $canteen['location'] }}</p>
+                    </div>
+                    @endif
+                    @if(!empty($canteen['description']))
+                    <div>
+                        <p class="label-title">Deskripsi</p>
+                        <div class="bg-[#F9FAFB] p-4 rounded-2xl text-gray-500 font-bold text-sm leading-relaxed">
+                            {{ $canteen['description'] }}
                         </div>
                     </div>
+                    @endif
+                    @if(!empty($canteen['phone']))
+                    <div>
+                        <p class="label-title">No. Telepon Kantin</p>
+                        <p class="data-value">{{ $canteen['phone'] }}</p>
+                    </div>
+                    @endif
                 </div>
             </div>
 
             {{-- Informasi Pemilik --}}
-            <div class="review-card text-start">
-                <div class="flex items-center gap-3 mb-8">
-                    <i class="fa-solid fa-user-tie text-[#FF6900] text-sm"></i>
+            <div class="review-card">
+                <div class="flex items-center gap-3 mb-6">
+                    <i class="fa-solid fa-user-tie text-[#FF6900]"></i>
                     <h3 class="text-base font-black text-gray-900">Informasi Pemilik</h3>
                 </div>
-                <div class="grid grid-cols-1 gap-6">
+                <div class="space-y-5">
                     <div>
                         <p class="label-title">Nama Lengkap</p>
-                        <p class="data-value">Ani Suryani</p>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <p class="label-title">NIK (No. KTP)</p>
-                            <p class="data-value">3171234567890001</p>
-                        </div>
-                        <div>
-                            <p class="label-title">Nomor Telepon</p>
-                            <p class="data-value">081234567890</p>
-                        </div>
+                        <p class="data-value">{{ $canteen['admin_name'] ?? '-' }}</p>
                     </div>
                     <div>
-                        <p class="label-title">Alamat Email</p>
-                        <p class="data-value">ani.suryani@email.com</p>
+                        <p class="label-title">Email</p>
+                        <p class="data-value">{{ $canteen['admin_email'] ?? '-' }}</p>
                     </div>
-                </div>
-            </div>
-
-            {{-- Rekening --}}
-            <div class="review-card text-start">
-                <div class="flex items-center gap-3 mb-8">
-                    <i class="fa-solid fa-credit-card text-[#FF6900] text-sm"></i>
-                    <h3 class="text-base font-black text-gray-900">Rekening Settlement</h3>
-                </div>
-                <div class="bg-[#F9FAFB] p-6 rounded-[24px] border border-gray-50 flex items-center justify-between">
+                    @if(!empty($canteen['admin_phone']))
                     <div>
-                        <p class="text-[10px] font-black text-gray-400 mb-1">BANK BCA</p>
-                        <h4 class="text-lg font-black text-gray-900 tracking-wider">1234567890</h4>
-                        <p class="text-[11px] font-bold text-gray-400 mt-1 uppercase italic">A/N ANI SURYANI</p>
+                        <p class="label-title">No. Telepon</p>
+                        <p class="data-value">{{ $canteen['admin_phone'] }}</p>
                     </div>
-                    <i class="fa-solid fa-circle-check text-green-500 text-xl"></i>
+                    @endif
                 </div>
             </div>
         </div>
 
-        {{-- KOLOM KANAN: DOKUMEN LAMPIRAN (7/12 bagian) --}}
+        {{-- KOLOM KANAN: DOKUMEN LAMPIRAN DINAMIS --}}
+        @if($hasDocument)
         <div class="col-span-12 lg:col-span-7 space-y-6">
             <div class="review-card text-start h-full">
                 <div class="flex items-center gap-3 mb-8">
                     <i class="fa-solid fa-file-shield text-[#FF6900] text-sm"></i>
-                    <h3 class="text-base font-black text-gray-900">Dokumen Lampiran (Preview)</h3>
+                    <h3 class="text-base font-black text-gray-900">Dokumen Lampiran</h3>
                 </div>
-                
+
                 <div class="grid grid-cols-1 gap-8">
-                    {{-- Preview KTP --}}
                     <div class="space-y-3">
-                        <p class="text-xs font-black text-gray-400 uppercase tracking-widest">Foto KTP Asli</p>
+                        <p class="text-xs font-black text-gray-400 uppercase tracking-widest">Foto Dokumen Pendaftar</p>
                         <div class="img-doc-preview relative">
-                            <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=1000" class="w-full h-full object-cover opacity-90">
-                            <div class="absolute bottom-6 right-6 px-6 py-3 bg-white rounded-2xl shadow-xl flex items-center gap-3 border border-gray-100">
+                            {{-- Memanggil gambar secara dinamis dari storage --}}
+                            <img src="{{ asset('storage/' . $canteen['document_path']) }}"
+                                class="w-full h-full object-cover opacity-90" alt="Dokumen Kantin">
+                            <div
+                                class="absolute bottom-6 right-6 px-6 py-3 bg-white rounded-2xl shadow-xl flex items-center gap-3 border border-gray-100 cursor-pointer hover:bg-gray-50 transition-all">
                                 <i class="fa-solid fa-magnifying-glass-plus text-[#FF6900]"></i>
                                 <span class="text-xs font-black text-gray-700">Perbesar Gambar</span>
                             </div>
                         </div>
                     </div>
-
-                    {{-- Preview Selfie --}}
-                    <div class="space-y-3 pt-4">
-                        <p class="text-xs font-black text-gray-400 uppercase tracking-widest">Foto Selfie & KTP</p>
-                        <div class="img-doc-preview">
-                            <div class="flex flex-col items-center gap-3">
-                                 <i class="fa-solid fa-camera text-5xl text-gray-100"></i>
-                                 <p class="text-gray-300 font-bold">Gambar tidak tersedia</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
+        @endif
 
     </div>
 </div>

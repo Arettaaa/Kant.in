@@ -5,18 +5,25 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
     .sidebar-link.active {
         background-color: #FFF3E8;
         color: #FF6900 !important;
     }
-    
+
     .input-custom {
         transition: all 0.3s ease;
         border: 1px solid #F3F4F6;
     }
+
     .input-custom:focus {
         border-color: #FF6900;
         box-shadow: 0 0 0 4px rgba(255, 105, 0, 0.1);
@@ -39,9 +46,11 @@
 <div class="flex w-full h-screen bg-[#F9FAFB] overflow-hidden text-start font-sans">
 
     {{-- ======================== SIDEBAR GLOBAL ADMIN ======================== --}}
-    <aside class="w-[260px] h-screen bg-white flex flex-col py-8 px-6 shadow-sm flex-shrink-0 z-20 border-r border-gray-100 text-start">
+    <aside
+        class="w-[260px] h-screen bg-white flex flex-col py-8 px-6 shadow-sm flex-shrink-0 z-20 border-r border-gray-100 text-start">
         <div class="flex items-center gap-3 mb-12 px-2 text-start">
-            <div class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg" style="background-color:#FF6900;">
+            <div class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg"
+                style="background-color:#FF6900;">
                 <i class="fa-solid fa-utensils text-lg text-white"></i>
             </div>
             <div class="flex flex-col text-start">
@@ -51,39 +60,76 @@
         </div>
 
         <nav class="flex flex-col gap-2 flex-1 text-start">
-            <a href="/admin/global/dasbor" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all text-start">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            <a href="/admin/global/dasbor"
+                class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all text-start">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                    </path>
+                </svg>
                 Dasbor
             </a>
-            <a href="/admin/global/kantin-mitra" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all text-start">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <a href="/admin/global/kantin-mitra"
+                class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all text-start">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                    </path>
+                </svg>
                 Kantin Mitra
             </a>
-            <a href="/admin/global/transaksi" class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all text-start">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <a href="/admin/global/transaksi"
+                class="sidebar-link flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all text-start">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
+                    </path>
+                </svg>
                 Transaksi
             </a>
-            <a href="/admin/global/notifikasi" class="sidebar-link flex items-center justify-between px-4 py-3.5 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all text-start">
-                <div class="flex items-center gap-3"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg> Notifikasi</div>
-                <span class="w-5 h-5 bg-[#FF6900] text-white text-[10px] flex items-center justify-center rounded-full shadow-sm font-black">2</span>
+            <a href="/admin/global/notifikasi"
+                class="sidebar-link flex items-center justify-between px-4 py-3.5 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all text-start">
+                <div class="flex items-center gap-3"><svg class="w-5 h-5" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                        </path>
+                    </svg> Notifikasi</div>
+                <span
+                    class="w-5 h-5 bg-[#FF6900] text-white text-[10px] flex items-center justify-center rounded-full shadow-sm font-black">2</span>
             </a>
 
-            <div class="mt-8 mb-4 px-4 text-[10px] font-black text-gray-300 uppercase tracking-[0.2em] text-start">Sistem</div>
-            <a href="/admin/global/profil" class="sidebar-link active flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[15px] font-bold transition-all text-start" style="background-color: #FFF3E8; color: #FF6900 !important;">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <div class="mt-8 mb-4 px-4 text-[10px] font-black text-gray-300 uppercase tracking-[0.2em] text-start">
+                Sistem</div>
+            <a href="/admin/global/profil"
+                class="sidebar-link active flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[15px] font-bold transition-all text-start"
+                style="background-color: #FFF3E8; color: #FF6900 !important;">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                    </path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
                 Pengaturan
             </a>
         </nav>
 
-        <a href="/logout" class="flex items-center gap-3 px-4 py-4 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border-t border-gray-50 mt-auto text-start">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg> Keluar
+        <a href="/logout"
+            class="flex items-center gap-3 px-4 py-4 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all border-t border-gray-50 mt-auto text-start">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                </path>
+            </svg> Keluar
         </a>
     </aside>
 
     {{-- ======================== MAIN CONTENT ======================== --}}
     <main class="flex-1 h-screen overflow-y-auto hide-scrollbar flex flex-col text-start">
 
-        <header class="w-full bg-white border-b border-gray-100 px-10 py-6 sticky top-0 z-50 flex justify-between items-center shadow-sm text-start">
+        <header
+            class="w-full bg-white border-b border-gray-100 px-10 py-6 sticky top-0 z-50 flex justify-between items-center shadow-sm text-start">
             <div class="text-start">
                 <h2 class="text-2xl font-black text-gray-900 leading-none mb-1 text-start">Selamat Datang, Admin</h2>
                 <p id="realtimeDate" class="text-sm text-gray-400 font-bold text-start">Memuat Tanggal...</p>
@@ -91,22 +137,32 @@
 
             <div class="flex items-center gap-6 text-start">
                 <div class="relative" id="bellWrapper">
-                    <button onclick="toggleDropdown()" class="relative w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-[#FF6900] border border-gray-100 transition-all focus:outline-none">
+                    <button onclick="toggleDropdown()"
+                        class="relative w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-[#FF6900] border border-gray-100 transition-all focus:outline-none">
                         <i class="fa-solid fa-bell text-lg"></i>
-                        <span id="bellBadge" class="absolute top-2.5 right-3 w-3 h-3 border-2 border-white rounded-full" style="background-color:#FF6900;"></span>
+                        <span id="bellBadge" class="absolute top-2.5 right-3 w-3 h-3 border-2 border-white rounded-full"
+                            style="background-color:#FF6900;"></span>
                     </button>
                     <div id="notifDropdown" class="notif-dropdown hidden text-start" style="right:-20px;">
                         <div class="flex items-center justify-between px-5 py-4 border-b border-gray-50">
                             <span class="text-sm font-extrabold text-gray-900">Notifikasi Terbaru</span>
-                            <span class="text-xs font-black px-2.5 py-1 rounded-xl" style="background-color:#FFF3E8; color:#FF6900;">2 Baru</span>
+                            <span class="text-xs font-black px-2.5 py-1 rounded-xl"
+                                style="background-color:#FFF3E8; color:#FF6900;">2 Baru</span>
                         </div>
                         <div class="max-h-[300px] overflow-y-auto hide-scrollbar">
                             <div class="p-5 flex items-start gap-3 border-bottom border-gray-50">
-                                <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 flex-shrink-0"><i class="fa-solid fa-store text-sm"></i></div>
-                                <div class="flex-1 text-start"><p class="text-sm font-extrabold text-gray-900 leading-tight">Pendaftaran Kantin Baru</p><p class="text-[11px] text-gray-400 mt-1">10 mnt lalu</p></div>
+                                <div
+                                    class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 flex-shrink-0">
+                                    <i class="fa-solid fa-store text-sm"></i></div>
+                                <div class="flex-1 text-start">
+                                    <p class="text-sm font-extrabold text-gray-900 leading-tight">Pendaftaran Kantin
+                                        Baru</p>
+                                    <p class="text-[11px] text-gray-400 mt-1">10 mnt lalu</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="p-4 text-center border-t border-gray-50"><a href="/admin/global/notifikasi" class="text-xs font-black text-[#FF6900] uppercase">Lihat Selengkapnya</a></div>
+                        <div class="p-4 text-center border-t border-gray-50"><a href="/admin/global/notifikasi"
+                                class="text-xs font-black text-[#FF6900] uppercase">Lihat Selengkapnya</a></div>
                     </div>
                 </div>
 
@@ -114,10 +170,15 @@
 
                 <div class="flex items-center gap-4 group text-start">
                     <div class="text-right text-start">
-                        <p class="text-sm font-black text-gray-900 leading-none mb-1 group-hover:text-[#FF6900] text-start">Admin Utama</p>
-                        <p class="text-[10px] font-bold text-[#FF6900] uppercase tracking-widest text-start">Pusat Kendali</p>
+                        <p
+                            class="text-sm font-black text-gray-900 leading-none mb-1 group-hover:text-[#FF6900] text-start">
+                            Admin Utama</p>
+                        <p class="text-[10px] font-bold text-[#FF6900] uppercase tracking-widest text-start">Pusat
+                            Kendali</p>
                     </div>
-                    <div class="w-12 h-12 rounded-full bg-[#FFF3E8] flex items-center justify-center text-[#FF6900] font-black text-lg border border-orange-100 shadow-sm transition-all group-hover:bg-[#FF6900] group-hover:text-white">A</div>
+                    <div
+                        class="w-12 h-12 rounded-full bg-[#FFF3E8] flex items-center justify-center text-[#FF6900] font-black text-lg border border-orange-100 shadow-sm transition-all group-hover:bg-[#FF6900] group-hover:text-white">
+                        A</div>
                 </div>
             </div>
         </header>
@@ -126,7 +187,8 @@
         <div class="p-10 flex flex-col items-center justify-start flex-1 bg-[#F9FAFB]">
             {{-- Header Judul Mungil --}}
             <div class="w-full max-w-md mb-6 flex items-center gap-4 text-start">
-                <a href="/admin/global/pengaturan" class="w-9 h-9 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-[#FF6900] transition-all shadow-sm">
+                <a href="/admin/global/pengaturan"
+                    class="w-9 h-9 rounded-full bg-white border border-gray-100 flex items-center justify-center text-gray-400 hover:text-[#FF6900] transition-all shadow-sm">
                     <i class="fa-solid fa-arrow-left text-[10px]"></i>
                 </a>
                 <h3 class="text-lg font-black text-gray-900 tracking-tight">Pengaturan Akun</h3>
@@ -134,40 +196,66 @@
 
             {{-- CARD FORM (KECIL - max-w-md) --}}
             <div class="w-full max-w-md bg-white p-10 rounded-[40px] border border-gray-100 shadow-sm">
+                {{-- Taruh di atas form, di dalam card --}}
+                @if(session('success_update'))
+                <div class="mb-6 px-5 py-4 rounded-2xl text-sm font-bold flex items-center gap-3"
+                    style="background-color: #F0FDF4; color: #166534;">
+                    <i class="fa-solid fa-circle-check"></i>
+                    Profil berhasil diperbarui!
+                </div>
+                @endif
+
+                @if($errors->any())
+                <div class="mb-6 px-5 py-4 rounded-2xl text-sm font-bold flex items-center gap-3"
+                    style="background-color: #FFF1F2; color: #991B1B;">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                    {{ $errors->first() }}
+                </div>
+                @endif
+
                 <form action="{{ route('admin.global.profil.update') }}" method="POST" class="space-y-6 text-start">
                     @csrf
                     @method('PUT')
 
                     <div class="text-start">
-                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2.5 block ml-1">Nama Lengkap</label>
+                        <label
+                            class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2.5 block ml-1">Nama
+                            Lengkap</label>
                         <div class="relative">
-                            <i class="fa-solid fa-user absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]"></i>
-                            <input type="text" name="name" value="{{ $user->name }}" 
+                            <i
+                                class="fa-solid fa-user absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]"></i>
+                            <input type="text" name="name" value="{{ $user->name }}"
                                 class="input-custom w-full pl-12 pr-6 py-4 rounded-[20px] bg-[#F9FAFB] text-[13px] font-bold text-gray-700 outline-none border-none">
                         </div>
                     </div>
 
                     <div class="text-start">
-                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2.5 block ml-1">Alamat Email</label>
+                        <label
+                            class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2.5 block ml-1">Alamat
+                            Email</label>
                         <div class="relative">
-                            <i class="fa-solid fa-envelope absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]"></i>
-                            <input type="email" name="email" value="{{ $user->email }}" 
+                            <i
+                                class="fa-solid fa-envelope absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]"></i>
+                            <input type="email" name="email" value="{{ $user->email }}"
                                 class="input-custom w-full pl-12 pr-6 py-4 rounded-[20px] bg-[#F9FAFB] text-[13px] font-bold text-gray-700 outline-none border-none">
                         </div>
                     </div>
 
                     <div class="text-start">
-                        <label class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2.5 block ml-1">Nomor Telepon</label>
+                        <label
+                            class="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2.5 block ml-1">Nomor
+                            Telepon</label>
                         <div class="relative">
-                            <i class="fa-solid fa-phone absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]"></i>
-                            <input type="text" name="phone" value="{{ $user->phone ?? '08123456789' }}" 
+                            <i
+                                class="fa-solid fa-phone absolute left-5 top-1/2 -translate-y-1/2 text-gray-300 text-[13px]"></i>
+                            <input type="text" name="phone" value="{{ $user->phone ?? '08123456789' }}"
                                 class="input-custom w-full pl-12 pr-6 py-4 rounded-[20px] bg-[#F9FAFB] text-[13px] font-bold text-gray-700 outline-none border-none">
                         </div>
                     </div>
 
                     {{-- Button Simpan (CENTERED) --}}
                     <div class="pt-2 flex justify-center">
-                        <button type="submit" 
+                        <button type="submit"
                             class="px-8 py-4 bg-[#FF6900] text-white rounded-[20px] font-black text-[12px] flex items-center justify-center gap-2.5 shadow-lg shadow-orange-100 hover:scale-[1.03] transition-all uppercase tracking-widest">
                             <i class="fa-solid fa-save text-[11px]"></i>
                             Simpan Perubahan

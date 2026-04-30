@@ -113,6 +113,9 @@ Route::middleware(['auth:sanctum', 'role:admin_global'])->group(function () {
 
     Route::get('/transactions', [TransactionController::class, 'globalTransactions']);
     Route::get('/dashboard', [TransactionController::class, 'globalDashboard']);
+
+     Route::get('/admin-global/profiles', [ProfileController::class, 'show']);
+    Route::post('/admin-global/profiles', [ProfileController::class, 'update']);
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {

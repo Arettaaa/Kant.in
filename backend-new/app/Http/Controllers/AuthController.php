@@ -26,7 +26,10 @@ class AuthController extends Controller
         ];
 
         if ($role === 'admin_kantin') {
-            $rules['canteen_name'] = 'required|string|max:255';
+            $rules['canteen_name']        = 'required|string|max:255';
+            $rules['canteen_location']    = 'nullable|string|max:255';
+            $rules['canteen_description'] = 'nullable|string|max:500';
+            $rules['canteen_phone']       = 'nullable|string|max:20';
         }
 
         $request->validate($rules, [
@@ -36,12 +39,15 @@ class AuthController extends Controller
         ]);
 
         $response = Http::timeout(15)->post($this->apiUrl('/auth/register'), [
-            'name'         => $request->name,
-            'email'        => $request->email,
-            'password'     => $request->password,
-            'phone'        => $request->phone,
-            'role'         => $role,
-            'canteen_name' => $request->canteen_name,
+            'name'                 => $request->name,
+            'email'                => $request->email,
+            'password'             => $request->password,
+            'phone'                => $request->phone,
+            'role'                 => $role,
+            'canteen_name'         => $request->canteen_name,
+            'canteen_location'     => $request->canteen_location,    // ← tambah
+            'canteen_description'  => $request->canteen_description, // ← tambah
+            'canteen_phone'        => $request->canteen_phone,       // ← tambah
         ]);
 
         $data = $response->json();
@@ -94,7 +100,7 @@ class AuthController extends Controller
 
         $role = $data['user']['role'] ?? 'pembeli';
 
-        return match($role) {
+        return match ($role) {
             'admin_global' => redirect()->intended('/admin/global/dasbor'),
             'admin_kantin' => redirect()->intended('/admin/pesanan'),
             default        => redirect()->intended('/beranda'),

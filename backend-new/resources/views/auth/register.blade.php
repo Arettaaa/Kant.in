@@ -43,12 +43,13 @@
 
             {{-- PENTING: Tampilan Error Validasi dari Controller --}}
             {{-- Bagian Error Container --}}
-            <div id="errorContainer" class="mb-4 p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium {{ $errors->any() ? '' : 'hidden' }}">
+            <div id="errorContainer"
+                class="mb-4 p-3 rounded-xl bg-red-50 text-red-600 text-sm font-medium {{ $errors->any() ? '' : 'hidden' }}">
                 <ul id="errorList" class="list-disc pl-5">
                     @if ($errors->any())
-                        @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                        @endforeach
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
                     @endif
                 </ul>
             </div>
@@ -105,14 +106,15 @@
                         </div>
                     </div>
 
-                   {{-- Input Kata Sandi --}}
+                    {{-- Input Kata Sandi --}}
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1.5">Kata Sandi</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
                                 <i class="fa-solid fa-lock"></i>
                             </span>
-                            <input id="passwordRegister" type="password" name="password" placeholder="Min. 8 karakter (Huruf & Angka)" required
+                            <input id="passwordRegister" type="password" name="password"
+                                placeholder="Min. 8 karakter (Huruf & Angka)" required
                                 oninput="checkStrength(this.value)"
                                 class="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-300 transition-all"
                                 style="background-color:#FAFAFA;">
@@ -121,7 +123,7 @@
                                 <i id="eyeIcon" class="fa-regular fa-eye"></i>
                             </button>
                         </div>
-                        
+
                         {{-- Bar Indikator Kekuatan --}}
                         <div class="mt-2 flex gap-1.5" id="strengthBar">
                             <div id="s1" class="flex-1 h-1 bg-gray-200 rounded-full transition-all duration-300"></div>
@@ -133,15 +135,55 @@
                     </div>
 
                     <div id="namaKantinField" style="display: none;">
-                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Kantin</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
-                                <i class="fa-solid fa-store"></i>
-                            </span>
-                            <input type="text" name="canteen_name" id="regCanteenName" placeholder="Warung Bu Ani"
-                                value="{{ old('canteen_name') }}"
-                                class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-300 transition-all"
-                                style="background-color:#FAFAFA;">
+                        {{-- Nama Kantin --}}
+                        <div class="mb-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Kantin</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                                    <i class="fa-solid fa-store"></i>
+                                </span>
+                                <input type="text" name="canteen_name" placeholder="Warung Bu Ani"
+                                    value="{{ old('canteen_name') }}"
+                                    class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-300"
+                                    style="background-color:#FAFAFA;">
+                            </div>
+                        </div>
+
+                        {{-- Lokasi --}}
+                        <div class="mb-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Lokasi Kantin</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                </span>
+                                <input type="text" name="canteen_location" placeholder="Gedung A, Lantai 1"
+                                    value="{{ old('canteen_location') }}"
+                                    class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-300"
+                                    style="background-color:#FAFAFA;">
+                            </div>
+                        </div>
+
+                        {{-- Deskripsi --}}
+                        <div class="mb-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">Deskripsi Singkat</label>
+                            <textarea name="canteen_description" placeholder="Ceritakan sedikit tentang kantin kamu..."
+                                rows="3"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"
+                                style="background-color:#FAFAFA;">{{ old('canteen_description') }}</textarea>
+                        </div>
+
+                        {{-- No Telepon Kantin --}}
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1.5">No. Telepon Kantin</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                                    <i class="fa-solid fa-phone"></i>
+                                </span>
+                                <input type="tel" name="canteen_phone" placeholder="08123456789"
+                                    value="{{ old('canteen_phone') }}"
+                                    class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-300"
+                                    style="background-color:#FAFAFA;">
+                            </div>
                         </div>
                     </div>
 

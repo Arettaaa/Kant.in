@@ -38,31 +38,41 @@ class KeamananController extends Controller
     public function updatePassword(Request $request)
     {
         $request->validate([
-            'current_password' => 'required|string',
-            'new_password'     => [
-                'required', 'confirmed', 'min:8',
-                'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[0-9]/'
+            'current_password'          => 'required|string',
+            'new_password'              => [
+                'required',
+                'confirmed',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/'
             ],
+            'new_password_confirmation' => 'required|string',
         ], [
-            'current_password.required'  => 'Kata sandi saat ini wajib diisi.',
-            'new_password.required'      => 'Kata sandi baru wajib diisi.',
-            'new_password.confirmed'     => 'Konfirmasi kata sandi baru tidak cocok.',
-            'new_password.min'           => 'Kata sandi minimal 8 karakter.',
-            'new_password.regex'         => 'Kata sandi harus mengandung huruf besar, huruf kecil, dan angka.',
+            'current_password.required' => 'Kata sandi saat ini wajib diisi.',
+            'new_password.required'     => 'Kata sandi baru wajib diisi.',
+            'new_password.confirmed'    => 'Konfirmasi kata sandi baru tidak cocok.',
+            'new_password.min'          => 'Kata sandi minimal 8 karakter.',
+            'new_password.regex'        => 'Kata sandi harus mengandung huruf besar, huruf kecil, dan angka.',
         ]);
 
         $user = Session::get('user');
         if (!$user) return redirect()->route('pelanggan.login');
 
-        $role     = $user['role'] ?? 'pembeli';
-        $prefix   = $role === 'admin_kantin' ? '/admin' : '/buyers';
-        $endpoint = $prefix . '/profiles';
+        $role = $user['role'] ?? 'pembeli';
+
+        // Sesuaikan endpoint per role
+        $endpoint = match ($role) {
+            'admin_kantin' => '/admin/profiles',
+            'admin_global' => '/admin-global/profiles',
+            default        => '/buyers/profiles',
+        };
 
         $response = Http::timeout(15)
             ->withToken($this->apiToken())
             ->post($this->apiUrl($endpoint), [
-                'old_password' => $request->current_password,
-                'password'     => $request->new_password,
+                'old_password'          => $request->current_password,
+                'password'              => $request->new_password,
                 'password_confirmation' => $request->new_password_confirmation,
             ]);
 

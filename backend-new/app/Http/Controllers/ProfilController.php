@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/ProfilController.php
 
 namespace App\Http\Controllers;
 
@@ -20,14 +19,22 @@ class ProfilController extends Controller
         return Session::get('api_token', '');
     }
 
+    private function getEndpointByRole(string $role): string
+    {
+        return match ($role) {
+            'admin_kantin' => '/admin/profiles',
+            'admin_global' => '/admin-global/profiles',
+            default        => '/buyers/profiles',
+        };
+    }
+
     private function fetchUser(): ?object
     {
         $user = Session::get('user');
         if (!$user) return null;
 
-        $role = $user['role'] ?? 'pembeli';
-        $prefix = $role === 'admin_kantin' ? '/admin' : '/buyers';
-        $endpoint = $prefix . '/profiles';
+        $role     = $user['role'] ?? 'pembeli';
+        $endpoint = $this->getEndpointByRole($role);
 
         $response = Http::timeout(15)
             ->withToken($this->apiToken())
@@ -36,8 +43,6 @@ class ProfilController extends Controller
         if (!$response->successful()) return (object) $user;
 
         $data = $response->json('data');
-
-        // Sync session supaya nama di beranda ikut terupdate
         Session::put('user', $data);
 
         return (object) $data;
@@ -94,8 +99,7 @@ class ProfilController extends Controller
         if (!$user) return redirect()->route('pelanggan.login');
 
         $role     = $user['role'] ?? 'pembeli';
-        $prefix   = $role === 'admin_kantin' ? '/admin' : '/buyers';
-        $endpoint = $prefix . '/profiles';
+        $endpoint = $this->getEndpointByRole($role);
 
         $request->validate([
             'name'          => 'required|string|max:255',

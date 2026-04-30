@@ -406,18 +406,17 @@
                 <div>
                     <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Jam
                         Operasional (WIB)</label>
-                    <div class="flex gap-2">
+                    <div class="inline-flex gap-2">
                         <input type="text" name="operating_hours[open]" id="edit_jam_buka" oninput="validateJam(this)"
                             placeholder="07:00"
-                            class="flex-1 px-6 py-4 rounded-2xl bg-white border border-gray-100 font-bold text-sm shadow-sm"
+                            class="w-24 px-4 py-4 rounded-2xl bg-white border border-gray-100 font-bold text-sm shadow-sm text-center"
                             maxlength="5">
                         <input type="text" name="operating_hours[close]" id="edit_jam_tutup" oninput="validateJam(this)"
                             placeholder="17:00"
-                            class="flex-1 px-6 py-4 rounded-2xl bg-white border border-gray-100 font-bold text-sm shadow-sm"
+                            class="w-24 px-4 py-4 rounded-2xl bg-white border border-gray-100 font-bold text-sm shadow-sm text-center"
                             maxlength="5">
                     </div>
                 </div>
-
                 <div>
                     <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1 mb-1 block">Status
                         Kantin</label>
@@ -493,7 +492,7 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
     // --- REALTIME DATE WIB ---
     function updateDateTime() {
         const now = new Date();

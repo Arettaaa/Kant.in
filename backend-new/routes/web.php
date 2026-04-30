@@ -72,12 +72,17 @@ Route::middleware(['check.session'])->prefix('admin/global')->name('admin.global
     Route::get('/transaksi', [TransactionController::class, 'index'])->name('transaksi');
     Route::get('/transaksi/ekspor', [TransactionController::class, 'export'])->name('transaksi.export');
     Route::get('/notifikasi', [NotificationController::class, 'index'])->name('notifikasi');
+    Route::post('/notifikasi/{id}/approve', [NotificationController::class, 'approve'])->name('notifikasi.approve');
+    Route::post('/notifikasi/{id}/reject', [NotificationController::class, 'reject'])->name('notifikasi.reject');
+    Route::get('/rev-pendaftaran/{id}', [NotificationController::class, 'review'])->name('rev-pendaftaran');
+    Route::post('/notifikasi/{id}/approve', [NotificationController::class, 'approve'])->name('notifikasi.approve');
 
 
     // Profil & Keamanan
     Route::get('/profil', [ProfilController::class, 'index'])->name('profil');
     Route::put('/profil', [ProfilController::class, 'update'])->name('profil.update');
     Route::get('/keamanan', [KeamananController::class, 'index'])->name('keamanan');
+    Route::post('/keamanan', [KeamananController::class, 'updatePassword'])->name('keamanan.update');
 
     Route::post('/kantin-mitra', [CanteenController::class, 'store'])->name('kantin.store');
     Route::put('/kantin-mitra/{id}', [CanteenController::class, 'update'])->name('kantin.update');
