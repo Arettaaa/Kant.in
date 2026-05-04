@@ -138,42 +138,7 @@
 <div class="flex w-full h-screen bg-[#F9FAFB] overflow-hidden">
 
     {{-- ======================== SIDEBAR ======================== --}}
-    <aside class="w-[240px] h-screen bg-white flex flex-col py-8 px-6 shadow-sm flex-shrink-0 z-20 border-r border-gray-100">
-        <div class="flex items-center gap-3 mb-10 px-2">
-            <div class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg" style="background-color:#FF6900;">
-                <i class="fa-solid fa-store text-lg text-white"></i>
-            </div>
-            <span class="text-xl font-extrabold text-gray-900 tracking-tight">Kantin</span>
-        </div>
-
-        <nav class="flex flex-col gap-2 flex-1">
-            <a href="{{ route('admin.pesanan') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold transition-all" style="background-color:#FFF3E8;color:#FF6900;">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                Pesanan
-            </a>
-            <a href="{{ route('admin.menu') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                Kelola Menu
-            </a>
-            <a href="{{ route('admin.riwayat') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-                Riwayat Transaksi
-            </a>
-            <a href="{{ route('admin.profil') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                Profil Kantin
-            </a>
-        </nav>
-
-        <form method="POST" action="{{ route('logout') }}" class="mt-auto border-t border-gray-100 pt-6">
-            @csrf
-            <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                Keluar
-            </button>
-        </form>
-    </aside>
-
+    @include('admin.partials.sidebar')
     {{-- ======================== MAIN CONTENT ======================== --}}
     <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#F9FAFB] hide-scrollbar">
 
@@ -221,16 +186,16 @@
         @endif
 
         {{-- Tabs --}}
-        <div class="flex items-center gap-8 px-10 mt-8 border-b border-gray-100">
+        <div class="flex items-center gap-0 px-10 mt-8 border-b border-gray-100">
             <button onclick="switchTab('masuk')" id="tabMasukBtn"
-                class="pb-3 text-[15px] transition-all tab-active">
+                class="pb-3 px-1 mr-8 text-[15px] transition-all tab-active">
                 Pesanan Masuk
                 <span id="badgeMasuk" class="ml-2 px-2 py-0.5 bg-[#FF6900] text-white rounded-full text-[10px] font-black">{{ $menungguVerifikasi->count() }}</span>
             </button>
             <button onclick="switchTab('diproses')" id="tabDiprosesBtn"
-                class="pb-3 text-[15px] transition-all tab-inactive">
+                class="pb-3 px-1 text-[15px] transition-all tab-inactive">
                 Diproses
-                <span id="badgeDiproses" class="ml-2 px-2 py-0.5 bg-gray-300 text-white rounded-full text-[10px] font-black">{{ $sedangDiproses->count() }}</span>
+                <span id="badgeDiproses" class="ml-2 px-2 py-0.5 bg-gray-200 text-gray-400 rounded-full text-[10px] font-black">{{ $sedangDiproses->count() }}</span>
             </button>
         </div>
 
@@ -248,12 +213,13 @@
                     {{-- Header card --}}
                     <div class="flex justify-between items-start mb-5">
                         <div class="flex items-center gap-3">
-                            @if(!empty($order->customer_snapshot['photo_profile']))
-                                <img src="{{ asset('storage/' . $order->customer_snapshot['photo_profile']) }}"
+                            @php $photo = $order->customer_snapshot['photo_profile'] ?? null; @endphp
+                            @if($photo)
+                                <img src="{{ Str::startsWith($photo, 'http') ? $photo : asset('storage/' . $photo) }}"
                                     class="w-11 h-11 rounded-full object-cover" alt="foto">
                             @else
-                                <div class="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center text-gray-300">
-                                    <i class="fa-solid fa-user text-lg"></i>
+                                <div class="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <i class="fa-solid fa-user text-gray-300 text-lg"></i>
                                 </div>
                             @endif
                             <div>
@@ -311,16 +277,19 @@
             @else
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 @foreach($sedangDiproses as $order)
-                <a href="{{ route('admin.pesanan.rincian', $order->_id) }}" class="card-order block no-underline">
+                <a href="{{ route('admin.pesanan.rincian', $order->_id) }}" class="card-order block no-underline" style="text-decoration:none;">
                     {{-- Header card --}}
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex items-center gap-3">
-                            @if(!empty($order->customer_snapshot['photo_profile']))
-                                <img src="{{ asset('storage/' . $order->customer_snapshot['photo_profile']) }}"
+                            @php
+                                $photo = $order->customer_snapshot['photo_profile'] ?? null;
+                            @endphp
+                            @if($photo)
+                                <img src="{{ Str::startsWith($photo, 'http') ? $photo : asset('storage/' . $photo) }}"
                                     class="w-11 h-11 rounded-full object-cover" alt="foto">
                             @else
-                                <div class="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center text-gray-300">
-                                    <i class="fa-solid fa-user text-lg"></i>
+                                <div class="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <i class="fa-solid fa-user text-gray-300 text-lg"></i>
                                 </div>
                             @endif
                             <div>
@@ -332,7 +301,7 @@
                         </div>
                         <div class="text-right">
                             <p class="text-[10px] font-black text-gray-300 mb-1">{{ $order->order_code }}</p>
-                            @if($order->delivery_details['method'] === 'delivery')
+                            @if(($order->delivery_details['method'] ?? '') === 'delivery')
                                 <span class="badge-delivery">Antar Kurir</span>
                             @else
                                 <span class="badge-pickup">Ambil Sendiri</span>
@@ -342,27 +311,27 @@
 
                     {{-- Item ringkas --}}
                     <div class="text-[13px] text-gray-500 mb-4">
-                        {{ $order->items->count() ?? count($order->items) }} item
+                        {{ count($order->items) }} item
                         &nbsp;·&nbsp;
                         <span class="font-bold text-gray-700">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
                     </div>
 
-                    {{-- Footer: status badge + tombol Siap (kalau masih processing) --}}
+                    {{-- Footer: status badge + tombol Siap --}}
                     <div class="flex justify-between items-center pt-4 border-t border-gray-50">
                         @if($order->status === 'processing')
                             <span class="badge-dimasak"><i class="fa-solid fa-fire-flame-curved mr-1"></i>Dimasak</span>
-                            {{-- Tombol Siap: stop propagasi link, submit form --}}
                             <form method="POST" action="{{ route('admin.pesanan.status', $order->_id) }}"
-                                onclick="event.stopPropagation()">
+                                onclick="event.preventDefault(); event.stopPropagation(); this.submit();">
                                 @csrf
                                 @method('PUT')
                                 <input type="hidden" name="status" value="ready">
-                                <button type="submit" class="btn-siap">SIAP</button>
+                                <button type="button"
+                                    onclick="event.stopPropagation(); this.closest('form').submit();"
+                                    class="btn-siap">SIAP</button>
                             </form>
                         @else
                             {{-- status = ready --}}
                             <span class="badge-siap"><i class="fa-solid fa-check mr-1"></i>Siap Diambil</span>
-                            <span class="text-[11px] text-gray-400 font-semibold">Menunggu pelanggan</span>
                         @endif
                     </div>
                 </a>
@@ -383,22 +352,28 @@
         const tDiproses = document.getElementById('tabDiproses');
         const bMasuk    = document.getElementById('tabMasukBtn');
         const bDiproses = document.getElementById('tabDiprosesBtn');
+        const badgeMasuk    = document.getElementById('badgeMasuk');
+        const badgeDiproses = document.getElementById('badgeDiproses');
+
+        const activeClass   = 'pb-3 px-1 mr-8 text-[15px] transition-all tab-active';
+        const inactiveClass = 'pb-3 px-1 text-[15px] transition-all tab-inactive';
+        const badgeActive   = 'ml-2 px-2 py-0.5 bg-[#FF6900] text-white rounded-full text-[10px] font-black';
+        const badgeInactive = 'ml-2 px-2 py-0.5 bg-gray-200 text-gray-400 rounded-full text-[10px] font-black';
 
         if (tab === 'masuk') {
             tMasuk.classList.remove('hidden');
             tDiproses.classList.add('hidden');
-            bMasuk.className    = 'pb-3 text-[15px] transition-all tab-active';
-            bDiproses.className = 'pb-3 text-[15px] transition-all tab-inactive';
-            // badge warna
-            document.getElementById('badgeMasuk').className    = 'ml-2 px-2 py-0.5 bg-[#FF6900] text-white rounded-full text-[10px] font-black';
-            document.getElementById('badgeDiproses').className = 'ml-2 px-2 py-0.5 bg-gray-300 text-white rounded-full text-[10px] font-black';
+            bMasuk.className    = activeClass;
+            bDiproses.className = inactiveClass;
+            badgeMasuk.className    = badgeActive;
+            badgeDiproses.className = badgeInactive;
         } else {
             tDiproses.classList.remove('hidden');
             tMasuk.classList.add('hidden');
-            bDiproses.className = 'pb-3 text-[15px] transition-all tab-active';
-            bMasuk.className    = 'pb-3 text-[15px] transition-all tab-inactive';
-            document.getElementById('badgeDiproses').className = 'ml-2 px-2 py-0.5 bg-[#FF6900] text-white rounded-full text-[10px] font-black';
-            document.getElementById('badgeMasuk').className    = 'ml-2 px-2 py-0.5 bg-gray-300 text-white rounded-full text-[10px] font-black';
+            bDiproses.className = activeClass.replace('mr-8 ', '');
+            bMasuk.className    = inactiveClass;
+            badgeDiproses.className = badgeActive;
+            badgeMasuk.className    = badgeInactive;
         }
     }
 

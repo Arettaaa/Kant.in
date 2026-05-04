@@ -30,7 +30,7 @@ class MenuController extends Controller
 
         $categories = $menus->pluck('category')->unique()->sort()->values();
 
-        return view('admin.menu', compact('menus', 'categories'));
+        return view('admin.kelola-menu', compact('menus', 'categories'));
     }
 
     /**
