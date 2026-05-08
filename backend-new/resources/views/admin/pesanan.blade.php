@@ -277,7 +277,7 @@
             @else
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 @foreach($sedangDiproses as $order)
-                <a href="{{ route('admin.pesanan.rincian', $order->_id) }}" class="card-order block no-underline" style="text-decoration:none;">
+                <a href="{{ route('admin.pesanan.status', $order->_id) }}" class="card-order block" style="text-decoration:none;">
                     {{-- Header card --}}
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex items-center gap-3">
@@ -316,23 +316,14 @@
                         <span class="font-bold text-gray-700">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</span>
                     </div>
 
-                    {{-- Footer: status badge + tombol Siap --}}
+                    {{-- Footer: badge status + lihat detail --}}
                     <div class="flex justify-between items-center pt-4 border-t border-gray-50">
                         @if($order->status === 'processing')
                             <span class="badge-dimasak"><i class="fa-solid fa-fire-flame-curved mr-1"></i>Dimasak</span>
-                            <form method="POST" action="{{ route('admin.pesanan.status', $order->_id) }}"
-                                onclick="event.preventDefault(); event.stopPropagation(); this.submit();">
-                                @csrf
-                                @method('PUT')
-                                <input type="hidden" name="status" value="ready">
-                                <button type="button"
-                                    onclick="event.stopPropagation(); this.closest('form').submit();"
-                                    class="btn-siap">SIAP</button>
-                            </form>
                         @else
-                            {{-- status = ready --}}
                             <span class="badge-siap"><i class="fa-solid fa-check mr-1"></i>Siap Diambil</span>
                         @endif
+                        <span class="btn-detail">Lihat Detail <i class="fa-solid fa-chevron-right text-[11px]"></i></span>
                     </div>
                 </a>
                 @endforeach
@@ -346,6 +337,12 @@
 
 @push('scripts')
 <script>
+    // ── Auto buka tab diproses kalau redirect dari status.blade ──
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'diproses') {
+        switchTab('diproses');
+    }
+
     // ── Tab switching ──────────────────────────────────────────
     function switchTab(tab) {
         const tMasuk    = document.getElementById('tabMasuk');

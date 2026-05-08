@@ -101,23 +101,39 @@ Route::middleware(['check.session'])->prefix('admin/global')->name('admin.global
 */
 Route::middleware(['check.session', 'admin.kantin'])->prefix('admin')->name('admin.')->group(function () {
 
-    // Pesanan
+    // -----------------------------------------------------------------------
+    // PESANAN
+    // -----------------------------------------------------------------------
     Route::get('/pesanan', [AdminPesananController::class, 'index'])->name('pesanan');
-    Route::get('/pesanan/{id}', [AdminPesananController::class, 'show'])->name('pesanan.show');
     Route::get('/pesanan/{id}/rincian', [AdminPesananController::class, 'rincian'])->name('pesanan.rincian');
+
+    // GET halaman status (processing → ready) — dari card diproses
+    Route::get('/pesanan/{id}/status', [AdminPesananController::class, 'statusPage'])->name('pesanan.status');
+
+    // GET halaman cancel — read only setelah tolak
+    Route::get('/pesanan/{id}/cancel', [AdminPesananController::class, 'cancelPage'])->name('pesanan.cancelPage');
+
+    // POST verifikasi & tolak pembayaran — dari halaman rincian
     Route::post('/pesanan/{id}/verify', [AdminPesananController::class, 'verifyPayment'])->name('pesanan.verify');
     Route::post('/pesanan/{id}/reject', [AdminPesananController::class, 'rejectPayment'])->name('pesanan.reject');
-    Route::put('/pesanan/{id}/status', [AdminPesananController::class, 'updateStatus'])->name('pesanan.status');
-    Route::post('/pesanan/{id}/cancel', [AdminPesananController::class, 'cancel'])->name('pesanan.cancel');
+
+    // PUT update status (processing → ready) — dari halaman status
+    Route::put('/pesanan/{id}/status', [AdminPesananController::class, 'updateStatus'])->name('pesanan.updateStatus');
+
+    // Toggle buka/tutup kantin — AJAX
     Route::post('/kantin/toggle-open', [AdminPesananController::class, 'toggleOpen'])->name('kantin.toggleOpen');
 
-    // Riwayat Transaksi
+    // -----------------------------------------------------------------------
+    // RIWAYAT TRANSAKSI
+    // -----------------------------------------------------------------------
     Route::get('/riwayat', [AdminTransactionController::class, 'index'])->name('riwayat');
-    Route::get('/riwayat/{id}', [AdminTransactionController::class, 'detail'])->name('riwayat.detail');
     Route::get('/riwayat/chart-data', [AdminTransactionController::class, 'chartData'])->name('riwayat.chart');
     Route::get('/riwayat/export', [AdminTransactionController::class, 'export'])->name('riwayat.export');
+    Route::get('/riwayat/{id}', [AdminTransactionController::class, 'detail'])->name('riwayat.detail');
 
-    // Menu
+    // -----------------------------------------------------------------------
+    // KELOLA MENU
+    // -----------------------------------------------------------------------
     Route::get('/menu', [AdminMenuController::class, 'index'])->name('menu');
     Route::get('/menu/tambah', [AdminMenuController::class, 'create'])->name('menu.tambah');
     Route::post('/menu', [AdminMenuController::class, 'store'])->name('menu.store');
@@ -126,11 +142,14 @@ Route::middleware(['check.session', 'admin.kantin'])->prefix('admin')->name('adm
     Route::delete('/menu/{id}', [AdminMenuController::class, 'destroy'])->name('menu.delete');
     Route::put('/menu/{id}/availability', [AdminMenuController::class, 'updateAvailability'])->name('menu.availability');
 
-    // Profil
+    // -----------------------------------------------------------------------
+    // PROFIL
+    // -----------------------------------------------------------------------
     Route::get('/profil', [AdminProfilController::class, 'index'])->name('profil');
     Route::put('/profil', [AdminProfilController::class, 'update'])->name('profil.update');
     Route::get('/pusat-bantuan', [AdminProfilController::class, 'bantuan'])->name('support');
 });
+
 /*
 |--------------------------------------------------------------------------
 | Pelanggan Routes

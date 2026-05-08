@@ -65,11 +65,12 @@ class PesananController extends Controller
 
         $order->update(['status' => $request->status]);
 
-        return back()->with('success', 'Status pesanan berhasil diperbarui.');
+        return redirect()->route('admin.pesanan', ['tab' => 'diproses'])
+            ->with('success', 'Status pesanan berhasil diperbarui.');
     }
 
     /**
-     * Verifikasi pembayaran → status jadi processing.
+     * Verifikasi pembayaran → status jadi processing → redirect ke halaman status.
      */
     public function verifyPayment($orderId)
     {
@@ -96,11 +97,13 @@ class PesananController extends Controller
             'status'  => 'processing',
         ]);
 
-        return back()->with('success', 'Pembayaran berhasil diverifikasi. Pesanan masuk ke antrian.');
+        // Redirect ke halaman status setelah terima
+        return redirect()->route('admin.pesanan.status', $orderId)
+            ->with('success', 'Pembayaran diverifikasi. Pesanan sedang dimasak.');
     }
 
     /**
-     * Tolak pembayaran → batalkan pesanan.
+     * Tolak pembayaran → batalkan pesanan → redirect ke halaman cancel.
      */
     public function rejectPayment(Request $request, $orderId)
     {
@@ -130,7 +133,8 @@ class PesananController extends Controller
             'status'  => Order::STATUS_CANCELLED,
         ]);
 
-        return back()->with('success', 'Pembayaran ditolak. Pesanan dibatalkan.');
+        // Redirect ke halaman cancel setelah tolak
+        return redirect()->route('admin.pesanan.cancel', $orderId);
     }
 
     /**
@@ -200,6 +204,44 @@ class PesananController extends Controller
 
         $order->update(['status' => Order::STATUS_CANCELLED]);
 
-        return back()->with('success', 'Pesanan berhasil dibatalkan.');
+        return redirect()->route('admin.pesanan.cancelPage', $orderId);
+    }
+
+    /**
+     * Halaman status pesanan — admin ubah dari processing → ready.
+     * GET /pesanan/{id}/status
+     */
+    public function statusPage($orderId)
+    {
+        $canteenId = $this->getCanteenId();
+
+        $order = Order::where('_id', $orderId)
+            ->where('canteen_id', $canteenId)
+            ->first();
+
+        if (!$order) {
+            abort(404, 'Pesanan tidak ditemukan.');
+        }
+
+        return view('admin.status', compact('order'));
+    }
+
+    /**
+     * Halaman cancel — read only, tampil info pesanan yang dibatalkan.
+     * GET /pesanan/{id}/cancel
+     */
+    public function cancelPage($orderId)
+    {
+        $canteenId = $this->getCanteenId();
+
+        $order = Order::where('_id', $orderId)
+            ->where('canteen_id', $canteenId)
+            ->first();
+
+        if (!$order) {
+            abort(404, 'Pesanan tidak ditemukan.');
+        }
+
+        return view('admin.cancel', compact('order'));
     }
 }
