@@ -173,29 +173,29 @@
 
         {{-- Flash message --}}
         @if(session('success'))
-        <div class="mx-10 mt-6 px-5 py-3 bg-green-50 border border-green-100 rounded-2xl text-green-700 text-sm font-semibold flex items-center gap-2">
+        <div id="flashSuccess" class="mx-10 mt-6 px-5 py-3 bg-green-50 border border-green-100 rounded-2xl text-green-700 text-sm font-semibold flex items-center gap-2 transition-opacity duration-500">
             <i class="fa-solid fa-circle-check text-green-500"></i>
             {{ session('success') }}
         </div>
         @endif
         @if(session('error'))
-        <div class="mx-10 mt-6 px-5 py-3 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm font-semibold flex items-center gap-2">
+        <div id="flashError" class="mx-10 mt-6 px-5 py-3 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-sm font-semibold flex items-center gap-2 transition-opacity duration-500">
             <i class="fa-solid fa-circle-exclamation text-red-400"></i>
             {{ session('error') }}
         </div>
         @endif
 
         {{-- Tabs --}}
-        <div class="flex items-center gap-0 px-10 mt-8 border-b border-gray-100">
+        <div class="flex items-center px-10 mt-8 border-b border-gray-100">
             <button onclick="switchTab('masuk')" id="tabMasukBtn"
-                class="pb-3 px-1 mr-8 text-[15px] transition-all tab-active">
+                style="padding-bottom:12px; margin-right:32px; font-size:15px; font-weight:800; border:none; background:none; cursor:pointer; border-bottom: 3px solid #FF6900; color:#FF6900;">
                 Pesanan Masuk
-                <span id="badgeMasuk" class="ml-2 px-2 py-0.5 bg-[#FF6900] text-white rounded-full text-[10px] font-black">{{ $menungguVerifikasi->count() }}</span>
+                <span id="badgeMasuk" style="margin-left:8px; padding:2px 8px; background:#FF6900; color:white; border-radius:999px; font-size:10px; font-weight:900;">{{ $menungguVerifikasi->count() }}</span>
             </button>
             <button onclick="switchTab('diproses')" id="tabDiprosesBtn"
-                class="pb-3 px-1 text-[15px] transition-all tab-inactive">
+                style="padding-bottom:12px; font-size:15px; font-weight:700; border:none; background:none; cursor:pointer; border-bottom: 3px solid transparent; color:#9ca3af;">
                 Diproses
-                <span id="badgeDiproses" class="ml-2 px-2 py-0.5 bg-gray-200 text-gray-400 rounded-full text-[10px] font-black">{{ $sedangDiproses->count() }}</span>
+                <span id="badgeDiproses" style="margin-left:8px; padding:2px 8px; background:#e5e7eb; color:#9ca3af; border-radius:999px; font-size:10px; font-weight:900;">{{ $sedangDiproses->count() }}</span>
             </button>
         </div>
 
@@ -337,6 +337,17 @@
 
 @push('scripts')
 <script>
+    // ── Auto dismiss flash message ─────────────────────────────
+    ['flashSuccess', 'flashError'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            setTimeout(() => {
+                el.style.opacity = '0';
+                setTimeout(() => el.remove(), 500);
+            }, 3000); // hilang setelah 3 detik
+        }
+    });
+
     // ── Auto buka tab diproses kalau redirect dari status.blade ──
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('tab') === 'diproses') {
@@ -352,25 +363,36 @@
         const badgeMasuk    = document.getElementById('badgeMasuk');
         const badgeDiproses = document.getElementById('badgeDiproses');
 
-        const activeClass   = 'pb-3 px-1 mr-8 text-[15px] transition-all tab-active';
-        const inactiveClass = 'pb-3 px-1 text-[15px] transition-all tab-inactive';
-        const badgeActive   = 'ml-2 px-2 py-0.5 bg-[#FF6900] text-white rounded-full text-[10px] font-black';
-        const badgeInactive = 'ml-2 px-2 py-0.5 bg-gray-200 text-gray-400 rounded-full text-[10px] font-black';
-
         if (tab === 'masuk') {
             tMasuk.classList.remove('hidden');
             tDiproses.classList.add('hidden');
-            bMasuk.className    = activeClass;
-            bDiproses.className = inactiveClass;
-            badgeMasuk.className    = badgeActive;
-            badgeDiproses.className = badgeInactive;
+
+            bMasuk.style.borderBottom   = '3px solid #FF6900';
+            bMasuk.style.color          = '#FF6900';
+            bMasuk.style.fontWeight     = '800';
+            bDiproses.style.borderBottom = '3px solid transparent';
+            bDiproses.style.color        = '#9ca3af';
+            bDiproses.style.fontWeight   = '700';
+
+            badgeMasuk.style.background  = '#FF6900';
+            badgeMasuk.style.color       = 'white';
+            badgeDiproses.style.background = '#e5e7eb';
+            badgeDiproses.style.color      = '#9ca3af';
         } else {
             tDiproses.classList.remove('hidden');
             tMasuk.classList.add('hidden');
-            bDiproses.className = activeClass.replace('mr-8 ', '');
-            bMasuk.className    = inactiveClass;
-            badgeDiproses.className = badgeActive;
-            badgeMasuk.className    = badgeInactive;
+
+            bDiproses.style.borderBottom = '3px solid #FF6900';
+            bDiproses.style.color        = '#FF6900';
+            bDiproses.style.fontWeight   = '800';
+            bMasuk.style.borderBottom   = '3px solid transparent';
+            bMasuk.style.color          = '#9ca3af';
+            bMasuk.style.fontWeight     = '700';
+
+            badgeDiproses.style.background = '#FF6900';
+            badgeDiproses.style.color      = 'white';
+            badgeMasuk.style.background  = '#e5e7eb';
+            badgeMasuk.style.color       = '#9ca3af';
         }
     }
 
@@ -395,6 +417,8 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
             },
             body: JSON.stringify({ is_open: isOpen }),

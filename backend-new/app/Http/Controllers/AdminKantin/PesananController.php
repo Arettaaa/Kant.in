@@ -30,12 +30,12 @@ class PesananController extends Controller
         }
 
         $pesananMasuk = Order::where('canteen_id', $canteenId)
-            ->whereIn('status', [Order::STATUS_PENDING, 'processing', 'ready'])
+            ->whereIn('status', [Order::STATUS_PENDING, 'processing'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         $menungguVerifikasi = $pesananMasuk->where('status', Order::STATUS_PENDING)->values();
-        $sedangDiproses     = $pesananMasuk->whereIn('status', ['processing', 'ready'])->values();
+        $sedangDiproses     = $pesananMasuk->where('status', 'processing')->values();
 
         return view('admin.pesanan', compact(
             'canteen',
@@ -134,7 +134,7 @@ class PesananController extends Controller
         ]);
 
         // Redirect ke halaman cancel setelah tolak
-        return redirect()->route('admin.pesanan.cancel', $orderId);
+        return redirect()->route('admin.pesanan.cancelPage', $orderId);
     }
 
     /**
@@ -142,10 +142,6 @@ class PesananController extends Controller
      */
     public function toggleOpen(Request $request)
     {
-        $request->validate([
-            'is_open' => 'required|in:0,1,true,false',
-        ]);
-
         $canteenId = $this->getCanteenId();
         $canteen   = Canteen::find($canteenId);
 
@@ -153,8 +149,13 @@ class PesananController extends Controller
             return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan.'], 404);
         }
 
-        $isOpen = filter_var($request->is_open, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE)
-            ?? (bool)(int) $request->is_open;
+        // Handle JSON boolean true/false maupun string "true"/"false"/"1"/"0"
+        $raw    = $request->input('is_open');
+        $isOpen = filter_var($raw, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+        if (is_null($isOpen)) {
+            return response()->json(['success' => false, 'message' => 'Nilai is_open tidak valid.'], 422);
+        }
 
         Canteen::where('_id', $canteenId)->update(['is_open' => $isOpen]);
 
