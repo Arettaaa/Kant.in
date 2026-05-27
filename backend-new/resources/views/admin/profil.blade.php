@@ -109,20 +109,6 @@
                             </div>
                             <i class="fa-solid fa-chevron-right text-gray-300 text-sm"></i>
                         </a>
-
-                        {{-- Jam Operasional --}}
-                        <a href="/admin/profil/jam-operasional" class="flex items-center justify-between p-6 hover:bg-gray-50 transition-all">
-                            <div class="flex items-center gap-5">
-                                <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-500">
-                                    <i class="fa-solid fa-clock text-lg"></i>
-                                </div>
-                                <div class="text-left">
-                                    <p class="text-[15px] font-black text-gray-800">Jam Operasional</p>
-                                    <p class="text-[12px] text-gray-400 font-medium">Atur jadwal buka/tutup</p>
-                                </div>
-                            </div>
-                            <i class="fa-solid fa-chevron-right text-gray-300 text-sm"></i>
-                        </a>
                     </div>
                 </div>
 

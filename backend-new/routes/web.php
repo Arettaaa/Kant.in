@@ -140,7 +140,7 @@ Route::middleware(['check.session', 'admin.kantin'])->prefix('admin')->name('adm
     Route::get('/menu/{id}/edit', [AdminMenuController::class, 'edit'])->name('menu.edit');
     Route::put('/menu/{id}', [AdminMenuController::class, 'update'])->name('menu.update');
     Route::delete('/menu/{id}', [AdminMenuController::class, 'destroy'])->name('menu.delete');
-    Route::put('/menu/{id}/availability', [AdminMenuController::class, 'updateAvailability'])->name('menu.availability');
+    Route::put('/menu/{id}/availability', [AdminMenuController::class, 'toggleAvailability'])->name('menu.availability');
 
     // -----------------------------------------------------------------------
     // PROFIL

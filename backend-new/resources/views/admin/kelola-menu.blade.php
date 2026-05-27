@@ -10,43 +10,12 @@
 <div class="flex w-full h-screen bg-[#F9FAFB] overflow-hidden text-start">
 
     {{-- ======================== SIDEBAR ======================== --}}
-    <aside class="w-[240px] h-screen bg-white flex flex-col py-8 px-6 shadow-sm flex-shrink-0 z-20 border-r border-gray-100">
-        <div class="flex items-center gap-3 mb-10 px-2 text-start">
-            <div class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg" style="background-color:#FF6900;">
-                <i class="fa-solid fa-store text-lg text-white"></i>
-            </div>
-            <span class="text-xl font-extrabold text-gray-900 tracking-tight text-start">Kantin</span>
-        </div>
-
-        <nav class="flex flex-col gap-2 flex-1 text-start">
-            <a href="/admin/pesanan" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                Pesanan
-            </a>
-            <a href="/admin/menu" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold transition-all" style="background-color:#FFF3E8;color:#FF6900;">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                Kelola Menu
-            </a>
-            <a href="/admin/riwayat" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all text-start">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-                Riwayat Transaksi
-            </a>
-            <a href="/admin/profil" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all text-start">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                Profil Kantin
-            </a>
-        </nav>
-
-        <a href="/admin/login" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all mt-auto text-start border-t border-gray-50 pt-6">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-            Keluar
-        </a>
-    </aside>
+    @include('admin.partials.sidebar')
 
     {{-- ======================== MAIN CONTENT ======================== --}}
     <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#F9FAFB] text-start">
-        
-        {{-- HEADER --}}
+
+        {{-- HEADER DENGAN SEARCH BAR --}}
         <div class="sticky top-0 z-10 w-full flex items-center justify-between px-10 py-6 bg-white/90 backdrop-blur-md border-b border-gray-100 text-start">
             <div class="flex items-center gap-4 text-start">
                 <div class="w-12 h-12 rounded-2xl flex items-center justify-center bg-orange-50 shadow-sm text-start">
@@ -54,60 +23,107 @@
                 </div>
                 <div class="text-start">
                     <h2 class="text-xl font-extrabold text-gray-900 leading-none mb-1 text-start">Warung Bu Ani</h2>
-                    {{-- Dinamis ID untuk Count --}}
                     <p class="text-sm text-gray-400 font-medium tracking-wide text-start">
-                        <span id="menuCount">0</span> Menu terdaftar
+                        <span id="menuCount">{{ count($menus) }}</span> Menu ditampilkan
                     </p>
                 </div>
             </div>
-            <a href="{{ route('admin.menu.tambah') }}" class="flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#FF6900] text-white font-bold text-sm hover:brightness-110 transition-all">
-                <i class="fa-solid fa-plus text-xs"></i>
-                Tambah Menu
-            </a>
+            
+            {{-- Wrapper untuk Search & Button --}}
+            <div class="flex items-center gap-4">
+                {{-- Search Bar --}}
+                <div class="relative group">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#FF6900] transition-colors"></i>
+                    <input type="text" id="searchInput" placeholder="Cari menu atau kategori..." class="w-64 pl-11 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-semibold text-gray-800 focus:outline-none focus:bg-white focus:border-[#FF6900] transition-all placeholder-gray-400 shadow-sm">
+                </div>
+
+                <a href="{{ route('admin.menu.tambah') }}" class="flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#FF6900] text-white font-bold text-sm hover:brightness-110 transition-all shadow-sm">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    Tambah Menu
+                </a>
+            </div>
         </div>
 
-        {{-- Grid Menu Container --}}
-        <div id="menuContainer" class="px-10 pb-10 mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 text-start">
-            
-            @php
-                $menus = [
-                    ['id' => 1, 'name' => 'Nasi Goreng Spesial', 'price' => '25.000', 'img' => 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400', 'status' => 'TERSEDIA'],
-                    ['id' => 2, 'name' => 'Mie Goreng Ayam', 'price' => '22.000', 'img' => 'https://images.unsplash.com/photo-1585032226651-759b368d7246?w=400', 'status' => 'TERSEDIA'],
-                    ['id' => 3, 'name' => 'Es Teh Manis', 'price' => '5.000', 'img' => 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400', 'status' => 'HABIS'],
-                    ['id' => 4, 'name' => 'Brown Sugar Boba', 'price' => '18.000', 'img' => 'https://images.unsplash.com/photo-1544145945-f904253d0c7b?w=400', 'status' => 'TERSEDIA'],
-                ];
-            @endphp
+        {{-- Flash message dengan efek transisi (dari Backend) --}}
+        @if(session('success'))
+        <div id="flashMessage" class="mx-10 mt-6 px-5 py-4 bg-green-50 border border-green-100 text-green-700 rounded-2xl font-semibold text-sm transition-opacity duration-500 ease-in-out opacity-100">
+            {{ session('success') }}
+        </div>
+        @endif
 
-            @foreach($menus as $menu)
-            <div id="menu-{{ $menu['id'] }}" class="menu-card bg-white rounded-[32px] p-5 shadow-sm border border-gray-100 flex gap-4 transition-all duration-300 {{ $menu['status'] == 'HABIS' ? 'opacity-60 grayscale' : '' }}">
-                <img src="{{ $menu['img'] }}" class="w-24 h-24 rounded-2xl object-cover" alt="Menu">
+        {{-- Grid Menu Container --}}
+        <div id="menuContainer" class="px-10 pb-10 mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 text-start relative">
+
+            @forelse($menus as $menu)
+            <div id="menu-{{ $menu['_id'] }}" class="menu-card bg-white rounded-[32px] p-5 shadow-sm border border-gray-100 flex gap-4 transition-all duration-300 {{ !$menu['is_available'] ? 'opacity-60 grayscale' : '' }}">
+
+                {{-- Gambar menu --}}
+                @if(!empty($menu['image']))
+                    <img src="{{ $menu['image'] }}" class="w-24 h-24 rounded-2xl object-cover flex-shrink-0" alt="{{ $menu['name'] }}">
+                @else
+                    <div class="w-24 h-24 rounded-2xl bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-utensils text-gray-300 text-2xl"></i>
+                    </div>
+                @endif
+
                 <div class="flex-1 flex flex-col justify-between text-start">
                     <div class="flex justify-between items-start text-start">
-                        <h3 class="menu-title text-base font-black {{ $menu['status'] == 'HABIS' ? 'text-gray-400' : 'text-gray-800' }} text-start">{{ $menu['name'] }}</h3>
-                        
+                        <div>
+                            <h3 class="menu-title text-base font-black {{ !$menu['is_available'] ? 'text-gray-400' : 'text-gray-800' }} text-start">{{ $menu['name'] }}</h3>
+                            @if(!empty($menu['category']))
+                                <span class="text-xs text-gray-400 font-medium">{{ $menu['category'] }}</span>
+                            @endif
+                        </div>
+
                         <div class="flex gap-2 text-start">
-                            <a href="{{ route('admin.menu.edit') }}" class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-blue-500 transition-all text-start">
-                                <i class="fa-solid fa-pencil text-[12px] text-start"></i>
+                            <a href="{{ route('admin.menu.edit', $menu['_id']) }}" class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-blue-500 transition-all">
+                                <i class="fa-solid fa-pencil text-[12px]"></i>
                             </a>
-                            <button onclick="openDeleteModal('{{ $menu['id'] }}', '{{ $menu['name'] }}')" class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-red-500 transition-all text-start">
-                                <i class="fa-solid fa-trash-can text-[12px] text-start"></i>
+                            <button
+                                onclick="openDeleteModal('{{ $menu['_id'] }}', '{{ addslashes($menu['name']) }}')"
+                                class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-red-500 transition-all">
+                                <i class="fa-solid fa-trash-can text-[12px]"></i>
                             </button>
                         </div>
                     </div>
 
                     <div class="flex justify-between items-center mt-auto text-start">
-                        <span class="menu-price text-start font-black {{ $menu['status'] == 'HABIS' ? 'text-gray-400' : 'text-[#FF6900]' }}">Rp {{ $menu['price'] }}</span>
-                        
+                        <span class="menu-price text-start font-black {{ !$menu['is_available'] ? 'text-gray-400' : 'text-[#FF6900]' }}">
+                            Rp {{ number_format($menu['price'], 0, ',', '.') }}
+                        </span>
+
                         <div class="flex items-center gap-3 text-start">
-                            <span class="status-text text-[10px] font-black tracking-widest uppercase {{ $menu['status'] == 'HABIS' ? 'text-gray-400' : 'text-[#22c55e]' }} text-start">{{ $menu['status'] }}</span>
-                            <button onclick="toggleMenuStatus({{ $menu['id'] }})" class="toggle-btn relative inline-flex items-center w-11 h-6 rounded-full transition-all duration-300 {{ $menu['status'] == 'HABIS' ? 'bg-gray-200' : 'bg-[#22c55e]' }}">
-                                <span class="toggle-circle absolute w-4 h-4 bg-white rounded-full transition-all duration-300 {{ $menu['status'] == 'HABIS' ? 'left-[4px]' : 'left-[24px]' }}"></span>
+                            <span class="status-text text-[10px] font-black tracking-widest uppercase {{ !$menu['is_available'] ? 'text-gray-400' : 'text-[#22c55e]' }}">
+                                {{ $menu['is_available'] ? 'TERSEDIA' : 'HABIS' }}
+                            </span>
+                            <button
+                                onclick="toggleMenuStatus('{{ $menu['_id'] }}')"
+                                data-available="{{ $menu['is_available'] ? '1' : '0' }}"
+                                class="toggle-btn relative inline-flex items-center w-11 h-6 rounded-full transition-all duration-300 {{ !$menu['is_available'] ? 'bg-gray-200' : 'bg-[#22c55e]' }}">
+                                <span class="toggle-circle absolute w-4 h-4 bg-white rounded-full transition-all duration-300 {{ !$menu['is_available'] ? 'left-[4px]' : 'left-[24px]' }}"></span>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-            @endforeach
+            @empty
+            <div class="col-span-1 lg:col-span-2 flex flex-col items-center justify-center py-20 text-center">
+                <div class="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-utensils text-2xl text-orange-300"></i>
+                </div>
+                <p class="text-gray-400 font-semibold">Belum ada menu. Tambahkan menu pertamamu!</p>
+            </div>
+            @endforelse
+
+            {{-- ELEMENT EMPTY STATE KHUSUS PENCARIAN (Disembunyikan secara default) --}}
+            <div id="searchEmptyState" class="hidden col-span-1 lg:col-span-2 flex-col items-center justify-center py-24 text-center">
+                <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                    <i class="fa-solid fa-magnifying-glass text-2xl text-gray-300"></i>
+                </div>
+                <h3 class="text-lg font-black text-gray-900 mb-1">Pencarian Tidak Ditemukan</h3>
+                <p class="text-gray-400 font-medium text-sm">Tidak ada menu atau kategori yang cocok dengan "<span id="searchKeyword" class="font-bold text-gray-800"></span>"</p>
+            </div>
+
         </div>
     </main>
 </div>
@@ -121,11 +137,11 @@
             </div>
             <h3 class="text-2xl font-black text-gray-900 mb-3">Hapus Menu?</h3>
             <p class="text-[15px] text-gray-500 font-medium leading-relaxed mb-1">Apakah Anda yakin ingin menghapus menu</p>
-            <p id="deleteMenuName" class="text-[16px] text-gray-900 font-black mb-6">"Nasi Goreng Spesial"?</p>
+            <p id="deleteMenuName" class="text-[16px] text-gray-900 font-black mb-6"></p>
             <p class="text-[13px] text-gray-400 mb-10">Tindakan ini tidak dapat dibatalkan.</p>
             <div class="grid grid-cols-2 w-full gap-4">
                 <button onclick="closeDeleteModal()" class="py-4 bg-gray-100 text-gray-600 rounded-2xl font-black text-[15px] hover:bg-gray-200 transition-all">Batal</button>
-                <button onclick="confirmDelete()" class="py-4 bg-[#FF3B30] text-white rounded-2xl font-black text-[15px] shadow-lg shadow-red-100 hover:brightness-110 transition-all text-center">Hapus</button>
+                <button onclick="confirmDelete()" id="confirmDeleteBtn" class="py-4 bg-[#FF3B30] text-white rounded-2xl font-black text-[15px] shadow-lg shadow-red-100 hover:brightness-110 transition-all text-center">Hapus</button>
             </div>
         </div>
     </div>
@@ -133,43 +149,127 @@
 
 @push('scripts')
 <script>
-    // Fungsi untuk update jumlah menu di header
-    function updateMenuCount() {
-        const count = document.querySelectorAll('.menu-card').length;
-        document.getElementById('menuCount').innerText = count;
-    }
-
-    // Jalankan pertama kali saat halaman load
-    window.onload = updateMenuCount;
-
-    function toggleMenuStatus(id) {
-        const card = document.getElementById('menu-' + id);
-        const btn = card.querySelector('.toggle-btn');
-        const circle = card.querySelector('.toggle-circle');
-        const statusText = card.querySelector('.status-text');
-        const title = card.querySelector('.menu-title');
-        const price = card.querySelector('.menu-price');
-
-        if (statusText.textContent === 'TERSEDIA') {
-            card.classList.add('opacity-60', 'grayscale');
-            btn.classList.replace('bg-[#22c55e]', 'bg-gray-200');
-            circle.style.left = '4px';
-            statusText.textContent = 'HABIS';
-            statusText.classList.replace('text-[#22c55e]', 'text-gray-400');
-            title.classList.replace('text-gray-800', 'text-gray-400');
-            price.classList.replace('text-[#FF6900]', 'text-gray-400');
-        } else {
-            card.classList.remove('opacity-60', 'grayscale');
-            btn.classList.replace('bg-gray-200', 'bg-[#22c55e]');
-            circle.style.left = '24px';
-            statusText.textContent = 'TERSEDIA';
-            statusText.classList.replace('text-gray-400', 'text-[#22c55e]');
-            title.classList.replace('text-gray-400', 'text-gray-800');
-            price.classList.replace('text-gray-400', 'text-[#FF6900]');
+    // ── Auto-hide Flash Message (Backend) ────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+        const flashMsg = document.getElementById('flashMessage');
+        if (flashMsg) {
+            setTimeout(() => {
+                flashMsg.classList.replace('opacity-100', 'opacity-0');
+                setTimeout(() => { flashMsg.remove(); }, 500);
+            }, 3000); 
         }
+    });
+
+    // ── Fitur Pencarian Real-time (Live Search) ──────────────────────────
+    const searchInput = document.getElementById('searchInput');
+    const searchEmptyState = document.getElementById('searchEmptyState');
+    const searchKeyword = document.getElementById('searchKeyword');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const filter = this.value.toLowerCase();
+            const cards = document.querySelectorAll('.menu-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const title = card.querySelector('.menu-title').textContent.toLowerCase();
+                const categoryEl = card.querySelector('span.text-xs.text-gray-400');
+                const category = categoryEl ? categoryEl.textContent.toLowerCase() : '';
+
+                if (title.includes(filter) || category.includes(filter)) {
+                    card.style.display = 'flex'; 
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none'; 
+                }
+            });
+
+            // Update angka "Menu ditampilkan"
+            document.getElementById('menuCount').innerText = visibleCount;
+
+            // Tampilkan "Empty State Pencarian" jika tidak ada hasil DAN ada kartu menu di database
+            if (visibleCount === 0 && cards.length > 0) {
+                searchEmptyState.classList.remove('hidden');
+                searchEmptyState.classList.add('flex');
+                searchKeyword.innerText = this.value; // Tampilkan kata yang diketik
+            } else {
+                searchEmptyState.classList.add('hidden');
+                searchEmptyState.classList.remove('flex');
+            }
+        });
     }
 
+    // ── Helpers ──────────────────────────────────────────────────────────
+    function showNotification(message) {
+        const notif = document.createElement('div');
+        notif.className = 'mx-10 mt-6 px-5 py-4 bg-green-50 border border-green-100 text-green-700 rounded-2xl font-semibold text-sm transition-opacity duration-500 ease-in-out opacity-0';
+        notif.innerText = message;
+        
+        const container = document.getElementById('menuContainer');
+        container.parentNode.insertBefore(notif, container);
+        
+        setTimeout(() => notif.classList.replace('opacity-0', 'opacity-100'), 10);
+        setTimeout(() => {
+            notif.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => notif.remove(), 500);
+        }, 3000);
+    }
+
+    function updateMenuCount() {
+        const visibleCards = Array.from(document.querySelectorAll('.menu-card')).filter(card => card.style.display !== 'none');
+        document.getElementById('menuCount').innerText = visibleCards.length;
+    }
+
+    // ── Toggle Ketersediaan ──────────────────────────────────────────────
+    function toggleMenuStatus(id) {
+        const card     = document.getElementById('menu-' + id);
+        const btn      = card.querySelector('.toggle-btn');
+        const circle   = card.querySelector('.toggle-circle');
+        const statusEl = card.querySelector('.status-text');
+        const titleEl  = card.querySelector('.menu-title');
+        const priceEl  = card.querySelector('.menu-price');
+
+        const isCurrentlyAvailable = btn.dataset.available === '1';
+        const newAvailable = isCurrentlyAvailable ? 0 : 1;
+
+        fetch(`/admin/menu/${id}/availability`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+            body: JSON.stringify({ is_available: newAvailable }),
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) { alert('Gagal mengubah status menu.'); return; }
+
+            btn.dataset.available = newAvailable;
+
+            if (newAvailable === 0) {
+                card.classList.add('opacity-60', 'grayscale');
+                btn.classList.replace('bg-[#22c55e]', 'bg-gray-200');
+                circle.style.left = '4px';
+                statusEl.textContent = 'HABIS';
+                statusEl.classList.replace('text-[#22c55e]', 'text-gray-400');
+                titleEl.classList.replace('text-gray-800', 'text-gray-400');
+                priceEl.classList.replace('text-[#FF6900]', 'text-gray-400');
+            } else {
+                card.classList.remove('opacity-60', 'grayscale');
+                btn.classList.replace('bg-gray-200', 'bg-[#22c55e]');
+                circle.style.left = '24px';
+                statusEl.textContent = 'TERSEDIA';
+                statusEl.classList.replace('text-gray-400', 'text-[#22c55e]');
+                titleEl.classList.replace('text-gray-400', 'text-gray-800');
+                priceEl.classList.replace('text-gray-400', 'text-[#FF6900]');
+            }
+        })
+        .catch(() => alert('Terjadi kesalahan. Coba lagi.'));
+    }
+
+    // ── Delete Modal ─────────────────────────────────────────────────────
     let menuIdToDelete = null;
+
     function openDeleteModal(id, name) {
         menuIdToDelete = id;
         document.getElementById('deleteMenuName').innerText = `"${name}"?`;
@@ -182,16 +282,49 @@
         const modal = document.getElementById('deleteModal');
         modal.querySelector('div').classList.replace('scale-100', 'scale-95');
         setTimeout(() => modal.classList.add('hidden'), 200);
+        menuIdToDelete = null;
     }
 
     function confirmDelete() {
-        const card = document.getElementById('menu-' + menuIdToDelete);
-        card.classList.add('scale-0', 'opacity-0');
-        setTimeout(() => {
-            card.remove();
-            updateMenuCount(); // Hitung ulang setelah dihapus
-            closeDeleteModal();
-        }, 300);
+        if (!menuIdToDelete) return;
+
+        const btn = document.getElementById('confirmDeleteBtn');
+        btn.disabled = true;
+        btn.textContent = 'Menghapus...';
+
+        fetch(`/admin/menu/${menuIdToDelete}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({ _method: 'DELETE' }),
+        })
+        .then(res => {
+            if (res.ok) {
+                const card = document.getElementById('menu-' + menuIdToDelete);
+                card.classList.add('scale-0', 'opacity-0');
+                
+                setTimeout(() => {
+                    card.remove();
+                    updateMenuCount();
+                    closeDeleteModal();
+                    
+                    showNotification('Menu berhasil dihapus.');
+                    
+                    btn.disabled = false;
+                    btn.textContent = 'Hapus';
+                }, 300);
+            } else {
+                return res.json().then(d => { throw new Error(d.message || 'Gagal menghapus.'); });
+            }
+        })
+        .catch(err => {
+            alert(err.message);
+            btn.disabled = false;
+            btn.textContent = 'Hapus';
+        });
     }
 </script>
 @endpush

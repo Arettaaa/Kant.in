@@ -38,7 +38,7 @@ class MenuController extends Controller
      */
     public function create()
     {
-        return view('admin.menu-tambah');
+        return view('admin.tambah-menu');
     }
 
     /**
@@ -84,7 +84,7 @@ class MenuController extends Controller
             abort(404, 'Menu tidak ditemukan.');
         }
 
-        return view('admin.menu-edit', ['menu' => $this->formatMenu($menu)]);
+        return view('admin.edit-menu', ['menu' => $this->formatMenu($menu)]);
     }
 
     /**

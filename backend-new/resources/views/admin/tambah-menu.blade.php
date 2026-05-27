@@ -19,49 +19,23 @@
 @section('content')
 <div class="flex w-full h-screen bg-[#F9FAFB] overflow-hidden text-start">
 
-    {{-- SIDEBAR (Tetap Seragam) --}}
-    <aside class="w-[240px] h-screen bg-white flex flex-col py-8 px-6 shadow-sm flex-shrink-0 z-20 border-r border-gray-100">
-        <div class="flex items-center gap-3 mb-10 px-2">
-            <div class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg" style="background-color:#FF6900;">
-                <i class="fa-solid fa-store text-lg text-white"></i>
-            </div>
-            <span class="text-xl font-extrabold text-gray-900 tracking-tight">Kantin</span>
-        </div>
-        <nav class="flex flex-col gap-2 flex-1">
-            <a href="/admin/pesanan" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                Pesanan
-            </a>
-            <a href="/admin/menu" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold transition-all" style="background-color:#FFF3E8;color:#FF6900;">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                Kelola Menu
-            </a>
-            <a href="/admin/riwayat" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-                Riwayat Transaksi
-            </a>
-            <a href="/admin/profil" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:bg-gray-50 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                Profil Kantin
-            </a>
-        </nav>
-        <a href="/admin/login" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] font-bold text-gray-400 hover:text-red-500 mt-auto border-t border-gray-50 pt-6">
-            <i class="fa-solid fa-right-from-bracket"></i> Keluar
-        </a>
-    </aside>
+    {{-- Memanggil Sidebar dari partials --}}
+    @include('admin.partials.sidebar')
 
     {{-- MAIN CONTENT --}}
     <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#F9FAFB]">
         
-        {{-- Header (Sticky & Seragam) --}}
+        {{-- Header --}}
         <div class="sticky top-0 z-10 w-full flex items-center gap-4 px-10 py-6 bg-white/90 backdrop-blur-md border-b border-gray-100">
-            <a href="/admin/menu" class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 transition-all">
+            <a href="{{ route('admin.menu') }}" class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 transition-all">
                 <i class="fa-solid fa-arrow-left text-gray-400"></i>
             </a>
             <h2 class="text-xl font-extrabold text-gray-900 leading-none">Tambah Menu Baru</h2>
         </div>
 
-        <form id="menuForm" class="px-10 py-8 space-y-8 pb-32">
+        {{-- Form Container --}}
+        <form id="menuForm" action="{{ route('admin.menu.store') }}" method="POST" enctype="multipart/form-data" class="px-10 py-8 space-y-8 pb-32">
+            @csrf
             
             {{-- Upload Gambar --}}
             <div class="w-full">
@@ -77,8 +51,9 @@
                         </div>
                     </div>
                     <img id="imagePreview" class="hidden absolute inset-0 w-full h-full object-cover rounded-[30px]" />
-                    <input type="file" id="imageUpload" class="hidden" accept="image/*" required>
+                    <input type="file" name="image" id="imageUpload" class="hidden" accept="image/*" required>
                 </label>
+                @error('image') <span class="text-red-500 text-xs font-bold mt-1">{{ $message }}</span> @enderror
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -86,24 +61,26 @@
                 <div class="space-y-6 text-start">
                     <div>
                         <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">Nama Menu</p>
-                        <input type="text" id="namaMenu" placeholder="cth. Nasi Goreng Spesial" class="w-full px-6 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm focus:outline-none focus:border-[#FF6900] font-bold text-gray-800 transition-all">
+                        <input type="text" name="name" id="namaMenu" placeholder="cth. Nasi Goreng Spesial" value="{{ old('name') }}" required class="w-full px-6 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm focus:outline-none focus:border-[#FF6900] font-bold text-gray-800 transition-all">
+                        @error('name') <span class="text-red-500 text-xs font-bold mt-1">{{ $message }}</span> @enderror
                     </div>
                     <div>
                         <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">Harga (IDR)</p>
                         <div class="relative">
                             <span class="absolute left-6 top-1/2 -translate-y-1/2 font-bold text-gray-400">Rp</span>
-                            <input type="number" id="hargaMenu" placeholder="25000" class="w-full pl-14 pr-6 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm focus:outline-none focus:border-[#FF6900] font-bold text-gray-800 transition-all">
+                            <input type="number" name="price" id="hargaMenu" placeholder="25000" value="{{ old('price') }}" required class="w-full pl-14 pr-6 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm focus:outline-none focus:border-[#FF6900] font-bold text-gray-800 transition-all">
                         </div>
+                        @error('price') <span class="text-red-500 text-xs font-bold mt-1">{{ $message }}</span> @enderror
                     </div>
                     <div>
                         <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">Kategori</p>
-                        <select id="kategoriMenu" class="custom-select w-full px-6 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm focus:outline-none focus:border-[#FF6900] font-bold text-gray-800 transition-all">
-                            <option value="" disabled selected>Pilih Kategori</option>
-                            <option value="Nasi">Nasi</option>
-                            <option value="Mie">Mie</option>
-                            <option value="Minuman">Minuman</option>
-                            <option value="Camilan">Camilan</option>
+                        <select name="category" id="kategoriMenu" required class="custom-select w-full px-6 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm focus:outline-none focus:border-[#FF6900] font-bold text-gray-800 transition-all">
+                            <option value="" disabled {{ old('category') ? '' : 'selected' }}>Pilih Kategori</option>
+                            <option value="Makanan" {{ old('category') == 'Makanan' ? 'selected' : '' }}>Makanan</option>
+                            <option value="Minuman" {{ old('category') == 'Minuman' ? 'selected' : '' }}>Minuman</option>
+                            <option value="Camilan" {{ old('category') == 'Camilan' ? 'selected' : '' }}>Camilan</option>
                         </select>
+                        @error('category') <span class="text-red-500 text-xs font-bold mt-1">{{ $message }}</span> @enderror
                     </div>
                 </div>
 
@@ -111,15 +88,21 @@
                 <div class="space-y-6 text-start">
                     <div>
                         <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">Deskripsi</p>
-                        <textarea id="deskripsiMenu" rows="4" placeholder="Jelaskan menu Anda..." class="w-full px-6 py-4 rounded-3xl bg-white border border-gray-100 shadow-sm focus:outline-none focus:border-[#FF6900] font-bold text-gray-800 transition-all"></textarea>
+                        <textarea name="description" id="deskripsiMenu" rows="4" placeholder="Jelaskan menu Anda..." class="w-full px-6 py-4 rounded-3xl bg-white border border-gray-100 shadow-sm focus:outline-none focus:border-[#FF6900] font-bold text-gray-800 transition-all">{{ old('description') }}</textarea>
+                        @error('description') <span class="text-red-500 text-xs font-bold mt-1">{{ $message }}</span> @enderror
                     </div>
                     <div class="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm flex items-center justify-between">
                         <div>
                             <p class="text-sm font-black text-gray-800">Ketersediaan</p>
                             <p class="text-[11px] text-gray-400 font-medium">Matikan jika item habis</p>
                         </div>
-                        <button type="button" onclick="toggleSwitch()" id="switchBtn" class="relative inline-flex items-center w-12 h-6 rounded-full transition-all bg-[#22c55e]">
-                            <span id="switchCircle" class="absolute w-4 h-4 bg-white rounded-full left-[24px] transition-all"></span>
+                        
+                        {{-- Hidden input untuk mengirim status toggle ke backend --}}
+                        <input type="hidden" name="is_available" id="isAvailableInput" value="1">
+                        
+                        {{-- Toggle Button yang presisi di tengah --}}
+                        <button type="button" onclick="toggleSwitch()" id="switchBtn" class="relative inline-flex h-6 w-12 items-center rounded-full transition-colors duration-300 ease-in-out bg-[#22c55e]">
+                            <span id="switchCircle" class="inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform duration-300 ease-in-out translate-x-6"></span>
                         </button>
                     </div>
                 </div>
@@ -127,7 +110,7 @@
 
             {{-- Floating Button di Bawah --}}
             <div class="fixed bottom-0 right-0 left-[240px] p-6 bg-white/80 backdrop-blur-md border-t border-gray-100 z-20 flex justify-center">
-                <button type="button" id="submitBtn" onclick="submitMenu()" disabled 
+                <button type="submit" id="submitBtn" disabled 
                     class="w-full max-w-lg py-4 bg-[#FF6900] text-white rounded-2xl font-black text-sm shadow-xl flex items-center justify-center gap-3 transition-all duration-300 opacity-30 cursor-not-allowed">
                     <i class="fa-solid fa-check"></i>
                     Tambah Menu
@@ -140,16 +123,22 @@
 
 @push('scripts')
 <script>
-    // Logic untuk Switch Ketersediaan
+    // Logic untuk Switch Ketersediaan (menggunakan Flex & Translate Tailwind)
     let isAvailable = true;
     function toggleSwitch() {
         isAvailable = !isAvailable;
         const btn = document.getElementById('switchBtn');
         const circle = document.getElementById('switchCircle');
+        const hiddenInput = document.getElementById('isAvailableInput');
+        
         if (isAvailable) {
-            btn.style.backgroundColor = '#22c55e'; circle.style.left = '24px';
+            btn.classList.replace('bg-gray-300', 'bg-[#22c55e]');
+            circle.classList.replace('translate-x-1', 'translate-x-6');
+            hiddenInput.value = '1';
         } else {
-            btn.style.backgroundColor = '#d1d5db'; circle.style.left = '4px';
+            btn.classList.replace('bg-[#22c55e]', 'bg-gray-300');
+            circle.classList.replace('translate-x-6', 'translate-x-1');
+            hiddenInput.value = '0';
         }
     }
 
@@ -168,12 +157,9 @@
         }
     }
 
-    // Logic Validasi Form
-    const formInputs = ['namaMenu', 'hargaMenu', 'kategoriMenu', 'deskripsiMenu'];
-    formInputs.forEach(id => {
-        document.getElementById(id).addEventListener('input', validateForm);
-    });
-
+    // Logic Validasi Form untuk mengaktifkan tombol submit
+    const formInputs = ['namaMenu', 'hargaMenu', 'kategoriMenu'];
+    
     function validateForm() {
         const btn = document.getElementById('submitBtn');
         const isImgFilled = imgInput.files.length > 0;
@@ -182,16 +168,21 @@
         if (isImgFilled && isFormFilled) {
             btn.disabled = false;
             btn.classList.remove('opacity-30', 'cursor-not-allowed');
+            btn.classList.add('hover:brightness-110');
         } else {
             btn.disabled = true;
             btn.classList.add('opacity-30', 'cursor-not-allowed');
+            btn.classList.remove('hover:brightness-110');
         }
     }
 
-    // Submit Action
-    function submitMenu() {
-        window.location.href = '/admin/menu';
-    }
+    formInputs.forEach(id => {
+        document.getElementById(id).addEventListener('input', validateForm);
+        document.getElementById(id).addEventListener('change', validateForm);
+    });
+
+    // Panggil sekali saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', validateForm);
 </script>
 @endpush
 @endsection
