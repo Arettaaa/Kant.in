@@ -93,7 +93,7 @@
                         </div>
                     </div>
                     <p class="text-sm text-gray-400 font-black">
-                        🕒 {{ \Carbon\Carbon::parse($order->created_at)->timezone('Asia/Jakarta')->format('H:i') }} WIB
+                        <i class="fa-solid fa-clock mr-1"></i> {{ \Carbon\Carbon::parse($order->created_at)->timezone('Asia/Jakarta')->format('H:i') }} WIB
                     </p>
                 </div>
 
@@ -133,9 +133,9 @@
                 <input type="hidden" name="status" id="inputStatus" value="{{ $order->status }}">
                 <button id="btnSimpan" type="submit"
                     class="w-full py-5 rounded-3xl font-black text-[15px] shadow-2xl flex items-center justify-center gap-3 transition-all duration-300
-                        {{ $order->status === 'ready' ? 'bg-[#1A1A1A] text-white cursor-pointer' : 'bg-gray-200 text-gray-400 cursor-not-allowed' }}"
+                        {{ $order->status === 'ready' ? 'bg-[#22C55E] text-white cursor-pointer' : 'bg-gray-200 text-gray-400 cursor-not-allowed' }}"
                     {{ $order->status === 'processing' ? 'disabled' : '' }}>
-                    {{ $order->status === 'ready' ? 'Simpan — Pesanan Siap Diambil' : 'Pilih "Siap" untuk menyimpan' }}
+                    {{ $order->status === 'ready' ? 'Simpan Status' : 'Pilih "Siap" untuk menyimpan' }}
                 </button>
             </form>
         </div>
@@ -172,7 +172,7 @@
             helperText.className    = 'text-[12px] mt-6 text-center font-bold italic text-orange-500';
 
             btnSimpan.disabled      = true;
-            btnSimpan.className     = btnSimpan.className.replace('bg-[#1A1A1A] text-white cursor-pointer', 'bg-gray-200 text-gray-400 cursor-not-allowed');
+            btnSimpan.className     = btnSimpan.className.replace('bg-[#22C55E] text-white cursor-pointer', 'bg-gray-200 text-gray-400 cursor-not-allowed');
             btnSimpan.textContent   = 'Pilih "Siap" untuk menyimpan';
 
         } else {
@@ -184,8 +184,8 @@
             helperText.className    = 'text-[12px] mt-6 text-center font-bold italic text-green-600';
 
             btnSimpan.disabled      = false;
-            btnSimpan.className     = btnSimpan.className.replace('bg-gray-200 text-gray-400 cursor-not-allowed', 'bg-[#1A1A1A] text-white cursor-pointer');
-            btnSimpan.textContent   = 'Simpan — Pesanan Siap Diambil';
+            btnSimpan.className     = btnSimpan.className.replace('bg-gray-200 text-gray-400 cursor-not-allowed', 'bg-[#22C55E] text-white cursor-pointer');
+            btnSimpan.textContent   = 'Simpan Status';
         }
     }
 </script>
