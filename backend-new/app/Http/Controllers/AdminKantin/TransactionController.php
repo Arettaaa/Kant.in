@@ -17,22 +17,15 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TransactionController extends Controller
 {
-    /**
-     * Ambil canteen_id dari session (bukan auth()->user()).
-     */
     private function getCanteenId(): string
     {
         return (string) session('user')['canteen_id'];
     }
 
-    /**
-     * Halaman riwayat transaksi.
-     * Chart.js di view akan hit endpoint chartData() via AJAX.
-     */
     public function index()
     {
         $canteenId = $this->getCanteenId();
-        $canteen   = Canteen::find($canteenId);
+        $canteen = Canteen::find($canteenId);
 
         $orders = Order::where('canteen_id', $canteenId)
             ->whereIn('status', ['completed', 'cancelled'])
@@ -40,7 +33,7 @@ class TransactionController extends Controller
             ->get();
 
         $totalRevenue = $orders->where('status', 'completed')->sum('total_amount');
-        $totalOrders  = $orders->where('status', 'completed')->count();
+        $totalOrders = $orders->where('status', 'completed')->count();
 
         return view('admin.riwayat', compact(
             'canteen',
@@ -50,9 +43,6 @@ class TransactionController extends Controller
         ));
     }
 
-    /**
-     * Detail satu transaksi.
-     */
     public function detail($orderId)
     {
         $canteenId = $this->getCanteenId();
@@ -65,75 +55,89 @@ class TransactionController extends Controller
             abort(404, 'Transaksi tidak ditemukan.');
         }
 
-        return view('admin.riwayat-detail', compact('order'));
+        return view('admin.detail-riwayat', compact('order'));
     }
 
     /**
-     * API endpoint untuk Chart.js — data grafik pendapatan per hari.
-     * Dipanggil via AJAX dari view (sesuai syarat dosen: grafik harus hit API).
-     *
-     * GET /admin/riwayat/chart-data?periode=30
+     * API endpoint untuk Chart.js & Info Cards
      */
     public function chartData(Request $request)
     {
-        $request->validate([
-            'periode' => 'nullable|integer|in:7,30,90',
-        ]);
-
+        $type = $request->input('type', 'day'); // 'day', 'week', 'month'
         $canteenId = $this->getCanteenId();
-        $periode   = (int) $request->input('periode', 30);
 
-        $startDate = now()->subDays($periode - 1)->startOfDay();
-        $endDate   = now()->endOfDay();
+        $startDate = null;
+        $endDate = null;
+
+        // 1. Cek jika ada custom date dari modal filter
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $startDate = Carbon::parse($request->start_date, 'Asia/Jakarta')->startOfDay();
+            $endDate = Carbon::parse($request->end_date, 'Asia/Jakarta')->endOfDay();
+        } else {
+            // 2. Mode Kalender Asli
+            if ($type === 'week') {
+                $startDate = now('Asia/Jakarta')->startOfWeek(); // Senin
+                $endDate = now('Asia/Jakarta')->endOfWeek();   // Minggu
+            } elseif ($type === 'month') {
+                $startDate = now('Asia/Jakarta')->startOfMonth(); // Tgl 1
+                $endDate = now('Asia/Jakarta')->endOfMonth();   // Tgl Akhir
+            } else { // default 'day'
+                $startDate = now('Asia/Jakarta')->startOfDay();
+                $endDate = now('Asia/Jakarta')->endOfDay();
+            }
+        }
+
+        $periode = (int) $startDate->diffInDays($endDate) + 1;
 
         $orders = Order::where('canteen_id', $canteenId)
             ->where('status', 'completed')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->get(['total_amount', 'created_at']);
 
-        // Group by tanggal
-        $grouped = $orders->groupBy(fn($o) =>
+        $grouped = $orders->groupBy(
+            fn($o) =>
             Carbon::parse($o->created_at)->timezone('Asia/Jakarta')->format('Y-m-d')
         );
 
         $labels = [];
-        $data   = [];
+        $data = [];
 
-        for ($i = $periode - 1; $i >= 0; $i--) {
-            $date     = now()->subDays($i)->timezone('Asia/Jakarta')->format('Y-m-d');
-            $labels[] = Carbon::parse($date)->translatedFormat('d M');
-            $data[]   = $grouped->has($date)
-                ? (int) $grouped[$date]->sum('total_amount')
-                : 0;
+        for ($i = 0; $i < $periode; $i++) {
+            $date = $startDate->copy()->addDays($i)->format('Y-m-d');
+
+            // Jika filter Hari Ini, cukup tulis "Hari Ini", selain itu cetak Tgl+Bulan
+            if ($type === 'day' && !$request->filled('start_date')) {
+                $labels[] = 'Hari Ini';
+            } else {
+                $labels[] = Carbon::parse($date)->translatedFormat('d M');
+            }
+
+            $data[] = $grouped->has($date) ? (int) $grouped[$date]->sum('total_amount') : 0;
         }
 
         return response()->json([
             'success' => true,
-            'data'    => [
-                'labels'        => $labels,
-                'revenue'       => $data,
-                'total_revenue' => array_sum($data),
-                'periode'       => $periode,
+            'data' => [
+                'labels' => $labels,
+                'revenue' => $data,
+                'total_revenue' => $orders->sum('total_amount'),
+                'total_orders' => $orders->count(),
             ],
         ]);
     }
 
-    /**
-     * Export laporan PDF / Excel.
-     * GET /admin/riwayat/export?format=pdf&start_date=2024-01-01&end_date=2024-01-31
-     */
     public function export(Request $request)
     {
         $request->validate([
-            'format'     => 'required|in:pdf,xlsx',
+            'format' => 'required|in:pdf,xlsx',
             'start_date' => 'required|date',
-            'end_date'   => 'required|date|after_or_equal:start_date',
+            'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
         $canteenId = $this->getCanteenId();
-        $canteen   = Canteen::findOrFail($canteenId);
+        $canteen = Canteen::findOrFail($canteenId);
         $startDate = Carbon::parse($request->start_date)->startOfDay();
-        $endDate   = Carbon::parse($request->end_date)->endOfDay();
+        $endDate = Carbon::parse($request->end_date)->endOfDay();
 
         $orders = Order::where('canteen_id', $canteenId)
             ->whereBetween('created_at', [$startDate, $endDate])
@@ -148,37 +152,36 @@ class TransactionController extends Controller
         return $this->exportPdf($orders, $canteen, $startDate, $endDate);
     }
 
-    // =========================================================================
-    //  EXCEL EXPORT
-    // =========================================================================
+
+    //  EXCEL EXPORT 
 
     protected function exportExcel($orders, $canteen, $startDate, $endDate): StreamedResponse
     {
         $spreadsheet = new Spreadsheet();
-        $sheet       = $spreadsheet->getActiveSheet();
+        $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Laporan Penjualan');
 
         $this->writeReportHeader($sheet, $canteen, $startDate, $endDate);
 
         $tableHeaderRow = 7;
-        $columns        = ['A', 'B', 'C', 'D', 'E', 'F'];
-        $headers        = ['No.', 'ID Pesanan', 'Tanggal & Waktu', 'Nama Pelanggan', 'Metode Pembayaran', 'Total Harga (Rp)'];
+        $columns = ['A', 'B', 'C', 'D', 'E', 'F'];
+        $headers = ['No.', 'ID Pesanan', 'Tanggal & Waktu', 'Nama Pelanggan', 'Metode Pembayaran', 'Total Harga (Rp)'];
 
         foreach ($columns as $i => $col) {
             $sheet->getCell("{$col}{$tableHeaderRow}")->setValue($headers[$i]);
         }
 
         $sheet->getStyle("A{$tableHeaderRow}:F{$tableHeaderRow}")->applyFromArray([
-            'font'      => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF'], 'size' => 10, 'name' => 'Arial'],
-            'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF1E3A5F']],
+            'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF'], 'size' => 10, 'name' => 'Arial'],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF1E3A5F']],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
-            'borders'   => $this->borderStyle('FF1E3A5F'),
+            'borders' => $this->borderStyle('FF1E3A5F'),
         ]);
         $sheet->getRowDimension($tableHeaderRow)->setRowHeight(22);
 
-        $currentRow  = $tableHeaderRow + 1;
+        $currentRow = $tableHeaderRow + 1;
         $totalAmount = 0;
-        $no          = 1;
+        $no = 1;
 
         foreach ($orders as $order) {
             $bgColor = ($no % 2 === 0) ? 'FFF0F4FA' : 'FFFFFFFF';
@@ -201,8 +204,8 @@ class TransactionController extends Controller
             $sheet->getStyle("E{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle("F{$currentRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
             $sheet->getStyle("A{$currentRow}:F{$currentRow}")->applyFromArray([
-                'font'    => ['name' => 'Arial', 'size' => 10],
-                'fill'    => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => $bgColor]],
+                'font' => ['name' => 'Arial', 'size' => 10],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => $bgColor]],
                 'borders' => $this->borderStyle('FFB8C8D8'),
             ]);
 
@@ -225,10 +228,10 @@ class TransactionController extends Controller
         $sheet->getStyle("F{$totalRow}")->getNumberFormat()->setFormatCode('"Rp "#,##0');
         $sheet->getStyle("F{$totalRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
         $sheet->getStyle("A{$totalRow}:F{$totalRow}")->applyFromArray([
-            'font'      => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF'], 'size' => 10, 'name' => 'Arial'],
-            'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF2D6A4F']],
+            'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF'], 'size' => 10, 'name' => 'Arial'],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF2D6A4F']],
             'alignment' => ['vertical' => Alignment::VERTICAL_CENTER],
-            'borders'   => $this->borderStyle('FF1A5C3A'),
+            'borders' => $this->borderStyle('FF1A5C3A'),
         ]);
         $sheet->getRowDimension($totalRow)->setRowHeight(22);
 
@@ -252,31 +255,23 @@ class TransactionController extends Controller
             $writer = new Xlsx($spreadsheet);
             $writer->save('php://output');
         }, 200, [
-            'Content-Type'        => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
-            'Cache-Control'       => 'max-age=0',
+            'Cache-Control' => 'max-age=0',
         ]);
     }
-
-    // =========================================================================
-    //  PDF EXPORT
-    // =========================================================================
 
     protected function exportPdf($orders, $canteen, $startDate, $endDate)
     {
         $pdf = Pdf::loadView('exports.transactions_pdf', [
-            'orders'    => $orders,
-            'canteen'   => $canteen,
+            'orders' => $orders,
+            'canteen' => $canteen,
             'startDate' => $startDate,
-            'endDate'   => $endDate,
+            'endDate' => $endDate,
         ])->setPaper('a4', 'landscape');
 
         return $pdf->download('Laporan_Kantin_' . Carbon::now()->format('Ymd_His') . '.pdf');
     }
-
-    // =========================================================================
-    //  HELPERS
-    // =========================================================================
 
     protected function writeReportHeader($sheet, $canteen, $startDate, $endDate): void
     {
