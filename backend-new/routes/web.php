@@ -146,6 +146,7 @@ Route::middleware(['check.session', 'admin.kantin'])->prefix('admin')->name('adm
     // PROFIL
     // -----------------------------------------------------------------------
     Route::get('/profil', [AdminProfilController::class, 'index'])->name('profil');
+    Route::get('/profil/edit', [AdminProfilController::class, 'edit'])->name('profil.edit');
     Route::put('/profil', [AdminProfilController::class, 'update'])->name('profil.update');
     Route::get('/pusat-bantuan', [AdminProfilController::class, 'bantuan'])->name('support');
 });
