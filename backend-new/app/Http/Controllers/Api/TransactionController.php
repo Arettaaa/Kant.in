@@ -117,72 +117,70 @@ class TransactionController extends Controller
     }
 
     // GET /dashboard (admin global - semua kantin)
-   public function globalDashboard(Request $request)
+  public function globalDashboard(Request $request)
     {
-        // ✅ FIX: Ganti constant dengan string 'completed' langsung
-        $statusCompleted = 'completed';
+        $periode = $request->query('periode', 'bulan');
 
-        // Bulan ini
-        $startOfMonth = now()->startOfMonth();
-        $endOfMonth   = now()->endOfMonth();
+        [$start, $end] = match($periode) {
+            'hari'       => [now()->startOfDay(), now()->endOfDay()],
+            'minggu'     => [now()->startOfWeek(), now()->endOfWeek()],
+            'bulan_lalu' => [now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth()],
+            'tahun'      => [now()->startOfYear(), now()->endOfYear()],
+            'tahun_lalu' => [now()->subYear()->startOfYear(), now()->subYear()->endOfYear()],
+            'semua'      => [null, null],
+            default      => [now()->startOfMonth(), now()->endOfMonth()],
+        };
 
-        // Bulan lalu
-        $startOfLastMonth = now()->subMonth()->startOfMonth();
-        $endOfLastMonth   = now()->subMonth()->endOfMonth();
+        $query = Order::where('status', 'completed');
+        if ($start && $end) $query->whereBetween('created_at', [$start, $end]);
 
-        // Pendapatan bulan ini
-        $totalPendapatan = Order::where('status', $statusCompleted)
-            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
-            ->sum('total_amount');
+        $orders = $query->get();
 
-        // Total pesanan bulan ini
-        $totalPesanan = Order::where('status', $statusCompleted)
-            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
-            ->count();
+                // Pembanding dinamis sesuai periode
+        [$startPrev, $endPrev] = match($periode) {
+            'hari'       => [now()->subDay()->startOfDay(), now()->subDay()->endOfDay()],
+            'minggu'     => [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()],
+            'bulan_lalu' => [now()->subMonths(2)->startOfMonth(), now()->subMonths(2)->endOfMonth()],
+            'tahun'      => [now()->subYear()->startOfYear(), now()->subYear()->endOfYear()],
+            'tahun_lalu' => [now()->subYears(2)->startOfYear(), now()->subYears(2)->endOfYear()],
+            'semua'      => [null, null],
+            default      => [now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth()],
+        };
 
-        // Pendapatan bulan lalu
-        $pendapatanBulanLalu = Order::where('status', $statusCompleted)
-            ->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])
-            ->sum('total_amount');
+        $pendapatanPembanding = ($startPrev && $endPrev)
+            ? Order::where('status', 'completed')
+                ->whereBetween('created_at', [$startPrev, $endPrev])
+                ->sum('total_amount')
+            : null;
 
-        // Hitung persentase
-        $persentase = 0;
+        $totalPendapatan = $orders->sum('total_amount');
+        $totalPesanan    = $orders->count();
+
+       $persentase = 0;
         $trend = 'flat';
 
-        if ($pendapatanBulanLalu > 0) {
-            $persentase = (($totalPendapatan - $pendapatanBulanLalu) / $pendapatanBulanLalu) * 100;
+        if ($pendapatanPembanding === null) {
+            // Periode 'semua' → tidak ada pembanding
+            $trend = 'none';
+        } elseif ($pendapatanPembanding > 0) {
+            $persentase = (($totalPendapatan - $pendapatanPembanding) / $pendapatanPembanding) * 100;
+            if ($persentase > 0) $trend = 'up';
+            elseif ($persentase < 0) $trend = 'down';
         } elseif ($totalPendapatan > 0) {
             $persentase = 100;
-        }
-
-        if ($persentase > 0) {
             $trend = 'up';
-        } elseif ($persentase < 0) {
-            $trend = 'down';
         }
+        elseif ($persentase < 0) $trend = 'down';
 
-        // Statistik kantin
         $kantinAktif   = Canteen::where('is_active', true)->where('status', 'active')->count();
         $kantinPending = Canteen::where('status', 'pending')->count();
 
-        // Top kantin
-        $topKantin = Order::where('status', $statusCompleted)
-            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
-            ->get()
-            ->groupBy('canteen_id')
-            ->map(function ($orders) {
-                return [
-                    'total' => $orders->count(),
-                    'canteen_id' => $orders->first()->canteen_id,
-                ];
-            })
-            ->sortByDesc('total')
-            ->take(5)
-            ->values();
+        $topKantin = $orders->groupBy('canteen_id')
+            ->map(fn($o) => ['total' => $o->count(), 'canteen_id' => $o->first()->canteen_id])
+            ->sortByDesc('total')->take(5)->values();
 
         $chartLabels = [];
         $chartData   = [];
-
         foreach ($topKantin as $item) {
             $canteen = Canteen::find($item['canteen_id']);
             $chartLabels[] = $canteen ? $canteen->name : 'Unknown';
@@ -199,7 +197,7 @@ class TransactionController extends Controller
                 'chartLabels'       => $chartLabels,
                 'chartData'         => $chartData,
                 'revenuePercentage' => round(abs($persentase), 1),
-                'revenueTrend'      => $trend
+                'revenueTrend'      => $trend,
             ]
         ]);
     }

@@ -114,33 +114,41 @@
                             Rp {{ number_format($totalPendapatan, 0, ',', '.') }}
                         </h3>
                         <div class="mt-4 flex items-center gap-2 text-start">
-                            @if($revenueTrend == 'up')
-                            {{-- Jika Naik (Hijau) --}}
-                            <span
-                                class="text-[10px] font-black px-2.5 py-1 bg-green-50 text-[#22C55E] rounded-lg text-start">
+                        @if($revenueTrend == 'up')
+                            <span class="text-[10px] font-black px-2.5 py-1 bg-green-50 text-[#22C55E] rounded-lg">
                                 +{{ $revenuePercentage }}%
                             </span>
-                            @elseif($revenueTrend == 'down')
-                            {{-- Jika Turun (Merah) --}}
-                            <span
-                                class="text-[10px] font-black px-2.5 py-1 bg-red-50 text-red-500 rounded-lg text-start">
+                        @elseif($revenueTrend == 'down')
+                            <span class="text-[10px] font-black px-2.5 py-1 bg-red-50 text-red-500 rounded-lg">
                                 -{{ $revenuePercentage }}%
                             </span>
-                            @else
-                            {{-- Jika Stabil / Belum Ada Data (Abu-abu) --}}
-                            <span
-                                class="text-[10px] font-black px-2.5 py-1 bg-gray-50 text-gray-500 rounded-lg text-start">
+                        @elseif($revenueTrend == 'none')
+                            <span class="text-[10px] font-black px-2.5 py-1 bg-gray-50 text-gray-400 rounded-lg">
+                                —
+                            </span>
+                        @else
+                            <span class="text-[10px] font-black px-2.5 py-1 bg-gray-50 text-gray-500 rounded-lg">
                                 {{ $revenuePercentage }}%
                             </span>
-                            @endif
+                        @endif
 
-                            <span class="text-[10px] font-bold text-gray-300 italic text-start">Vs bulan lalu</span>
+                        {{-- Label pembanding juga dinamis --}}
+                        <span class="text-[10px] font-bold text-gray-300 italic">
+                            @switch($periode)
+                                @case('hari') Vs kemarin @break
+                                @case('minggu') Vs minggu lalu @break
+                                @case('bulan_lalu') Vs 2 bulan lalu @break
+                                @case('tahun') Vs tahun lalu @break
+                                @case('tahun_lalu') Vs 2 tahun lalu @break
+                                @case('semua') @break
+                                @default Vs bulan lalu
+                            @endswitch
+                        </span>
                         </div>
                     </div>
                     <i class="fa-solid fa-wallet absolute -right-6 -bottom-6 text-8xl text-gray-50 opacity-50"></i>
                 </div>
 
-                {{-- ✅ KARTU TOTAL PESANAN --}}
                 <div
                     class="stat-card bg-white p-8 rounded-[40px] border border-gray-100 shadow-sm relative overflow-hidden text-start">
                     <div class="relative z-10 text-start">
@@ -190,10 +198,23 @@
                         <p class="text-xs text-gray-400 font-bold mt-1 uppercase tracking-widest text-start">Volume
                             penjualan berdasarkan total pesanan selesai</p>
                     </div>
-                    <div
-                        class="px-5 py-2.5 bg-orange-50 text-[#FF6900] rounded-full text-[10px] font-black tracking-widest uppercase border border-orange-100 text-start">
-                        Bulan Ini
+                   <div class="relative" id="dashDateContainer">
+                    <div onclick="toggleDashDate()"
+                        class="flex items-center gap-2 px-5 py-2.5 bg-orange-50 text-[#FF6900] rounded-full text-[10px] font-black tracking-widest uppercase border border-orange-100 cursor-pointer select-none">
+                        {{ $labelPeriode }}
+                        <i class="fa-solid fa-chevron-down text-[10px]" id="dashChevron"></i>
                     </div>
+                    <div id="dashDateDropdown"
+                        class="hidden absolute top-full right-0 mt-2 w-44 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 py-2">
+                        <a href="?periode=hari" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Hari Ini</a>
+                        <a href="?periode=minggu" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Minggu Ini</a>
+                        <a href="?periode=bulan" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Bulan Ini</a>
+                        <a href="?periode=bulan_lalu" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Bulan Lalu</a>
+                        <a href="?periode=tahun" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Tahun Ini</a>
+                        <a href="?periode=tahun_lalu" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Tahun Lalu</a>
+                        <a href="?periode=semua" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Semua Periode</a>
+                    </div>
+                </div>
                 </div>
                 <div class="h-[400px] w-full text-start">
                     <canvas id="performanceChart"></canvas>
@@ -280,6 +301,23 @@
             }
         });
     });
+
+            function toggleDashDate() {
+            const dd = document.getElementById('dashDateDropdown');
+            const ch = document.getElementById('dashChevron');
+            dd.classList.toggle('hidden');
+            ch.style.transform = dd.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+
+        window.addEventListener('click', function(e) {
+            const container = document.getElementById('dashDateContainer');
+            const dropdown  = document.getElementById('dashDateDropdown');
+            const chevron   = document.getElementById('dashChevron');
+            if (container && !container.contains(e.target)) {
+                if (dropdown) dropdown.classList.add('hidden');
+                if (chevron) chevron.style.transform = 'rotate(0deg)';
+            }
+        });
 
     //dropdown bell
     function toggleDropdown() {
