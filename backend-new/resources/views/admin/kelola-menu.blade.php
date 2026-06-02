@@ -55,7 +55,7 @@
         <div id="menuContainer" class="px-10 pb-10 mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 text-start relative">
 
             @forelse($menus as $menu)
-            <div id="menu-{{ $menu['_id'] }}" class="menu-card bg-white rounded-[32px] p-5 shadow-sm border border-gray-100 flex gap-4 transition-all duration-300 {{ !$menu['is_available'] ? 'opacity-60 grayscale' : '' }}">
+            <div id="menu-{{ $menu['_id'] }}" class="menu-card bg-white rounded-[32px] p-5 shadow-sm border border-gray-100 flex gap-4 transition-all duration-300 {{ !$menu['is_available'] ? 'opacity-60 grayscale order-last' : '' }}">
 
                 {{-- Gambar menu --}}
                 @if(!empty($menu['image']))
@@ -247,7 +247,7 @@
             btn.dataset.available = newAvailable;
 
             if (newAvailable === 0) {
-                card.classList.add('opacity-60', 'grayscale');
+                card.classList.add('opacity-60', 'grayscale', 'order-last'); 
                 btn.classList.replace('bg-[#22c55e]', 'bg-gray-200');
                 circle.style.left = '4px';
                 statusEl.textContent = 'HABIS';
@@ -255,7 +255,7 @@
                 titleEl.classList.replace('text-gray-800', 'text-gray-400');
                 priceEl.classList.replace('text-[#FF6900]', 'text-gray-400');
             } else {
-                card.classList.remove('opacity-60', 'grayscale');
+                card.classList.remove('opacity-60', 'grayscale', 'order-last');
                 btn.classList.replace('bg-gray-200', 'bg-[#22c55e]');
                 circle.style.left = '24px';
                 statusEl.textContent = 'TERSEDIA';
