@@ -160,10 +160,14 @@
         </div>
 
         {{-- ======================== BOTTOM BAR ======================== --}}
+        @php
+            $isAvailable = $menu['is_available'] ?? true;
+            $canOrderNow = $bisaPesan && $isAvailable;
+        @endphp
+
         <div class="sticky bottom-0 bg-white border-t border-gray-100 px-8 py-5 flex items-center gap-4">
 
-            <div
-                class="flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-2.5 {{ !$bisaPesan ? 'opacity-40 pointer-events-none' : '' }}">
+            <div class="flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-2.5 {{ !$canOrderNow ? 'opacity-40 pointer-events-none' : '' }}">
                 <button type="button" onclick="changeQty(-1)"
                     class="qty-btn w-8 h-8 rounded-full border-2 border-gray-200 bg-white flex items-center justify-center text-gray-400 flex-shrink-0">
                     <i class="fa-solid fa-minus text-xs"></i>
@@ -175,26 +179,31 @@
                 </button>
             </div>
 
-            @if($bisaPesan)
-            <button id="addCartBtn" onclick="addToCart()"
-                class="add-cart-btn flex-1 py-4 rounded-2xl text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-2"
-                style="background: linear-gradient(135deg, #FF6900, #ea580c);">
-                <i class="fa-solid fa-bag-shopping text-base"></i>
-                <span>Tambah ke Keranjang</span>
-                <span id="totalPrice">· Rp {{ number_format($menu['price'], 0, ',', '.') }}</span>
-            </button>
+            {{-- Kondisi Tombol Aksi --}}
+            @if(!$bisaPesan)
+                <div class="flex-1 py-4 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 bg-gray-100 text-gray-400 cursor-not-allowed">
+                    <i class="fa-solid fa-store-slash text-base"></i>
+                    <span>
+                        @if(!$isOpen)
+                        Kantin Sedang Tutup
+                        @else
+                        Di Luar Jam Operasional ({{ $open }} - {{ $close }})
+                        @endif
+                    </span>
+                </div>
+            @elseif(!$isAvailable)
+                <div class="flex-1 py-4 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 bg-red-50 text-red-400 cursor-not-allowed border border-red-100">
+                    <i class="fa-solid fa-ban text-base"></i>
+                    <span>Menu Sedang Habis</span>
+                </div>
             @else
-            <div
-                class="flex-1 py-4 rounded-2xl font-extrabold text-sm flex items-center justify-center gap-2 bg-gray-100 text-gray-400 cursor-not-allowed">
-                <i class="fa-solid fa-store-slash text-base"></i>
-                <span>
-                    @if(!$isOpen)
-                    Kantin Sedang Tutup
-                    @else
-                    Di Luar Jam Operasional ({{ $open }} - {{ $close }})
-                    @endif
-                </span>
-            </div>
+                <button id="addCartBtn" onclick="addToCart()"
+                    class="add-cart-btn flex-1 py-4 rounded-2xl text-white font-extrabold text-sm shadow-lg flex items-center justify-center gap-2"
+                    style="background: linear-gradient(135deg, #FF6900, #ea580c);">
+                    <i class="fa-solid fa-bag-shopping text-base"></i>
+                    <span>Tambah ke Keranjang</span>
+                    <span id="totalPrice">· Rp {{ number_format($menu['price'], 0, ',', '.') }}</span>
+                </button>
             @endif
 
         </div>
@@ -245,39 +254,49 @@
 }
 
     function addToCart() {
-    const btn = document.getElementById('addCartBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Menambahkan...</span>';
+        const btn = document.getElementById('addCartBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Menambahkan...</span>';
 
-    fetch('/keranjang/items', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-        },
-        body: JSON.stringify({ menu_id: menuId, quantity: qty }),
-    })
-    .then(r => {
-        if (r.ok) {
-            // Sukses — animasi hijau sebentar lalu balik ke normal
+        fetch('/keranjang/items', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json' // Tambahkan ini agar tidak dikasih HTML login page kalau belum login
+            },
+            body: JSON.stringify({ menu_id: menuId, quantity: qty }),
+        })
+        .then(async r => {
+            // Cek jika belum login
+            if (r.status === 401 || (r.redirected && r.url.includes('/login'))) {
+                window.location.href = '/login';
+                return Promise.reject('unauthorized');
+            }
+
+            const data = await r.json();
+            
+            if (!r.ok) {
+                return Promise.reject(data.message || 'Gagal menambahkan ke keranjang.');
+            }
+            return data;
+        })
+        .then(data => {
+            // Sukses
             btn.style.background = 'linear-gradient(135deg, #22c55e, #16a34a)';
             btn.innerHTML = '<i class="fa-solid fa-check"></i><span>Ditambahkan!</span>';
             showToast('Berhasil ditambahkan ke keranjang!', 'success');
 
-            // Balik ke tampilan normal setelah 1.5 detik
             setTimeout(() => resetBtn(), 1500);
-        } else {
-            return r.json().then(data => {
-                resetBtn();
-                showToast(data.message ?? 'Gagal menambahkan ke keranjang.', 'error');
-            });
-        }
-    })
-    .catch(() => {
-        resetBtn();
-        showToast('Terjadi kesalahan. Coba lagi.', 'error');
-    });
-}
+        })
+        .catch(error => {
+            if (error === 'unauthorized') return;
+
+            resetBtn();
+            const errorMsg = typeof error === 'string' ? error : 'Terjadi kesalahan. Coba lagi.';
+            showToast(errorMsg, 'error');
+        });
+    }
 
     function resetBtn() {
         const btn = document.getElementById('addCartBtn');

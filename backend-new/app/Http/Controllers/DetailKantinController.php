@@ -15,20 +15,31 @@ class DetailKantinController extends Controller
 
     public function index($id)
     {
-        // Ambil data kantin
         $kantinResponse = Http::timeout(15)->get($this->apiUrl('/canteens/' . $id));
         if (!$kantinResponse->successful()) abort(404);
 
         $kantin = $kantinResponse->json('data');
 
-        // Ambil menu kantin
         $menuResponse = Http::timeout(15)->get($this->apiUrl('/canteens/' . $id . '/menus'));
         $menus = [];
         if ($menuResponse->successful()) {
             $menus = $menuResponse->json('data') ?? [];
         }
 
-        // Kelompokkan menu berdasarkan kategori
+       
+        $totalRating = 0;
+        $ratingCount = 0;
+
+        foreach ($menus as $menu) {
+            if (($menu['total_reviews'] ?? 0) > 0) {
+                $totalRating += $menu['average_rating'] ?? 0;
+                $ratingCount++;
+            }
+        }
+
+        $kantin['computed_rating'] = ($ratingCount > 0) ? round($totalRating / $ratingCount, 1) : null;
+
+
         $menuByKategori = [];
         foreach ($menus as $menu) {
             $kat = ucfirst($menu['category'] ?? 'Lainnya');
