@@ -311,6 +311,10 @@
                     </div>
                 </div>
 
+                <div id="exportError" class="hidden text-xs text-red-500 font-bold bg-red-50 p-3 rounded-xl text-center border border-red-100 transition-all">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Mohon pilih tanggal Mulai dan Selesai!
+                </div>
+
                 <button onclick="downloadReport()"
                     class="w-full py-3.5 bg-[#FF6900] text-white rounded-2xl font-black text-sm shadow-lg shadow-orange-200 hover:brightness-110 flex items-center justify-center gap-2 transition-all">
                     <i class="fa-solid fa-download"></i> Unduh Sekarang
@@ -582,12 +586,18 @@
             function downloadReport() {
                 let sd = document.getElementById('exportStart').value;
                 let ed = document.getElementById('exportEnd').value;
+                let errorNotif = document.getElementById('exportError');
                 
                 if(!sd || !ed) { 
-                    alert('Mohon pilih tanggal Mulai dan Selesai terlebih dahulu!'); 
+                    errorNotif.classList.remove('hidden'); 
+                    setTimeout(() => {
+                        errorNotif.classList.add('hidden');
+                    }, 3000);
+                    
                     return; 
                 }
                 
+                errorNotif.classList.add('hidden'); // Sembunyikan error jika sukses
                 window.location.href = `/admin/riwayat/export?format=${state.exportFormat}&start_date=${sd}&end_date=${ed}`;
                 toggleModal('exportModal');
             }
