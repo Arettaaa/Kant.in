@@ -260,18 +260,13 @@
                     <div id="dateDropdown"
                         class="hidden absolute top-full left-0 mt-2 w-full bg-white border border-gray-100 rounded-2xl shadow-xl z-[60] py-2 overflow-hidden"
                         style="animation: modalIn 0.2s ease;">
-                        <a href="?periode=semua"
-                            class="block px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Semua
-                            Periode</a>
-                        <a href="?periode=hari"
-                            class="block px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Hari
-                            Ini</a>
-                        <a href="?periode=minggu"
-                            class="block px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Minggu
-                            Ini</a>
-                        <a href="?periode=bulan"
-                            class="block px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Bulan
-                            Ini</a>
+                        <a href="?periode=hari" class="block px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Hari Ini</a>
+                        <a href="?periode=minggu" class="block px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Minggu Ini</a>
+                        <a href="?periode=bulan" class="block px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Bulan Ini</a>
+                        <a href="?periode=bulan_lalu" class="block px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Bulan Lalu</a>
+                        <a href="?periode=tahun" class="block px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Tahun Ini</a>
+                        <a href="?periode=tahun_lalu" class="block px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Tahun Lalu</a>
+                        <a href="?periode=semua" class="block px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Semua Periode</a>
                     </div>
                 </div>
 
@@ -354,15 +349,17 @@
         </div>
         <div class="mb-7">
             <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3">Pilih Periode Laporan</p>
-            <div class="grid grid-cols-2 gap-3">
-                <button id="per-hari" onclick="setPeriode('hari')" class="periode-chip">Hari ini</button>
-                <button id="per-minggu" onclick="setPeriode('minggu')" class="periode-chip">Minggu Ini</button>
-                <button id="per-bulan" onclick="setPeriode('bulan')" class="periode-chip active">Bulan Ini</button>
-                <button id="per-semua" onclick="setPeriode('semua')" class="periode-chip">Semua</button>
-            </div>
+           <div class="grid grid-cols-3 gap-3">
+            <button id="per-hari" onclick="setPeriode('hari')" class="periode-chip">Hari Ini</button>
+            <button id="per-minggu" onclick="setPeriode('minggu')" class="periode-chip">Minggu Ini</button>
+            <button id="per-bulan" onclick="setPeriode('bulan')" class="periode-chip active">Bulan Ini</button>
+            <button id="per-bulan_lalu" onclick="setPeriode('bulan_lalu')" class="periode-chip">Bulan Lalu</button>
+            <button id="per-tahun" onclick="setPeriode('tahun')" class="periode-chip">Tahun Ini</button>
+            <button id="per-tahun_lalu" onclick="setPeriode('tahun_lalu')" class="periode-chip">Tahun Lalu</button>
+            <button id="per-semua" onclick="setPeriode('semua')" class="periode-chip" style="grid-column: span 3;">Semua Periode</button>
+        </div>
         </div>
 
-        {{-- ✅ TOMBOL EKSPOR YANG MEMANGGIL JAVASCRIPT --}}
         <button onclick="jalankanEkspor()"
             class="unduh-btn w-full py-4 rounded-2xl text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-md"
             style="background:linear-gradient(135deg,#FF6900,#ea580c);">
@@ -491,14 +488,13 @@
             else { btn.style.cssText = 'border-color:#FF6900; color:#FF6900; background-color:#FFF3E8;'; btn.classList.remove('text-gray-500'); }
         });
     }
-    function setPeriode(p) {
-        activePeriode = p;
-        ['hari', 'minggu', 'bulan', 'semua'].forEach(k => {
-            document.getElementById(`per-${k}`).classList.toggle('active', k === p);
-        });
-    }
+ function setPeriode(p) {
+    activePeriode = p;
+    ['hari', 'minggu', 'bulan', 'bulan_lalu', 'tahun', 'tahun_lalu', 'semua'].forEach(k => {
+        document.getElementById(`per-${k}`).classList.toggle('active', k === p);
+    });
+}
 
-    // ✅ FUNGSI JAVASCRIPT UNTUK MENEMBAK CONTROLLER EKSPOR
     function jalankanEkspor() {
         // Ambil URL dari route Laravel
         const url = "{{ route('admin.global.transaksi.export') }}";

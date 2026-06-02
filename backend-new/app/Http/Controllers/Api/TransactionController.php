@@ -28,7 +28,6 @@ class TransactionController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Hanya hitung revenue dari transaksi yang selesai (bukan cancelled)
         $totalRevenue = $orders->where('status', 'completed')->sum('total_amount');
         $totalOrders  = $orders->where('status', 'completed')->count();
 
@@ -76,12 +75,21 @@ class TransactionController extends Controller
         $query = Order::where('status', 'completed');
 
         // Filter Waktu
-        if ($periode == 'hari') {
-            $query->whereDate('created_at', today());
+       if ($periode == 'hari') {
+        $query->whereDate('created_at', today());
         } elseif ($periode == 'minggu') {
             $query->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()]);
-        } else {
+        } elseif ($periode == 'bulan' || $periode == '') {
             $query->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()]);
+        } elseif ($periode == 'bulan_lalu') {
+            $query->whereBetween('created_at', [
+                now()->subMonth()->startOfMonth(),
+                now()->subMonth()->endOfMonth()
+            ]);
+        } elseif ($periode == 'tahun') {
+            $query->whereYear('created_at', now()->year);
+        } elseif ($periode == 'tahun_lalu') {
+            $query->whereYear('created_at', now()->year - 1);
         }
 
         $orders = $query->get();

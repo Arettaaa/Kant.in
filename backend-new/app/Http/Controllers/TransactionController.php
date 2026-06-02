@@ -35,11 +35,13 @@ class TransactionController extends Controller
 
         if ($response->successful()) {
             $data = $response->json('data');
-
             $labelPeriode = 'Bulan Ini';
-            if ($periode == 'hari')   $labelPeriode = 'Hari Ini';
-            if ($periode == 'minggu') $labelPeriode = 'Minggu Ini';
-            if ($periode == 'semua')  $labelPeriode = 'Semua Periode';
+            if ($periode == 'hari')       $labelPeriode = 'Hari Ini';
+            if ($periode == 'minggu')     $labelPeriode = 'Minggu Ini';
+            if ($periode == 'bulan_lalu') $labelPeriode = 'Bulan Lalu';
+            if ($periode == 'tahun')      $labelPeriode = 'Tahun Ini';
+            if ($periode == 'tahun_lalu') $labelPeriode = 'Tahun Lalu';
+            if ($periode == 'semua')      $labelPeriode = 'Semua Periode';
 
             return view('admin_global.transaksi', [
                 'grandTotalRevenue' => $data['grand_total_revenue'] ?? 0,
@@ -72,7 +74,10 @@ class TransactionController extends Controller
         $labelPeriode = 'Bulan Ini';
         if ($periode == 'hari')   { $namaPeriode = 'Hari_Ini';       $labelPeriode = 'Hari Ini'; }
         if ($periode == 'minggu') { $namaPeriode = 'Minggu_Ini';     $labelPeriode = 'Minggu Ini'; }
+        if ($periode == 'bulan_lalu') { $namaPeriode = 'Bulan_Lalu'; $labelPeriode = 'Bulan Lalu'; }
         if ($periode == 'semua')  { $namaPeriode = 'Semua_Periode';  $labelPeriode = 'Semua Periode'; }
+        if ($periode == 'tahun')      { $namaPeriode = 'Tahun_Ini';   $labelPeriode = 'Tahun Ini'; }
+        if ($periode == 'tahun_lalu') { $namaPeriode = 'Tahun_Lalu';  $labelPeriode = 'Tahun Lalu'; }
 
         $filename = "Laporan_Transaksi_Global_{$namaPeriode}_{$timestamp}";
 
