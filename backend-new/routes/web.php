@@ -159,7 +159,18 @@ Route::middleware(['check.session', 'admin.kantin'])->prefix('admin')->name('adm
 Route::get('/beranda', [BerandaController::class, 'index'])->name('pelanggan.beranda');
 Route::get('/menu/{id}', [DetailMenuController::class, 'index'])->name('pelanggan.detail-menu');
 Route::get('/kantin/{id}', [DetailKantinController::class, 'index'])->name('pelanggan.detail-kantin');
+Route::get('/jelajah', [JelajahController::class, 'index'])->name('pelanggan.jelajah');
 
+
+Route::middleware('check.session')->group(function () {
+    Route::get('/profil', [ProfilController::class, 'index'])->name('pelanggan.profil');
+    Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('pelanggan.edit-profil');
+    Route::get('/profil/data-diri', [ProfilController::class, 'dataDiri'])->name('pelanggan.data-diri');
+    Route::post('/profil/update', [ProfilController::class, 'update'])->name('pelanggan.profil.update');
+    Route::get('/profil/keamanan', [KeamananController::class, 'index'])->name('pelanggan.keamanan');
+    Route::post('/profil/keamanan', [KeamananController::class, 'updatePassword'])->name('pelanggan.password.update');
+
+    
 // Keranjang
 Route::get('/keranjang', [CartController::class, 'index'])->name('pelanggan.keranjang');
 Route::post('/keranjang/items', [CartController::class, 'addItem'])->name('pelanggan.keranjang.add');
@@ -175,21 +186,12 @@ Route::post('/pembayaran/session', [CheckoutController::class, 'saveSession']);
 Route::get('/pembayaran', [CheckoutController::class, 'index']);
 Route::post('/pembayaran', [CheckoutController::class, 'store']);
 Route::post('/pembayaran/batalkan', [CheckoutController::class, 'cancel']);
-Route::get('/jelajah', [JelajahController::class, 'index'])->name('pelanggan.jelajah');
 Route::get('/pesanan', [PesananController::class, 'index'])->name('pelanggan.pesanan');
 Route::post('/pesanan/{orderId}/complete', [PesananController::class, 'complete']);
 Route::get('/profil', [ProfilController::class, 'index'])->name('pelanggan.profil');
 Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('pelanggan.edit-profil');
 Route::get('/profil/data-diri', [ProfilController::class, 'dataDiri'])->name('pelanggan.data-diri');
 
-
-Route::middleware('check.session')->group(function () {
-    Route::get('/profil', [ProfilController::class, 'index'])->name('pelanggan.profil');
-    Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('pelanggan.edit-profil');
-    Route::get('/profil/data-diri', [ProfilController::class, 'dataDiri'])->name('pelanggan.data-diri');
-    Route::post('/profil/update', [ProfilController::class, 'update'])->name('pelanggan.profil.update');
-    Route::get('/profil/keamanan', [KeamananController::class, 'index'])->name('pelanggan.keamanan');
-    Route::post('/profil/keamanan', [KeamananController::class, 'updatePassword'])->name('pelanggan.password.update');
 });
 
 /*

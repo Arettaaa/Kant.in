@@ -105,12 +105,21 @@
 
         {{-- Info --}}
         <div class="flex-1 px-6 py-5 flex flex-col gap-4">
-            <div class="flex items-start justify-between gap-2">
+           <div class="flex items-start justify-between gap-2">
                 <h1 class="text-2xl font-extrabold text-gray-900 leading-tight">{{ $kantin['name'] }}</h1>
+                
+                @if($kantin['computed_rating'] !== null)
                 <div class="flex items-center gap-1.5 bg-amber-50 px-2.5 py-1.5 rounded-xl flex-shrink-0">
                     <i class="fa-solid fa-star text-amber-400 text-sm"></i>
-                    <span class="text-sm font-extrabold text-gray-800">5.0</span>
+                    <span class="text-sm font-extrabold text-gray-800">{{ $kantin['computed_rating'] }}</span>
                 </div>
+                @else
+                <div class="flex items-center gap-1.5 bg-gray-100 px-2.5 py-1.5 rounded-xl flex-shrink-0">
+                    <i class="fa-solid fa-star text-gray-400 text-sm"></i>
+                    <span class="text-xs font-extrabold text-gray-500">Baru</span>
+                </div>
+                @endif
+                
             </div>
 
             @if(!empty($kantin['description']))
@@ -251,8 +260,36 @@
     let cartCount = 0;
     let cartTotal = 0;
 
+    // 1. Tambahkan fungsi showToast persis seperti di menu.blade.php
+    function showToast(message, type = 'success') {
+        const existing = document.getElementById('toastNotif');
+        if (existing) existing.remove();
+
+        const colors = type === 'success'
+            ? 'background: linear-gradient(135deg, #22c55e, #16a34a);'
+            : 'background: linear-gradient(135deg, #ef4444, #dc2626);';
+
+        const icon = type === 'success' ? 'fa-check' : 'fa-xmark';
+
+        const toast = document.createElement('div');
+        toast.id = 'toastNotif';
+        toast.style.cssText = `
+            position: fixed; top: 24px; right: 24px; z-index: 9999;
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 20px; border-radius: 16px; color: white;
+            font-size: 14px; font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease; ${colors}
+        `;
+        toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
     function addToCart(btn, menuId, price) {
-        // Animasi tombol
         btn.style.backgroundColor = '#FF6900';
         btn.style.color = 'white';
         btn.style.borderColor = '#FF6900';
@@ -265,30 +302,51 @@
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json' // TAMBAHAN PENTING: Supaya Laravel ngasih JSON kalau error/belum login
             },
             body: JSON.stringify({ menu_id: menuId, quantity: 1 }),
         })
-        .then(r => r.json())
+        .then(async r => {
+            // Cek jika status 401 atau kena redirect ke halaman login
+            if (r.status === 401 || (r.redirected && r.url.includes('/login'))) {
+                window.location.href = '/login';
+                return Promise.reject('unauthorized');
+            }
+
+            // Antisipasi jika middleware tetap memaksa return HTML
+            const contentType = r.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                window.location.href = '/login';
+                return Promise.reject('unauthorized');
+            }
+
+            const data = await r.json();
+            
+            if (!r.ok) {
+                return Promise.reject(data.message || 'Gagal menambahkan ke keranjang.');
+            }
+
+            return data;
+        })
         .then(data => {
             btn.disabled = false;
-            if (data.success !== false) {
-                cartCount++;
-                cartTotal += price;
-                updateCartFloat();
-            } else {
-                // Reset tombol ke abu
-                btn.style.backgroundColor = '';
-                btn.style.color = '#d1d5db';
-                btn.style.borderColor = '#e5e7eb';
-                alert(data.message ?? 'Gagal menambahkan ke keranjang.');
-            }
+            cartCount++;
+            cartTotal += price;
+            updateCartFloat();
+            showToast('Berhasil ditambahkan ke keranjang!', 'success'); // Kasih toast sukses
         })
-        .catch(() => {
+        .catch(error => {
+            if (error === 'unauthorized') return; // Stop jika sudah redirect
+
+            // Reset tombol
             btn.disabled = false;
             btn.style.backgroundColor = '';
             btn.style.color = '#d1d5db';
             btn.style.borderColor = '#e5e7eb';
-            alert('Terjadi kesalahan. Coba lagi.');
+            
+            // Ganti alert bawaan browser jadi Toast!
+            const errorMsg = typeof error === 'string' ? error : 'Terjadi kesalahan. Coba lagi.';
+            showToast(errorMsg, 'error');
         });
     }
 
@@ -309,4 +367,16 @@
         });
     }
 </script>
+
+<style>
+    /* Jangan lupa tambahkan animasi untuk Toast-nya */
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(40px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes slideOut {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(40px); }
+    }
+</style>
 @endpush

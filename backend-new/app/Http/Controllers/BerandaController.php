@@ -24,8 +24,6 @@ class BerandaController extends Controller
 
         $token = $request->session()->get('api_token', '');
 
-        // Jalankan semua request sequential, BUKAN pool
-        // (pool deadlock di php artisan serve karena single-threaded)
         try {
             $menusResponse   = Http::timeout(10)->get($this->apiUrl('/menus'));
             $canteensResponse = Http::timeout(10)->get($this->apiUrl('/canteens'));
@@ -56,8 +54,6 @@ class BerandaController extends Controller
             }
         }
 
-        // ---- MENU POPULER ----
-        // Sort: rating × log(1 + total_reviews), ambil 4 teratas
         usort($allMenus, function ($a, $b) {
             $scoreA = ($a['total_reviews'] ?? 0) > 0
                 ? ($a['average_rating'] ?? 0) * log1p($a['total_reviews'])
@@ -69,7 +65,6 @@ class BerandaController extends Controller
         });
         $menuPopuler = array_slice($allMenus, 0, 3);
 
-        // ---- KANTIN REKOMENDASI ----
         $ratingSum   = [];
         $ratingCount = [];
         foreach ($allMenus as $menu) {
@@ -88,23 +83,21 @@ class BerandaController extends Controller
             return $k;
         }, $allCanteens);
 
-        // Filter null DULU sebelum sort — ini yang bikin error sebelumnya
         $allCanteens = array_values(array_filter($allCanteens, fn($k) => $k['computed_rating'] !== null));
         usort($allCanteens, fn($a, $b) => $b['computed_rating'] <=> $a['computed_rating']);
         $kantinRekomendasi = array_slice($allCanteens, 0, 5);
 
 
-        // Data nama menu per kantin (untuk search hints)
         $allMenuNames    = array_column($allMenus,    'name');
         $allCanteenNames = array_column($allCanteens, 'name');
 
-        return view('pelanggan.beranda', compact(
+       return view('pelanggan.beranda', compact(
             'namaDepan',
-            'cartCount',
             'menuPopuler',
             'kantinRekomendasi',
             'allMenuNames',
-            'allCanteenNames'
+            'allCanteenNames',
+            'cartCount'
         ));
     }
 }

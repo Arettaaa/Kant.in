@@ -21,7 +21,10 @@ public class ReportDownloadHelper {
         // 2. Siapkan Request
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
         request.addRequestHeader("Authorization", "Bearer " + token);
-        request.addRequestHeader("Accept", "application/json");
+        String acceptHeader = format.equals("pdf")
+                ? "application/pdf"
+                : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        request.addRequestHeader("Accept", acceptHeader);
 
         // 3. Nama File
         String ext = format.equals("pdf") ? ".pdf" : ".xlsx";
