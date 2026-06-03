@@ -87,7 +87,7 @@ public class RegisterActivity extends AppCompatActivity {
         });
 
         btnRegister.setOnClickListener(this::onClick);
-        
+
         tabPemilik.setOnClickListener(v -> {
             startActivity(new Intent(RegisterActivity.this, RegisterAdminActivity.class));
             finish();

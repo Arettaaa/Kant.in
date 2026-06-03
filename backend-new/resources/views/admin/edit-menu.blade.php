@@ -81,6 +81,15 @@
                         </select>
                         @error('category') <span class="text-red-500 text-xs font-bold mt-1">{{ $message }}</span> @enderror
                     </div>
+                    {{-- INPUT BARU: Estimasi Waktu Masak --}}
+                    <div class="text-start">
+                        <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3 text-start">Estimasi Waktu Masak</p>
+                        <div class="relative text-start">
+                            <input type="number" name="estimated_cooking_time" id="estimasiMasak" value="{{ old('estimated_cooking_time', $menu['estimated_cooking_time'] ?? '') }}" placeholder="15" min="1" class="w-full pl-6 pr-20 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm focus:outline-none focus:border-[#FF6900] font-bold text-gray-800 transition-all text-start">
+                            <span class="absolute right-6 top-1/2 -translate-y-1/2 font-bold text-gray-400 text-start">Menit</span>
+                        </div>
+                        @error('estimated_cooking_time') <span class="text-red-500 text-xs font-bold mt-1">{{ $message }}</span> @enderror
+                    </div>
                 </div>
 
                 {{-- Kolom Kanan --}}
