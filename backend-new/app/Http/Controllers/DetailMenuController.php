@@ -13,7 +13,7 @@ class DetailMenuController extends Controller
         return rtrim($base, '/') . '/api' . $path;
     }
 
-    public function index($id)
+    public function index(Request $request, $id)
     {
         $menuResponse = Http::timeout(15)->get($this->apiUrl('/menus/' . $id));
 
@@ -41,7 +41,7 @@ class DetailMenuController extends Controller
         $close     = $canteen['operating_hours']['close'] ?? '23:59';
 
         if ($isOpen) {
-            $now       = now(); // sudah Jakarta karena timezone di config sudah diubah
+            $now       = now();
             $nowMins   = ($now->hour * 60) + $now->minute;
 
             [$openH, $openM]   = explode(':', $open);
@@ -53,6 +53,36 @@ class DetailMenuController extends Controller
             $bisaPesan = $nowMins >= $openMins && $nowMins < $closeMins;
         }
 
-        return view('pelanggan.detail-menu', compact('menu', 'canteen', 'canteenName', 'bisaPesan', 'open', 'close', 'isOpen'));
+        // ======= REVISI HITUNGAN JENIS MENU UNIK =======
+        $cartCount = 0;
+        $itemInCart = false; // Flag untuk tahu menu ini udah ada di keranjang/belum
+        $token = $request->session()->get('api_token', '');
+        
+        if ($token) {
+            try {
+                $cartResponse = Http::withToken($token)->timeout(10)->get($this->apiUrl('/buyers/carts'));
+                if ($cartResponse->successful()) {
+                    $cart = $cartResponse->json('data');
+                    if ($cart && !empty($cart['canteens'])) {
+                        foreach ($cart['canteens'] as $c) {
+                            foreach ($c['items'] as $item) {
+                                $cartCount++; // REVISI: dihitung +1 per jenis produk, bukan ditambah quantity
+                                
+                                // Cek apakah menu ini sudah ada di dalam keranjang pembeli
+                                if (($item['menu_id'] ?? '') == $id) {
+                                    $itemInCart = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                $cartCount = 0;
+            }
+        }
+
+        return view('pelanggan.detail-menu', compact(
+            'menu', 'canteen', 'canteenName', 'bisaPesan', 'open', 'close', 'isOpen', 'cartCount', 'itemInCart'
+        ));
     }
 }
