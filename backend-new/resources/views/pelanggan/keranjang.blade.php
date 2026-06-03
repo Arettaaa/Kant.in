@@ -5,226 +5,78 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-    .cart-item {
-        transition: all 0.2s ease;
-    }
+    .cart-item { transition: all 0.2s ease; }
+    .qty-btn { transition: all 0.15s ease; }
+    .qty-btn:hover { background-color: #FF6900; color: white; border-color: #FF6900; }
 
-    .qty-btn {
-        transition: all 0.15s ease;
-    }
-
-    .qty-btn:hover {
-        background-color: #FF6900;
-        color: white;
-        border-color: #FF6900;
-    }
-
-    .metode-card {
-        transition: all 0.2s ease;
-        cursor: pointer;
-    }
-
-    .metode-card.active {
-        border-color: #FF6900;
-        background-color: #FFFAF7;
-    }
-
-    .metode-card:not(.active):hover {
-        border-color: #fdba74;
-    }
+    .metode-card { transition: all 0.2s ease; cursor: pointer; }
+    .metode-card.active { border-color: #FF6900; background-color: #FFFAF7; }
+    .metode-card:not(.active):hover { border-color: #fdba74; }
 
     .radio-dot {
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        border: 2px solid #d1d5db;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        transition: all 0.15s ease;
+        width: 18px; height: 18px; border-radius: 50%; border: 2px solid #d1d5db;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s ease;
     }
+    .metode-card.active .radio-dot { border-color: #FF6900; background-color: #FF6900; }
+    .radio-inner { width: 6px; height: 6px; border-radius: 50%; background: white; display: none; }
+    .metode-card.active .radio-inner { display: block; }
 
-    .metode-card.active .radio-dot {
-        border-color: #FF6900;
-        background-color: #FF6900;
-    }
-
-    .radio-inner {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: white;
-        display: none;
-    }
-
-    .metode-card.active .radio-inner {
-        display: block;
-    }
-
-    .checkout-btn {
-        transition: all 0.2s ease;
-    }
-
-    .checkout-btn:hover {
-        filter: brightness(1.08);
-        transform: translateY(-1px);
-        box-shadow: 0 8px 24px rgba(255, 105, 0, 0.35);
-    }
-
-    .checkout-btn:active {
-        transform: translateY(0);
-    }
+    .checkout-btn { transition: all 0.2s ease; }
+    .checkout-btn:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(255, 105, 0, 0.35); }
+    .checkout-btn:active { transform: translateY(0); }
 
     /* Alamat section */
     .alamat-section {
-        overflow: hidden;
-        max-height: 0;
-        opacity: 0;
+        overflow: hidden; max-height: 0; opacity: 0;
         transition: max-height 0.35s ease, opacity 0.3s ease, margin 0.3s ease;
     }
-
-    .alamat-section.show {
-        max-height: 400px;
-        opacity: 1;
-    }
-
+    .alamat-section.show { max-height: 400px; opacity: 1; }
     .alamat-input {
-        width: 100%;
-        padding: 12px 14px;
-        background-color: #F9FAFB;
-        border: 1.5px solid #e5e7eb;
-        border-radius: 14px;
-        font-size: 13px;
-        color: #374151;
-        outline: none;
-        transition: all 0.2s;
-        resize: none;
+        width: 100%; padding: 12px 14px; background-color: #F9FAFB; border: 1.5px solid #e5e7eb;
+        border-radius: 14px; font-size: 13px; color: #374151; outline: none; transition: all 0.2s; resize: none;
     }
-
-    .alamat-input:focus {
-        border-color: #FF6900;
-        box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.1);
-        background-color: #fff;
-    }
+    .alamat-input:focus { border-color: #FF6900; box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.1); background-color: #fff; }
 
     /* ===== CUSTOM CHECKBOX ===== */
     .custom-cb {
-        appearance: none;
-        -webkit-appearance: none;
-        width: 18px;
-        height: 18px;
-        border-radius: 5px;
-        border: 2px solid #d1d5db;
-        background-color: white;
-        cursor: pointer;
-        flex-shrink: 0;
-        transition: all 0.15s ease;
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border-radius: 5px;
+        border: 2px solid #d1d5db; background-color: white; cursor: pointer; flex-shrink: 0;
+        transition: all 0.15s ease; position: relative; display: flex; align-items: center; justify-content: center;
     }
-
-    /* Hover effect saat belum dicentang */
-    .custom-cb:hover:not(:checked) {
-        border-color: #FF6900;
-    }
-
-    /* State: DICENTANG (Oren + Centang) */
-    .custom-cb:checked {
-        background-color: #FF6900;
-        border-color: #FF6900;
-    }
-
+    .custom-cb:hover:not(:checked) { border-color: #FF6900; }
+    .custom-cb:checked { background-color: #FF6900; border-color: #FF6900; }
     .custom-cb:checked::after {
-        content: '';
-        position: absolute;
-        left: 4px;
-        top: 1px;
-        width: 6px;
-        height: 10px;
-        border: 2px solid white;
-        border-top: none;
-        border-left: none;
-        transform: rotate(45deg);
+        content: ''; position: absolute; left: 4px; top: 1px; width: 6px; height: 10px;
+        border: 2px solid white; border-top: none; border-left: none; transform: rotate(45deg);
     }
+    .custom-cb:indeterminate { background-color: white; border-color: #9ca3af; }
+    .custom-cb:indeterminate::after { display: none !important; }
 
-    /* State: INDETERMINATE (Sebagian dipilih) */
-    .custom-cb:indeterminate {
-        background-color: white;
-        border-color: #9ca3af;
-    }
+    .cart-item.unselected { opacity: 0.55; }
+    .cart-item.unselected:hover { opacity: 0.8; }
 
-    .custom-cb:indeterminate::after {
-        display: none !important;
-    }
-
-    /* Item yang tidak dicentang: sedikit redup */
-    .cart-item.unselected {
-        opacity: 0.55;
-    }
-
-    .cart-item.unselected:hover {
-        opacity: 0.8;
-    }
-
-    /* Bar Pilih Semua */
     .select-all-bar {
-        background: white;
-        border-bottom: 1px solid #f3f4f6;
-        padding: 10px 24px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        position: sticky;
-        top: 73px;
-        z-index: 9;
+        background: white; border-bottom: 1px solid #f3f4f6; padding: 10px 24px;
+        display: flex; align-items: center; gap: 10px; position: sticky; top: 73px; z-index: 9;
     }
 
-    .notes-input {
-        transition: all 0.2s ease;
-    }
+    .notes-input { transition: all 0.2s ease; }
+    .notes-input:focus { border-color: #FF6900; box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.08); background-color: #fff; }
+    .notes-wrapper { transition: all 0.25s ease; }
 
-    .notes-input:focus {
-        border-color: #FF6900;
-        box-shadow: 0 0 0 3px rgba(255, 105, 0, 0.08);
-        background-color: #fff;
-    }
-
-    .notes-wrapper {
-        transition: all 0.25s ease;
-    }
-
-    .select-all-label {
-        font-size: 13px;
-        font-weight: 600;
-        color: #6b7280;
-        cursor: pointer;
-        user-select: none;
-    }
-
+    .select-all-label { font-size: 13px; font-weight: 600; color: #6b7280; cursor: pointer; user-select: none; }
     .selected-count-badge {
-        margin-left: auto;
-        font-size: 12px;
-        font-weight: 700;
-        color: #FF6900;
-        background-color: #FFF3E8;
-        padding: 2px 10px;
-        border-radius: 20px;
-        transition: all 0.2s;
+        margin-left: auto; font-size: 12px; font-weight: 700; color: #FF6900;
+        background-color: #FFF3E8; padding: 2px 10px; border-radius: 20px; transition: all 0.2s;
     }
+
+    /* Scrollbar hide for right panel */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
     @keyframes modalIn {
-        from {
-            opacity: 0;
-            transform: scale(0.92) translateY(8px);
-        }
-
-        to {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-        }
+        from { opacity: 0; transform: scale(0.92) translateY(8px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
     }
 </style>
 @endpush
@@ -233,7 +85,7 @@
 
 <div class="flex w-full h-screen bg-[#F9FAFB] overflow-hidden">
 
-    {{-- LEFT: KERANJANG --}}
+    {{-- ==================== LEFT: KERANJANG ==================== --}}
     <div class="flex-1 flex flex-col h-screen overflow-y-auto border-r border-gray-100 bg-white">
 
         {{-- Header --}}
@@ -320,7 +172,7 @@
                         </div>
                     </div>
 
-                    {{-- Notes input — muncul saat item dicentang --}}
+                    {{-- Notes input --}}
                     <div class="notes-wrapper hidden" id="notes-wrapper-{{ $item['menu_id'] }}">
                         <div class="flex items-center gap-2 pl-1">
                             <i class="fa-regular fa-note-sticky text-[11px] text-gray-300 flex-shrink-0"></i>
@@ -351,148 +203,141 @@
             </a>
         </div>
 
-        {{-- Metode Pemesanan --}}
-        <div id="metodeSection" class="px-6 pb-4">
-            <h2 class="text-base font-extrabold text-gray-900 mb-4">Metode Pemesanan</h2>
-            <div class="grid grid-cols-2 gap-3">
-
-                {{-- Ambil Sendiri --}}
-                <div id="metode-ambil" onclick="setMetode('ambil')"
-                    class="metode-card active rounded-2xl border-2 p-4 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style="background-color:#FFF3E8;">
-                        <i class="fa-solid fa-bag-shopping text-base" style="color:#FF6900;"></i>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-extrabold text-gray-800">Ambil Sendiri</p>
-                        <p class="text-xs text-gray-400 mt-0.5">Siap dalam 10–15 menit</p>
-                    </div>
-                    <div class="radio-dot">
-                        <div class="radio-inner"></div>
-                    </div>
-                </div>
-
-                {{-- Kurir Antar --}}
-                <div id="metode-kurir" onclick="setMetode('kurir')"
-                    class="metode-card rounded-2xl border-2 border-gray-200 p-4 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100">
-                        <i class="fa-solid fa-person-biking text-base text-gray-400"></i>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-1.5">
-                            <p class="text-sm font-extrabold text-gray-800">Kurir Antar</p>
-                            <span id="ongkirBadge" class="text-[11px] font-black px-1.5 py-0.5 rounded-lg"
-                                style="background-color:#FFF3E8; color:#FF6900;">...</span>
-                        </div>
-                        <p class="text-xs text-gray-400 mt-0.5">Diantar ke kelasmu</p>
-                    </div>
-                    <div class="radio-dot">
-                        <div class="radio-inner"></div>
-                    </div>
-                </div>
-
-            </div>
-
-            {{-- Alamat Pengiriman --}}
-            <div id="alamatSection" class="alamat-section mt-4">
-                <div class="bg-gray-50 rounded-2xl border border-gray-100 p-4">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-location-dot text-sm" style="color:#FF6900;"></i>
-                            <p class="text-sm font-extrabold text-gray-800">Alamat Pengiriman</p>
-                        </div>
-                        <button onclick="toggleEditAlamat()"
-                            class="text-xs font-bold px-3 py-1.5 rounded-xl transition-all hover:bg-orange-100"
-                            style="color:#FF6900;" id="editAlamatBtn">
-                            <i class="fa-solid fa-pen text-[10px] mr-1"></i>Ubah
-                        </button>
-                    </div>
-                    <div id="alamatDisplay">
-                        <div class="flex items-center gap-2.5 px-3 py-2.5 bg-white rounded-xl border border-gray-100">
-                            <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
-                                style="background-color:#FFF3E8;">
-                                <i class="fa-solid fa-building text-xs" style="color:#FF6900;"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-bold text-gray-400" id="displayAlamat">SV IPB, CA B01 lt.2,
-                                    Kampus IPB Cilibende</p>
-                            </div>
-                            <i class="fa-solid fa-circle-check text-green-400 text-sm mt-0.5 flex-shrink-0"></i>
-                        </div>
-                    </div>
-                    <div id="alamatForm" class="hidden flex flex-col gap-3 mt-2">
-                        <div>
-                            <label class="text-xs font-bold text-gray-500 mb-1.5 block">Alamat Lengkap <span
-                                    class="text-red-400">*</span></label>
-                            <textarea id="inputAlamat" class="alamat-input" rows="1"
-                                placeholder="Cth: Gedung A Lt. 2, Fak. Teknologi Pertanian, Kampus IPB Dramaga, Bogor">SV IPB, CA B01 lt.2, Kampus IPB Cilibende</textarea>
-                        </div>
-                        <div class="flex gap-2 mt-1">
-                            <button onclick="batalEditAlamat()"
-                                class="flex-1 py-2.5 rounded-xl border-2 border-gray-200 text-xs font-bold text-gray-500 hover:bg-gray-50 transition-all">
-                                Batal
-                            </button>
-                            <button onclick="simpanAlamat()"
-                                class="flex-1 py-2.5 rounded-xl text-white text-xs font-bold transition-all hover:brightness-110"
-                                style="background-color:#FF6900;">
-                                Simpan Alamat
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
         <div class="pb-6"></div>
-
     </div>
 
-    {{-- RIGHT: RINGKASAN --}}
-    <div class="w-[320px] flex-shrink-0 flex flex-col h-screen bg-[#F9FAFB]">
-        <div class="flex-1 px-7 py-8 flex flex-col">
-            <h2 class="text-lg font-extrabold text-gray-900 mb-6">Ringkasan Pesanan</h2>
 
-            {{-- Info kalau belum ada yang dipilih --}}
-            <div id="noSelectionInfo" class="flex flex-col items-center justify-center py-8 gap-2">
-                <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center mb-1">
-                    <i class="fa-regular fa-square-check text-xl" style="color:#FF6900;"></i>
+    {{-- ==================== RIGHT: RINGKASAN & METODE ==================== --}}
+    <div class="w-[360px] flex-shrink-0 flex flex-col h-screen bg-[#F9FAFB] border-l border-gray-100">
+        
+        <div class="flex-1 overflow-y-auto hide-scrollbar px-6 py-6 flex flex-col gap-5">
+            
+            {{-- KOTAK 1: RINGKASAN PESANAN --}}
+            <div class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex flex-col">
+                <h2 class="text-base font-extrabold text-gray-900 mb-4">Ringkasan Pesanan</h2>
+
+                {{-- Info kalau belum ada yang dipilih --}}
+                <div id="noSelectionInfo" class="flex flex-col items-center justify-center py-6 gap-2">
+                    <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center mb-1">
+                        <i class="fa-regular fa-square-check text-xl" style="color:#FF6900;"></i>
+                    </div>
+                    <p class="text-sm font-bold text-gray-500 text-center">Pilih item terlebih dahulu</p>
+                    <p class="text-xs text-gray-400 text-center">pilih item di keranjang untuk menghitung total</p>
                 </div>
-                <p class="text-sm font-bold text-gray-500 text-center">Pilih item terlebih dahulu</p>
-                <p class="text-xs text-gray-400 text-center">pilih item di keranjang untuk menghitung total</p>
-            </div>
 
-            {{-- Warning multi kantin --}}
-            <div id="multiKantinWarning" class="hidden mb-3 px-4 py-3 rounded-2xl text-xs font-bold text-orange-600"
-                style="background-color:#FFF7ED;">
-                <i class="fa-solid fa-triangle-exclamation mr-1"></i>
-                Item dari beberapa kantin dipilih. Checkout hanya bisa dari 1 kantin.
-            </div>
+                {{-- Warning multi kantin --}}
+                <div id="multiKantinWarning" class="hidden mb-3 px-4 py-3 rounded-2xl text-xs font-bold text-orange-600"
+                    style="background-color:#FFF7ED;">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+                    Item dari beberapa kantin dipilih. Checkout hanya bisa dari 1 kantin.
+                </div>
 
-            <div id="summaryDetail" class="hidden flex-col gap-3">
+                <div id="summaryDetail" class="hidden flex-col gap-3">
+                    {{-- Daftar item yang dipilih --}}
+                    <div id="selectedItemsList" class="flex flex-col gap-2 pb-3 border-b border-gray-200"></div>
 
-                {{-- Daftar item yang dipilih --}}
-                <div id="selectedItemsList" class="flex flex-col gap-2 pb-3 border-b border-gray-200"></div>
-
-                <div class="flex flex-col gap-3 pt-1">
-                    <div class="flex items-center justify-between py-2 border-b border-gray-200">
-                        <span class="text-sm text-gray-400 font-semibold">Subtotal</span>
-                        <span id="summarySubtotal" class="text-sm font-bold text-gray-800">Rp 0</span>
-                    </div>
-                    <div id="ongkirRow" class="hidden items-center justify-between py-1">
-                        <span class="text-sm text-gray-400 font-semibold">Ongkos Kirim</span>
-                        <span id="ongkirValue" class="text-sm font-bold text-gray-800">Gratis</span>
-                    </div>
-                    <div class="flex items-center justify-between pt-2">
-                        <span class="text-base font-extrabold text-gray-900">Total</span>
-                        <span id="summaryTotal" class="text-xl font-extrabold" style="color:#FF6900;">Rp 0</span>
+                    <div class="flex flex-col gap-3 pt-1">
+                        <div class="flex items-center justify-between py-2 border-b border-gray-200">
+                            <span class="text-sm text-gray-400 font-semibold">Subtotal</span>
+                            <span id="summarySubtotal" class="text-sm font-bold text-gray-800">Rp 0</span>
+                        </div>
+                        <div id="ongkirRow" class="hidden items-center justify-between py-1">
+                            <span class="text-sm text-gray-400 font-semibold">Ongkos Kirim</span>
+                            <span id="ongkirValue" class="text-sm font-bold text-gray-800">Gratis</span>
+                        </div>
+                        <div class="flex items-center justify-between pt-2">
+                            <span class="text-base font-extrabold text-gray-900">Total</span>
+                            <span id="summaryTotal" class="text-xl font-extrabold" style="color:#FF6900;">Rp 0</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            {{-- KOTAK 2: METODE PEMESANAN --}}
+            <div id="metodeSection" class="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 flex flex-col" style="display: none;">
+                <h2 class="text-base font-extrabold text-gray-900 mb-4">Metode Pemesanan</h2>
+                
+                <div class="flex flex-col gap-3">
+                    {{-- Ambil Sendiri --}}
+                    <div id="metode-ambil" onclick="setMetode('ambil')"
+                        class="metode-card active rounded-2xl border-2 p-3.5 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                            style="background-color:#FFF3E8;">
+                            <i class="fa-solid fa-bag-shopping text-base" style="color:#FF6900;"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-extrabold text-gray-800">Ambil Sendiri</p>
+                            <p class="text-[11px] text-gray-400 mt-0.5">Siap dalam 10–15 menit</p>
+                        </div>
+                        <div class="radio-dot"><div class="radio-inner"></div></div>
+                    </div>
+
+                    {{-- Kurir Antar --}}
+                    <div id="metode-kurir" onclick="setMetode('kurir')"
+                        class="metode-card rounded-2xl border-2 border-gray-200 p-3.5 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-gray-100">
+                            <i class="fa-solid fa-person-biking text-base text-gray-400"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1.5">
+                                <p class="text-sm font-extrabold text-gray-800">Kurir Antar</p>
+                                <span id="ongkirBadge" class="text-[10px] font-black px-1.5 py-0.5 rounded-lg"
+                                    style="background-color:#FFF3E8; color:#FF6900;">...</span>
+                            </div>
+                            <p class="text-[11px] text-gray-400 mt-0.5">Diantar ke kelasmu</p>
+                        </div>
+                        <div class="radio-dot"><div class="radio-inner"></div></div>
+                    </div>
+                </div>
+
+                {{-- Alamat Pengiriman --}}
+                <div id="alamatSection" class="alamat-section mt-4">
+                    <div class="bg-gray-50 rounded-2xl border border-gray-100 p-3.5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-location-dot text-sm" style="color:#FF6900;"></i>
+                                <p class="text-sm font-extrabold text-gray-800">Alamat Pengiriman</p>
+                            </div>
+                            <button onclick="toggleEditAlamat()"
+                                class="text-xs font-bold px-2 py-1 rounded-lg transition-all hover:bg-orange-100"
+                                style="color:#FF6900;" id="editAlamatBtn">
+                                <i class="fa-solid fa-pen text-[10px] mr-1"></i>Ubah
+                            </button>
+                        </div>
+                        <div id="alamatDisplay">
+                            <div class="flex items-center gap-2.5 px-3 py-2.5 bg-white rounded-xl border border-gray-100">
+                                <div class="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
+                                    style="background-color:#FFF3E8;">
+                                    <i class="fa-solid fa-building text-xs" style="color:#FF6900;"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-xs font-bold text-gray-500" id="displayAlamat">SV IPB, CA B01 lt.2, Kampus IPB Cilibende</p>
+                                </div>
+                                <i class="fa-solid fa-circle-check text-green-400 text-sm mt-0.5 flex-shrink-0"></i>
+                            </div>
+                        </div>
+                        <div id="alamatForm" class="hidden flex flex-col gap-3 mt-2">
+                            <div>
+                                <label class="text-[11px] font-bold text-gray-500 mb-1.5 block">Alamat Lengkap <span class="text-red-400">*</span></label>
+                                <textarea id="inputAlamat" class="alamat-input" rows="2"
+                                    placeholder="Cth: Gedung A Lt. 2, Fak. Teknologi Pertanian...">SV IPB, CA B01 lt.2, Kampus IPB Cilibende</textarea>
+                            </div>
+                            <div class="flex gap-2 mt-1">
+                                <button onclick="batalEditAlamat()"
+                                    class="flex-1 py-2 rounded-xl border-2 border-gray-200 text-xs font-bold text-gray-500 hover:bg-gray-50 transition-all">Batal</button>
+                                <button onclick="simpanAlamat()"
+                                    class="flex-1 py-2 rounded-xl text-white text-xs font-bold transition-all hover:brightness-110"
+                                    style="background-color:#FF6900;">Simpan</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
-        <div class="px-7 pb-8">
-            {{-- Tombol disabled kalau tidak ada yang dipilih --}}
+
+        {{-- Area Tombol Bawah (Sticky) --}}
+        <div class="px-6 pb-6 pt-3 bg-[#F9FAFB] z-10 border-t border-gray-100">
             <button id="checkoutBtn" onclick="handleCheckout()"
                 class="checkout-btn w-full py-4 rounded-2xl text-white font-extrabold text-sm flex items-center justify-center gap-2 transition-all"
                 style="background: linear-gradient(135deg, #d1d5db, #9ca3af);" disabled>
@@ -502,8 +347,8 @@
                 </svg>
             </button>
         </div>
-    </div>
 
+    </div>
 </div>
 
 {{-- MODAL HAPUS KERANJANG --}}
@@ -524,6 +369,7 @@
             <button onclick="closeClearModal()"
                 class="flex-1 py-3 rounded-2xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all">Batal</button>
             <button onclick="clearCart()"
+                id="btnConfirmClear"
                 class="flex-1 py-3 rounded-2xl text-sm font-bold text-white transition-all hover:brightness-110"
                 style="background-color:#ef4444;">Ya, Hapus</button>
         </div>
@@ -548,12 +394,114 @@ let metode = 'ambil';
 let ongkirAmount = 0;
 let isEditingAlamat = false;
 
+// ── TOGGLE EDIT ALAMAT ────────────────────────────────────
+function toggleEditAlamat() {
+    isEditingAlamat = true;
+    document.getElementById('alamatDisplay').classList.add('hidden');
+    document.getElementById('alamatForm').classList.remove('hidden');
+    document.getElementById('editAlamatBtn').classList.add('hidden');
+}
+
+function batalEditAlamat() {
+    isEditingAlamat = false;
+    document.getElementById('alamatDisplay').classList.remove('hidden');
+    document.getElementById('alamatForm').classList.add('hidden');
+    document.getElementById('editAlamatBtn').classList.remove('hidden');
+}
+
+function simpanAlamat() {
+    const inputVal = document.getElementById('inputAlamat').value.trim();
+    if (!inputVal) {
+        alert('Alamat tidak boleh kosong!');
+        return;
+    }
+    document.getElementById('displayAlamat').textContent = inputVal;
+    batalEditAlamat();
+}
+
+
+// ── HAPUS ITEM (MULTIPLE) ─────────────────────────────────
+function openClearModal() {
+    const checked = document.querySelectorAll('.item-cb:checked');
+    if (checked.length === 0) {
+        alert("Pilih minimal satu item untuk dihapus.");
+        return;
+    }
+    document.getElementById('clearModal').classList.remove('hidden');
+    document.getElementById('clearModal').classList.add('flex');
+}
+
+function closeClearModal() {
+    document.getElementById('clearModal').classList.add('hidden');
+    document.getElementById('clearModal').classList.remove('flex');
+}
+
+function clearCart() {
+    const checked = document.querySelectorAll('.item-cb:checked');
+    if (checked.length === 0) return;
+
+    const menuIds = Array.from(checked).map(cb => cb.dataset.id);
+    const btn = document.getElementById('btnConfirmClear');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menghapus...';
+
+    // Menggunakan endpoint DELETE /keranjang
+    fetch('/keranjang', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ menu_ids: menuIds }) // Mengirim array ID menu
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            // Hapus secara visual di frontend
+            checked.forEach(cb => {
+                const id = cb.dataset.id;
+                const card = document.querySelector(`.cart-item[data-id="${id}"]`);
+                if (card) {
+                    const canteenId = card.dataset.canteenId;
+                    card.remove();
+                    delete qtys[id];
+
+                    // Hapus header kantin kalau kosong
+                    const remaining = document.querySelectorAll(`.cart-item[data-canteen-id="${canteenId}"]`);
+                    if (remaining.length === 0) {
+                        document.querySelector(`[data-canteen-header="${canteenId}"]`)?.remove();
+                        document.querySelector(`[data-canteen-group="${canteenId}"]`)?.remove();
+                    }
+                }
+            });
+
+            closeClearModal();
+            checkEmpty();
+            syncSelectAllState();
+            updateSummary();
+            
+            // Panggil fungsi update notifikasi untuk shopee-style badge
+            updateCartNotification();
+        } else {
+            alert(data.message || 'Gagal menghapus item.');
+        }
+    })
+    .catch(() => {
+        alert('Terjadi kesalahan saat menghapus item.');
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = 'Ya, Hapus';
+    });
+}
+
 // ── ONGKIR ────────────────────────────────────────────────
 function fetchOngkir(canteenId) {
     return fetch(`/keranjang/ongkir/${canteenId}`)
         .then(r => r.json())
         .then(data => {
-            ongkirAmount = parseInt(data.delivery_fee) || 0; // ← parseInt di sini
+            ongkirAmount = parseInt(data.delivery_fee) || 0;
 
             const badge = document.getElementById('ongkirBadge');
             if (badge) {
@@ -643,12 +591,11 @@ function onItemCheck(cb) {
     syncCanteenCheckbox(cb.dataset.canteenId);
     syncSelectAllState();
 
-    // Re-fetch ongkir kalau mode kurir dan kantin berubah
     if (metode === 'kurir') {
         const selectedCanteenId = getSelectedCanteenId();
         if (selectedCanteenId) {
             fetchOngkir(selectedCanteenId);
-            return; // updateSummary dipanggil di dalam fetchOngkir
+            return; 
         } else {
             ongkirAmount = 0;
         }
@@ -671,6 +618,7 @@ function updateItemVisual(cb) {
         notesWrapper?.classList.add('hidden');
     }
 }
+
 // ── SYNC CHECKBOX ─────────────────────────────────────────
 function syncCanteenCheckbox(canteenId) {
     const itemCbs = document.querySelectorAll(`.item-cb[data-canteen-id="${canteenId}"]`);
@@ -749,6 +697,7 @@ function changeQty(id, delta) {
 }
 
 function removeItem(id) {
+    // Menghapus 1 item
     fetch(`/keranjang/items/${id}`, {
         method: 'DELETE',
         headers: {
@@ -773,6 +722,9 @@ function removeItem(id) {
         checkEmpty();
         syncSelectAllState();
         updateSummary();
+        
+        // Panggil fungsi update notifikasi
+        updateCartNotification();
     });
 }
 
@@ -785,8 +737,8 @@ function updateSummary() {
     const noSelInfo = document.getElementById('noSelectionInfo');
     const selectedList = document.getElementById('selectedItemsList');
     const multiWarning = document.getElementById('multiKantinWarning');
+    const metodeSection = document.getElementById('metodeSection'); // Ambil container metode pemesanan
 
-    // ← Paksa integer
     const ongkir = metode === 'kurir' ? parseInt(ongkirAmount) || 0 : 0;
 
     badge.textContent = checked.length + ' dipilih';
@@ -795,9 +747,12 @@ function updateSummary() {
         noSelInfo.classList.remove('hidden');
         summaryDetail.classList.add('hidden');
         summaryDetail.classList.remove('flex');
+        metodeSection.style.display = 'none'; // Sembunyikan metode pemesanan saat kosong!
+        
         checkoutBtn.disabled = true;
         checkoutBtn.style.background = 'linear-gradient(135deg, #d1d5db, #9ca3af)';
         checkoutBtn.innerHTML = 'Pilih Item Dulu <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>';
+        
         if (multiWarning) multiWarning.classList.add('hidden');
         return;
     }
@@ -810,6 +765,13 @@ function updateSummary() {
     noSelInfo.classList.add('hidden');
     summaryDetail.classList.remove('hidden');
     summaryDetail.classList.add('flex');
+    
+    // Tampilkan metode pemesanan hanya jika item yang di-ceklis dari 1 kantin
+    if (!isMulti) {
+        metodeSection.style.display = 'flex';
+    } else {
+        metodeSection.style.display = 'none';
+    }
 
     let subtotal = 0;
     selectedList.innerHTML = '';
@@ -819,7 +781,6 @@ function updateSummary() {
         const card = document.querySelector(`.cart-item[data-id="${id}"]`);
         if (!card) return;
 
-        // ← Paksa integer semua
         const price = parseInt(card.dataset.price) || 0;
         const qty   = parseInt(qtys[id]) || 0;
         const name  = card.querySelector('p.font-extrabold.text-gray-900')?.textContent || 'Item';
@@ -833,13 +794,11 @@ function updateSummary() {
             </div>`;
     });
 
-    // ← Pastikan keduanya integer sebelum dijumlah
     const total = parseInt(subtotal) + parseInt(ongkir);
 
     document.getElementById('summarySubtotal').textContent = 'Rp ' + subtotal.toLocaleString('id-ID');
     document.getElementById('summaryTotal').textContent    = 'Rp ' + total.toLocaleString('id-ID');
 
-    // ← Update nilai ongkir di ringkasan
     const ongkirEl = document.getElementById('ongkirValue');
     if (ongkirEl) {
         ongkirEl.textContent = ongkir === 0 ? 'Gratis' : 'Rp ' + ongkir.toLocaleString('id-ID');
@@ -873,7 +832,6 @@ function handleCheckout() {
 
     const alamat = document.getElementById('displayAlamat')?.textContent?.trim() || '';
 
-    // Kirim ke Laravel session dulu
     fetch('/pembayaran/session', {
         method: 'POST',
         headers: {
@@ -903,13 +861,35 @@ function checkEmpty() {
         document.getElementById('emptyCart').classList.remove('hidden');
         document.getElementById('emptyCart').classList.add('flex');
         document.getElementById('selectAllBar').classList.add('hidden');
-        document.getElementById('metodeSection').classList.add('hidden');
+        document.getElementById('metodeSection').style.display = 'none'; // Sembunyikan metode pemesanan
     }
+}
+
+// ── UPDATE NOTIFIKASI SECARA REAL-TIME ────────────────────
+function updateCartNotification() {
+    // 1. Hitung sisa kotak menu yang ada di layar
+    const remainingItemsCount = document.querySelectorAll('.cart-item').length;
+    
+    // 2. Simpan ke local storage supaya tidak basi saat diklik back
+    localStorage.setItem('kantin_cart_count', remainingItemsCount);
+
+    // 3. Cari bulatan notifikasi (biasanya di Sidebar/Header) dan perbarui angkanya
+    const cartBadges = document.querySelectorAll('a[href="/keranjang"] span.text-white');
+    
+    cartBadges.forEach(badge => {
+        if (remainingItemsCount > 0) {
+            badge.textContent = remainingItemsCount > 9 ? '9+' : remainingItemsCount;
+            badge.classList.remove('hidden');
+            badge.style.display = 'flex';
+        } else {
+            badge.classList.add('hidden');
+            badge.style.display = 'none';
+        }
+    });
 }
 
 // INIT
 @if($cart && !empty($cart['canteens']))
-    // Pre-fetch ongkir kantin pertama supaya badge langsung tampil
     fetchOngkir('{{ $cart["canteens"][0]["canteen_id"] }}');
 @endif
 
@@ -918,5 +898,35 @@ function checkEmpty() {
 @endif
 
 updateSummary();
+
+// ── LOGIKA AUTO-CHECK DARI "BELI SEKARANG" ──
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const buyNowId = urlParams.get('buy_now');
+    
+    if (buyNowId) {
+        // Uncheck semua item lainnya terlebih dahulu biar nggak dobel/bentrok
+        document.querySelectorAll('.item-cb').forEach(cb => {
+            if (cb.checked) {
+                cb.checked = false;
+                updateItemVisual(cb);
+            }
+        });
+        
+        // Cari checkbox item yang baru saja ditambahkan via Beli Sekarang
+        const targetCb = document.getElementById('cb-' + buyNowId);
+        
+        if (targetCb) {
+            // Ceklis otomatis
+            targetCb.checked = true;
+            
+            // Panggil trigger kalkulasi
+            onItemCheck(targetCb);
+            
+            // Opsional: Gulir layar perlahan ke item tersebut
+            targetCb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+});
 </script>
 @endpush

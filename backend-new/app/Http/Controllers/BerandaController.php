@@ -44,7 +44,8 @@ class BerandaController extends Controller
                     if ($cart && !empty($cart['canteens'])) {
                         foreach ($cart['canteens'] as $canteen) {
                             foreach ($canteen['items'] as $item) {
-                                $cartCount += $item['quantity'];
+                                // INI SATU-SATUNYA YANG BERUBAH: Dihitung +1 per jenis menu
+                                $cartCount++; 
                             }
                         }
                     }
