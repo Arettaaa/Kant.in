@@ -4,48 +4,30 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
 <style>
-    .menu-item-card {
-        transition: all 0.2s ease;
-        cursor: pointer;
-    }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
 
-    .menu-item-card:hover {
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        transform: translateY(-2px);
-    }
+    /* ── SCROLLBAR ── */
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    .menu-item-card .menu-img {
-        transition: transform 0.3s ease;
-    }
-
-    .menu-item-card:hover .menu-img {
-        transform: scale(1.05);
-    }
-
-    .add-btn {
-        transition: all 0.15s ease;
-    }
-
-    .add-btn:hover {
-        background-color: #FF6900;
-        color: white;
-        border-color: #FF6900;
-        transform: scale(1.1);
-    }
-
+    /* ── LEFT PANEL ── */
     .left-panel {
-        width: 300px;
+        width: 320px; /* Sedikit dilebarkan agar teks lebih lega */
         flex-shrink: 0;
         position: relative;
         display: flex;
         flex-direction: column;
+        border-right: 1px solid #F0EDE8;
     }
 
     .hero-img-wrap {
-        height: 300px;
+        height: 220px; /* Dikecilkan dari 300px agar konten bawah naik */
         overflow: hidden;
         flex-shrink: 0;
+        position: relative;
     }
 
     .hero-img-wrap img {
@@ -53,26 +35,128 @@
         height: 100%;
         object-fit: cover;
     }
+    
+    .hero-overlay {
+        position: absolute; inset: 0;
+        background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 40%);
+        pointer-events: none;
+    }
 
+    /* ── INFO BADGES ── */
+    .info-card {
+        background: #F9FAFB;
+        border-radius: 16px;
+        padding: 16px;
+        border: 1px solid #F3F4F6;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .info-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #4B5563;
+        line-height: 1.4;
+    }
+
+    .info-icon {
+        width: 18px;
+        display: flex;
+        justify-content: center;
+        margin-top: 2px;
+    }
+
+    /* ── MENU CARD ── */
+    .menu-item-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid #F0EDE8;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .menu-item-card:hover {
+        box-shadow: 0 12px 24px rgba(255, 105, 0, 0.08);
+        border-color: #FFD0A8;
+        transform: translateY(-4px);
+    }
+
+    .menu-img-container {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        overflow: hidden;
+        background: #F9FAFB;
+        position: relative;
+    }
+
+    .menu-item-card .menu-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+
+    .menu-item-card:hover .menu-img {
+        transform: scale(1.08);
+    }
+
+    .add-btn {
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        border: 2px solid #F3F4F6;
+        display: flex; align-items: center; justify-content: center;
+        color: #9CA3AF;
+        background: white;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .menu-item-card:hover .add-btn {
+        border-color: #FF6900;
+        color: #FF6900;
+    }
+
+    .add-btn:active {
+        background-color: #FF6900 !important;
+        color: white !important;
+        transform: scale(0.95);
+    }
+
+    /* ── SEARCH INPUT ── */
+    .search-input {
+        width: 100%;
+        padding: 12px 16px 12px 42px;
+        border-radius: 16px;
+        background: white;
+        border: 1.5px solid #F3F4F6;
+        font-size: 13.5px;
+        color: #111;
+        transition: all 0.2s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    .search-input:focus {
+        outline: none;
+        border-color: #FF6900;
+        box-shadow: 0 0 0 4px rgba(255,105,0,0.1);
+    }
+
+    /* ── FLOATING CART ── */
     .cart-float {
         position: fixed;
         bottom: 32px;
         right: 40px;
         z-index: 50;
-        transition: all 0.2s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
     .cart-float:hover {
-        transform: scale(1.05);
-    }
-
-    .hide-scrollbar::-webkit-scrollbar {
-        display: none;
-    }
-
-    .hide-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
+        transform: translateY(-4px) scale(1.02);
     }
 </style>
 @endpush
@@ -82,100 +166,116 @@
 <div class="flex w-full h-screen bg-[#F9FAFB] overflow-hidden">
 
     {{-- ======================== LEFT PANEL ======================== --}}
-    <div class="left-panel h-screen bg-white border-r border-gray-100 flex flex-col overflow-y-auto hide-scrollbar">
+    <div class="left-panel h-screen bg-white flex flex-col overflow-y-auto hide-scrollbar">
 
         {{-- Hero Image --}}
-        <div class="relative">
-            <div class="hero-img-wrap">
-                @if(!empty($kantin['image']))
-                <img src="{{ $kantin['image'] }}" alt="{{ $kantin['name'] }}">
-                @else
-                <div class="w-full h-full flex items-center justify-center bg-orange-50">
-                    <i class="fa-solid fa-store text-orange-200" style="font-size:60px;"></i>
-                </div>
-                @endif
+        <div class="hero-img-wrap">
+            @if(!empty($kantin['image']))
+            <img src="{{ $kantin['image'] }}" alt="{{ $kantin['name'] }}">
+            @else
+            <div class="w-full h-full flex flex-col items-center justify-center bg-[#2d1300]">
+                <i class="fa-solid fa-store text-orange-500/30 text-6xl"></i>
             </div>
+            @endif
+            <div class="hero-overlay"></div>
+            
             <a href="javascript:history.back()"
-                class="absolute top-4 left-4 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-md hover:bg-white transition-all">
-                <svg class="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                class="absolute top-5 left-5 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white hover:bg-white/40 hover:scale-105 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
                 </svg>
             </a>
         </div>
 
-        {{-- Info --}}
-        <div class="flex-1 px-6 py-5 flex flex-col gap-4">
-           <div class="flex items-start justify-between gap-2">
-                <h1 class="text-2xl font-extrabold text-gray-900 leading-tight">{{ $kantin['name'] }}</h1>
+        {{-- Info Kantin --}}
+        <div class="flex-1 px-7 py-6 flex flex-col gap-6">
+            
+            {{-- Title & Rating --}}
+            <div class="flex items-start justify-between gap-3">
+                <h1 class="text-2xl font-extrabold text-gray-900 leading-tight tracking-tight">{{ $kantin['name'] }}</h1>
                 
                 @if($kantin['computed_rating'] !== null)
-                <div class="flex items-center gap-1.5 bg-amber-50 px-2.5 py-1.5 rounded-xl flex-shrink-0">
-                    <i class="fa-solid fa-star text-amber-400 text-sm"></i>
-                    <span class="text-sm font-extrabold text-gray-800">{{ $kantin['computed_rating'] }}</span>
+                <div class="flex items-center gap-1.5 bg-amber-50 border border-amber-100 px-2.5 py-1.5 rounded-xl flex-shrink-0">
+                    <i class="fa-solid fa-star text-amber-400 text-xs"></i>
+                    <span class="text-sm font-extrabold text-amber-600">{{ $kantin['computed_rating'] }}</span>
                 </div>
                 @else
                 <div class="flex items-center gap-1.5 bg-gray-100 px-2.5 py-1.5 rounded-xl flex-shrink-0">
-                    <i class="fa-solid fa-star text-gray-400 text-sm"></i>
-                    <span class="text-xs font-extrabold text-gray-500">Baru</span>
+                    <i class="fa-solid fa-star text-gray-400 text-xs"></i>
+                    <span class="text-[11px] font-extrabold text-gray-500 uppercase tracking-wide">Baru</span>
                 </div>
                 @endif
-                
             </div>
 
-            @if(!empty($kantin['description']))
-            <p class="text-sm text-gray-500 leading-relaxed">{{ $kantin['description'] }}</p>
-            @endif
-
-            <div class="flex items-center gap-3 text-xs text-gray-400 font-semibold flex-wrap">
-                @if(!empty($kantin['location']))
-                <span class="flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5" style="color:#FF6900;" fill="currentColor" viewBox="0 0 24 24">
-                        <path
-                            d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                    </svg>
-                    {{ $kantin['location'] }}
-                </span>
-                @endif
-
-                @if(!empty($kantin['operating_hours']))
-                <span class="flex items-center gap-1">
-                    <i class="fa-regular fa-clock text-gray-400"></i>
-                    {{ $kantin['operating_hours']['open'] }} - {{ $kantin['operating_hours']['close'] }}
-                </span>
-                @endif
-
-                <span class="flex items-center gap-1 font-bold"
-                    style="color: {{ ($kantin['is_open'] ?? false) ? '#22c55e' : '#9ca3af' }}">
-                    <span class="w-1.5 h-1.5 rounded-full inline-block"
-                        style="background-color: {{ ($kantin['is_open'] ?? false) ? '#22c55e' : '#9ca3af' }}"></span>
-                    {{ ($kantin['is_open'] ?? false) ? 'Buka' : 'Tutup' }}
-                </span>
-            </div>
-
-            {{-- Search --}}
-            <div class="relative mt-1">
-                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" fill="none"
+            {{-- SEARCH BAR (Dipindah ke atas agar mudah dicari) --}}
+            <div class="relative">
+                <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none"
                     stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <input id="menuSearch" type="text" placeholder="Cari menu di sini..." oninput="searchMenu()"
-                    onfocus="this.style.borderColor='#FF6900'; this.style.boxShadow='0 0 0 3px rgba(255,105,0,0.12)';"
-                    onblur="this.style.borderColor='#e5e7eb'; this.style.boxShadow='';"
-                    class="w-full pl-9 pr-4 py-2.5 rounded-2xl border border-gray-200 bg-gray-50 text-sm text-gray-700 placeholder-gray-400 focus:outline-none transition-all">
+                <input id="menuSearch" type="text" placeholder="Cari menu di kantin ini..." oninput="searchMenu()" class="search-input">
             </div>
+
+            {{-- Info Badges Card --}}
+            <div class="info-card">
+                @if(!empty($kantin['location']))
+                <div class="info-row">
+                    <div class="info-icon"><i class="fa-solid fa-location-dot" style="color:#FF6900;"></i></div>
+                    <span>{{ $kantin['location'] }}</span>
+                </div>
+                @endif
+
+                @if(!empty($kantin['operating_hours']))
+                <div class="info-row">
+                    <div class="info-icon"><i class="fa-regular fa-clock text-gray-400"></i></div>
+                    <span>{{ $kantin['operating_hours']['open'] }} - {{ $kantin['operating_hours']['close'] }} WIB</span>
+                </div>
+                @endif
+
+                <div class="info-row items-center">
+                    <div class="info-icon">
+                        <span class="relative flex h-3 w-3 mt-0.5">
+                          @if($kantin['is_open'] ?? false)
+                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                              <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                          @else
+                              <span class="relative inline-flex rounded-full h-3 w-3 bg-gray-400"></span>
+                          @endif
+                        </span>
+                    </div>
+                    <span style="color: {{ ($kantin['is_open'] ?? false) ? '#22c55e' : '#9ca3af' }}; font-weight: 700;">
+                        {{ ($kantin['is_open'] ?? false) ? 'Sedang Buka' : 'Sedang Tutup' }}
+                    </span>
+                </div>
+            </div>
+
+            {{-- Deskripsi Kantin --}}
+            @if(!empty($kantin['description']))
+            <div>
+                <h3 class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Tentang Kantin</h3>
+                <p class="text-[13.5px] text-gray-500 leading-relaxed font-medium text-justify">
+                    {{ $kantin['description'] }}
+                </p>
+            </div>
+            @endif
+
         </div>
 
     </div>{{-- END LEFT PANEL --}}
 
     {{-- ======================== MAIN CONTENT ======================== --}}
-    <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#F9FAFB] hide-scrollbar">
-        <div class="px-8 py-8 flex flex-col gap-10 pb-28">
+    <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#F9FAFB] hide-scrollbar relative">
+        <div class="px-10 py-10 flex flex-col gap-12 pb-32">
 
             @forelse($menuByKategori as $kategori => $items)
             <section class="menu-section" data-section="{{ strtolower($kategori) }}">
-                <h2 class="text-lg font-extrabold text-gray-900 mb-4">{{ $kategori }}</h2>
-                <div class="grid grid-cols-3 gap-4">
+                <div class="flex items-center gap-3 mb-5">
+                    <h2 class="text-xl font-extrabold text-gray-900 capitalize">{{ $kategori }}</h2>
+                    <div class="h-px bg-gray-200 flex-1 opacity-50"></div>
+                </div>
+                
+                <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                     @php
                         $available = collect($items)->filter(fn($m) => $m['is_available'] ?? true)->values();
                         $unavailable = collect($items)->filter(fn($m) => !($m['is_available'] ?? true))->values();
@@ -184,44 +284,52 @@
 
                     @foreach($sortedItems as $menu)
                         <a href="/menu/{{ $menu['_id'] }}"
-                            class="menu-item-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col
-                                {{ !($menu['is_available'] ?? true) ? 'opacity-50 grayscale pointer-events-none' : '' }}"
+                            class="menu-item-card group {{ !($menu['is_available'] ?? true) ? 'opacity-60 grayscale pointer-events-none' : '' }}"
                             data-name="{{ strtolower($menu['name']) }}">
 
-                        <div class="w-full aspect-square overflow-hidden bg-gray-100">
+                        <div class="menu-img-container">
                             @if(!empty($menu['image']))
-                            <img src="{{ $menu['image'] }}" alt="{{ $menu['name'] }}"
-                                class="menu-img w-full h-full object-cover">
+                            <img src="{{ $menu['image'] }}" alt="{{ $menu['name'] }}" class="menu-img">
                             @else
-                            <div class="w-full h-full flex items-center justify-center bg-orange-50">
-                                <i class="fa-solid fa-utensils text-orange-200 text-3xl"></i>
+                            <div class="w-full h-full flex items-center justify-center bg-orange-50/50">
+                                <i class="fa-solid fa-utensils text-orange-200 text-4xl"></i>
+                            </div>
+                            @endif
+                            
+                            {{-- Badge Rating di dalam foto jika ada --}}
+                            @if(!empty($menu['average_rating']))
+                            <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+                                <i class="fa-solid fa-star text-amber-400 text-[10px]"></i>
+                                <span class="text-[11px] font-bold text-gray-800">{{ number_format($menu['average_rating'], 1) }}</span>
                             </div>
                             @endif
                         </div>
 
-                        <div class="p-3 flex flex-col gap-1">
-                            <p class="text-sm font-extrabold text-gray-900 leading-tight">{{ $menu['name'] }}</p>
-                            @if(!empty($menu['description']))
-                            <p class="text-xs text-gray-400 leading-snug line-clamp-1">{{ $menu['description'] }}</p>
-                            @endif
-                            <div class="flex items-center justify-between mt-2">
-                                <span class="text-sm font-extrabold" style="color:#FF6900;">
+                        <div class="p-4 flex flex-col flex-1 justify-between gap-3">
+                            <div>
+                                <p class="text-sm font-extrabold text-gray-900 leading-tight line-clamp-2">{{ $menu['name'] }}</p>
+                                @if(!empty($menu['description']))
+                                <p class="text-[11.5px] text-gray-400 font-medium leading-snug line-clamp-1 mt-1">{{ $menu['description'] }}</p>
+                                @endif
+                            </div>
+                            
+                            <div class="flex items-end justify-between mt-auto">
+                                <span class="text-[15px] font-black tracking-tight" style="color:#FF6900;">
                                     Rp {{ number_format($menu['price'], 0, ',', '.') }}
                                 </span>
+
                                 @if($kantin['is_open'] ?? false)
-                                @if($menu['is_available'] ?? true)
-                                <button type="button"
-                                    onclick="event.preventDefault(); addToCart(this, '{{ $menu['_id'] }}', {{ $menu['price'] }})"
-                                    class="add-btn w-7 h-7 rounded-full border-2 flex items-center justify-center text-gray-300 border-gray-200">
-                                    <i class="fa-solid fa-plus text-[10px]"></i>
-                                </button>
+                                    @if($menu['is_available'] ?? true)
+                                    <button type="button"
+                                        onclick="event.preventDefault(); addToCart(this, '{{ $menu['_id'] }}', {{ $menu['price'] }})"
+                                        class="add-btn">
+                                        <i class="fa-solid fa-plus text-xs"></i>
+                                    </button>
+                                    @else
+                                    <span class="text-[10px] font-bold text-red-500 bg-red-50 px-2 py-1 rounded-md border border-red-100">Habis</span>
+                                    @endif
                                 @else
-                                <span
-                                    class="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">Habis</span>
-                                @endif
-                                @else
-                                <span
-                                    class="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">Tutup</span>
+                                    <span class="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">Tutup</span>
                                 @endif
                             </div>
                         </div>
@@ -230,12 +338,12 @@
                 </div>
             </section>
             @empty
-            <div class="flex flex-col items-center justify-center py-20 gap-3">
-                <div class="w-16 h-16 rounded-full bg-orange-50 flex items-center justify-center">
-                    <i class="fa-solid fa-bowl-food text-2xl" style="color:#FF6900;"></i>
+            <div class="flex flex-col items-center justify-center py-32 gap-3 opacity-60">
+                <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-2">
+                    <i class="fa-solid fa-bowl-food text-3xl text-gray-400"></i>
                 </div>
-                <p class="text-base font-extrabold text-gray-700">Belum ada menu</p>
-                <p class="text-sm text-gray-400 font-medium">Menu kantin ini belum tersedia</p>
+                <p class="text-lg font-extrabold text-gray-700">Kantin Belum Memiliki Menu</p>
+                <p class="text-sm text-gray-500 font-medium">Silakan kembali lagi nanti.</p>
             </div>
             @endforelse
 
@@ -247,16 +355,20 @@
 {{-- FLOATING CART --}}
 <div id="cartFloat" class="cart-float hidden">
     <button onclick="window.location.href='/keranjang'"
-        class="flex items-center gap-3 px-5 py-3.5 rounded-2xl text-white font-extrabold text-sm shadow-xl"
-        style="background: linear-gradient(135deg, #FF6900, #ea580c);">
-        <div class="relative">
-            <i class="fa-solid fa-cart-shopping text-base"></i>
+        class="flex items-center gap-3 px-6 py-4 rounded-[20px] text-white font-extrabold text-sm shadow-2xl"
+        style="background: linear-gradient(135deg, #FF6900, #ea580c); box-shadow: 0 10px 25px rgba(255,105,0,0.3);">
+        <div class="relative flex items-center justify-center">
+            <i class="fa-solid fa-cart-shopping text-lg"></i>
             <span id="cartCount"
-                class="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-white text-[10px] font-black flex items-center justify-center"
-                style="color:#FF6900;">0</span>
+                class="absolute -top-2 -right-2.5 w-5 h-5 rounded-full bg-white text-[10px] font-black flex items-center justify-center"
+                style="color:#FF6900; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">0</span>
         </div>
-        <span id="cartLabel">Lihat Keranjang</span>
-        <span id="cartTotal" class="font-extrabold">Rp 0</span>
+        <div class="w-px h-5 bg-white/20 mx-1"></div>
+        <div class="flex flex-col items-start text-left leading-tight">
+            <span class="text-[11px] font-semibold text-orange-100">Total Belanja</span>
+            <span id="cartTotal" class="text-[15px] font-black tracking-tight">Rp 0</span>
+        </div>
+        <i class="fa-solid fa-chevron-right ml-2 text-orange-200 text-xs"></i>
     </button>
 </div>
 
@@ -267,7 +379,6 @@
     let cartCount = 0;
     let cartTotal = 0;
 
-    // 1. Tambahkan fungsi showToast persis seperti di menu.blade.php
     function showToast(message, type = 'success') {
         const existing = document.getElementById('toastNotif');
         if (existing) existing.remove();
@@ -284,8 +395,8 @@
             position: fixed; top: 24px; right: 24px; z-index: 9999;
             display: flex; align-items: center; gap: 12px;
             padding: 14px 20px; border-radius: 16px; color: white;
-            font-size: 14px; font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            animation: slideIn 0.3s ease; ${colors}
+            font-size: 14px; font-weight: 700; box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); ${colors}
         `;
         toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
         document.body.appendChild(toast);
@@ -297,6 +408,7 @@
     }
 
     function addToCart(btn, menuId, price) {
+        // Animasi klik tombol
         btn.style.backgroundColor = '#FF6900';
         btn.style.color = 'white';
         btn.style.borderColor = '#FF6900';
@@ -309,18 +421,16 @@
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json' // TAMBAHAN PENTING: Supaya Laravel ngasih JSON kalau error/belum login
+                'Accept': 'application/json' 
             },
             body: JSON.stringify({ menu_id: menuId, quantity: 1 }),
         })
         .then(async r => {
-            // Cek jika status 401 atau kena redirect ke halaman login
             if (r.status === 401 || (r.redirected && r.url.includes('/login'))) {
                 window.location.href = '/login';
                 return Promise.reject('unauthorized');
             }
 
-            // Antisipasi jika middleware tetap memaksa return HTML
             const contentType = r.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
                 window.location.href = '/login';
@@ -337,21 +447,25 @@
         })
         .then(data => {
             btn.disabled = false;
+            // Kembalikan style tombol ke awal (outline abu) agar bisa diklik lagi
+            setTimeout(() => {
+                btn.style.backgroundColor = 'white';
+                btn.style.color = '#FF6900'; // Biar tetep oren setelah diklik
+            }, 300);
+
             cartCount++;
             cartTotal += price;
             updateCartFloat();
-            showToast('Berhasil ditambahkan ke keranjang!', 'success'); // Kasih toast sukses
+            showToast('Berhasil ditambahkan ke keranjang!', 'success');
         })
         .catch(error => {
-            if (error === 'unauthorized') return; // Stop jika sudah redirect
+            if (error === 'unauthorized') return; 
 
-            // Reset tombol
             btn.disabled = false;
-            btn.style.backgroundColor = '';
-            btn.style.color = '#d1d5db';
-            btn.style.borderColor = '#e5e7eb';
+            btn.style.backgroundColor = 'white';
+            btn.style.color = '#9CA3AF';
+            btn.style.borderColor = '#F3F4F6';
             
-            // Ganti alert bawaan browser jadi Toast!
             const errorMsg = typeof error === 'string' ? error : 'Terjadi kesalahan. Coba lagi.';
             showToast(errorMsg, 'error');
         });
@@ -360,14 +474,25 @@
     function updateCartFloat() {
         document.getElementById('cartCount').textContent = cartCount;
         document.getElementById('cartTotal').textContent = 'Rp ' + cartTotal.toLocaleString('id-ID');
-        document.getElementById('cartFloat').classList.toggle('hidden', cartCount === 0);
+        
+        const cartFloat = document.getElementById('cartFloat');
+        if (cartCount > 0) {
+            cartFloat.classList.remove('hidden');
+        } else {
+            cartFloat.classList.add('hidden');
+        }
     }
 
     function searchMenu() {
         const q = document.getElementById('menuSearch').value.toLowerCase().trim();
         document.querySelectorAll('.menu-item-card').forEach(card => {
-            card.style.display = card.dataset.name.includes(q) ? 'flex' : 'none';
+            if(card.dataset.name.includes(q)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
         });
+        
         document.querySelectorAll('.menu-section').forEach(section => {
             const visible = [...section.querySelectorAll('.menu-item-card')].some(c => c.style.display !== 'none');
             section.style.display = visible ? 'block' : 'none';
@@ -376,14 +501,13 @@
 </script>
 
 <style>
-    /* Jangan lupa tambahkan animasi untuk Toast-nya */
     @keyframes slideIn {
-        from { opacity: 0; transform: translateX(40px); }
-        to { opacity: 1; transform: translateX(0); }
+        from { opacity: 0; transform: translateX(40px) scale(0.95); }
+        to { opacity: 1; transform: translateX(0) scale(1); }
     }
     @keyframes slideOut {
-        from { opacity: 1; transform: translateX(0); }
-        to { opacity: 0; transform: translateX(40px); }
+        from { opacity: 1; transform: translateX(0) scale(1); }
+        to { opacity: 0; transform: translateX(40px) scale(0.95); }
     }
 </style>
 @endpush
