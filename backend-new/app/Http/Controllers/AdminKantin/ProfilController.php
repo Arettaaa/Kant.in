@@ -12,27 +12,21 @@ use App\Models\Menu;
 
 class ProfilController extends Controller
 {
-    /**
-     * Ambil user object dari session.
-     */
+
     private function getUser(): User
     {
         $sessionUser = session('user');
         return User::find($sessionUser['_id'] ?? $sessionUser['id']);
     }
 
-    /**
-     * Halaman profil — tampil data admin dan kantin sekaligus.
-     */
+
     public function index()
     {
         $user = $this->getUser();
         $canteen = Canteen::find((string) ($user->canteen_id ?? session('user')['canteen_id']));
 
-        // --- LOGIKA MENGHITUNG RATING ---
         $menus = Menu::where('canteen_id', (string) $canteen->_id)->get();
 
-        // Kumpulkan semua review dari semua menu
         $allReviews = $menus->flatMap(fn($m) => $m->reviews ?? []);
 
         $totalReviews = $allReviews->count();
@@ -51,12 +45,8 @@ class ProfilController extends Controller
         return view('admin.edit-profil', compact('user', 'canteen'));
     }
 
-    /**
-     * Update profil admin + kantin dalam satu form submit.
-     */
     public function update(Request $request)
     {
-        // 1. Validasi Input (Semua dibuat nullable agar fleksibel)
         $request->validate([
             'name' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:20',
@@ -74,12 +64,8 @@ class ProfilController extends Controller
             'qris_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // ---------------------------------------------------------------
-        // 2. UPDATE DATA PENGELOLA (ADMIN)
-        // ---------------------------------------------------------------
         $user = $this->getUser();
 
-        // Gunakan assignment langsung agar menembus batas $fillable
         if ($request->has('name'))
             $user->name = $request->name;
         if ($request->has('phone'))
@@ -98,10 +84,8 @@ class ProfilController extends Controller
             $user->photo_profile = $request->file('photo_profile')->store('profiles', 'public');
         }
 
-        // Simpan paksa perubahan ke tabel users
         $user->save();
 
-        // Segarkan session agar foto dan nama di pojok layar langsung berubah
         $sessionUser = session('user');
         $sessionUser['name'] = $user->name;
         $sessionUser['phone'] = $user->phone;
@@ -110,15 +94,10 @@ class ProfilController extends Controller
         }
         session(['user' => $sessionUser]);
 
-
-        // ---------------------------------------------------------------
-        // 3. UPDATE DATA KANTIN
-        // ---------------------------------------------------------------
         $canteenId = $user->canteen_id ?? session('user')['canteen_id'];
         $canteen = Canteen::find((string) $canteenId);
 
         if ($canteen) {
-            // Gunakan assignment langsung agar menembus batas $fillable
             if ($request->has('description'))
                 $canteen->description = $request->description;
             if ($request->has('location'))
@@ -152,9 +131,6 @@ class ProfilController extends Controller
         return redirect()->route('admin.profil')->with('success', 'Profil dan pengaturan berhasil diperbarui.');
     }
 
-    /**
-     * Halaman pusat bantuan — statis.
-     */
     public function bantuan()
     {
         return view('admin.support');

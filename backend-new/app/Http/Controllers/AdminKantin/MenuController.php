@@ -15,9 +15,6 @@ class MenuController extends Controller
         return (string) session('user')['canteen_id'];
     }
 
-    /**
-     * Daftar semua menu milik kantin ini.
-     */
     public function index()
     {
         $canteenId = $this->getCanteenId();
@@ -33,17 +30,12 @@ class MenuController extends Controller
         return view('admin.kelola-menu', compact('menus', 'categories'));
     }
 
-    /**
-     * Halaman form tambah menu baru.
-     */
+
     public function create()
     {
         return view('admin.tambah-menu');
     }
 
-    /**
-     * Simpan menu baru.
-     */
     public function store(Request $request)
     {
         $canteenId = $this->getCanteenId();
@@ -69,9 +61,6 @@ class MenuController extends Controller
         return redirect()->route('admin.menu')->with('success', 'Menu berhasil ditambahkan.');
     }
 
-    /**
-     * Halaman form edit menu.
-     */
     public function edit($menuId)
     {
         $canteenId = $this->getCanteenId();
@@ -87,9 +76,6 @@ class MenuController extends Controller
         return view('admin.edit-menu', ['menu' => $this->formatMenu($menu)]);
     }
 
-    /**
-     * Simpan perubahan menu.
-     */
     public function update(Request $request, $menuId)
     {
         $canteenId = $this->getCanteenId();
@@ -121,9 +107,6 @@ class MenuController extends Controller
         return redirect()->route('admin.menu')->with('success', 'Menu berhasil diperbarui.');
     }
 
-    /**
-     * Hapus menu.
-     */
     public function destroy($menuId)
     {
         $canteenId = $this->getCanteenId();
@@ -142,9 +125,6 @@ class MenuController extends Controller
         return redirect()->route('admin.menu')->with('success', 'Menu berhasil dihapus.');
     }
 
-    /**
-     * Toggle ketersediaan menu — AJAX, return JSON.
-     */
     public function toggleAvailability(Request $request, $menuId)
     {
         $request->validate([
