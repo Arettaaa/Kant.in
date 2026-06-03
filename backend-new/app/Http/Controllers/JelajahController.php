@@ -33,7 +33,6 @@ class JelajahController extends Controller
                 $menus = $response->json('data') ?? [];
             }
 
-            // Filter category di sisi web, sama seperti Android
             if ($category !== 'Semua') {
                 $menus = array_filter(
                     $menus,
@@ -41,6 +40,19 @@ class JelajahController extends Controller
                 );
                 $menus = array_values($menus);
             }
+
+            usort($menus, function ($a, $b) {
+                $availA = $a['is_available'] ?? true;
+                $availB = $b['is_available'] ?? true;
+
+                if ($availA !== $availB) {
+                    return $availA ? -1 : 1;
+                }
+
+                $ratingA = $a['average_rating'] ?? 0;
+                $ratingB = $b['average_rating'] ?? 0;
+                return $ratingB <=> $ratingA;
+            });
         } else {
             $statusFilter = $request->get('status', 'semua');
             $searchKantin = $request->get('search', '');
@@ -50,7 +62,6 @@ class JelajahController extends Controller
                 $canteens = $response->json('data') ?? [];
             }
 
-            // Filter search di sisi web
             if ($searchKantin !== '') {
                 $canteens = array_filter(
                     $canteens,
@@ -58,7 +69,6 @@ class JelajahController extends Controller
                 );
             }
 
-            // Filter buka/tutup di sisi web, sama seperti Android
             if ($statusFilter === 'buka') {
                 $canteens = array_filter($canteens, fn($k) => $k['is_open'] ?? false);
             } elseif ($statusFilter === 'tutup') {
@@ -67,7 +77,6 @@ class JelajahController extends Controller
 
             $canteens = array_values($canteens);
 
-            // Versi paralel (lebih cepat)
             $canteenIds = array_column($canteens, '_id');
 
             $responses = Http::pool(
@@ -98,6 +107,19 @@ class JelajahController extends Controller
                 $kantin['computed_rating'] = $avgRating;
                 return $kantin;
             }, $canteens);
+
+            usort($canteens, function ($a, $b) {
+                $openA = $a['is_open'] ?? false;
+                $openB = $b['is_open'] ?? false;
+
+                if ($openA !== $openB) {
+                    return $openA ? -1 : 1;
+                }
+
+                $ratingA = $a['computed_rating'] ?? 0;
+                $ratingB = $b['computed_rating'] ?? 0;
+                return $ratingB <=> $ratingA;
+            });
         }
 
         return view('pelanggan.jelajah', compact('menus', 'canteens', 'tab', 'category', 'search', 'searchKantin', 'statusFilter'));

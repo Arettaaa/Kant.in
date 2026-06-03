@@ -102,7 +102,8 @@
             <div class="grid grid-cols-2 gap-4 pb-8">
                 @forelse($menus as $menu)
                 <a href="/menu/{{ $menu['_id'] }}"
-                    class="menu-card bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
+                class="menu-card bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex items-center gap-4
+                    {{ !($menu['is_available'] ?? true) ? 'opacity-50 grayscale pointer-events-none' : '' }}">
                     <div class="relative flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden bg-gray-100">
                         @if(!empty($menu['image']))
                         <img src="{{ $menu['image'] }}" alt="{{ $menu['name'] }}"
@@ -186,8 +187,9 @@
             {{-- GRID KANTIN --}}
             <div class="grid grid-cols-2 gap-4 pb-8">
                 @forelse($canteens as $kantin)
-                <a href="/kantin/{{ $kantin['_id'] }}"
-                    class="menu-card bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex items-center gap-4">
+               <a href="/kantin/{{ $kantin['_id'] }}"
+                class="menu-card bg-white rounded-3xl p-4 shadow-sm border border-gray-100 flex items-center gap-4
+                    {{ !($kantin['is_open'] ?? false) ? 'opacity-50 grayscale pointer-events-none' : '' }}">
                     <div class="relative flex-shrink-0 w-16 h-16 rounded-2xl overflow-hidden bg-gray-100">
                         @if(!empty($kantin['image']))
                         <img src="{{ $kantin['image'] }}" alt="{{ $kantin['name'] }}"
