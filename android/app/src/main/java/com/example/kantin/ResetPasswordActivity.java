@@ -20,7 +20,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
     private ImageView btnBack;
     private Button btnSubmit;
     private EditText etNewPassword, etConfirmPassword;
-    private ImageView ivToggleNewPassword, ivToggleConfirmPassword; // Tambahan variabel
+    private ImageView ivToggleNewPassword, ivToggleConfirmPassword;
     private View bar1, bar2, bar3, bar4;
     private TextView tvStrengthLabel;
 
@@ -37,7 +37,6 @@ public class ResetPasswordActivity extends AppCompatActivity {
         etNewPassword = findViewById(R.id.etNewPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
 
-        // Inisialisasi ikon mata
         ivToggleNewPassword = findViewById(R.id.ivToggleNewPassword);
         ivToggleConfirmPassword = findViewById(R.id.ivToggleConfirmPassword);
 
@@ -46,7 +45,6 @@ public class ResetPasswordActivity extends AppCompatActivity {
 
         String emailFromIntent = getIntent().getStringExtra("email");
 
-        // --- AKSI KLIK UNTUK IKON MATA ---
         ivToggleNewPassword.setOnClickListener(v -> togglePassword(etNewPassword, ivToggleNewPassword));
         ivToggleConfirmPassword.setOnClickListener(v -> togglePassword(etConfirmPassword, ivToggleConfirmPassword));
 
@@ -111,21 +109,17 @@ public class ResetPasswordActivity extends AppCompatActivity {
         });
     }
 
-    // --- FUNGSI UNTUK MENGUBAH VISIBILITAS PASSWORD ---
     private void togglePassword(EditText editText, ImageView eyeIcon) {
         if (editText.getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
-            // Jika sedang tertutup -> Buka password
             editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-            eyeIcon.setImageResource(R.drawable.eye); // Pastikan Anda punya gambar eye_close.xml atau .png
-            eyeIcon.setAlpha(1.0f); // Bikin ikon sedikit lebih terang saat diklik (opsional)
+            eyeIcon.setImageResource(R.drawable.eye);
+            eyeIcon.setAlpha(1.0f);
         } else {
-            // Jika sedang terbuka -> Tutup password
             editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
             eyeIcon.setImageResource(R.drawable.eye_close);
-            eyeIcon.setAlpha(0.5f); // Kembalikan transparansi
+            eyeIcon.setAlpha(0.5f);
         }
 
-        // Pindahkan kursor ke ujung teks agar user tidak bingung saat lanjut mengetik
         editText.setSelection(editText.getText().length());
     }
 

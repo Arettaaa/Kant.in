@@ -47,60 +47,30 @@ public class UbahProfilKantin extends AppCompatActivity {
 
     private static final String TAG = "UbahProfilKantin";
 
-    // ── Views: Logo kantin ──
     private ImageView ivCanteenLogo, btnEditCanteenLogo;
 
-    // ── Views: Form kantin ──
     private EditText etCanteenName, etCanteenLocation, etCanteenDescription,
             etDeliveryFee, etOpenTime, etCloseTime;
 
-    // ── Views: QRIS — 2 state ──
-    //
-    // STATE 1 (btnUploadQrisEmpty): ditampilkan saat belum ada QRIS sama sekali.
-    //   Klik → buka galeri.
-    //
-    // STATE 2 (containerQrisPreview): ditampilkan saat ada gambar QRIS,
-    //   baik yang lama dari server maupun preview file baru yang belum disimpan.
-    //   Di dalamnya ada:
-    //     • tvQrisLabel       → badge "QRIS saat ini" atau "Preview QRIS baru"
-    //     • ivQrisImage       → gambar QRIS
-    //     • btnGantiQris      → buka galeri untuk ganti
-    //   Di luar (tapi masih satu parent LinearLayout):
-    //     • tvQrisPreviewBadge → banner orange "belum disimpan", muncul hanya
-    //                            saat fileQris != null (sebelum tombol Simpan ditekan)
     private LinearLayout btnUploadQrisEmpty;
     private LinearLayout containerQrisPreview;
     private LinearLayout btnGantiQris;
     private ImageView ivQrisImage;
     private TextView tvQrisLabel;
     private TextView tvQrisPreviewBadge;
-
-    // ── Views: Profil admin ──
     private ImageView ivAdminPhoto, btnEditAdminPhoto;
     private EditText etAdminName, etAdminEmail, etAdminPhone;
-
-    // ── Views: Action ──
     private AppCompatButton btnSubmitAll;
     private android.widget.ImageButton btnBack;
-
-    // ── Dependencies ──
     private SessionManager sessionManager;
     private ApiService apiService;
-
-    // ── State file yang dipilih user ──
     private File fileLogo  = null;
     private File fileQris  = null;
     private File fileAdmin = null;
-
-    // Konstanta tipe gambar untuk onActivityResult
     private static final int TYPE_LOGO  = 1;
     private static final int TYPE_QRIS  = 2;
     private static final int TYPE_ADMIN = 3;
     private int currentImageType = 0;
-
-    // ==========================================================
-    // LIFECYCLE
-    // ==========================================================
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,10 +91,6 @@ public class UbahProfilKantin extends AppCompatActivity {
         loadCanteenSettings();
     }
 
-    // ==========================================================
-    // INIT VIEWS
-    // ==========================================================
-
     private void initViews() {
         // Logo
         ivCanteenLogo      = findViewById(R.id.ivCanteenLogo);
@@ -138,7 +104,7 @@ public class UbahProfilKantin extends AppCompatActivity {
         etOpenTime           = findViewById(R.id.etOpenTime);
         etCloseTime          = findViewById(R.id.etCloseTime);
 
-        // QRIS — semua view untuk dua state
+        // QRIS
         btnUploadQrisEmpty   = findViewById(R.id.btnUploadQrisEmpty);
         containerQrisPreview = findViewById(R.id.containerQrisPreview);
         btnGantiQris         = findViewById(R.id.btnGantiQris);
@@ -163,17 +129,6 @@ public class UbahProfilKantin extends AppCompatActivity {
         etAdminEmail.setEnabled(false);
     }
 
-    // ==========================================================
-    // HELPER QRIS STATE
-    //
-    // Semua perubahan visibility QRIS dipusatkan di sini agar
-    // tidak ada yang terlewat di berbagai tempat.
-    // ==========================================================
-
-    /**
-     * Tampilkan STATE 1: placeholder kosong (belum ada QRIS).
-     * Dipanggil saat: API tidak mengembalikan qrisUrl.
-     */
     private void tampilQrisKosong() {
         Log.d(TAG, "tampilQrisKosong() → STATE 1: placeholder");
         btnUploadQrisEmpty.setVisibility(View.VISIBLE);
@@ -181,11 +136,6 @@ public class UbahProfilKantin extends AppCompatActivity {
         tvQrisPreviewBadge.setVisibility(View.GONE);
     }
 
-    /**
-     * Tampilkan STATE 2 dengan gambar dari SERVER.
-     * Label: "QRIS saat ini" (badge hijau/abu), badge "belum disimpan" GONE.
-     * Dipanggil saat: API mengembalikan qrisUrl yang valid.
-     */
     private void tampilQrisDariServer(String url) {
         Log.d(TAG, "tampilQrisDariServer() → STATE 2 (server): url=" + url);
         btnUploadQrisEmpty.setVisibility(View.GONE);
@@ -200,32 +150,20 @@ public class UbahProfilKantin extends AppCompatActivity {
         Glide.with(this).load(url).into(ivQrisImage);
     }
 
-    /**
-     * Tampilkan STATE 2 dengan gambar PREVIEW dari file lokal.
-     * Label: "Preview QRIS baru", badge "belum disimpan" VISIBLE.
-     * Dipanggil saat: user memilih file baru dari galeri.
-     */
     private void tampilQrisPreviewBaru(File file) {
         Log.d(TAG, "tampilQrisPreviewBaru() → STATE 2 (preview): path=" + file.getAbsolutePath());
         btnUploadQrisEmpty.setVisibility(View.GONE);
         containerQrisPreview.setVisibility(View.VISIBLE);
 
-        // Label berubah jadi "Preview QRIS baru" — tetap pakai drawable yang sama
         tvQrisLabel.setText("Preview QRIS baru");
         tvQrisLabel.setBackgroundResource(R.drawable.bg_badge_orange_light);
         tvQrisLabel.setVisibility(View.VISIBLE);
 
-        // Banner peringatan "belum disimpan" muncul
         tvQrisPreviewBadge.setVisibility(View.VISIBLE);
 
         Glide.with(this).load(file).into(ivQrisImage);
     }
 
-    /**
-     * Setelah simpan berhasil: sembunyikan badge "belum disimpan",
-     * kembalikan label ke "QRIS saat ini".
-     * Dipanggil di callback sukses updateCanteenSettings.
-     */
     private void konfirmasiQrisTersimpan(String urlBaru) {
         Log.d(TAG, "konfirmasiQrisTersimpan() → url=" + urlBaru);
         tvQrisPreviewBadge.setVisibility(View.GONE);
@@ -234,13 +172,8 @@ public class UbahProfilKantin extends AppCompatActivity {
         if (urlBaru != null) {
             Glide.with(this).load(urlBaru).into(ivQrisImage);
         }
-        // Reset file agar tidak dikirim ulang jika user simpan lagi
         fileQris = null;
     }
-
-    // ==========================================================
-    // LOAD DATA (READ)
-    // ==========================================================
 
     private void loadCanteenSettings() {
         String canteenId = sessionManager.getCanteenId();
@@ -280,7 +213,6 @@ public class UbahProfilKantin extends AppCompatActivity {
                             Glide.with(UbahProfilKantin.this).load(data.getImage()).into(ivCanteenLogo);
                         }
 
-                        // ── QRIS: tentukan state awal berdasarkan data server ──
                         if (data.getQrisUrl() != null && !data.getQrisUrl().isEmpty()) {
                             tampilQrisDariServer(data.getQrisUrl());
                         } else {
@@ -361,10 +293,6 @@ public class UbahProfilKantin extends AppCompatActivity {
         });
     }
 
-    // ==========================================================
-    // EVENT LISTENER & IMAGE PICKER
-    // ==========================================================
-
     private void setupListeners() {
         btnBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
@@ -375,7 +303,7 @@ public class UbahProfilKantin extends AppCompatActivity {
         btnEditCanteenLogo.setOnClickListener(v -> bukaGaleri(TYPE_LOGO));
         ivCanteenLogo.setOnClickListener(v      -> bukaGaleri(TYPE_LOGO));
 
-        // QRIS — kedua state sama-sama buka galeri
+        // QRIS
         btnUploadQrisEmpty.setOnClickListener(v -> bukaGaleri(TYPE_QRIS));
         btnGantiQris.setOnClickListener(v       -> bukaGaleri(TYPE_QRIS));
 
@@ -414,14 +342,6 @@ public class UbahProfilKantin extends AppCompatActivity {
         picker.start();
     }
 
-    // ==========================================================
-    // onActivityResult — terima file dari ImagePicker
-    //
-    // FIX: Pakai "extra_image_path" dari Intent extras, bukan
-    // new File(uri.getPath()) yang tidak valid di Android 10+.
-    // content:// URI tidak bisa langsung dijadikan File path.
-    // ==========================================================
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -430,7 +350,6 @@ public class UbahProfilKantin extends AppCompatActivity {
 
             String filePath = data.getStringExtra("extra_image_path");
 
-            // Fallback untuk ImagePicker versi lama yang tidak set extras
             if (filePath == null && data.getData() != null) {
                 filePath = data.getData().getPath();
                 Log.w(TAG, "onActivityResult → extras kosong, fallback ke URI path: " + filePath);
@@ -460,7 +379,6 @@ public class UbahProfilKantin extends AppCompatActivity {
 
                 } else if (currentImageType == TYPE_QRIS) {
                     fileQris = file;
-                    // Langsung tampilkan preview + badge "belum disimpan"
                     tampilQrisPreviewBaru(fileQris);
                     Log.d(TAG, "onActivityResult → fileQris diset | path=" + fileQris.getAbsolutePath());
 
@@ -479,9 +397,6 @@ public class UbahProfilKantin extends AppCompatActivity {
         }
     }
 
-    // ==========================================================
-    // SIMPAN DATA
-    // ==========================================================
 
     @SuppressWarnings("SetTextI18n")
     private void validasiDanSimpan() {
@@ -518,8 +433,6 @@ public class UbahProfilKantin extends AppCompatActivity {
                 + " | fileLogo=" + (fileLogo != null ? fileLogo.getAbsolutePath() + " (size=" + fileLogo.length() + ")" : "null")
                 + " | fileQris=" + (fileQris != null ? fileQris.getAbsolutePath() + " (size=" + fileQris.length() + ")" : "null"));
 
-        // _method=PUT: dikirim sebagai POST agar PHP bisa baca file multipart,
-        // tapi Laravel tetap routing ke Route::put('/canteens/{id}/settings').
         RequestBody method      = RequestBody.create(MediaType.parse("text/plain"), "PUT");
         RequestBody desc        = RequestBody.create(MediaType.parse("text/plain"), descVal);
         RequestBody fee         = RequestBody.create(MediaType.parse("text/plain"), feeVal);
@@ -566,12 +479,9 @@ public class UbahProfilKantin extends AppCompatActivity {
                                         + " | image=" + updated.getImage()
                                         + " | qris="  + updated.getQrisUrl());
 
-                                // QRIS berhasil disimpan → update state UI:
-                                // sembunyikan badge "belum disimpan", label kembali ke "QRIS saat ini"
                                 if (updated.getQrisUrl() != null) {
                                     konfirmasiQrisTersimpan(updated.getQrisUrl());
                                 } else if (fileQris != null) {
-                                    // Server tidak kembalikan URL baru tapi file dikirim — reset saja badge
                                     konfirmasiQrisTersimpan(null);
                                 }
                             }
@@ -609,7 +519,6 @@ public class UbahProfilKantin extends AppCompatActivity {
         RequestBody rbName  = RequestBody.create(MediaType.parse("text/plain"), name);
         RequestBody rbPhone = RequestBody.create(MediaType.parse("text/plain"), phone);
 
-        // List kosong = tidak kirim foto. Retrofit tidak bisa terima null sebagai @Part.
         List<MultipartBody.Part> photoParts = new ArrayList<>();
         if (fileAdmin != null) {
             if (fileAdmin.exists() && fileAdmin.length() > 0) {
@@ -668,9 +577,6 @@ public class UbahProfilKantin extends AppCompatActivity {
                 });
     }
 
-    // ==========================================================
-    // HELPER
-    // ==========================================================
 
     private MultipartBody.Part prepareFilePart(String partName, File file) {
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);

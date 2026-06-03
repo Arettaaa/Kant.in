@@ -44,7 +44,6 @@ public class RegisterActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_registerpelanggan);
 
-        // Inisialisasi View
         etName     = findViewById(R.id.etName);
         etEmail    = findViewById(R.id.etEmail);
         etPhone    = findViewById(R.id.etPhone);
@@ -55,14 +54,12 @@ public class RegisterActivity extends AppCompatActivity {
         tabPelanggan = findViewById(R.id.tabPelanggan);
         tabPemilik   = findViewById(R.id.tabPemilik);
 
-        // Inisialisasi View Indikator Password
         bar1 = findViewById(R.id.bar1);
         bar2 = findViewById(R.id.bar2);
         bar3 = findViewById(R.id.bar3);
         bar4 = findViewById(R.id.bar4);
         tvStrengthLabel = findViewById(R.id.tvStrengthLabel);
 
-        // Tombol Mata Password
         ivTogglePassword.setOnClickListener(v -> {
             if (isPasswordVisible) {
                 etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
@@ -76,7 +73,6 @@ public class RegisterActivity extends AppCompatActivity {
             etPassword.setSelection(etPassword.getText().length());
         });
 
-        // TextWatcher untuk ngecek kekuatan password secara real-time
         etPassword.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -90,10 +86,8 @@ public class RegisterActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
-        // Klik Tombol Register
         btnRegister.setOnClickListener(this::onClick);
-
-        // Pindah ke halaman admin
+        
         tabPemilik.setOnClickListener(v -> {
             startActivity(new Intent(RegisterActivity.this, RegisterAdminActivity.class));
             finish();

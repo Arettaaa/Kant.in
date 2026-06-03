@@ -38,7 +38,6 @@ import retrofit2.Response;
 
 public class TambahMenu extends AppCompatActivity {
 
-    // UI Components
     private CardView btnBack, cardPhotoPreview, btnChangeFoto, btnSave;
     private ImageView ivPhotoPreview;
     private LinearLayout containerPhoto, layoutUploadPlaceholder;
@@ -46,12 +45,10 @@ public class TambahMenu extends AppCompatActivity {
     private Spinner spinnerCategory;
     private android.widget.CheckBox switchIsAvailable;
 
-    // Data & Network
     private Uri selectedImageUri = null;
     private ApiService apiService;
     private SessionManager sessionManager;
 
-    // Image Picker Launcher
     private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -67,7 +64,6 @@ public class TambahMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tambah_menu);
 
-        // Pengaturan Window Insets (Agar UI rapi sampai ke ujung layar)
         View mainView = findViewById(android.R.id.content);
         if (mainView != null) {
             ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, insets) -> {
@@ -87,14 +83,12 @@ public class TambahMenu extends AppCompatActivity {
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
 
-        // Komponen Foto
         containerPhoto = findViewById(R.id.containerPhoto);
         layoutUploadPlaceholder = findViewById(R.id.layoutUploadPlaceholder);
         cardPhotoPreview = findViewById(R.id.cardPhotoPreview);
         ivPhotoPreview = findViewById(R.id.ivPhotoPreview);
         btnChangeFoto = findViewById(R.id.btnChangeFoto);
 
-        // Komponen Input
         etName = findViewById(R.id.etEditMenuName);
         etPrice = findViewById(R.id.etEditPrice);
         spinnerCategory = findViewById(R.id.spinnerCategory);
@@ -104,17 +98,15 @@ public class TambahMenu extends AppCompatActivity {
 
         btnSave = findViewById(R.id.btnSave);
 
-        switchIsAvailable.setChecked(true); // Default menu tersedia
+        switchIsAvailable.setChecked(true);
     }
 
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
 
-        // Klik area foto kosong atau tombol edit foto
         containerPhoto.setOnClickListener(v -> openGallery());
         btnChangeFoto.setOnClickListener(v -> openGallery());
 
-        // Tombol Simpan
         btnSave.setOnClickListener(v -> validateAndSubmit());
     }
 
@@ -141,13 +133,11 @@ public class TambahMenu extends AppCompatActivity {
         String description = etDescription.getText().toString().trim();
         String category = spinnerCategory.getSelectedItem().toString();
 
-        // 1. Validasi Input Teks Kosong
         if (name.isEmpty() || price.isEmpty()) {
             Toast.makeText(this, "Nama dan Harga wajib diisi!", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 2. Validasi Dropdown Kategori belum dipilih
         if (category.equals("Pilih Kategori...")) {
             Toast.makeText(this, "Silakan pilih kategori menu terlebih dahulu!", Toast.LENGTH_SHORT).show();
             return;
@@ -159,10 +149,9 @@ public class TambahMenu extends AppCompatActivity {
     private void uploadMenuToServer(String name, String price, String category, String cookingTime, String description, boolean isAvailable) {
         String canteenId = sessionManager.getCanteenId();
 
-        btnSave.setEnabled(false); // Matikan tombol sementara agar tidak dobel klik
+        btnSave.setEnabled(false);
         Toast.makeText(this, "Menyimpan menu...", Toast.LENGTH_SHORT).show();
 
-        // Siapkan Data Teks
         RequestBody nameBody = RequestBody.create(name, MediaType.parse("text/plain"));
         RequestBody priceBody = RequestBody.create(price, MediaType.parse("text/plain"));
         RequestBody categoryBody = RequestBody.create(category, MediaType.parse("text/plain"));
@@ -170,7 +159,6 @@ public class TambahMenu extends AppCompatActivity {
         RequestBody descBody = RequestBody.create(description, MediaType.parse("text/plain"));
         RequestBody availableBody = RequestBody.create(isAvailable ? "1" : "0", MediaType.parse("text/plain"));
 
-        // Siapkan Data Gambar (Jika Ada)
         MultipartBody.Part imagePart = null;
         if (selectedImageUri != null) {
             File imageFile = getFileFromUri(selectedImageUri);
@@ -180,7 +168,6 @@ public class TambahMenu extends AppCompatActivity {
             }
         }
 
-        // Tembak API
         apiService.createMenu(canteenId, nameBody, priceBody, categoryBody, cookingTimeBody, descBody, availableBody, imagePart)
                 .enqueue(new Callback<>() {
                     @Override
@@ -188,7 +175,7 @@ public class TambahMenu extends AppCompatActivity {
                         btnSave.setEnabled(true);
                         if (response.isSuccessful()) {
                             Toast.makeText(TambahMenu.this, "Menu berhasil ditambahkan!", Toast.LENGTH_SHORT).show();
-                            finish(); // Tutup Activity setelah sukses
+                            finish();
                         } else {
                             Toast.makeText(TambahMenu.this, "Gagal menyimpan menu", Toast.LENGTH_SHORT).show();
                         }
@@ -202,11 +189,10 @@ public class TambahMenu extends AppCompatActivity {
                 });
     }
 
-    // Fungsi Pengaman untuk konversi URI Galeri ke File fisik
     private File getFileFromUri(Uri uri) {
         try {
             InputStream inputStream = getContentResolver().openInputStream(uri);
-            if (inputStream == null) return null; // Cegah NullPointerException
+            if (inputStream == null) return null;
 
             File tempFile = new File(getCacheDir(), "menu_img_" + System.currentTimeMillis() + ".jpg");
             FileOutputStream outputStream = new FileOutputStream(tempFile);
