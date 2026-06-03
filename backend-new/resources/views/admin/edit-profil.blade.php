@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <style>
-        /* Styling khusus area potong gambar */
         .cropper-container {
             max-height: 60vh;
             width: 100%;
@@ -43,13 +42,11 @@
             </div>
 
             {{-- FORM UPDATE --}}
-            {{-- TAMBAHAN: ID profilForm ditambahkan di sini --}}
             <form id="profilForm" action="{{ route('admin.profil.update') }}" method="POST" enctype="multipart/form-data"
                 class="px-10 py-10 space-y-8 max-w-6xl mx-auto w-full pb-20">
                 @csrf
                 @method('PUT')
 
-                {{-- Pesan Error Validasi --}}
                 @if ($errors->any())
                     <div class="bg-red-50 border border-red-100 text-red-500 p-4 rounded-2xl text-sm font-bold">
                         <ul>
@@ -104,7 +101,7 @@
                                     </div>
                                 </div>
 
-                                {{-- Input Lokasi Kantin (READ-ONLY) --}}
+                                {{-- Input Lokasi Kantin --}}
                                 <div>
                                     <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Lokasi /
                                         Alamat <span class="text-gray-300 normal-case ml-1">(Paten)</span></p>
@@ -189,7 +186,7 @@
                             </div>
                         </div>
 
-                        {{-- Email Pemilik (READ-ONLY) --}}
+                        {{-- Email Pemilik--}}
                         <div>
                             <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Email Kantin
                                 <span class="text-gray-300 normal-case ml-1">(Paten)</span>
@@ -319,13 +316,11 @@
             let currentInputId = '';
             let currentPreviewId = '';
 
-            // Objek untuk menyimpan gambar yang sudah dicrop secara sementara
             let croppedBlobs = {};
 
             const cropperModal = document.getElementById('cropperModal');
             const imageToCrop = document.getElementById('imageToCrop');
 
-            // Menangani semua input file
             document.querySelectorAll('.upload-cropper').forEach(input => {
                 input.addEventListener('change', function (e) {
                     if (this.files && this.files[0]) {
@@ -366,10 +361,8 @@
                 if (!cropper) return;
 
                 cropper.getCroppedCanvas().toBlob((blob) => {
-                    // 1. Simpan blob ke dalam variabel global
                     croppedBlobs[currentInputId] = blob;
 
-                    // 2. Tampilkan di UI
                     const url = URL.createObjectURL(blob);
                     const previewImg = document.getElementById(currentPreviewId);
 
@@ -386,9 +379,6 @@
                 }, 'image/jpeg');
             }
 
-            // =========================================================================
-            // INTERCEPT FORM SUBMIT: KIRM DATA VIA FETCH API UNTUK MENGHINDARI BUG BROWSER
-            // =========================================================================
             document.getElementById('profilForm').addEventListener('submit', async function (e) {
                 e.preventDefault();
 
@@ -397,10 +387,8 @@
                 submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
                 submitBtn.disabled = true;
 
-                // Ambil semua data teks dari form
                 let formData = new FormData(this);
 
-                // Timpa data gambar dengan blob hasil crop (jika ada)
                 if (croppedBlobs['logoInput']) {
                     formData.set('image', croppedBlobs['logoInput'], 'logo.jpg');
                 }
@@ -413,7 +401,7 @@
 
                 try {
                     let response = await fetch(this.action, {
-                        method: 'POST', // Method asli dari form, Laravel membaca @method('PUT') dari token
+                        method: 'POST', 
                         body: formData,
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'
@@ -421,11 +409,9 @@
                     });
 
                     if (response.ok || response.redirected) {
-                        // 1. Munculkan Pop-up Sukses yang cantik
                         document.getElementById('successPopup').classList.remove('hidden');
                         submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Tersimpan';
 
-                        // 2. Tunggu 1.5 detik agar user bisa melihat popup, lalu otomatis redirect
                         setTimeout(() => {
                             window.location.href = "{{ route('admin.profil') }}";
                         }, 1500);

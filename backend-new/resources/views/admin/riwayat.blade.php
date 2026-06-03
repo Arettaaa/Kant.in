@@ -56,7 +56,6 @@
             color: #9CA3AF;
         }
 
-        /* Modal Selectable UI */
         .selectable-btn.active {
             border-color: #FF6900;
             background-color: #FFF8F3;
