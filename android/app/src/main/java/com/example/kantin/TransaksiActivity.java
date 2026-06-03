@@ -38,10 +38,8 @@ import retrofit2.Response;
 
 public class TransaksiActivity extends AppCompatActivity {
 
-    // ✅ TAG untuk Logcat — filter dengan: adb logcat -s TRANSAKSI
     private static final String TAG = "TRANSAKSI";
 
-    // View elements
     private TextView tvTotalPendapatan, tvTotalPesananSelesai, tvDate;
     private TextView tabHariIni, tabMingguIni, tabBulanIni;
     private EditText etSearch;
@@ -51,7 +49,6 @@ public class TransaksiActivity extends AppCompatActivity {
     private TransactionAdapter adapter;
     private List<TransactionOrder> allOrders = new ArrayList<>();
 
-    // Status Filter Default
     private String currentPeriod = "hari_ini";
     private String currentStatusFilter = "semua"; // "semua", "completed", "cancelled"
 
@@ -150,9 +147,6 @@ public class TransaksiActivity extends AppCompatActivity {
         tab.setBackgroundResource(0);
     }
 
-    // ====================================================================
-    // API
-    // ====================================================================
     private void fetchTransactions() {
         SessionManager sessionManager = new SessionManager(this);
         String token     = sessionManager.getToken();
@@ -209,13 +203,9 @@ public class TransaksiActivity extends AppCompatActivity {
         });
     }
 
-    // ====================================================================
-    // FILTER LOGIC
-    // ====================================================================
     private void applyFilters(String query, String period) {
         List<TransactionOrder> filteredList = new ArrayList<>();
 
-        // ✅ Parse UTC agar konsisten dengan format backend
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'", Locale.getDefault());
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
@@ -227,7 +217,6 @@ public class TransaksiActivity extends AppCompatActivity {
 
         for (TransactionOrder order : allOrders) {
             boolean matchesQuery  = true;
-            // ✅ FIX UTAMA: default TRUE agar order tetap tampil walau created_at null/gagal parse
             boolean matchesPeriod = true;
             boolean matchesStatus = true;
 
@@ -247,7 +236,6 @@ public class TransaksiActivity extends AppCompatActivity {
                         Calendar calOrder = Calendar.getInstance();
                         calOrder.setTime(orderDate);
 
-                        // ✅ Reset ke false HANYA setelah Date berhasil di-parse
                         matchesPeriod = false;
 
                         switch (period) {
@@ -272,10 +260,10 @@ public class TransaksiActivity extends AppCompatActivity {
                                 + order.getCreatedAt() + " → matchesPeriod=" + matchesPeriod);
                     }
                 } catch (ParseException e) {
-                    // ✅ Kalau format tanggal berbeda dari yang diharapkan, log formatnya
+
                     Log.w(TAG, "  GAGAL parse created_at [" + order.getOrderCode() + "]: \""
                             + order.getCreatedAt() + "\" — order tetap ditampilkan");
-                    // matchesPeriod tetap true (default), jadi order tidak dibuang
+
                 }
             } else {
                 Log.w(TAG, "  created_at null/kosong [" + order.getOrderCode() + "] — matchesPeriod=true (tampil semua)");

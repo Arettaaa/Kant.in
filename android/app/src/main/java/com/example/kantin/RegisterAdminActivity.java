@@ -47,22 +47,18 @@ public class RegisterAdminActivity extends AppCompatActivity {
 
         initializeViews();
 
-        // Fitur Buka/Tutup Password
         ivTogglePassword.setOnClickListener(v -> togglePassword());
 
-        // Pindah ke register pelanggan
         tabPelanggan.setOnClickListener(v -> {
             startActivity(new Intent(this, RegisterActivity.class));
             finish();
         });
 
-        // Ke halaman login
         tvLogin.setOnClickListener(v -> {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
         });
 
-        // TextWatcher untuk ngecek kekuatan password secara real-time
         etPassword.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -76,7 +72,6 @@ public class RegisterAdminActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
-        // Logika Tombol Daftar Admin
         btnRegister.setOnClickListener(v -> {
             validasiDanDaftar();
         });
@@ -96,7 +91,6 @@ public class RegisterAdminActivity extends AppCompatActivity {
         tabPelanggan    = findViewById(R.id.tabPelanggan);
         tvLogin         = findViewById(R.id.tvLogin);
 
-        // Inisialisasi View Indikator Password (pastikan ID ini ada di XML Register Admin juga)
         bar1 = findViewById(R.id.bar1);
         bar2 = findViewById(R.id.bar2);
         bar3 = findViewById(R.id.bar3);
@@ -107,7 +101,7 @@ public class RegisterAdminActivity extends AppCompatActivity {
     private void togglePassword() {
         if (isPasswordVisible) {
             etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            ivTogglePassword.setImageResource(R.drawable.eye); // Pastikan drawable ini ada
+            ivTogglePassword.setImageResource(R.drawable.eye);
             isPasswordVisible = false;
         } else {
             etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
@@ -117,7 +111,6 @@ public class RegisterAdminActivity extends AppCompatActivity {
         etPassword.setSelection(etPassword.getText().length());
     }
 
-    // Fungsi Cek Kekuatan Password
     private void checkPasswordStrength(String password) {
         int score = 0;
 
@@ -132,7 +125,6 @@ public class RegisterAdminActivity extends AppCompatActivity {
         int colorYellow = Color.parseColor("#EAB308");
         int colorGreen  = Color.parseColor("#22C55E");
 
-        // Reset semua ke abu-abu dulu
         if (bar1 != null) bar1.setBackgroundColor(colorGray);
         if (bar2 != null) bar2.setBackgroundColor(colorGray);
         if (bar3 != null) bar3.setBackgroundColor(colorGray);
@@ -218,26 +210,22 @@ public class RegisterAdminActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<BaseResponse> call, Response<BaseResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    // Tampilan Sukses pada Tombol
+
                     btnRegister.setText("Berhasil! Mengalihkan...");
                     btnRegister.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#22C55E"))); // Hijau
 
-                    // Pesan khusus admin (harus nunggu verifikasi) ditampilkan via Toast yang agak panjang
                     Toast.makeText(RegisterAdminActivity.this, "Pendaftaran Berhasil! Silakan tunggu verifikasi admin untuk masuk.", Toast.LENGTH_LONG).show();
 
-                    // Delay 2.5 Detik
                     new Handler().postDelayed(() -> {
                         startActivity(new Intent(RegisterAdminActivity.this, LoginActivity.class));
                         finish();
                     }, 2500);
 
                 } else {
-                    // Kalau gagal, kembalikan tombol
                     btnRegister.setEnabled(true);
                     btnRegister.setText("DAFTAR SEKARANG");
                     btnRegister.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#F97316"))); // Orange
 
-                    // Tangkap validasi 422 dari Laravel
                     if (response.code() == 422) {
                         try {
                             String errorBody = response.errorBody().string();
@@ -250,7 +238,6 @@ public class RegisterAdminActivity extends AppCompatActivity {
                                 if (errors.has("email")) etEmail.setError(errors.getJSONArray("email").getString(0));
                                 if (errors.has("phone")) etPhone.setError(errors.getJSONArray("phone").getString(0));
                                 if (errors.has("password")) etPassword.setError(errors.getJSONArray("password").getString(0));
-                                // Asumsi field nama kantin di Laravel adalah "canteen_name". Ganti kalau berbeda!
                                 if (errors.has("canteen_name")) etNamaKantin.setError(errors.getJSONArray("canteen_name").getString(0));
                             } else {
                                 String msg = json.optString("message", "Data tidak valid");
