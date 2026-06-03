@@ -37,7 +37,6 @@ public class UbahProfilPelangganActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private File photoFile = null;
 
-    // Pastikan URL Ngrok ini sesuai dengan yang sedang jalan
     private final String BASE_URL_STORAGE = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/";
 
     @Override
@@ -65,7 +64,7 @@ public class UbahProfilPelangganActivity extends AppCompatActivity {
         etPhone = findViewById(R.id.etPhone);
         etEmail = findViewById(R.id.etEmail);
         btnSimpan = findViewById(R.id.btnSimpan);
-        etEmail.setEnabled(false); // Biasanya email tidak bisa diubah
+        etEmail.setEnabled(false);
     }
 
     private void loadDataAwal() {
@@ -149,7 +148,6 @@ public class UbahProfilPelangganActivity extends AppCompatActivity {
 
         String token = "Bearer " + sessionManager.getToken();
 
-        // 3. Panggil API (Sekarang hanya 4 parameter karena _method dihapus)
         ApiClient.getClient().create(ApiService.class)
                 .updateProfileBuyers(token, rbName, rbPhone, partPhoto)
                 .enqueue(new Callback<ProfileResponse>() {
@@ -160,7 +158,6 @@ public class UbahProfilPelangganActivity extends AppCompatActivity {
 
                         if (response.isSuccessful()) {
                             Toast.makeText(UbahProfilPelangganActivity.this, "Profil berhasil diperbarui!", Toast.LENGTH_SHORT).show();
-                            // Update session lokal agar saat balik ke halaman sebelumnya data sudah baru
                             if (response.body() != null) {
                                 ProfileResponse.UserData d = response.body().getData();
                                 sessionManager.saveUserInfo(d.getName(), d.getEmail(), d.getPhone());

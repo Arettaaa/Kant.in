@@ -41,7 +41,6 @@ public class UpdateStatusPesananActivity extends AppCompatActivity {
     private OrderModel currentOrder;
     private ApiService apiService;
 
-    // 🔥 Variabel untuk nyimpen status sementara sebelum tombol ditekan
     private String selectedStatus = "processing";
 
     // Warna State UI
@@ -135,19 +134,17 @@ public class UpdateStatusPesananActivity extends AppCompatActivity {
     private void setupListeners() {
         btnBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
-        // 🔥 KLIK KARTU DIMASAK: Hanya ubah UI jadi oranye, tombol ilang
+
         cardDimasak.setOnClickListener(v -> {
             selectedStatus = "processing";
             updateUIByStatus("processing");
         });
 
-        // 🔥 KLIK KARTU SIAP: Hanya ubah UI jadi hijau, munculin tombol (API BELUM DITEMBAK)
         cardSiap.setOnClickListener(v -> {
             selectedStatus = "ready";
             updateUIByStatus("ready");
         });
 
-        // 🔥 KLIK TOMBOL BAWAH: Nembak API untuk ubah jadi "ready"
         btnSelesaiPesanan.setOnClickListener(v -> {
             if (selectedStatus.equals("ready")) {
                 updateStatusToBackend("ready");
@@ -156,7 +153,6 @@ public class UpdateStatusPesananActivity extends AppCompatActivity {
     }
 
     private void updateStatusToBackend(String newStatus) {
-        // Matikan tombol sementara biar gak diklik dobel
         btnSelesaiPesanan.setEnabled(false);
         btnSelesaiPesanan.setText("Menyimpan Status...");
 
@@ -170,7 +166,7 @@ public class UpdateStatusPesananActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     Toast.makeText(UpdateStatusPesananActivity.this, "Pesanan siap diambil/diantar!", Toast.LENGTH_SHORT).show();
-                    finish(); // 🔥 Balik otomatis ke halaman sebelumnya (Dashboard)
+                    finish();
                 } else {
                     btnSelesaiPesanan.setText("Konfirmasi Pesanan Siap");
                     Toast.makeText(UpdateStatusPesananActivity.this, "Gagal memperbarui status", Toast.LENGTH_SHORT).show();
@@ -219,8 +215,8 @@ public class UpdateStatusPesananActivity extends AppCompatActivity {
             cardSiap.setCardElevation(8f);
 
             tvStatusKeterangan.setText("Klik tombol di bawah untuk memberitahu pelanggan.");
-            btnSelesaiPesanan.setText("Konfirmasi Pesanan Siap"); // Ubah teks tombol
-            btnSelesaiPesanan.setVisibility(View.VISIBLE); // Munculkan tombol
+            btnSelesaiPesanan.setText("Konfirmasi Pesanan Siap");
+            btnSelesaiPesanan.setVisibility(View.VISIBLE);
         }
     }
 }
