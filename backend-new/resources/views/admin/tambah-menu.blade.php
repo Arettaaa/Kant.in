@@ -25,7 +25,7 @@
     {{-- MAIN CONTENT --}}
     <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#F9FAFB]">
         
-        {{-- Header --}}
+        
         <div class="sticky top-0 z-10 w-full flex items-center gap-4 px-10 py-6 bg-white/90 backdrop-blur-md border-b border-gray-100">
             <a href="{{ route('admin.menu') }}" class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-200 hover:bg-gray-50 transition-all">
                 <i class="fa-solid fa-arrow-left text-gray-400"></i>
@@ -33,11 +33,11 @@
             <h2 class="text-xl font-extrabold text-gray-900 leading-none">Tambah Menu Baru</h2>
         </div>
 
-        {{-- Form Container --}}
+        
         <form id="menuForm" action="{{ route('admin.menu.store') }}" method="POST" enctype="multipart/form-data" class="px-10 py-8 space-y-8 pb-32">
             @csrf
             
-            {{-- Upload Gambar --}}
+            
             <div class="w-full">
                 <p class="text-xs font-black text-gray-900 uppercase tracking-widest mb-4">Gambar Menu</p>
                 <label for="imageUpload" class="group cursor-pointer w-full h-48 border-2 border-dashed border-gray-200 rounded-[32px] bg-white flex flex-col items-center justify-center gap-3 hover:border-[#FF6900] transition-all overflow-hidden relative">
@@ -57,7 +57,7 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {{-- Kolom Kiri --}}
+              
                 <div class="space-y-6 text-start">
                     <div>
                         <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">Nama Menu</p>
@@ -82,9 +82,18 @@
                         </select>
                         @error('category') <span class="text-red-500 text-xs font-bold mt-1">{{ $message }}</span> @enderror
                     </div>
+                    
+                    <div>
+                        <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">Estimasi Waktu Masak</p>
+                        <div class="relative">
+                            <input type="number" name="estimated_cooking_time" id="estimasiMasak" placeholder="15" value="{{ old('estimated_cooking_time') }}" min="1" class="w-full pl-6 pr-20 py-4 rounded-2xl bg-white border border-gray-100 shadow-sm focus:outline-none focus:border-[#FF6900] font-bold text-gray-800 transition-all">
+                            <span class="absolute right-6 top-1/2 -translate-y-1/2 font-bold text-gray-400">Menit</span>
+                        </div>
+                        @error('estimated_cooking_time') <span class="text-red-500 text-xs font-bold mt-1">{{ $message }}</span> @enderror
+                    </div>
                 </div>
 
-                {{-- Kolom Kanan --}}
+               
                 <div class="space-y-6 text-start">
                     <div>
                         <p class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">Deskripsi</p>
@@ -97,10 +106,10 @@
                             <p class="text-[11px] text-gray-400 font-medium">Matikan jika item habis</p>
                         </div>
                         
-                        {{-- Hidden input untuk mengirim status toggle ke backend --}}
+                       
                         <input type="hidden" name="is_available" id="isAvailableInput" value="1">
                         
-                        {{-- Toggle Button yang presisi di tengah --}}
+                       
                         <button type="button" onclick="toggleSwitch()" id="switchBtn" class="relative inline-flex h-6 w-12 items-center rounded-full transition-colors duration-300 ease-in-out bg-[#22c55e]">
                             <span id="switchCircle" class="inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform duration-300 ease-in-out translate-x-6"></span>
                         </button>
@@ -108,7 +117,7 @@
                 </div>
             </div>
 
-            {{-- Floating Button di Bawah --}}
+          
             <div class="fixed bottom-0 right-0 left-[240px] p-6 bg-white/80 backdrop-blur-md border-t border-gray-100 z-20 flex justify-center">
                 <button type="submit" id="submitBtn" disabled 
                     class="w-full max-w-lg py-4 bg-[#FF6900] text-white rounded-2xl font-black text-sm shadow-xl flex items-center justify-center gap-3 transition-all duration-300 opacity-30 cursor-not-allowed">
@@ -123,7 +132,7 @@
 
 @push('scripts')
 <script>
-    // Logic untuk Switch Ketersediaan (menggunakan Flex & Translate Tailwind)
+    
     let isAvailable = true;
     function toggleSwitch() {
         isAvailable = !isAvailable;
@@ -142,7 +151,6 @@
         }
     }
 
-    // Logic Preview Gambar
     const imgInput = document.getElementById('imageUpload');
     const imgPreview = document.getElementById('imagePreview');
     const previewContainer = document.getElementById('previewContainer');
@@ -157,7 +165,6 @@
         }
     }
 
-    // Logic Validasi Form untuk mengaktifkan tombol submit
     const formInputs = ['namaMenu', 'hargaMenu', 'kategoriMenu'];
     
     function validateForm() {
@@ -181,7 +188,6 @@
         document.getElementById(id).addEventListener('change', validateForm);
     });
 
-    // Panggil sekali saat halaman dimuat
     document.addEventListener('DOMContentLoaded', validateForm);
 </script>
 @endpush
