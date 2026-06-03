@@ -37,9 +37,9 @@ class AuthController extends Controller
         if ($role === 'admin_kantin') {
             $canteen = Canteen::create([
                 'name'              => $request->canteen_name,
-                'location'          => $request->canteen_location ?? null,    // ← tambah
-                'description'       => $request->canteen_description ?? null, // ← tambah
-                'phone'             => $request->canteen_phone ?? null,       // ← tambah
+                'location'          => $request->canteen_location ?? null,   
+                'description'       => $request->canteen_description ?? null,
+                'phone'             => $request->canteen_phone ?? null,      
                 'is_active'         => false,
                 'status'            => 'pending',
                 'delivery_fee_flat' => 0,
