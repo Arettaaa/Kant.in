@@ -15,7 +15,7 @@
 
     /* ── LEFT PANEL ── */
     .left-panel {
-        width: 320px; /* Sedikit dilebarkan agar teks lebih lega */
+        width: 320px; 
         flex-shrink: 0;
         position: relative;
         display: flex;
@@ -24,7 +24,7 @@
     }
 
     .hero-img-wrap {
-        height: 220px; /* Dikecilkan dari 300px agar konten bawah naik */
+        height: 220px; 
         overflow: hidden;
         flex-shrink: 0;
         position: relative;
@@ -129,17 +129,17 @@
         transform: scale(0.95);
     }
 
-    /* ── SEARCH INPUT ── */
+    /* ── SEARCH INPUT (Main Area) ── */
     .search-input {
         width: 100%;
-        padding: 12px 16px 12px 42px;
-        border-radius: 16px;
+        padding: 14px 16px 14px 44px;
+        border-radius: 18px;
         background: white;
-        border: 1.5px solid #F3F4F6;
-        font-size: 13.5px;
+        border: 1.5px solid #F0EDE8;
+        font-size: 14px;
         color: #111;
         transition: all 0.2s;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
     .search-input:focus {
         outline: none;
@@ -207,16 +207,6 @@
                 @endif
             </div>
 
-            {{-- SEARCH BAR (Dipindah ke atas agar mudah dicari) --}}
-            <div class="relative">
-                <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none"
-                    stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input id="menuSearch" type="text" placeholder="Cari menu di kantin ini..." oninput="searchMenu()" class="search-input">
-            </div>
-
             {{-- Info Badges Card --}}
             <div class="info-card">
                 @if(!empty($kantin['location']))
@@ -266,7 +256,17 @@
 
     {{-- ======================== MAIN CONTENT ======================== --}}
     <main class="flex-1 flex flex-col h-screen overflow-y-auto bg-[#F9FAFB] hide-scrollbar relative">
-        <div class="px-10 py-10 flex flex-col gap-12 pb-32">
+        <div class="px-10 py-10 flex flex-col gap-10 pb-32">
+
+            {{-- SEARCH BAR (Berada di atas daftar menu makanan) --}}
+            <div class="relative w-full mb-2">
+                <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input id="menuSearch" type="text" placeholder="Cari menu di kantin ini..." oninput="searchMenu()" class="search-input">
+            </div>
 
             @forelse($menuByKategori as $kategori => $items)
             <section class="menu-section" data-section="{{ strtolower($kategori) }}">
@@ -408,7 +408,6 @@
     }
 
     function addToCart(btn, menuId, price) {
-        // Animasi klik tombol
         btn.style.backgroundColor = '#FF6900';
         btn.style.color = 'white';
         btn.style.borderColor = '#FF6900';
@@ -447,10 +446,9 @@
         })
         .then(data => {
             btn.disabled = false;
-            // Kembalikan style tombol ke awal (outline abu) agar bisa diklik lagi
             setTimeout(() => {
                 btn.style.backgroundColor = 'white';
-                btn.style.color = '#FF6900'; // Biar tetep oren setelah diklik
+                btn.style.color = '#FF6900'; 
             }, 300);
 
             cartCount++;

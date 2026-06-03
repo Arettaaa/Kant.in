@@ -84,7 +84,7 @@
                                 </div>
                                 <div class="text-left">
                                     <p class="text-[15px] font-black text-gray-800">Data Diri</p>
-                                    <p class="text-[12px] text-gray-400 font-medium">Nama, alamat, kontak</p>
+                                    <p class="text-[12px] text-gray-400 font-medium">Nama, alamat email, kontak</p>
                                 </div>
                             </div>
                             <i class="fa-solid fa-chevron-right text-gray-300 text-sm"></i>
