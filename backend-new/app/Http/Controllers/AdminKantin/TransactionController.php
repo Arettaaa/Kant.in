@@ -58,25 +58,30 @@ class TransactionController extends Controller
         return view('admin.detail-riwayat', compact('order'));
     }
 
+    /**
+     * API endpoint untuk Chart.js & Info Cards
+     */
     public function chartData(Request $request)
     {
-        $type = $request->input('type', 'day'); 
+        $type = $request->input('type', 'day'); // 'day', 'week', 'month'
         $canteenId = $this->getCanteenId();
 
         $startDate = null;
         $endDate = null;
 
+        // 1. Cek jika ada custom date dari modal filter
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $startDate = Carbon::parse($request->start_date, 'Asia/Jakarta')->startOfDay();
             $endDate = Carbon::parse($request->end_date, 'Asia/Jakarta')->endOfDay();
         } else {
+            // 2. Mode Kalender Asli
             if ($type === 'week') {
-                $startDate = now('Asia/Jakarta')->startOfWeek(); 
-                $endDate = now('Asia/Jakarta')->endOfWeek();   
+                $startDate = now('Asia/Jakarta')->startOfWeek(); // Senin
+                $endDate = now('Asia/Jakarta')->endOfWeek();   // Minggu
             } elseif ($type === 'month') {
-                $startDate = now('Asia/Jakarta')->startOfMonth(); 
-                $endDate = now('Asia/Jakarta')->endOfMonth();   
-            } else { 
+                $startDate = now('Asia/Jakarta')->startOfMonth(); // Tgl 1
+                $endDate = now('Asia/Jakarta')->endOfMonth();   // Tgl Akhir
+            } else { // default 'day'
                 $startDate = now('Asia/Jakarta')->startOfDay();
                 $endDate = now('Asia/Jakarta')->endOfDay();
             }
@@ -100,6 +105,7 @@ class TransactionController extends Controller
         for ($i = 0; $i < $periode; $i++) {
             $date = $startDate->copy()->addDays($i)->format('Y-m-d');
 
+            // Jika filter Hari Ini, cukup tulis "Hari Ini", selain itu cetak Tgl+Bulan
             if ($type === 'day' && !$request->filled('start_date')) {
                 $labels[] = 'Hari Ini';
             } else {
@@ -146,6 +152,8 @@ class TransactionController extends Controller
         return $this->exportPdf($orders, $canteen, $startDate, $endDate);
     }
 
+
+    //  EXCEL EXPORT 
 
     protected function exportExcel($orders, $canteen, $startDate, $endDate): StreamedResponse
     {

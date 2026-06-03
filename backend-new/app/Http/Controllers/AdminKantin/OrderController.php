@@ -30,19 +30,23 @@ class OrderController extends Controller
         return $this->user()['canteen_id'] ?? '';
     }
 
+    // GET /admin/pesanan
     public function index(Request $request)
     {
         $canteenId = $this->canteenId();
 
+        // Ambil pending orders
         $pendingResponse = Http::withToken($this->token())
             ->get($this->apiUrl("/canteens/{$canteenId}/orders"), ['status' => 'pending']);
 
+        // Ambil processing + ready orders
         $processingResponse = Http::withToken($this->token())
             ->get($this->apiUrl("/canteens/{$canteenId}/orders"), ['status' => 'processing']);
 
         $readyResponse = Http::withToken($this->token())
             ->get($this->apiUrl("/canteens/{$canteenId}/orders"), ['status' => 'ready']);
 
+        // Ambil data kantin
         $canteenResponse = Http::withToken($this->token())
             ->get($this->apiUrl("/canteens/{$canteenId}/settings"));
 
@@ -62,6 +66,7 @@ class OrderController extends Controller
         ]);
     }
 
+    // GET /admin/pesanan/{id}/rincian
     public function rincian($id)
     {
         $canteenId = $this->canteenId();
@@ -81,6 +86,7 @@ class OrderController extends Controller
         return view('admin.rincian', compact('order'));
     }
 
+    // POST /admin/pesanan/{id}/verify
     public function verify($id)
     {
         $canteenId = $this->canteenId();
@@ -95,6 +101,7 @@ class OrderController extends Controller
         return back()->with('error', $response->json()['message'] ?? 'Gagal verifikasi pembayaran.');
     }
 
+    // POST /admin/pesanan/{id}/reject
     public function reject(Request $request, $id)
     {
         $canteenId = $this->canteenId();
@@ -111,6 +118,7 @@ class OrderController extends Controller
         return back()->with('error', $response->json()['message'] ?? 'Gagal menolak pembayaran.');
     }
 
+    // PUT /admin/pesanan/{id}/status
     public function updateStatus(Request $request, $id)
     {
         $canteenId = $this->canteenId();
@@ -127,6 +135,7 @@ class OrderController extends Controller
         return back()->with('error', $response->json()['message'] ?? 'Gagal update status.');
     }
 
+    // POST /admin/pesanan/{id}/cancel
     public function cancel($id)
     {
         $canteenId = $this->canteenId();
@@ -143,6 +152,7 @@ class OrderController extends Controller
         return back()->with('error', $response->json()['message'] ?? 'Gagal membatalkan pesanan.');
     }
 
+    // GET /admin/riwayat
     public function history(Request $request)
     {
         $canteenId = $this->canteenId();
@@ -157,6 +167,7 @@ class OrderController extends Controller
         return view('admin.riwayat', compact('orders'));
     }
 
+    // GET /admin/riwayat/{id}
     public function historyDetail($id)
     {
         $canteenId = $this->canteenId();

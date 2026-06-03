@@ -9,11 +9,17 @@ use Illuminate\Http\Request;
 
 class PesananController extends Controller
 {
+    /**
+     * Ambil canteen_id dari session user (bukan auth()->user()).
+     */
     private function getCanteenId(): string
     {
         return (string) session('user')['canteen_id'];
     }
 
+    /**
+     * Halaman utama pesanan — tampil pesanan masuk & diproses.
+     */
     public function index()
     {
         $canteenId = $this->getCanteenId();
@@ -38,6 +44,9 @@ class PesananController extends Controller
         ));
     }
 
+    /**
+     * Update status pesanan.
+     */
     public function updateStatus(Request $request, $orderId)
     {
         $request->validate([
@@ -60,6 +69,9 @@ class PesananController extends Controller
             ->with('success', 'Status pesanan berhasil diperbarui.');
     }
 
+    /**
+     * Verifikasi pembayaran → status jadi processing → redirect ke halaman status.
+     */
     public function verifyPayment($orderId)
     {
         $canteenId = $this->getCanteenId();
@@ -85,10 +97,14 @@ class PesananController extends Controller
             'status'  => 'processing',
         ]);
 
+        // Redirect ke halaman status setelah terima
         return redirect()->route('admin.pesanan.status', $orderId)
             ->with('success', 'Pembayaran diverifikasi. Pesanan sedang dimasak.');
     }
 
+    /**
+     * Tolak pembayaran → batalkan pesanan → redirect ke halaman cancel.
+     */
     public function rejectPayment(Request $request, $orderId)
     {
         $request->validate([
@@ -117,9 +133,13 @@ class PesananController extends Controller
             'status'  => Order::STATUS_CANCELLED,
         ]);
 
+        // Redirect ke halaman cancel setelah tolak
         return redirect()->route('admin.pesanan.cancelPage', $orderId);
     }
 
+    /**
+     * Toggle buka/tutup kantin — AJAX, return JSON.
+     */
     public function toggleOpen(Request $request)
     {
         $canteenId = $this->getCanteenId();
@@ -146,6 +166,9 @@ class PesananController extends Controller
         ]);
     }
 
+    /**
+     * Halaman rincian pesanan lengkap — verifikasi / tolak pembayaran di sini.
+     */
     public function rincian($orderId)
     {
         $canteenId = $this->getCanteenId();
@@ -161,6 +184,9 @@ class PesananController extends Controller
         return view('admin.pesanan-rincian', compact('order'));
     }
 
+    /**
+     * Batalkan pesanan.
+     */
     public function cancel($orderId)
     {
         $canteenId = $this->getCanteenId();
@@ -182,6 +208,10 @@ class PesananController extends Controller
         return redirect()->route('admin.pesanan.cancelPage', $orderId);
     }
 
+    /**
+     * Halaman status pesanan — admin ubah dari processing → ready.
+     * GET /pesanan/{id}/status
+     */
     public function statusPage($orderId)
     {
         $canteenId = $this->getCanteenId();
@@ -197,6 +227,10 @@ class PesananController extends Controller
         return view('admin.status', compact('order'));
     }
 
+    /**
+     * Halaman cancel — read only, tampil info pesanan yang dibatalkan.
+     * GET /pesanan/{id}/cancel
+     */
     public function cancelPage($orderId)
     {
         $canteenId = $this->getCanteenId();
