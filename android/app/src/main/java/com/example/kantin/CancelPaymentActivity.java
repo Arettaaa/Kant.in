@@ -25,7 +25,7 @@ public class CancelPaymentActivity extends AppCompatActivity {
 
     private ImageView btnBack;
     private TextView tvTimer;
-    private TextView tvOrderId; // tambah ini
+    private TextView tvOrderId;
 
     private MaterialButton btnCancelOrder;
     private CountDownTimer countDownTimer;
@@ -41,7 +41,7 @@ public class CancelPaymentActivity extends AppCompatActivity {
         tvOrderId = findViewById(R.id.tvOrderId);
         btnCancelOrder = findViewById(R.id.btnCancelOrder);
 
-        // Tampilkan ORDER_CODE di UI (bukan ORDER_ID)
+        //  ORDER_CODE
         // Di onCreate, setelah ambil intent
         String orderCode = getIntent().getStringExtra("ORDER_CODE");
         String orderId = getIntent().getStringExtra("ORDER_ID");
@@ -76,7 +76,6 @@ public class CancelPaymentActivity extends AppCompatActivity {
         }.start();
     }
 
-    // --- FUNGSI MEMUNCULKAN BOTTOM SHEET DIALOG ---
     private void showCancelBottomSheetDialog() {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
 
@@ -128,20 +127,16 @@ public class CancelPaymentActivity extends AppCompatActivity {
                     });
         });
 
-        // Aksi jika user klik "Kembali" di dialog
         btnBackFromDialog.setOnClickListener(v -> {
             bottomSheetDialog.dismiss();
         });
 
-        // Tampilkan dialog ke layar
         bottomSheetDialog.show();
     }
 
-    // FUNGSI INI WAJIB ADA AGAR TIMER BERHENTI SAAT PINDAH HALAMAN
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Pastikan timer dihentikan saat halaman ditutup agar tidak bocor di background
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }

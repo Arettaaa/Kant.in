@@ -2,28 +2,6 @@ package com.example.kantin.model.response;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * ProfileAdminResponse — disesuaikan dengan ProfileController.php
- *
- * Response GET /admin/profiles:
- * {
- *   "success": true,
- *   "data": {
- *     "_id", "name", "email", "phone", "role",
- *     "canteen_id", "status", "photo_profile",
- *     "created_at", "updated_at"
- *   }
- * }
- *
- * CATATAN: ProfileController hanya return data user saja (toArray()),
- * tidak ada nested canteen. Canteen info diambil terpisah jika dibutuhkan.
- *
- * Field update yang diterima server (ProfileController@update):
- * - name (sometimes)
- * - phone (sometimes)
- * - photo_profile (file image)
- * - password (sometimes, min:8, confirmed → butuh password_confirmation)
- */
 public class ProfileAdminResponse {
 
     @SerializedName("success")

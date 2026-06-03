@@ -106,6 +106,10 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
 
         // 5. Tombol Tambah (Add to Cart)
         holder.btnAddMenu.setOnClickListener(v -> {
+            if (!menu.isAvailable()) { // ← CEK MENU HABIS DULU
+                Toast.makeText(context, "Menu sedang tidak tersedia", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (!isCanteenOpen) {
                 Toast.makeText(context, "Kantin sedang tutup", Toast.LENGTH_SHORT).show();
                 return;
@@ -135,14 +139,21 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
         });
 
 // tampilan tombol sesuai status kantin
-        if (isCanteenOpen) {
-            holder.btnAddMenu.setAlpha(1.0f);
-            holder.btnAddMenu.setClickable(true);
-            holder.btnAddMenu.setCardBackgroundColor(android.graphics.Color.parseColor("#FFF7ED"));
-        } else {
+        if (!menu.isAvailable()) {
             holder.btnAddMenu.setAlpha(0.4f);
             holder.btnAddMenu.setClickable(false);
             holder.btnAddMenu.setCardBackgroundColor(android.graphics.Color.parseColor("#E5E7EB"));
+            holder.tvStatusMenu.setVisibility(View.VISIBLE); // ← TAMBAH
+        } else if (!isCanteenOpen) {
+            holder.btnAddMenu.setAlpha(0.4f);
+            holder.btnAddMenu.setClickable(false);
+            holder.btnAddMenu.setCardBackgroundColor(android.graphics.Color.parseColor("#E5E7EB"));
+            holder.tvStatusMenu.setVisibility(View.GONE); // ← TAMBAH
+        } else {
+            holder.btnAddMenu.setAlpha(1.0f);
+            holder.btnAddMenu.setClickable(true);
+            holder.btnAddMenu.setCardBackgroundColor(android.graphics.Color.parseColor("#FFF7ED"));
+            holder.tvStatusMenu.setVisibility(View.GONE); // ← TAMBAH
         }
 
     }
@@ -161,6 +172,8 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
         ImageView imgMenu;
         TextView tvNamaMenu, tvDeskripsiMenu, tvHargaMenu, tvRatingMenu;
         androidx.cardview.widget.CardView btnAddMenu;
+        TextView tvStatusMenu;
+
 
         public MenuViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -170,6 +183,8 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
             tvHargaMenu     = itemView.findViewById(R.id.tvHargaMenu);
             btnAddMenu      = itemView.findViewById(R.id.btnAddMenu);
             tvRatingMenu    = itemView.findViewById(R.id.tvRatingMenu);
+            tvStatusMenu = itemView.findViewById(R.id.tvStatusMenu); // ← TAMBAH
+
         }
     }
     public void setCanteenOpen(boolean isOpen) {

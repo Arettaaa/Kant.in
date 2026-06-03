@@ -35,6 +35,8 @@ public class DetailMenuActivity extends AppCompatActivity {
     private boolean isCanteenOpen = true; // ← tambah ini
     private TextView tvTambahKeranjang;
 
+    private boolean isMenuAvailable = true;
+
     private TextView tvRatingMenu, tvJumlahUlasan;
 
 
@@ -176,22 +178,26 @@ public class DetailMenuActivity extends AppCompatActivity {
                 });
     }
 
-    // ← update tampilan tombol sesuai status kantin
     private void updateTambahKeranjangButton() {
-        if (isCanteenOpen) {
-            btnTambahKeranjang.setAlpha(1.0f);
-            btnTambahKeranjang.setEnabled(true);
-            tvTambahKeranjang.setText("Tambah Keranjang");
-        } else {
+        if (!isMenuAvailable) {
+            btnTambahKeranjang.setAlpha(0.4f);
+            btnTambahKeranjang.setEnabled(false);
+            tvTambahKeranjang.setText("Menu Habis");
+        } else if (!isCanteenOpen) {
             btnTambahKeranjang.setAlpha(0.4f);
             btnTambahKeranjang.setEnabled(false);
             tvTambahKeranjang.setText("Kantin Sedang Tutup");
+        } else {
+            btnTambahKeranjang.setAlpha(1.0f);
+            btnTambahKeranjang.setEnabled(true);
+            tvTambahKeranjang.setText("Tambah Keranjang");
         }
     }
 
     private void bindData(MenuListResponse.MenuItem menu) {
         menuName  = menu.getName();
         basePrice = menu.getPriceAsDouble();
+        isMenuAvailable = menu.isAvailable();
 
         tvNamaMenu.setText(menuName);
         tvDeskripsi.setText(menu.getDescription());

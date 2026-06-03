@@ -21,7 +21,7 @@ public class ProfileResponse extends BaseResponse {
         @SerializedName("phone")
         private String phone;
 
-        @SerializedName("photo_profile") // Memastikan mapping ke JSON 'photo_profile'
+        @SerializedName("photo_profile")
         private String photo_profile;
 
         @SerializedName("role")

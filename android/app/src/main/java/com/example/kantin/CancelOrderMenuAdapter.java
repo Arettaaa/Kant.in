@@ -52,7 +52,6 @@ public class CancelOrderMenuAdapter extends RecyclerView.Adapter<CancelOrderMenu
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Sesuaikan ID ini dengan yang ada di item_order_menu.xml kamu
             tvQuantity = itemView.findViewById(R.id.tv_quantity);
             tvMenuName = itemView.findViewById(R.id.tv_menu_name);
             tvNotes = itemView.findViewById(R.id.tv_notes);

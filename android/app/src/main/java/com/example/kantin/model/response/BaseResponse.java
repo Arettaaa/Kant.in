@@ -2,10 +2,6 @@ package com.example.kantin.model.response;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * BaseResponse — dipakai untuk endpoint yang hanya return status + message.
- * Contoh: logout, toggle availability, verify/reject payment, dll.
- */
 public class BaseResponse {
     @SerializedName("success")
     private boolean success;

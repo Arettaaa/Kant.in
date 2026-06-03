@@ -6,13 +6,6 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * OrderListResponse — disesuaikan dengan struktur DB MongoDB asli.
- *
- * Status order  : pending | processing | completed | cancelled
- * Status payment: unpaid | paid | pending_verification | rejected
- * Delivery method: pickup | delivery
- */
 public class OrderListResponse {
 
     @SerializedName("success")

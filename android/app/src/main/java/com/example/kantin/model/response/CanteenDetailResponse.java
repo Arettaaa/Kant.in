@@ -26,10 +26,10 @@ public class CanteenDetailResponse {
         @SerializedName("location")
         private String location;
 
-        @SerializedName("image") // Tetap pakai "image" agar kode temanmu aman
+        @SerializedName("image")
         private String image;
 
-        @SerializedName("qris_image")// Tambahan baru untuk fitur QRIS kamu
+        @SerializedName("qris_image")
         private String qrisUrl;
 
         @SerializedName("is_open")

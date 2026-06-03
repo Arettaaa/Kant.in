@@ -45,19 +45,16 @@ public class OrderProsesFragment extends Fragment {
         adapter = new OrderProsesAdapter(getContext(), orderList);
         rvOrderProses.setAdapter(adapter);
 
-        // HAPUS fetchOrders() dari sini biar nggak tabrakan!
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // Cukup panggil API di sini saja
         fetchOrders();
     }
 
     private void fetchOrders() {
-        // PERLINDUNGAN CRASH: Pastikan fragment menempel di layar
         Context context = getContext();
         if (!isAdded() || context == null) return;
 
@@ -67,16 +64,13 @@ public class OrderProsesFragment extends Fragment {
         api.getAdminOrders(session.getCanteenId(), "processing").enqueue(new Callback<AdminOrderListResponse>() {
             @Override
             public void onResponse(@NonNull Call<AdminOrderListResponse> call, @NonNull Response<AdminOrderListResponse> response) {
-                // PERLINDUNGAN CRASH
                 if (!isAdded() || getContext() == null) return;
 
-                // 🔥 HAPUS syarat isSuccess() di sini!
                 if (response.isSuccessful() && response.body() != null) {
                     orderList.clear();
 
                     if (response.body().getData() != null) {
                         orderList.addAll(response.body().getData());
-                        // Tambahkan Log biar kita yakin datanya masuk
                         android.util.Log.d("DEBUG_PROSES", "Jumlah pesanan diproses: " + orderList.size());
                     }
 

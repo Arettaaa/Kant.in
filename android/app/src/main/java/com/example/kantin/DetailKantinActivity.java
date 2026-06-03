@@ -39,7 +39,6 @@ public class DetailKantinActivity extends AppCompatActivity {
     private boolean isErrorShown = false;
     private boolean canteenIsOpen = true;
 
-    // List untuk menyimpan data menu asli
     private List<MenuListResponse.MenuItem> originalMenuList = new ArrayList<>();
 
     @Override
@@ -109,13 +108,15 @@ public class DetailKantinActivity extends AppCompatActivity {
             }
         }
 
-        // Cek apakah hasil pencarian kosong
+        filteredList.sort((a, b) -> {
+            if (a.isAvailable() != b.isAvailable()) return a.isAvailable() ? -1 : 1;
+            return Double.compare(b.getAverageRating(), a.getAverageRating());
+        });
+
         if (filteredList.isEmpty()) {
-            // Jika kosong: sembunyikan RecyclerView, tampilkan pesan kosong
             rvMenu.setVisibility(View.GONE);
             tvMenuKosong.setVisibility(View.VISIBLE);
         } else {
-            // Jika ada menu: tampilkan RecyclerView, sembunyikan pesan kosong
             rvMenu.setVisibility(View.VISIBLE);
             tvMenuKosong.setVisibility(View.GONE);
         }
@@ -185,7 +186,12 @@ public class DetailKantinActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<MenuListResponse> call, Response<MenuListResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    originalMenuList = response.body().getData();
+                    List<MenuListResponse.MenuItem> rawList = response.body().getData();
+                    rawList.sort((a, b) -> {
+                        if (a.isAvailable() != b.isAvailable()) return a.isAvailable() ? -1 : 1;
+                        return Double.compare(b.getAverageRating(), a.getAverageRating());
+                    });
+                    originalMenuList = rawList;
                     menuAdapter = new MenuAdapter(DetailKantinActivity.this, originalMenuList, canteenIsOpen);
                     rvMenu.setAdapter(menuAdapter);
 

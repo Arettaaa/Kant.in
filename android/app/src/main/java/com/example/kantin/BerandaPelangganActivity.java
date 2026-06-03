@@ -46,7 +46,6 @@ public class BerandaPelangganActivity extends AppCompatActivity {
     private TextView tvHaloUser;
     private TextView tvBadgeKeranjang;
 
-    // Pastikan BASE_URL sesuai dengan link Ngrok aktif
     private final String BASE_URL_STORAGE = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/";
 
     private List<MenuListResponse.MenuItem> cachedMenus = new ArrayList<>();
@@ -149,7 +148,6 @@ public class BerandaPelangganActivity extends AppCompatActivity {
         navProfil.setOnClickListener(v -> startActivity(new Intent(this, ProfilPelangganActivity.class)));
     }
 
-    // --- FUNGSI UNTUK MENGUBAH WARNA CHIP AKTIF & INAKTIF ---
     private void updateKategoriUI(CardView activeChip) {
         CardView[] allChips = {chipSemua, chipMakanan, chipMinuman, chipCemilan};
 
@@ -160,12 +158,12 @@ public class BerandaPelangganActivity extends AppCompatActivity {
             TextView text = (TextView) layout.getChildAt(1);
 
             if (chip == activeChip) {
-                // Style Aktif: Background Oranye, Teks & Ikon Putih
+                // Style Aktif
                 chip.setCardBackgroundColor(android.graphics.Color.parseColor("#F97316"));
                 icon.setColorFilter(android.graphics.Color.parseColor("#FFFFFF"));
                 text.setTextColor(android.graphics.Color.parseColor("#FFFFFF"));
             } else {
-                // Style Tidak Aktif: Background Putih, Ikon Oranye, Teks Abu-abu
+                // Style Tidak Aktif
                 chip.setCardBackgroundColor(android.graphics.Color.parseColor("#FFFFFF"));
                 icon.setColorFilter(android.graphics.Color.parseColor("#F97316"));
                 text.setTextColor(android.graphics.Color.parseColor("#4B5563"));
@@ -299,10 +297,8 @@ public class BerandaPelangganActivity extends AppCompatActivity {
     }
 
     private void fetchCartCount() {
-        // Ambil token dari SessionManager
-        String token = sessionManager.getToken(); // Pastikan method ini sesuai dengan SessionManager kamu
+        String token = sessionManager.getToken();
 
-        // Gunakan getAuthClient(token), JANGAN getClient()
         ApiService apiService = ApiClient.getAuthClient(token).create(ApiService.class);
 
         apiService.getCart().enqueue(new Callback<CartResponse>() {
@@ -326,7 +322,6 @@ public class BerandaPelangganActivity extends AppCompatActivity {
 
                     Log.d("DEBUG_BADGE", "Total item yang dihitung untuk badge: " + totalItems);
 
-                    // Update UI
                     if (totalItems > 0) {
                         tvBadgeKeranjang.setText(String.valueOf(totalItems));
                         tvBadgeKeranjang.setVisibility(View.VISIBLE);
@@ -427,12 +422,10 @@ public class BerandaPelangganActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateProfileUI();
-        // Reset kategori ke "Semua" setiap kali user kembali ke Beranda
         if (chipSemua != null) {
             updateKategoriUI(chipSemua);
         }
 
-        // Panggil fungsi ini agar badge keranjang selalu update!
         fetchCartCount();
     }
 

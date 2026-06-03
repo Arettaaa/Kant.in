@@ -62,7 +62,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
             firstName = fullName;
         }
         tvShopName.setText(firstName != null ? firstName : "Admin");
-        // Foto profil
         ImageView ivFotoAdmin = findViewById(R.id.iv_shop_icon);
         String BASE_URL_STORAGE = "https://nonephemerally-nonrevolving-judie.ngrok-free.dev/storage/";
         String path = sessionManager.getPhotoUrl();
@@ -74,7 +73,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
         apiService = ApiClient.getAuthClient(token).create(ApiService.class);
 
-        // Setup ViewPager2 + Tab
         AdminPagerAdapter pagerAdapter = new AdminPagerAdapter(this);
         viewPager.setAdapter(pagerAdapter);
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {

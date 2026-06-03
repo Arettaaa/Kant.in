@@ -35,11 +35,10 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Menyembunyikan Action Bar bawaan agar tampilan lebih bersih
         if (getSupportActionBar() != null) getSupportActionBar().hide();
         setContentView(R.layout.activity_login);
 
-        // 1. Inisialisasi SessionManager
+        // Inisialisasi SessionManager
         sessionManager = new SessionManager(this);
 
         // Memeriksa status login sebelumnya (Auto-Login)
@@ -50,10 +49,8 @@ public class LoginActivity extends AppCompatActivity {
         // 2. Inisialisasi View
         initViews();
 
-        // 3. Fitur Buka/Tutup Password (Mata)
         ivTogglePassword.setOnClickListener(v -> togglePassword());
 
-        // 4. Logika Tombol Login
         btnLogin.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
@@ -63,7 +60,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        // 5. Navigasi ke Register & Lupa Password
         tvRegister.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
         tvForgotPassword.setOnClickListener(v -> startActivity(new Intent(this, LupaPasswordActivity.class)));
     }
@@ -135,7 +131,7 @@ public class LoginActivity extends AppCompatActivity {
                     }
 
                 } else if (response.code() == 403) {
-                    tampilkanDialogMenungguValidasi(); // Sudah ada tapi belum dipanggil!
+                    tampilkanDialogMenungguValidasi();
 
                 } else {
                     tampilkanDialogError("Login Gagal", "Email atau password salah.");
@@ -185,8 +181,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void pindahKeBeranda() {
-        // Karena session hanya disimpan jika sudah Aktif/Pelanggan,
-        // kita cukup cek role-nya saja di sini.
         if (sessionManager.isAdminKantin()) {
             startActivity(new Intent(LoginActivity.this, AdminDashboardActivity.class));
         } else {

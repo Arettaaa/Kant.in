@@ -18,7 +18,6 @@ public class RatingCheckResponse {
         @SerializedName("has_rated")
         private boolean hasRated;
 
-        // Nilai rating 1-5, 0 kalau belum pernah rating
         @SerializedName("rating")
         private int rating;
 

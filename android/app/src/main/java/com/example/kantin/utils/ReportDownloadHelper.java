@@ -12,13 +12,11 @@ public class ReportDownloadHelper {
 
     public static void downloadLaporan(Context context, String format, String startDate, String endDate, String canteenId, String token) {
 
-        // 1. Siapkan URL
         String url = ApiClient.BASE_URL + "canteens/" + canteenId + "/export" +
                 "?format=" + format +
                 "&start_date=" + startDate +
                 "&end_date=" + endDate;
 
-        // 2. Siapkan Request
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
         request.addRequestHeader("Authorization", "Bearer " + token);
         String acceptHeader = format.equals("pdf")
@@ -26,17 +24,14 @@ public class ReportDownloadHelper {
                 : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         request.addRequestHeader("Accept", acceptHeader);
 
-        // 3. Nama File
         String ext = format.equals("pdf") ? ".pdf" : ".xlsx";
         String fileName = "Laporan_Kantin_" + startDate.replace("-", "") + "_sd_" + endDate.replace("-", "") + ext;
 
-        // 4. Tampilan Notifikasi & Lokasi Simpan
         request.setTitle("Laporan Penjualan Kant.in");
         request.setDescription("Mengunduh " + fileName);
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
 
-        // 5. Eksekusi
         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         if (manager != null) {
             manager.enqueue(request);

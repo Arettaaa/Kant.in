@@ -2,10 +2,6 @@ package com.example.kantin.model.response;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * OrderDetailResponse — untuk GET /canteens/{id}/orders (single order)
- * Struktur data sama persis dengan OrderListResponse.OrderItem
- */
 public class OrderDetailResponse {
 
     @SerializedName("success")

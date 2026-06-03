@@ -26,7 +26,6 @@ public class OrderItem implements Serializable {
     @SerializedName("subtotal")
     private int subtotal;
 
-    // --- GETTER ---
     public String getMenuId() {
         return menuId;
     }

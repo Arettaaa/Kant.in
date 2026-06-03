@@ -38,7 +38,7 @@ public class ExploreMenuAdapter extends RecyclerView.Adapter<ExploreMenuAdapter.
     }
 
     public void filter(String query, String category) {
-        List<MenuListResponse.MenuItem> filtered = new ArrayList<>(); // ← list baru
+        List<MenuListResponse.MenuItem> filtered = new ArrayList<>();
         for (MenuListResponse.MenuItem menu : listOriginal) {
             boolean matchSearch = menu.getName().toLowerCase().contains(query.toLowerCase());
             boolean matchCategory = category.equals("Semua") || category.equalsIgnoreCase(menu.getCategory());
@@ -46,7 +46,11 @@ public class ExploreMenuAdapter extends RecyclerView.Adapter<ExploreMenuAdapter.
                 filtered.add(menu);
             }
         }
-        listMenu = filtered; // ← replace sekaligus, bukan clear dulu
+        filtered.sort((a, b) -> {
+            if (a.isAvailable() != b.isAvailable()) return a.isAvailable() ? -1 : 1;
+            return Double.compare(b.getAverageRating(), a.getAverageRating());
+        });
+        listMenu = filtered;
         notifyDataSetChanged();
     }
     @NonNull
@@ -72,7 +76,6 @@ public class ExploreMenuAdapter extends RecyclerView.Adapter<ExploreMenuAdapter.
         }
         Glide.with(context).load(imageUrl).placeholder(R.drawable.makanan).into(holder.ivMenu);
 
-        // ← cukup ini, tidak ada fetch API di sini
         String canteenId = menu.getCanteenId();
         if (canteenId != null && canteenNameCache.containsKey(canteenId)) {
             holder.tvNamaKantin.setText(canteenNameCache.get(canteenId));
@@ -80,24 +83,47 @@ public class ExploreMenuAdapter extends RecyclerView.Adapter<ExploreMenuAdapter.
             holder.tvNamaKantin.setText("Memuat...");
         }
 
-        holder.itemView.setOnClickListener(v -> {
-            String menuId = menu.getId();
-            if (menuId == null || menuId.isEmpty()) {
-                Toast.makeText(context, "ID menu tidak valid", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            Intent intent = new Intent(context, DetailMenuActivity.class);
-            intent.putExtra("MENU_ID", menuId);
-            context.startActivity(intent);
-        });
+        // Klik item
+        if (menu.isAvailable()) {
+            holder.itemView.setOnClickListener(v -> {
+                String menuId = menu.getId();
+                if (menuId == null || menuId.isEmpty()) {
+                    Toast.makeText(context, "ID menu tidak valid", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Intent intent = new Intent(context, DetailMenuActivity.class);
+                intent.putExtra("MENU_ID", menuId);
+                context.startActivity(intent);
+            });
+        } else {
+            holder.itemView.setOnClickListener(null);
+        }
 
+        // Rating
         double rating = menu.getAverageRating();
         int totalReviews = menu.getTotalReviews();
-
         if (totalReviews > 0) {
             holder.tvRatingMenu.setText(String.format(Locale.getDefault(), "%.1f", rating));
         } else {
             holder.tvRatingMenu.setText("Baru");
+        }
+
+        if (!menu.isAvailable()) {
+            holder.itemView.setAlpha(0.5f);
+            holder.tvStatusExplore.setVisibility(View.VISIBLE);
+            holder.itemView.setBackgroundTintList(
+                    android.content.res.ColorStateList.valueOf(
+                            android.graphics.Color.parseColor("#E5E7EB")
+                    )
+            );
+        } else {
+            holder.itemView.setAlpha(1.0f);
+            holder.tvStatusExplore.setVisibility(View.GONE);
+            holder.itemView.setBackgroundTintList(
+                    android.content.res.ColorStateList.valueOf(
+                            android.graphics.Color.parseColor("#FDFDFD")
+                    )
+            );
         }
     }
     @Override
@@ -106,21 +132,30 @@ public class ExploreMenuAdapter extends RecyclerView.Adapter<ExploreMenuAdapter.
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivMenu;
         TextView tvNamaMenu, tvNamaKantin, tvHarga, tvRatingMenu;
+        TextView tvStatusExplore;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ivMenu       = itemView.findViewById(R.id.imgMenuExplore);
-            tvNamaMenu   = itemView.findViewById(R.id.tvNamaMenuExplore);
-            tvNamaKantin = itemView.findViewById(R.id.tvNamaKantinExplore);
-            tvHarga      = itemView.findViewById(R.id.tvHargaExplore);
-            tvRatingMenu = itemView.findViewById(R.id.tvRatingExplore);
+            ivMenu          = itemView.findViewById(R.id.imgMenuExplore);
+            tvNamaMenu      = itemView.findViewById(R.id.tvNamaMenuExplore);
+            tvNamaKantin    = itemView.findViewById(R.id.tvNamaKantinExplore);
+            tvHarga         = itemView.findViewById(R.id.tvHargaExplore);
+            tvRatingMenu    = itemView.findViewById(R.id.tvRatingExplore);
+            tvStatusExplore = itemView.findViewById(R.id.tvStatusExplore);
         }
     }
 
     public void updateData(List<MenuListResponse.MenuItem> newData) {
-        this.listOriginal = new ArrayList<>(newData);
-        this.listMenu = new ArrayList<>(newData);
-        // Prefetch semua canteen name sekaligus
+        List<MenuListResponse.MenuItem> sorted = new ArrayList<>(newData);
+        sorted.sort((a, b) -> {
+            if (a.isAvailable() != b.isAvailable()) {
+                return a.isAvailable() ? -1 : 1;
+            }
+            return Double.compare(b.getAverageRating(), a.getAverageRating());
+        });
+
+        this.listOriginal = sorted;
+        this.listMenu = new ArrayList<>(sorted);
         for (MenuListResponse.MenuItem menu : newData) {
             String canteenId = menu.getCanteenId();
             if (canteenId != null && !canteenNameCache.containsKey(canteenId)) {

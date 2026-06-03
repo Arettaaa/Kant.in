@@ -18,7 +18,6 @@ public class CartResponse {
     public String getMessage() { return message; }
     public CartData getData() { return data; }
 
-    // ── CartData ──────────────────────────────────────────────
     public static class CartData {
         @SerializedName("_id")
         private String id;
@@ -34,7 +33,6 @@ public class CartResponse {
         public List<CanteenCart> getCanteens() { return canteens; }
     }
 
-    // ── CanteenCart ───────────────────────────────────────────
     public static class CanteenCart {
         @SerializedName("canteen_id")
         private String canteenId;
@@ -54,7 +52,6 @@ public class CartResponse {
         public double getSubtotal() { return subtotal; }
     }
 
-    // ── CartItem ──────────────────────────────────────────────
     public static class CartItem {
         @SerializedName("menu_id")
         private String menuId;
@@ -77,7 +74,6 @@ public class CartResponse {
         private String canteenId;
         private String canteenName;
 
-        // ← TAMBAH INI
         private String notes;
 
         public String getMenuId()    { return menuId; }
@@ -92,7 +88,6 @@ public class CartResponse {
         public String getCanteenId()                   { return canteenId; }
         public String getCanteenName()                 { return canteenName; }
 
-        // ← TAMBAH INI
         public String getNotes()              { return notes; }
         public void setNotes(String notes)    { this.notes = notes; }
     }

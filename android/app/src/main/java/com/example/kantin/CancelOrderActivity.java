@@ -19,7 +19,7 @@ public class CancelOrderActivity extends AppCompatActivity {
     private TextView tvOrderId, tvCustomerName, tvTime;
     private RecyclerView rvOrderItems;
 
-    private OrderModel orderData; // Menyimpan data pesanan yang dikirim dari DetailPesanan
+    private OrderModel orderData; // simpan data
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +39,13 @@ public class CancelOrderActivity extends AppCompatActivity {
 
         rvOrderItems = findViewById(R.id.rv_order_items);
         rvOrderItems.setLayoutManager(new LinearLayoutManager(this));
-        // Mencegah scroll ganda jika RecyclerView berada di dalam NestedScrollView
+        // biar cegah scroll ganda jika RecyclerView
         rvOrderItems.setNestedScrollingEnabled(false);
     }
 
     private void getIntentData() {
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("ORDER_DATA")) {
-            // Menangkap objek OrderModel yang dikirim dari DetailPesanan
             orderData = (OrderModel) intent.getSerializableExtra("ORDER_DATA");
 
             if (orderData != null) {
@@ -71,7 +70,7 @@ public class CancelOrderActivity extends AppCompatActivity {
             tvTime.setText("-");
         }
 
-        // 4. Set Daftar Menu ke RecyclerView
+        // 4. Set Daftar Menu
         if(orderData.getItems() != null && !orderData.getItems().isEmpty()){
             CancelOrderMenuAdapter adapter = new CancelOrderMenuAdapter(orderData.getItems());
             rvOrderItems.setAdapter(adapter);
@@ -79,7 +78,6 @@ public class CancelOrderActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        // Tombol kembali
         btnBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
     }
 }

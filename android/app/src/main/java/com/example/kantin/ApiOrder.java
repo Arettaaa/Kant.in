@@ -3,7 +3,7 @@ package com.example.kantin;
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
-public class ApiOrder { // <-- Nama class diubah jadi ApiOrder
+public class ApiOrder {
 
     @SerializedName("_id")
     private String id;
@@ -29,7 +29,6 @@ public class ApiOrder { // <-- Nama class diubah jadi ApiOrder
     @SerializedName("items")
     private List<OrderItem> items;
 
-    // --- GETTERS ---
     public String getId() { return id; }
     public String getOrderCode() { return orderCode; }
     public int getTotalAmount() { return totalAmount; }
@@ -42,9 +41,8 @@ public class ApiOrder { // <-- Nama class diubah jadi ApiOrder
     // --- SETTER ---
     public void setStatus(String status) { this.status = status; }
 
-    // =========================================================
     // INNER CLASSES
-    // =========================================================
+
 
     public static class CustomerSnapshot {
         @SerializedName("name")

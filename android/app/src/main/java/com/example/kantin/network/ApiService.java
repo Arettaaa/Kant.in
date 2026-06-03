@@ -47,29 +47,9 @@ import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-/**
- * ApiService — semua endpoint yang dipakai Admin Kantin.
- * Disesuaikan dengan controller Laravel yang sebenarnya.
- */
 public interface ApiService {
-
-    // ================================================================
-    // 1. AUTENTIKASI — AuthController
-    // ================================================================
-
-    /**
-     * Login → dapat token
-     * POST /api/auth/sessions
-     * Response: { message, token, user } — FLAT, tidak ada wrapper success/data
-     */
     @POST("auth/sessions")
     Call<LoginResponse> login(@Body LoginRequest request);
-
-    /**
-     * Logout → hapus token di server
-     * DELETE /api/auth/sessions
-     * Response: { message }
-     */
     @DELETE("auth/sessions")
     Call<BaseResponse> logout();
 
@@ -78,21 +58,11 @@ public interface ApiService {
 
     @POST("auth/reset-password")
     Call<BaseResponse> resetPassword(@Body ResetPasswordRequest request);
-
-    /**
-     * Register Admin Kantin
-     * POST /api/auth/register
-     * Response: { message, user } — TANPA token (harus tunggu approve)
-     */
     @POST("auth/register")
     Call<RegisterResponse> registerPelanggan(@Body RegisterPelangganRequest request);
 
     @POST("auth/register")
     Call<BaseResponse> registerAdminKantin(@Body RegisterAdminKantinRequest request);
-
-
-    //    @POST("auth/register")
-    //    Call<BaseResponse> registerAdminKantin(@Body RegisterAdminKantinRequest request);
 
     // 1. Daftar Kantin
     @GET("canteens")
@@ -113,16 +83,6 @@ public interface ApiService {
     // Detail menu by ID
     @GET("menus/{menuId}")
     Call<MenuDetailResponse> getMenuDetail(@Path("menuId") String menuId);
-
-    // ================================================================
-    // 2. MENU — MenuController
-    // ================================================================
-
-    /**
-     * Lihat semua menu kantin
-     * GET /api/canteens/{canteenId}/menus
-     * Support query: ?search=keyword&category=makanan
-     */
     @GET("canteens/{canteenId}/menus")
     Call<MenuListResponse> getMenus(
             @Path("canteenId") String canteenId,
@@ -130,15 +90,9 @@ public interface ApiService {
             @Query("category") String category   // nullable
     );
 
-    /** Lihat status ketersediaan semua menu */
     @GET("canteens/{canteenId}/menus/availabilities")
     Call<MenuListResponse> getMenuAvailabilities(@Path("canteenId") String canteenId);
 
-    /**
-     * Tambah menu baru
-     * POST /api/canteens/{canteenId}/menus
-     * Field: name*, description, price* (integer), category*, image (file), estimated_cooking_time
-     */
     @Multipart
     @POST("canteens/{canteenId}/menus")
     Call<MenuDetailResponse> addMenu(
@@ -151,13 +105,6 @@ public interface ApiService {
             @Part MultipartBody.Part image  // nullable — kirim null jika tidak ada foto
     );
 
-    /**
-     * Edit menu
-     * PUT /api/canteens/{canteenId}/menus/{menuId}
-     * Laravel tidak support PUT multipart → pakai POST + _method: PUT
-     */
-
-    // UPDATE MENU (Laravel butuh @POST + _method=PUT jika ada file Multipart)
     @Multipart
     @POST("canteens/{canteenId}/menus/{menuId}")
     Call<MenuDetailResponse> updateMenu(
@@ -173,52 +120,26 @@ public interface ApiService {
             @Part MultipartBody.Part image // Opsional jika foto diganti
     );
 
-    /**
-     * Toggle ketersediaan menu (available/unavailable)
-     * PUT /api/canteens/{canteenId}/menus/{menuId}/availabilities
-     * Body: { is_available: 0|1|true|false }
-     */
     @Multipart
     @POST("canteens/{canteenId}/menus/{menuId}/availabilities")
     Call<MenuDetailResponse> toggleMenuAvailability(
             @Path("canteenId") String canteenId,
             @Path("menuId") String menuId,
-            @Part("_method") RequestBody method,        // "PUT"
-            @Part("is_available") RequestBody isAvailable // "1" atau "0"
+            @Part("_method") RequestBody method,
+            @Part("is_available") RequestBody isAvailable
     );
 
-    /**
-     * Hapus menu
-     * DELETE /api/canteens/{canteenId}/menus/{menuId}
-     */
     @DELETE("canteens/{canteenId}/menus/{menuId}")
     Call<BaseResponse> deleteMenu(
             @Path("canteenId") String canteenId,
             @Path("menuId") String menuId
     );
-
-    // ================================================================
-    // 3. PESANAN — OrderController
-    // ================================================================
-
-    /**
-     * Lihat semua pesanan masuk di kantin
-     * GET /api/canteens/{canteenId}/orders
-     * Optional filter: ?status=pending|processing|ready|completed|cancelled
-     *
-     * Status order: pending | processing | ready | completed | cancelled
-     */
     @GET("canteens/{canteenId}/orders")
     Call<OrderListResponse> getOrders(
             @Path("canteenId") String canteenId,
-            @Query("status") String status  // nullable — null = semua status
+            @Query("status") String status
     );
 
-    /**
-     * Update status pesanan
-     * PUT /api/canteens/{canteenId}/orders/{orderId}/statuses
-     * Body: { status: "processing"|"ready"|"completed"|"cancelled" }
-     */
     @PUT("canteens/{canteenId}/orders/{orderId}/statuses")
     Call<BaseResponse> updateOrderStatus(
             @Path("canteenId") String canteenId,
@@ -226,37 +147,18 @@ public interface ApiService {
             @Body UpdateStatusOrderRequest request
     );
 
-    /**
-     * Verifikasi bukti pembayaran → status payment jadi "paid", order jadi "processing"
-     * POST /api/canteens/{canteenId}/orders/{orderId}/payments/verify
-     * Hanya bisa jika payment.status = "pending_verification"
-     */
     @POST("canteens/{canteenId}/orders/{orderId}/payments/verify")
     Call<BaseResponse> verifyPayment(
             @Path("canteenId") String canteenId,
             @Path("orderId") String orderId
     );
 
-    /**
-     * Tolak bukti pembayaran → status payment jadi "rejected", order jadi "cancelled"
-     * POST /api/canteens/{canteenId}/orders/{orderId}/payments/reject
-     */
     @POST("canteens/{canteenId}/orders/{orderId}/payments/reject")
     Call<BaseResponse> rejectPayment(
             @Path("canteenId") String canteenId,
             @Path("orderId") String orderId
     );
 
-    // ================================================================
-    // 4. KANTIN — CanteenController
-    // ================================================================
-
-    /**
-     * Toggle buka/tutup kantin
-     * PUT /api/canteens/{canteenId}/availability
-     * Body: { is_open: 0|1|true|false }
-     * Hanya bisa untuk kantinnya sendiri
-     */
     @Multipart
     @POST("canteens/{canteenId}/availability")
     Call<BaseResponse> toggleCanteenOpen(
@@ -265,24 +167,9 @@ public interface ApiService {
             @Part("is_open") RequestBody isOpen    // "1" atau "0"
     );
 
-    // ================================================================
-    // 5. PROFIL — ProfileController
-    // ================================================================
-
-    /**
-     * Lihat profil admin kantin
-     * GET /api/admin/profiles
-     * Response: { success, data: { _id, name, email, phone, role,
-     *             canteen_id, status, photo_profile, ... } }
-     */
     @GET("admin/profiles")
     Call<ProfileAdminResponse> getProfile();
 
-    /**
-     * Update profil admin kantin (nama, phone, foto)
-     * PUT /api/admin/profiles → pakai POST + _method: PUT karena ada file
-     * Field: name (sometimes), phone (sometimes), photo_profile (file, nullable)
-     */
     @Multipart
     @POST("admin/profiles")
     Call<ProfileAdminResponse> updateProfile(
@@ -291,42 +178,20 @@ public interface ApiService {
             @Part List<MultipartBody.Part> photoProfile  // kosong jika tidak ada foto baru
     );
 
-    /**
-     * Ganti password — pakai endpoint profil yang sama
-     * PUT /api/admin/profiles
-     * Field: password (min:8), password_confirmation
-     * Pakai Multipart juga karena endpoint sama
-     */
     @Multipart
     @POST("admin/profiles")
     Call<BaseResponse> updatePassword(
-            @Part("_method") String method,              // "PUT"
+            @Part("_method") String method,
             @Part("password") RequestBody password,
             @Part("password_confirmation") RequestBody passwordConfirmation
     );
 
-    // ================================================================
-    // 6. TRANSAKSI — TransactionController
-    // ================================================================
-
-    /**
-     * Laporan transaksi completed per kantin
-     * GET /api/canteens/{canteenId}/transactions
-     * Response: { success, data: { total_revenue, total_orders, orders: [...] } }
-     */
     @GET("canteens/{canteenId}/transactions")
     Call<TransactionListResponse> getTransactions(@Path("canteenId") String canteenId);
 
-    /**
-     * Dashboard per kantin — hanya admin global
-     * GET /api/canteens/{canteenId}/dashboard
-     */
     @GET("canteens/{canteenId}/dashboard")
     Call<DashboardResponse> getDashboard(@Path("canteenId") String canteenId);
 
-    // ================================================================
-    // FITUR PEMBELI (Prefix: buyers)
-    // ================================================================
 
 //    @POST("auth/register")
 //    Call<BaseResponse> register(@Body RegisterPelangganRequest request);
@@ -344,26 +209,21 @@ public interface ApiService {
 //    @DELETE("buyers/carts/items/{itemId}")
 //    Call<BaseResponse> removeFromCart(@Path("itemId") String itemId);
 
-    // GET cart
     @GET("buyers/carts")
     Call<CartResponse> getCart();
 
-    // POST add item
     @POST("buyers/carts/items")
     Call<CartResponse> addToCart(@Body AddToCartRequest request);
 
-    // PUT update quantity
     @PUT("buyers/carts/items/{itemId}")
     Call<CartResponse> updateCartItem(
             @Path("itemId") String itemId,
             @Body UpdateCartRequest request   // { "quantity": int }
     );
 
-    // DELETE remove item
     @DELETE("buyers/carts/items/{itemId}")
     Call<CartResponse> removeCartItem(@Path("itemId") String itemId);
 
-    /** 2. PESANAN (Order & Checkout) **/
 
     @Multipart
     @POST("buyers/checkouts")
@@ -396,11 +256,9 @@ public interface ApiService {
             @Field("rating") int rating
     );
 
-    // Cek apakah order sudah pernah dirating
     @GET("buyers/orders/{orderId}/ratings")
     Call<RatingCheckResponse> checkRating(@Path("orderId") String orderId);
 
-    /** 3. PROFIL (Pelanggan) **/
     @GET("buyers/profiles")
     Call<ProfileResponse> getBuyerProfile(@Header("Authorization") String token);
 

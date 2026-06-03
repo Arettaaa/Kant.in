@@ -2,23 +2,6 @@ package com.example.kantin.model.request;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * RegisterAdminKantinRequest — disesuaikan dengan AuthController@register
- *
- * Field yang diterima server:
- * - name (required)
- * - email (required, unique)
- * - password (required, min:6)
- * - phone (nullable)
- * - role (nullable, in:admin_kantin,pembeli)  ← "pembeli" BUKAN "buyer"
- * - canteen_name (required jika role=admin_kantin)
- *
- * Setelah register admin_kantin:
- * - Server buat Canteen baru dengan status "pending"
- * - User dibuat dengan status "pending"
- * - Tidak dapat token langsung — harus tunggu approve admin global
- * - Response: { message, user } — TANPA token
- */
 public class RegisterAdminKantinRequest {
 
     @SerializedName("name")
@@ -39,13 +22,13 @@ public class RegisterAdminKantinRequest {
     @SerializedName("canteen_name")
     private String canteenName;
 
-    @SerializedName("canteen_location")      // ← tambah
+    @SerializedName("canteen_location")
     private String canteenLocation;
 
-    @SerializedName("canteen_description")   // ← tambah
+    @SerializedName("canteen_description")
     private String canteenDescription;
 
-    @SerializedName("canteen_phone")         // ← tambah
+    @SerializedName("canteen_phone")
     private String canteenPhone;
 
     public RegisterAdminKantinRequest(String name, String email, String password,

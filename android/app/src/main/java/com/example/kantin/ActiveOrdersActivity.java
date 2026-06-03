@@ -57,7 +57,7 @@ public class ActiveOrdersActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadActiveOrders(); // Refresh setiap kali halaman aktif
+        loadActiveOrders();
     }
 
     private void loadActiveOrders() {
@@ -71,7 +71,7 @@ public class ActiveOrdersActivity extends AppCompatActivity {
                             List<OrderListResponse.OrderItem> allOrders = response.body().getData();
                             activeOrderList.clear();
 
-                            // Filter hanya pending, processing, ready
+                            // Filter  pending, processing, ready
                             for (OrderListResponse.OrderItem order : allOrders) {
                                 String status = order.getStatus();
                                 if ("pending".equals(status) || "processing".equals(status) || "ready".equals(status)) {

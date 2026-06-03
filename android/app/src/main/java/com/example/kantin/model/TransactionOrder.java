@@ -25,7 +25,6 @@ public class TransactionOrder {
     @SerializedName("payment")
     private Payment payment;
 
-    // Getter lama
     public String getId() { return id; }
     public String getOrderCode() { return orderCode; }
     public double getTotalAmount() { return totalAmount; }
@@ -38,7 +37,6 @@ public class TransactionOrder {
     public DeliveryDetails getDeliveryDetails() { return deliveryDetails; }
     public Payment getPayment() { return payment; }
 
-    // Inner classes
     public static class Customer {
         @SerializedName("name")
         public String name;

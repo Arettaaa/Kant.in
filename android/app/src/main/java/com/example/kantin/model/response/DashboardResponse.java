@@ -2,10 +2,6 @@ package com.example.kantin.model.response;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * DashboardResponse — untuk GET /canteens/{id}/dashboard
- * Struktur disesuaikan nanti setelah endpoint tersedia.
- */
 public class DashboardResponse {
 
     @SerializedName("success")

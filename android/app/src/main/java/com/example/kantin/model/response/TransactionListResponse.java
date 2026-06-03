@@ -20,7 +20,6 @@ public class TransactionListResponse {
         return data;
     }
 
-    // Inner class untuk membungkus object "data"
     public static class Data {
         @SerializedName("total_revenue")
         private double totalRevenue;

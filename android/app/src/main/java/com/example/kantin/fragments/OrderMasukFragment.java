@@ -51,7 +51,7 @@ public class OrderMasukFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        fetchOrders(); // Auto refresh tiap kembali ke tab ini
+        fetchOrders();
     }
 
     private void fetchOrders() {

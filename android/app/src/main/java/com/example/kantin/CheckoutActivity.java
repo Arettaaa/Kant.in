@@ -68,7 +68,7 @@ public class CheckoutActivity extends AppCompatActivity {
     private TextView btnKonfirmasi, tvFileName;
     private TextView tvItemCount, tvSubtotal, tvOngkir, tvTotal;
     private CardView btnDownloadQris;
-    private ImageView ivQrisThumbnail;       // thumbnail QRIS di kartu
+    private ImageView ivQrisThumbnail;
     private Uri imageUri;
 
     private LinearLayout layoutAlamat;
@@ -76,8 +76,8 @@ public class CheckoutActivity extends AppCompatActivity {
     private String deliveryMethod;
 
     // ── State QRIS ─────────────────────────────────────────────
-    private String qrisUrl = null;           // URL dari API kantin
-    private Bitmap qrisBitmap = null;        // Bitmap cache untuk download
+    private String qrisUrl = null;
+    private Bitmap qrisBitmap = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,8 +109,6 @@ public class CheckoutActivity extends AppCompatActivity {
         layoutAlamat        = findViewById(R.id.layoutAlamat);
         etAlamat            = findViewById(R.id.etAlamat);
 
-        // Thumbnail QRIS di dalam layout kartu QRIS
-        // Pastikan ImageView ini ada di activity_checkout.xml dengan id ivQrisThumbnail
         ivQrisThumbnail     = findViewById(R.id.ivQrisThumbnail);
     }
 
@@ -121,7 +119,7 @@ public class CheckoutActivity extends AppCompatActivity {
         }
     }
 
-    // ── Fetch QRIS URL dari API ────────────────────────────────
+    // ── Fetch QRIS URL dari API
 
     private void fetchQrisFromApi() {
         String canteenId = getIntent().getStringExtra("CANTEEN_ID");
@@ -156,11 +154,6 @@ public class CheckoutActivity extends AppCompatActivity {
                     }
                 });
     }
-
-    /**
-     * Load thumbnail QRIS ke ImageView di kartu, sekaligus cache Bitmap-nya
-     * agar bisa dipakai untuk download tanpa fetch ulang.
-     */
     private void loadQrisThumbnail() {
         if (qrisUrl == null || ivQrisThumbnail == null) return;
 
@@ -177,17 +170,15 @@ public class CheckoutActivity extends AppCompatActivity {
 
                     @Override
                     public void onLoadCleared(Drawable placeholder) {
-                        // no-op
                     }
                 });
     }
 
-    // ── Setup listeners ────────────────────────────────────────
 
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
 
-        // Tombol mata → preview fullscreen dialog
+        // Tombol mata
         btnDownloadQris.setOnClickListener(v -> showQrisDialog());
 
         // Upload bukti bayar
@@ -551,7 +542,6 @@ public class CheckoutActivity extends AppCompatActivity {
         }
     }
 
-    // ── Helpers ────────────────────────────────────────────────
 
     private void resetTombolKonfirmasi() {
         btnKonfirmasi.setText("Konfirmasi Pembayaran");

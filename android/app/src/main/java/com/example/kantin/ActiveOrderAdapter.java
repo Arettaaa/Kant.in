@@ -41,6 +41,7 @@ public class ActiveOrderAdapter extends RecyclerView.Adapter<ActiveOrderAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final OrderListResponse.OrderItem order = orderList.get(position);
+
         // Order code & total
         holder.tvOrderCode.setText(order.getOrderCode());
         holder.tvTotalBayar.setText(formatRupiah(order.getTotalAmount()));
@@ -48,7 +49,7 @@ public class ActiveOrderAdapter extends RecyclerView.Adapter<ActiveOrderAdapter.
         // Tanggal
         holder.tvTanggal.setText(formatTanggal(order.getCreatedAt()));
 
-        // Nama menu (gabungkan semua item)
+        // Nama menu
         if (order.getItems() != null && !order.getItems().isEmpty()) {
             StringBuilder menuNames = new StringBuilder();
             for (int i = 0; i < order.getItems().size(); i++) {
@@ -59,15 +60,13 @@ public class ActiveOrderAdapter extends RecyclerView.Adapter<ActiveOrderAdapter.
             holder.tvNamaMenu.setText(menuNames.toString());
         }
 
-        // Nama kantin — sementara pakai canteen_id, nanti bisa diganti nama kantin
+        // Nama kantin
         holder.tvNamaKantin.setText(order.getCanteenName() != null ? order.getCanteenName() : "Kantin");
 
-        // Update step tracker berdasarkan status
         updateStepTracker(holder, order.getStatus(), order);
     }
 
     private void updateStepTracker(ViewHolder holder, String status, OrderListResponse.OrderItem order) {
-        // Reset semua ke abu-abu dulu
         setStepInactive(holder.iconMenunggu, holder.tvMenunggu);
         setStepInactive(holder.iconDimasak, holder.tvDimasak);
         setStepInactive(holder.iconSiap, holder.tvSiap);
@@ -97,7 +96,6 @@ public class ActiveOrderAdapter extends RecyclerView.Adapter<ActiveOrderAdapter.
                 holder.line2.setBackgroundColor(0xFFF97316);
                 holder.tvStatusText.setText("Pesanan siap diambil!");
 
-                // Tampilkan tombol konfirmasi
                 holder.btnKonfirmasiTerima.setVisibility(View.VISIBLE);
                 holder.btnKonfirmasiTerima.setOnClickListener(v -> {
                     holder.btnKonfirmasiTerima.setEnabled(false);
@@ -201,8 +199,3 @@ public class ActiveOrderAdapter extends RecyclerView.Adapter<ActiveOrderAdapter.
         }
     }
 }
-
-
-//pending → masih nunggu verifikasi (user sudah di halaman ValidasiAdmin)
-//processing → sudah diverifikasi, sedang dimasak
-//ready → siap diambil

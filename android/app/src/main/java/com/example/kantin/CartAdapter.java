@@ -79,7 +79,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.etNoteItem.removeTextChangedListener((android.text.TextWatcher) holder.etNoteItem.getTag(R.id.tag_watcher));
         holder.etNoteItem.setText(item.getNotes() != null ? item.getNotes() : "");
 
-// ← TAMBAH WATCHER INI
         android.text.TextWatcher watcher = new android.text.TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -92,12 +91,9 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.etNoteItem.setTag(R.id.tag_watcher, watcher);
         holder.etNoteItem.addTextChangedListener(watcher);
 
-        // ==========================================
-        // LOGIKA GROUPING KANTIN ALA SHOPEE
-        // ==========================================
+        // LOGIKA GROUPING KANTIN
         boolean isFirstOfKantin = false;
 
-        // Cek apakah ini item pertama dari suatu kantin
         if (position == 0) {
             isFirstOfKantin = true;
         } else {
@@ -111,32 +107,25 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             holder.layoutHeaderKantin.setVisibility(View.VISIBLE);
             holder.tvNamaKantin.setText(item.getCanteenName());
 
-            // Set status checkbox header kantin
             boolean isAllKantinSelected = isAllItemsInKantinSelected(item.getCanteenId());
             holder.cbKantin.setOnCheckedChangeListener(null);
             holder.cbKantin.setChecked(isAllKantinSelected);
 
-            // Aksi kalau checkbox header kantin diklik
             holder.cbKantin.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 selectAllItemsInKantin(item.getCanteenId(), isChecked);
             });
         } else {
-            // Sembunyikan header jika bukan item pertama di kantin tersebut
             holder.layoutHeaderKantin.setVisibility(View.GONE);
         }
-        // ==========================================
 
-        // Set state checkbox item
         holder.cbSelectItem.setOnCheckedChangeListener(null);
         holder.cbSelectItem.setChecked(selectedStates.get(position));
         holder.cbSelectItem.setOnCheckedChangeListener((buttonView, isChecked) -> {
             selectedStates.set(position, isChecked);
-            // Paksa adapter refresh untuk mengupdate status centang Header Kantin
             notifyItemRangeChanged(0, items.size());
             listener.onSelectionChanged();
         });
 
-        // Gambar
         String imageUrl = item.getImage();
         if (imageUrl != null && !imageUrl.startsWith("http")) {
             imageUrl = BASE_URL_STORAGE + imageUrl;
@@ -153,7 +142,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         });
     }
 
-    // --- HELPER UNTUK CHECKBOX KANTIN ---
     private boolean isAllItemsInKantinSelected(String canteenId) {
         for (int i = 0; i < items.size(); i++) {
             if (items.get(i).getCanteenId().equals(canteenId)) {
@@ -174,7 +162,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         notifyDataSetChanged(); // Refresh UI
         listener.onSelectionChanged(); // Hitung ulang total bayar
     }
-    // -------------------------------------
 
     public double getSelectedSubtotal() {
         double total = 0;
@@ -250,7 +237,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         ImageView imgMenu;
         TextView tvNama, tvHarga, tvQty, btnPlus, btnMinus, tvNamaKantin;
         LinearLayout layoutHeaderKantin;
-        EditText etNoteItem; // ← TAMBAH INI
+        EditText etNoteItem;
 
         CartViewHolder(@NonNull View itemView) {
             super(itemView);

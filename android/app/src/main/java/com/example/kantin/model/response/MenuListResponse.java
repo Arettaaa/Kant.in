@@ -35,7 +35,6 @@ public class MenuListResponse extends BaseResponse {
         @SerializedName("estimated_cooking_time")
         private String estimatedCookingTime;
 
-        // ── Rating fields ──────────────────────────────────────
         @SerializedName("average_rating")
         private double averageRating;
 
