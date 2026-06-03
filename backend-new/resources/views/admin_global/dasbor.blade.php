@@ -190,36 +190,54 @@
                 </div>
             </div>
 
-            <div class="bg-white p-10 rounded-[44px] border border-gray-100 shadow-sm text-start">
-                <div class="flex justify-between items-center mb-10 text-start">
-                    <div class="text-start">
-                        <h3 class="text-xl font-black text-gray-900 uppercase tracking-tighter text-start">Kantin
-                            Performa Terbaik</h3>
-                        <p class="text-xs text-gray-400 font-bold mt-1 uppercase tracking-widest text-start">Volume
-                            penjualan berdasarkan total pesanan selesai</p>
-                    </div>
-                   <div class="relative" id="dashDateContainer">
-                    <div onclick="toggleDashDate()"
-                        class="flex items-center gap-2 px-5 py-2.5 bg-orange-50 text-[#FF6900] rounded-full text-[10px] font-black tracking-widest uppercase border border-orange-100 cursor-pointer select-none">
-                        {{ $labelPeriode }}
-                        <i class="fa-solid fa-chevron-down text-[10px]" id="dashChevron"></i>
-                    </div>
-                    <div id="dashDateDropdown"
-                        class="hidden absolute top-full right-0 mt-2 w-44 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 py-2">
-                        <a href="?periode=hari" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Hari Ini</a>
-                        <a href="?periode=minggu" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Minggu Ini</a>
-                        <a href="?periode=bulan" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Bulan Ini</a>
-                        <a href="?periode=bulan_lalu" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Bulan Lalu</a>
-                        <a href="?periode=tahun" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Tahun Ini</a>
-                        <a href="?periode=tahun_lalu" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Tahun Lalu</a>
-                        <a href="?periode=semua" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Semua Periode</a>
-                    </div>
+         <div class="bg-white p-10 rounded-[44px] border border-gray-100 shadow-sm text-start">
+    <div class="flex justify-between items-center mb-10 text-start">
+        <div class="text-start">
+            <h3 class="text-xl font-black text-gray-900 uppercase tracking-tighter">Kantin Performa Terbaik</h3>
+            <p class="text-xs text-gray-400 font-bold mt-1 uppercase tracking-widest">Volume penjualan berdasarkan total pesanan selesai</p>
+        </div>
+        <div class="flex items-center gap-3">
+            {{-- Toggle Chart --}}
+            <div class="flex gap-1.5">
+                <button id="btnBar" onclick="switchChart('bar')"
+                    class="w-9 h-9 rounded-xl border flex items-center justify-center text-sm transition-all border-orange-400 bg-orange-50 text-orange-500"
+                    title="Bar Chart">
+                    <i class="fa-solid fa-chart-bar"></i>
+                </button>
+                <button id="btnDonut" onclick="switchChart('donut')"
+                    class="w-9 h-9 rounded-xl border flex items-center justify-center text-sm transition-all border-gray-200 text-gray-400 hover:border-orange-300 hover:text-orange-400"
+                    title="Donut Chart">
+                    <i class="fa-solid fa-chart-pie"></i>
+                </button>
+            </div>
+            {{-- Filter Periode --}}
+            <div class="relative" id="dashDateContainer">
+                <div onclick="toggleDashDate()"
+                    class="flex items-center gap-2 px-5 py-2.5 bg-orange-50 text-[#FF6900] rounded-full text-[10px] font-black tracking-widest uppercase border border-orange-100 cursor-pointer select-none">
+                    {{ $labelPeriode }}
+                    <i class="fa-solid fa-chevron-down text-[10px]" id="dashChevron"></i>
                 </div>
-                </div>
-                <div class="h-[400px] w-full text-start">
-                    <canvas id="performanceChart"></canvas>
+                <div id="dashDateDropdown"
+                    class="hidden absolute top-full right-0 mt-2 w-44 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 py-2">
+                    <a href="?periode=hari" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Hari Ini</a>
+                    <a href="?periode=minggu" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Minggu Ini</a>
+                    <a href="?periode=bulan" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Bulan Ini</a>
+                    <a href="?periode=bulan_lalu" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Bulan Lalu</a>
+                    <a href="?periode=tahun" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Tahun Ini</a>
+                    <a href="?periode=tahun_lalu" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Tahun Lalu</a>
+                    <a href="?periode=semua" class="block px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-orange-50 hover:text-[#FF6900]">Semua Periode</a>
                 </div>
             </div>
+        </div>
+    </div>
+
+    {{-- Legend (muncul saat donut) --}}
+    <div id="chartLegend" class="hidden flex-wrap gap-x-5 gap-y-2 mb-6"></div>
+
+    <div class="h-[400px] w-full">
+        <canvas id="performanceChart"></canvas>
+    </div>
+</div>
 
         </div>
     </main>
@@ -227,111 +245,114 @@
 
 @push('scripts')
 <script>
-    // --- LOGIKA REAL TIME DATE ---
-    document.addEventListener('DOMContentLoaded', function() {
-        const dateElement = document.getElementById('realtimeDate');
-        const now = new Date();
-        const options = {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        };
-        dateElement.innerText = now.toLocaleDateString('id-ID', options);
+   const labelsData = {!! json_encode($chartLabels ?? []) !!};
+const chartDataArray = {!! json_encode($chartData ?? []) !!};
+const chartColors = ['#FF6900','#FFBD80','#FFD4A8','#FFE5CC','#FFF0E0'];
 
-        // --- CHART LOGIC DENGAN DATA DINAMIS ---
-        const ctx = document.getElementById('performanceChart').getContext('2d');
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, '#FF6900');
-        gradient.addColorStop(1, '#FF9F59');
+let currentChartType = 'bar';
+let chartInstance = null;
 
-        // Mengambil data JSON dari Controller
-        const labelsData = {!! json_encode($chartLabels ?? []) !!};
-        const chartDataArray = {!! json_encode($chartData ?? []) !!};
+function buildChart() {
+    if (chartInstance) chartInstance.destroy();
+    const ctx = document.getElementById('performanceChart').getContext('2d');
 
-        new Chart(ctx, {
+    if (currentChartType === 'bar') {
+        chartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: labelsData.length > 0 ? labelsData : ['Belum ada data'],
+                labels: labelsData.length ? labelsData : ['Belum ada data'],
                 datasets: [{
                     label: 'Total Pesanan Selesai',
-                    data: chartDataArray.length > 0 ? chartDataArray : [0],
-                    backgroundColor: [gradient, '#FFBD80', '#FFBD80', '#FFBD80', '#FFBD80'], // Item pertama (ranking 1) warnanya menyala
+                    data: chartDataArray.length ? chartDataArray : [0],
+                    backgroundColor: chartColors,
                     borderRadius: 12,
-                    barThickness: 60
+                    barThickness: 60,
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: {
-                            color: '#F3F4F6',
-                            drawBorder: false
-                        },
-                        ticks: {
-                            font: {
-                                weight: '800',
-                                size: 10
-                            },
-                            color: '#9CA3AF',
-                            stepSize: 1 // Supaya pesanan angkanya gak koma-koma di garis y-axis
-                        }
+                        grid: { color: '#F3F4F6', drawBorder: false },
+                        ticks: { font: { weight: '800', size: 10 }, color: '#9CA3AF', stepSize: 1 }
                     },
                     x: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                weight: '800',
-                                size: 11
-                            },
-                            color: '#4B5563'
+                        grid: { display: false },
+                        ticks: { font: { weight: '800', size: 11 }, color: '#4B5563' }
+                    }
+                }
+            }
+        });
+        document.getElementById('chartLegend').classList.add('hidden');
+        document.getElementById('chartLegend').classList.remove('flex');
+    } else {
+        chartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labelsData.length ? labelsData : ['Belum ada data'],
+                datasets: [{
+                    data: chartDataArray.length ? chartDataArray : [0],
+                    backgroundColor: chartColors,
+                    borderWidth: 0,
+                    hoverOffset: 10,
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                cutout: '62%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => {
+                                const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+                                const pct = total > 0 ? Math.round(ctx.parsed / total * 100) : 0;
+                                return ` ${ctx.parsed} pesanan (${pct}%)`;
+                            }
                         }
                     }
                 }
             }
         });
-    });
-
-            function toggleDashDate() {
-            const dd = document.getElementById('dashDateDropdown');
-            const ch = document.getElementById('dashChevron');
-            dd.classList.toggle('hidden');
-            ch.style.transform = dd.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-        }
-
-        window.addEventListener('click', function(e) {
-            const container = document.getElementById('dashDateContainer');
-            const dropdown  = document.getElementById('dashDateDropdown');
-            const chevron   = document.getElementById('dashChevron');
-            if (container && !container.contains(e.target)) {
-                if (dropdown) dropdown.classList.add('hidden');
-                if (chevron) chevron.style.transform = 'rotate(0deg)';
-            }
-        });
-
-    //dropdown bell
-    function toggleDropdown() {
-        const dd = document.getElementById('notifDropdown');
-        dd.classList.toggle('hidden');
+        const total = chartDataArray.reduce((a,b)=>a+b,0);
+        const legend = document.getElementById('chartLegend');
+        legend.classList.remove('hidden');
+        legend.classList.add('flex');
+        legend.innerHTML = labelsData.map((l,i) => `
+            <span style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#6B7280;">
+                <span style="width:10px;height:10px;border-radius:2px;background:${chartColors[i]};flex-shrink:0;"></span>
+                ${l}
+                <strong style="color:#111827;">${total > 0 ? Math.round(chartDataArray[i]/total*100) : 0}%</strong>
+            </span>`).join('');
     }
+}
 
-    window.addEventListener('click', function(e) {
-        const wrapper = document.getElementById('bellWrapper');
-        const dropdown = document.getElementById('notifDropdown');
-        if (wrapper && !wrapper.contains(e.target)) {
-            if (dropdown) dropdown.classList.add('hidden');
-        }
-    });
+function switchChart(type) {
+    currentChartType = type;
+    const btnBar   = document.getElementById('btnBar');
+    const btnDonut = document.getElementById('btnDonut');
+    const activeClass   = 'border-orange-400 bg-orange-50 text-orange-500';
+    const inactiveClass = 'border-gray-200 text-gray-400 hover:border-orange-300 hover:text-orange-400';
+    if (type === 'bar') {
+        btnBar.className   = `w-9 h-9 rounded-xl border flex items-center justify-center text-sm transition-all ${activeClass}`;
+        btnDonut.className = `w-9 h-9 rounded-xl border flex items-center justify-center text-sm transition-all ${inactiveClass}`;
+    } else {
+        btnDonut.className = `w-9 h-9 rounded-xl border flex items-center justify-center text-sm transition-all ${activeClass}`;
+        btnBar.className   = `w-9 h-9 rounded-xl border flex items-center justify-center text-sm transition-all ${inactiveClass}`;
+    }
+    buildChart();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // realtime date
+    const dateElement = document.getElementById('realtimeDate');
+    if (dateElement) {
+        dateElement.innerText = new Date().toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    }
+    buildChart();
+});
 </script>
 @endpush
 @endsection
