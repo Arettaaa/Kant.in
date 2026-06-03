@@ -47,10 +47,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         TransactionOrder order = orders.get(position);
         boolean isCancelled = "cancelled".equalsIgnoreCase(order.getStatus());
 
-        // --- Nama Pelanggan ---
         holder.tvNamaPelanggan.setText(order.getCustomerName());
 
-        // --- Kode Order + Jumlah Item ---
         int itemCount = order.getItemCount();
         String detailText = order.getOrderCode() + "  •  " + itemCount + " item";
         holder.tvDetailPesanan.setText(detailText);
@@ -59,11 +57,9 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             holder.tvJumlahItem.setVisibility(View.GONE);
         }
 
-        // --- Total Harga ---
         NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
         holder.tvTotalHarga.setText(nf.format(order.getTotalAmount()));
 
-        // --- STATUS & WARNA ---
         if (isCancelled) {
             holder.tvStatus.setText("DIBATALKAN");
             holder.tvStatus.setTextColor(Color.parseColor("#F44336"));
@@ -94,11 +90,9 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             holder.ivIcon.setImageResource(R.drawable.receipt_green);
         }
 
-        // --- Klik item → kirim semua data yang dibutuhkan DetaiTransaksiActivity ---
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(v.getContext(), DetaiTransaksiActivity.class);
 
-            // Data utama
             intent.putExtra("order_code",      order.getOrderCode());
             intent.putExtra("customer_name",   order.getCustomerName());
             intent.putExtra("status",          order.getStatus());
@@ -106,21 +100,18 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             intent.putExtra("total_amount",    order.getTotalAmount());
             intent.putExtra("subtotal_amount", order.getSubtotalAmount());
 
-            // Delivery fee
             double deliveryFee = 0;
             if (order.getDeliveryDetails() != null) {
                 deliveryFee = order.getDeliveryDetails().fee;
             }
             intent.putExtra("delivery_fee", deliveryFee);
 
-            // Payment method
             String paymentMethod = "";
             if (order.getPayment() != null && order.getPayment().method != null) {
                 paymentMethod = order.getPayment().method;
             }
             intent.putExtra("payment_method", paymentMethod);
 
-            // List item menu
             ArrayList<String>  itemNames     = new ArrayList<>();
             ArrayList<String>  itemPrices    = new ArrayList<>();
             ArrayList<Integer> itemQtys      = new ArrayList<>();

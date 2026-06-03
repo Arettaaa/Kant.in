@@ -15,12 +15,10 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        // Sembunyikan action bar
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
 
-        // Pindah ke MainActivity setelah 3 detik
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
