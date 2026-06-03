@@ -279,7 +279,7 @@
                                         </p>
                                     @endforeach
                                     @if($order->order_notes)
-                                        <p class="text-[11px] text-gray-400 italic mt-1">📝 {{ $order->order_notes }}</p>
+                                        <p class="text-[11px] text-gray-400 italic mt-1"><i class="fa-solid fa-note-sticky mr-1"></i> {{ $order->order_notes }}</p>
                                     @endif
                                 </div>
 
@@ -309,7 +309,14 @@
                     </div>
                 @else
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        @foreach($sedangDiproses as $order)
+                        @php
+                            // Mengurutkan koleksi agar status 'ready' berada di paling bawah
+                            $sortedDiproses = $sedangDiproses->sortBy(function($order) {
+                                return $order->status === 'ready' ? 1 : 0;
+                            });
+                        @endphp
+                        
+                        @foreach($sortedDiproses as $order)
                             <a href="{{ route('admin.pesanan.status', $order->_id) }}" class="card-order block"
                                 style="text-decoration:none;">
                                 {{-- Header card --}}
