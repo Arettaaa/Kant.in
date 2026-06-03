@@ -17,25 +17,26 @@ class PesananController extends Controller
         return (string) session('user')['canteen_id'];
     }
 
-    /**
-     * Halaman utama pesanan — tampil pesanan masuk & diproses.
-     */
+
     public function index()
     {
         $canteenId = $this->getCanteenId();
-        $canteen   = Canteen::find($canteenId);
+        $canteen = Canteen::find($canteenId);
 
         if (!$canteen) {
             abort(404, 'Kantin tidak ditemukan.');
         }
 
+
         $pesananMasuk = Order::where('canteen_id', $canteenId)
-            ->whereIn('status', [Order::STATUS_PENDING, 'processing'])
+            ->whereIn('status', [Order::STATUS_PENDING, 'processing', 'ready'])
             ->orderBy('created_at', 'desc')
             ->get();
 
         $menungguVerifikasi = $pesananMasuk->where('status', Order::STATUS_PENDING)->values();
-        $sedangDiproses     = $pesananMasuk->where('status', 'processing')->values();
+
+
+        $sedangDiproses = $pesananMasuk->whereIn('status', ['processing', 'ready'])->values();
 
         return view('admin.pesanan', compact(
             'canteen',
@@ -88,13 +89,13 @@ class PesananController extends Controller
             return back()->with('error', 'Pembayaran sudah diverifikasi sebelumnya.');
         }
 
-        $payment            = $order->payment;
-        $payment['status']  = 'paid';
+        $payment = $order->payment;
+        $payment['status'] = 'paid';
         $payment['paid_at'] = now()->toDateTimeString();
 
         $order->update([
             'payment' => $payment,
-            'status'  => 'processing',
+            'status' => 'processing',
         ]);
 
         // Redirect ke halaman status setelah terima
@@ -125,12 +126,12 @@ class PesananController extends Controller
             return back()->with('error', 'Pembayaran sudah diverifikasi sebelumnya.');
         }
 
-        $payment           = $order->payment;
+        $payment = $order->payment;
         $payment['status'] = 'rejected';
 
         $order->update([
             'payment' => $payment,
-            'status'  => Order::STATUS_CANCELLED,
+            'status' => Order::STATUS_CANCELLED,
         ]);
 
         // Redirect ke halaman cancel setelah tolak
@@ -143,14 +144,14 @@ class PesananController extends Controller
     public function toggleOpen(Request $request)
     {
         $canteenId = $this->getCanteenId();
-        $canteen   = Canteen::find($canteenId);
+        $canteen = Canteen::find($canteenId);
 
         if (!$canteen) {
             return response()->json(['success' => false, 'message' => 'Kantin tidak ditemukan.'], 404);
         }
 
         // Handle JSON boolean true/false maupun string "true"/"false"/"1"/"0"
-        $raw    = $request->input('is_open');
+        $raw = $request->input('is_open');
         $isOpen = filter_var($raw, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 
         if (is_null($isOpen)) {
