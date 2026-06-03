@@ -29,7 +29,6 @@
                 </div>
             </div>
             
-            {{-- Wrapper untuk Search & Button --}}
             <div class="flex items-center gap-4">
                 {{-- Search Bar --}}
                 <div class="relative group">
@@ -44,20 +43,17 @@
             </div>
         </div>
 
-        {{-- Flash message dengan efek transisi (dari Backend) --}}
         @if(session('success'))
         <div id="flashMessage" class="mx-10 mt-6 px-5 py-4 bg-green-50 border border-green-100 text-green-700 rounded-2xl font-semibold text-sm transition-opacity duration-500 ease-in-out opacity-100">
             {{ session('success') }}
         </div>
         @endif
 
-        {{-- Grid Menu Container --}}
         <div id="menuContainer" class="px-10 pb-10 mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 text-start relative">
 
             @forelse($menus as $menu)
             <div id="menu-{{ $menu['_id'] }}" class="menu-card bg-white rounded-[32px] p-5 shadow-sm border border-gray-100 flex gap-4 transition-all duration-300 {{ !$menu['is_available'] ? 'opacity-60 grayscale order-last' : '' }}">
 
-                {{-- Gambar menu --}}
                 @if(!empty($menu['image']))
                     <img src="{{ $menu['image'] }}" class="w-24 h-24 rounded-2xl object-cover flex-shrink-0" alt="{{ $menu['name'] }}">
                 @else
@@ -115,7 +111,7 @@
             </div>
             @endforelse
 
-            {{-- ELEMENT EMPTY STATE KHUSUS PENCARIAN (Disembunyikan secara default) --}}
+            {{-- ELEMENT EMPTY STATE KHUSUS PENCARIAN -}}
             <div id="searchEmptyState" class="hidden col-span-1 lg:col-span-2 flex-col items-center justify-center py-24 text-center">
                 <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                     <i class="fa-solid fa-magnifying-glass text-2xl text-gray-300"></i>
@@ -149,7 +145,6 @@
 
 @push('scripts')
 <script>
-    // ── Auto-hide Flash Message (Backend) ────────────────────────────────
     document.addEventListener('DOMContentLoaded', function() {
         const flashMsg = document.getElementById('flashMessage');
         if (flashMsg) {
@@ -160,7 +155,6 @@
         }
     });
 
-    // ── Fitur Pencarian Real-time (Live Search) ──────────────────────────
     const searchInput = document.getElementById('searchInput');
     const searchEmptyState = document.getElementById('searchEmptyState');
     const searchKeyword = document.getElementById('searchKeyword');
@@ -184,14 +178,12 @@
                 }
             });
 
-            // Update angka "Menu ditampilkan"
             document.getElementById('menuCount').innerText = visibleCount;
 
-            // Tampilkan "Empty State Pencarian" jika tidak ada hasil DAN ada kartu menu di database
             if (visibleCount === 0 && cards.length > 0) {
                 searchEmptyState.classList.remove('hidden');
                 searchEmptyState.classList.add('flex');
-                searchKeyword.innerText = this.value; // Tampilkan kata yang diketik
+                searchKeyword.innerText = this.value; 
             } else {
                 searchEmptyState.classList.add('hidden');
                 searchEmptyState.classList.remove('flex');
@@ -199,7 +191,6 @@
         });
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────
     function showNotification(message) {
         const notif = document.createElement('div');
         notif.className = 'mx-10 mt-6 px-5 py-4 bg-green-50 border border-green-100 text-green-700 rounded-2xl font-semibold text-sm transition-opacity duration-500 ease-in-out opacity-0';
@@ -220,7 +211,6 @@
         document.getElementById('menuCount').innerText = visibleCards.length;
     }
 
-    // ── Toggle Ketersediaan ──────────────────────────────────────────────
     function toggleMenuStatus(id) {
         const card     = document.getElementById('menu-' + id);
         const btn      = card.querySelector('.toggle-btn');
@@ -267,7 +257,6 @@
         .catch(() => alert('Terjadi kesalahan. Coba lagi.'));
     }
 
-    // ── Delete Modal ─────────────────────────────────────────────────────
     let menuIdToDelete = null;
 
     function openDeleteModal(id, name) {

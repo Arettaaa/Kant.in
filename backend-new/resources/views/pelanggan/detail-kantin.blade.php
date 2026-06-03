@@ -176,10 +176,17 @@
             <section class="menu-section" data-section="{{ strtolower($kategori) }}">
                 <h2 class="text-lg font-extrabold text-gray-900 mb-4">{{ $kategori }}</h2>
                 <div class="grid grid-cols-3 gap-4">
-                    @foreach($items as $menu)
-                    <a href="/menu/{{ $menu['_id'] }}"
-                        class="menu-item-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col"
-                        data-name="{{ strtolower($menu['name']) }}">
+                    @php
+                        $available = collect($items)->filter(fn($m) => $m['is_available'] ?? true)->values();
+                        $unavailable = collect($items)->filter(fn($m) => !($m['is_available'] ?? true))->values();
+                        $sortedItems = $available->merge($unavailable);
+                    @endphp
+
+                    @foreach($sortedItems as $menu)
+                        <a href="/menu/{{ $menu['_id'] }}"
+                            class="menu-item-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col
+                                {{ !($menu['is_available'] ?? true) ? 'opacity-50 grayscale pointer-events-none' : '' }}"
+                            data-name="{{ strtolower($menu['name']) }}">
 
                         <div class="w-full aspect-square overflow-hidden bg-gray-100">
                             @if(!empty($menu['image']))

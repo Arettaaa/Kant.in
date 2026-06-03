@@ -17,16 +17,18 @@ class DashboardController extends Controller
 
     public function index(Request $request)
     {
-        $token = Session::get('api_token');
+        $token   = Session::get('api_token');
+        $periode = $request->query('periode', 'bulan'); // tambah ini
 
         $response = Http::timeout(15)
             ->withToken($token)
-            ->get($this->apiUrl('/dashboard'));
+            ->get($this->apiUrl('/dashboard'), [
+                'periode' => $periode  // kirim ke API
+            ]);
 
         if ($response->successful()) {
             $data = $response->json('data');
-        
-        Session::put('pending_count', $data['kantinPending'] ?? 0);
+            Session::put('pending_count', $data['kantinPending'] ?? 0);
 
             return view('admin_global.dasbor', [
                 'totalPendapatan'   => $data['totalPendapatan'] ?? 0,
@@ -35,13 +37,27 @@ class DashboardController extends Controller
                 'kantinPending'     => $data['kantinPending'] ?? 0,
                 'chartLabels'       => $data['chartLabels'] ?? [],
                 'chartData'         => $data['chartData'] ?? [],
-                // TANGKAP PERSENTASENYA DISINI
                 'revenuePercentage' => $data['revenuePercentage'] ?? 0,
                 'revenueTrend'      => $data['revenueTrend'] ?? 'flat',
+                'labelPeriode'      => $this->getLabelPeriode($periode), // tambah ini
+                'periode'           => $periode,
             ]);
         }
 
-        return redirect()->route('admin.login')->withErrors('Sesi habis atau gagal memuat data dasbor dari API.');
+        return redirect()->route('admin.login')->withErrors('Sesi habis atau gagal memuat data.');
+    }
+
+    private function getLabelPeriode(string $periode): string
+    {
+        return match($periode) {
+            'hari'       => 'Hari Ini',
+            'minggu'     => 'Minggu Ini',
+            'bulan_lalu' => 'Bulan Lalu',
+            'tahun'      => 'Tahun Ini',
+            'tahun_lalu' => 'Tahun Lalu',
+            'semua'      => 'Semua Periode',
+            default      => 'Bulan Ini',
+        };
     }
 
     public function pengaturan()

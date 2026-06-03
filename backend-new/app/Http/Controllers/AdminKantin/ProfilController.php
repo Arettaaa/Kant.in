@@ -74,9 +74,7 @@ class ProfilController extends Controller
             'qris_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // ---------------------------------------------------------------
         // 2. UPDATE DATA PENGELOLA (ADMIN)
-        // ---------------------------------------------------------------
         $user = $this->getUser();
 
         // Gunakan assignment langsung agar menembus batas $fillable
@@ -110,10 +108,7 @@ class ProfilController extends Controller
         }
         session(['user' => $sessionUser]);
 
-
-        // ---------------------------------------------------------------
         // 3. UPDATE DATA KANTIN
-        // ---------------------------------------------------------------
         $canteenId = $user->canteen_id ?? session('user')['canteen_id'];
         $canteen = Canteen::find((string) $canteenId);
 
